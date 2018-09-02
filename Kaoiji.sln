@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kaoiji", "Kaoiji\Kaoiji.csproj", "{BF0544C1-D4B7-4C50-B3D1-660727ECEC57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kaoiji", "Kaoiji\Kaoiji.csproj", "{BF0544C1-D4B7-4C50-B3D1-660727ECEC57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugin\ExamplePlugin.csproj", "{E08BB75A-AB7B-4917-90D6-944A6C92D937}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BF0544C1-D4B7-4C50-B3D1-660727ECEC57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF0544C1-D4B7-4C50-B3D1-660727ECEC57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF0544C1-D4B7-4C50-B3D1-660727ECEC57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E08BB75A-AB7B-4917-90D6-944A6C92D937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E08BB75A-AB7B-4917-90D6-944A6C92D937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E08BB75A-AB7B-4917-90D6-944A6C92D937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E08BB75A-AB7B-4917-90D6-944A6C92D937}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
