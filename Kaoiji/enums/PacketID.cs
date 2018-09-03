@@ -1,6 +1,6 @@
 ﻿namespace Kaoiji.enums
 {
-    public enum PacketIDs:short
+    public enum PacketID : short
     {
         Client_SendUserStatus = 0,
         Client_SendIrcMessage = 1,

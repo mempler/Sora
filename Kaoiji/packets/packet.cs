@@ -7,40 +7,40 @@ namespace Kaoiji.packets
 {
     public class PacketWriter
     {
-        private BinaryWriter bw;
+        private BinaryWriter bw { get; }
+        
         public void Announce(string msg)
         {
-            using (MemoryStream s = new MemoryStream())
-            using (BinaryWriter bw = new BinaryWriter(s))
-            {
-                Packet p = new Packet(PacketIDs.Server_Announce, s);
-                Binary.WriteOsuString(msg, bw);
-                Packet.WritePacket(p, bw);
-            }
+            Packet p = new Packet(PacketID.Server_Announce);
+            Binary.WriteOsuString(msg, new BinaryWriter(p.Data));
+            p.Write(bw);
         }
     }
     public class Packet
     {
         public Stream Data { get; }
-        public PacketIDs ID;
-        public Packet(PacketIDs ID, Stream Data) { this.ID = ID; this.Data = Data; }
-        public Packet() { }
+        public PacketID ID;
 
-        public static void WritePacket(Packet p, BinaryWriter w)
+        public Packet(PacketID ID) { this.ID = ID; Data = new MemoryStream(); }
+        public Packet() { Data = new MemoryStream(); }
+
+        public override string ToString() => $"PacketID: {ID}. PacketLength: {Data.Length}.";
+
+        public void Write(BinaryWriter w)
         {
-            w.Write((short)p.ID);
+            w.Write((short)ID);
             w.Write((byte)0);
-            w.Write(p.Data == null ? 0 : p.Data.Length);
-            p.Data.CopyTo(w.BaseStream);
+            w.Write(Data == null ? 0 : Data.Length);
+            if (Data != null)
+                Data.CopyTo(w.BaseStream);
             w.Close();
         }
-        public static Packet ReadPacket(BinaryReader r)
+        public Packet Read(BinaryReader r)
         {
-            Packet p = new Packet();
-            p.ID = (PacketIDs)r.ReadInt16();
+            ID = (PacketID)r.ReadInt16();
             r.BaseStream.Position++;
-            r.BaseStream.CopyTo(p.Data, r.ReadInt32());
-            return p;
+            r.BaseStream.CopyTo(Data, r.ReadInt32());
+            return this;
         }
     }
 }
