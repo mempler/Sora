@@ -68,7 +68,8 @@ namespace Kaoiji
                         p.pMeta = pMeta;
                         Plugins.Add(p);
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                 }
@@ -80,7 +81,8 @@ namespace Kaoiji
                 {
                     Console.WriteLine($"Try to Enable \"{p.pMeta.Name}\"");
                     p.OnStart();
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                     p.OnStop();
@@ -92,7 +94,7 @@ namespace Kaoiji
         /// </summary>
         static void UnloadPlugins()
         {
-            for(int i = 0; i < Plugins.Count; i++)
+            for (int i = 0; i < Plugins.Count; i++)
             {
                 Plugin p = Plugins[i];
                 try

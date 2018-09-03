@@ -21,7 +21,7 @@ namespace Kaoiji.objects
 
     public class Presence
     {
-        private MemoryStream OutputStream;
+        public MemoryStream OutputStream { get; }
 
         public string Token;
 

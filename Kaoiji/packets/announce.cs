@@ -9,10 +9,10 @@ namespace Kaoiji.packets
             PacketData = Binary.WriteOsuString(null);
             PacketID = PacketIDs.Server_Announce;
         }
-
         public Announce(string msg) {
             PacketData = Binary.WriteOsuString(msg);
             PacketID = PacketIDs.Server_Announce;
         }
+        public byte[] WritePacket() => P2B(this);
     }
 }

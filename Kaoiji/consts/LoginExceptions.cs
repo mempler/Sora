@@ -2,10 +2,12 @@
 
 namespace Kaoiji.consts
 {
-    public class LoginExceptions : Exception
+    public static class LoginExceptions
     {
-        public static LoginExceptions INVALID_LOGIN_DATA = new LoginExceptions("Invalid Login Data!");
-
-        public LoginExceptions(string message) : base(message) { }
+        public static LoginException INVALID_LOGIN_DATA = new LoginException("Invalid Login Data!");
+    }
+    public class LoginException : Exception
+    {
+        public LoginException(string message) : base(message) { }
     }
 }

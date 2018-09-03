@@ -19,6 +19,6 @@ namespace Kaoiji
         public string Description;
         public double Version;
         public string Plugin;
-        public string[] Dependencies; 
+        public string[] Dependencies;
     }
 }

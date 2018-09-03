@@ -24,6 +24,9 @@ namespace Kaoiji.server
         public HttpServer(int port) => Port = port;
         public void Stop() => ShouldStop = true;
 
+        /// <summary>
+        /// Start the HTTPServer.
+        /// </summary>
         public Thread Run()
         {
             pool = new SmartThreadPool();
@@ -32,15 +35,20 @@ namespace Kaoiji.server
             return t;
         }
 
+        /// <summary>
+        /// Root page handler. "/"
+        /// </summary>
         private void Root(HttpListenerRequest r, HttpListenerResponse w)
         {
             w.StatusCode = 200;
             if (r.HttpMethod.ToUpper() != "POST")
             {
-                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Kaoiji.Resources.index.html"))
+                using (Stream stream = Assembly.GetExecutingAssembly()
+                                               .GetManifestResourceStream("Kaoiji.Resources.index.html"))
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     string result = reader.ReadToEnd();
+                    w.ContentType = "text/html";
                     w.ContentLength64 = result.Length;
                     w.OutputStream.Write(Encoding.ASCII.GetBytes(result), 0, result.Length);
                 }
@@ -54,29 +62,31 @@ namespace Kaoiji.server
                 Presence presence = Presences.GetPresence(r.Headers["osu-token"]);
                 if (presence == null)
                 {
-                    string LoginInfo;
                     using (StreamReader reader = new StreamReader(r.InputStream, r.ContentEncoding))
-                        LoginInfo = reader.ReadToEnd();
-                    List<BaseHandler> h = Handlers.GetHandlers(HandlerTypes.Login);
-                    presence = new Presence();
-                    Handlers.RunHandlers(h, presence, LoginRequest.Parse(LoginInfo), w);
+                    {
+                        List<BaseHandler> h = Handlers.GetHandlers(HandlerTypes.Login);
+                        presence = new Presence();
+                        Handlers.RunHandlers(h, presence, LoginRequest.Parse(reader.ReadToEnd()), w);
+                        WriteStream(presence.OutputStream, w);
+                    }
                     return;
                 }
 
-                byte[] outBuff = null;
-                w.ContentLength64 = outBuff.Length;
-                w.OutputStream.Write(outBuff, 0, outBuff.Length);
-                w.Close();
-            } catch (Exception ex)
+                /* Place holder */
+
+                /* Place holder END */
+            }
+            catch (LoginException ex)
             {
                 if (ex == LoginExceptions.INVALID_LOGIN_DATA)
                 {
                     w.ContentType = "text/html";
-                    byte[] outBuff = new byte[] { (byte)'n', (byte)'o', (byte)'!' };
+                    byte[] outBuff = new byte[] { 0x4e, 0x6f, 0x21 }; // No!
                     w.ContentLength64 = outBuff.Length;
                     w.OutputStream.Write(outBuff, 0, outBuff.Length);
                     w.Close();
-                } else
+                }
+                else
                 {
                     Console.WriteLine(ex);
                 }
@@ -102,6 +112,12 @@ namespace Kaoiji.server
             }
             pool.Shutdown(true, 5000);
             listener.Stop();
+        }
+        private void WriteStream(Stream s, HttpListenerResponse w)
+        {
+            w.ContentLength64 = s.Length;
+            s.CopyTo(w.OutputStream);
+            w.Close();
         }
     }
 }
