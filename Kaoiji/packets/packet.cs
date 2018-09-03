@@ -5,15 +5,21 @@ using Kaoiji.helpers;
 
 namespace Kaoiji.packets
 {
+    /// <summary>
+    /// PacketWriter is the easy way to write packets.
+    /// </summary>
     public class PacketWriter
     {
-        private BinaryWriter bw { get; }
+        private BinaryWriter Buffer { get; }
         
-        public void Announce(string msg)
+        /// <summary>
+        /// Writes an Announcement (Yellow)
+        /// </summary>
+        public void Announce(string msg, params string[] args)
         {
             Packet p = new Packet(PacketID.Server_Announce);
-            Binary.WriteOsuString(msg, new BinaryWriter(p.Data));
-            p.Write(bw);
+            Binary.WriteOsuString(string.Format(msg, args), new BinaryWriter(p.Data));
+            p.Write(Buffer);
         }
     }
     public class Packet
