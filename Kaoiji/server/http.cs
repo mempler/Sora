@@ -17,16 +17,17 @@ namespace Kaoiji.server
 {
     public class HttpServer
     {
-        private int Port = 5001;
+        private readonly int Port = 5001;
         private bool ShouldStop = false;
         private SmartThreadPool pool;
 
         public HttpServer(int port) => Port = port;
+        public void Stop() => ShouldStop = true;
 
         public Thread Run()
         {
             pool = new SmartThreadPool();
-            Thread t = new Thread(run);
+            Thread t = new Thread(RunServer);
             t.Start();
             return t;
         }
@@ -81,8 +82,7 @@ namespace Kaoiji.server
                 }
             }
         }
-
-        private void run()
+        private void RunServer()
         {
             HttpListener listener = new HttpListener();
             if (!HttpListener.IsSupported)
@@ -103,6 +103,5 @@ namespace Kaoiji.server
             pool.Shutdown(true, 5000);
             listener.Stop();
         }
-        public void Stop() => ShouldStop = true;
     }
 }

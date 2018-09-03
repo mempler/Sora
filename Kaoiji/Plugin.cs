@@ -10,8 +10,8 @@ namespace Kaoiji
     {
         public Plugin() { }
         public PluginMeta pMeta;
-        public abstract void OnStart();
-        public abstract void OnStop();
+        public virtual void OnStart() { Console.WriteLine($"[{pMeta.Name}] Enabled!"); }
+        public virtual void OnStop() { Console.WriteLine($"[{pMeta.Name}] Disabled!"); }
     }
     public class PluginMeta
     {

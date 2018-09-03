@@ -13,14 +13,26 @@ namespace Kaoiji
 {
     class Program
     {
-        public const int ProtocolVersion = 19;
         private static string PluginDirectory = Path.Combine(Environment.CurrentDirectory, "plugins");
+
+        /// <summary>
+        /// Protocol Version. Current osu! version uses 19
+        /// </summary>
+        public const int ProtocolVersion = 19;
+        /// <summary>
+        /// List of Loaded plugins.
+        /// </summary>
         public static List<Plugin> Plugins = new List<Plugin>();
+
         static void Main(string[] args)
         {
+            // On Exit we want to unload all plugins.
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+            // Load all Plugins.
             LoadPlugins();
-            Handlers.init();
+            // Initialize handlers AFTER loading Plugins.
+            Handlers.Init();
+            // Run HTTP Server
             HttpServer serv = new HttpServer(80);
             serv.Run();
         }
@@ -30,18 +42,22 @@ namespace Kaoiji
             UnloadPlugins();
         }
 
-
+        /// <summary>
+        /// LoadPlugins is supposed to load all Plugins inside "plugins" Directory.
+        /// </summary>
         static void LoadPlugins()
         {
             if (!Directory.Exists(PluginDirectory))
                 Directory.CreateDirectory(PluginDirectory);
+
             foreach (string pluginDir in Directory.GetDirectories(PluginDirectory))
             {
                 try
                 {
-                    if (!File.Exists(Path.Combine(pluginDir, "Plugin.json")))
-                        continue;
                     string pMetaRaw = Path.Combine(pluginDir, "Plugin.json");
+                    if (!File.Exists(pMetaRaw))
+                        continue;
+
                     PluginMeta pMeta = JsonConvert.DeserializeObject<PluginMeta>(File.ReadAllText(pMetaRaw));
                     Assembly assembly = Assembly.LoadFrom(Path.Combine(pluginDir, pMeta.Plugin));
 
@@ -52,12 +68,12 @@ namespace Kaoiji
                         p.pMeta = pMeta;
                         Plugins.Add(p);
                     }
-                        
                 } catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                 }
             }
+
             foreach (Plugin p in Plugins)
             {
                 try
@@ -67,13 +83,18 @@ namespace Kaoiji
                 } catch (Exception ex)
                 {
                     Console.WriteLine(ex);
+                    p.OnStop();
                 }
             }
         }
+        /// <summary>
+        /// UnloadPlugins is supposed to unload all plugins.
+        /// </summary>
         static void UnloadPlugins()
         {
-            foreach (Plugin p in Plugins)
+            for(int i = 0; i < Plugins.Count; i++)
             {
+                Plugin p = Plugins[i];
                 try
                 {
                     Console.WriteLine($"Try to Disable \"{p.pMeta.Name}\"");
@@ -83,6 +104,8 @@ namespace Kaoiji
                 {
                     Console.WriteLine(ex);
                 }
+                Plugins.Remove(p);
+                i--;
             }
         }
     }

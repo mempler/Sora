@@ -4,22 +4,17 @@ namespace Kaoiji.helpers
 {
     class Binary
     {
-        public static byte[] WriteOsuString(string s)
+        public static void WriteOsuString(string s, BinaryWriter w)
         {
-            MemoryStream ms = new MemoryStream();
-            BinaryWriter bw = new BinaryWriter(ms);
-            
             if (s == null || s == "")
+                    w.Write((byte)0x00);
+            else
             {
-                bw.Write((byte)0x00);
-            } else {
-                bw.Write((byte)0x0b);
-                bw.Write(s);
+                w.Write((byte)0x0b);
+                w.Write(s);
             }
-            bw.Flush();
-            bw.Close();
-            return ms.ToArray();
         }
+
         public static string ReadOsuString(BinaryReader r)
         {
             if (r.ReadByte() != 0x0b)

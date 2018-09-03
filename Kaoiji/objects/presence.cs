@@ -10,19 +10,21 @@ namespace Kaoiji.objects
     public class Presences
     {
         public static Dictionary<string, Presence> presences = new Dictionary<string, Presence>();
+
         public static Presence GetPresence(string Token)
         {
-            if (Token == null)
-                return null;
-            if (!presences.ContainsKey(Token))
+            if (Token == null && !presences.ContainsKey(Token))
                 return null;
             return presences[Token];
         }
     }
+
     public class Presence
     {
-        public string Token;
         private MemoryStream OutputStream;
+
+        public string Token;
+
         public Presence()
         {
             Token = Guid.NewGuid().ToString();

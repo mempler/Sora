@@ -6,30 +6,26 @@ namespace Kaoiji.packets
 {
     public class Packet
     {
+        private Stream PacketData;
         public PacketIDs PacketID;
-        public byte[] PacketData;
-        public byte[] Write() => P2B(this);
-        public static byte[] P2B(Packet p)
+
+        public void Write(BinaryWriter w) => WritePacket(this, w);
+
+        public static void WritePacket(Packet p, BinaryWriter w)
         {
-            MemoryStream m = new MemoryStream();
-            BinaryWriter w = new BinaryWriter(m);
             w.Write((short)p.PacketID);
             w.Write((byte)0);
             w.Write(p.PacketData == null ? 0 : p.PacketData.Length);
-            w.Write(p.PacketData == null ? new byte[0] : p.PacketData);
+            p.PacketData.CopyTo(w.BaseStream);
             w.Close();
-            return m.ToArray();
         }
-        public static Packet B2P(byte[] b)
+
+        public static Packet ReadPacket(BinaryReader r)
         {
-            MemoryStream m = new MemoryStream(b);
-            BinaryReader r = new BinaryReader(m);
             Packet p = new Packet();
             p.PacketID = (PacketIDs)r.ReadInt16();
             r.BaseStream.Position++;
-            int DataLength = r.ReadInt32();
-            p.PacketData = new byte[DataLength];
-            r.Read(p.PacketData, (int)r.BaseStream.Position, DataLength);
+            r.BaseStream.CopyTo(p.PacketData, r.ReadInt32());
             return p;
         }
     }

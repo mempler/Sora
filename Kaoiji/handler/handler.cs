@@ -13,6 +13,7 @@ namespace Kaoiji.handler
     {
         public abstract void Run(Presence presence, object data, HttpListenerResponse writer);
     }
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class RegisterHandlerAttribute : Attribute
     {
@@ -22,10 +23,12 @@ namespace Kaoiji.handler
             Kind = t;
         }
     }
+
     public class Handlers
     {
         private static Dictionary<HandlerTypes, List<BaseHandler>> hndls = new Dictionary<HandlerTypes, List<BaseHandler>>();
-        public static void init()
+
+        public static void Init()
         {
             foreach (BaseHandler x in Reflector.GetEnumerableOfType<BaseHandler>())
             {
@@ -39,13 +42,15 @@ namespace Kaoiji.handler
                 }
             }
         }
+
         public static List<BaseHandler> GetHandlers(HandlerTypes type)
         {
             if (hndls.ContainsKey(type))
                 return hndls[type];
             else
-                return null;
+                return new List<BaseHandler>();
         }
+
         public static void RunHandlers(List<BaseHandler> h, Presence p, object data, HttpListenerResponse writer)
         {
             foreach (BaseHandler hndl in h)
