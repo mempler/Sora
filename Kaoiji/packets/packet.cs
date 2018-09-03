@@ -10,7 +10,11 @@ namespace Kaoiji.packets
     /// </summary>
     public class PacketWriter
     {
-        private BinaryWriter Buffer { get; }
+        public BinaryWriter Buffer { get; }
+        public PacketWriter(Stream s) => Buffer = new BinaryWriter(s);
+        public PacketWriter(BinaryWriter bw) => Buffer = bw;
+        public PacketWriter(PacketWriter pw) => Buffer = pw.Buffer;
+        public PacketWriter() => Buffer = new BinaryWriter(new MemoryStream());
         
         /// <summary>
         /// Writes an Announcement (Yellow)
