@@ -71,10 +71,6 @@ namespace Kaoiji.server
                     }
                     return;
                 }
-
-                /* Place holder */
-
-                /* Place holder END */
             }
             catch (LoginException ex)
             {
