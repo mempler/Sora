@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kaoiji.consts
 {
-    public static class LoginExceptions
+    public class LoginExceptions : Exception
     {
-        public static Exception INVALID_LOGIN_DATA = new Exception("Invalid Login Data!");
+        public static LoginExceptions INVALID_LOGIN_DATA = new LoginExceptions("Invalid Login Data!");
+
+        public LoginExceptions(string message) : base(message) { }
     }
 }
