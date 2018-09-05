@@ -13,7 +13,7 @@ namespace Kaoiji.helpers
         public static LoginData Parse(string b)
         {
             if (b == null)
-                return null;
+                throw new NullReferenceException();
 
             LoginData data = new LoginData();
 
@@ -31,8 +31,8 @@ namespace Kaoiji.helpers
 
             data.SecurityHash = new SecurityHash();
             string[] SHash = ClientInformation[3].Split(':');
-            data.SecurityHash.DiskMD5 = SHash[4];
-            data.SecurityHash.UniqueMD5 = SHash[5];
+            data.SecurityHash.DiskMD5 = SHash[3];
+            data.SecurityHash.UniqueMD5 = SHash[4];
             return data;
         }
     }
