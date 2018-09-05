@@ -17,6 +17,9 @@ namespace Kaoiji.server
 {
     public class HttpServer
     {
+        public static Stream IndexPage { get; set; } =
+            Assembly.GetExecutingAssembly()
+                    .GetManifestResourceStream("Kaoiji.Resources.index.html");
         private readonly int Port = 5001;
         private bool ShouldStop = false;
         private SmartThreadPool pool;
@@ -43,8 +46,7 @@ namespace Kaoiji.server
             w.StatusCode = 200;
             if (r.HttpMethod.ToUpper() != "POST")
             {
-                using (Stream stream = Assembly.GetExecutingAssembly()
-                                               .GetManifestResourceStream("Kaoiji.Resources.index.html"))
+                using (Stream stream = IndexPage)
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     string result = reader.ReadToEnd();
@@ -64,9 +66,10 @@ namespace Kaoiji.server
                 {
                     using (StreamReader reader = new StreamReader(r.InputStream, r.ContentEncoding))
                     {
-                        List<BaseHandler> h = Handlers.GetHandlers(HandlerTypes.Login);
                         presence = new Presence();
-                        Handlers.RunHandlers(h, presence, LoginRequest.Parse(reader.ReadToEnd()), w);
+                        Handlers.RunHandlers(Handlers.GetHandlers(HandlerTypes.Login),
+                            presence, LoginRequest.Parse(reader.ReadToEnd()), w);
+                        w.AddHeader("cho-token", presence.Token);
                         WriteStream(presence.OutputStream, w);
                     }
                     return;
@@ -82,11 +85,8 @@ namespace Kaoiji.server
                     w.OutputStream.Write(outBuff, 0, outBuff.Length);
                     w.Close();
                 }
-                else
-                {
-                    Console.WriteLine(ex);
-                }
             }
+            catch (Exception ex) { Console.WriteLine(ex); }
         }
         private void RunServer()
         {
@@ -113,6 +113,7 @@ namespace Kaoiji.server
         {
             w.ContentLength64 = s.Length;
             s.CopyTo(w.OutputStream);
+            s.Flush();
             w.Close();
         }
     }
