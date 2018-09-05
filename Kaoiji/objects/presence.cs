@@ -13,7 +13,9 @@ namespace Kaoiji.objects
 
         public static Presence GetPresence(string Token)
         {
-            if (Token == null && !presences.ContainsKey(Token))
+            if (Token == null)
+                return null;
+            if (!presences.ContainsKey(Token))
                 return null;
             return presences[Token];
         }
@@ -22,8 +24,7 @@ namespace Kaoiji.objects
     public class Presence
     {
         public MemoryStream OutputStream { get; }
-
-        public string Token;
+        public string Token { get; }
 
         public Presence()
         {
