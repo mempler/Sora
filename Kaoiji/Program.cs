@@ -79,7 +79,6 @@ namespace Kaoiji
             {
                 try
                 {
-                    Console.WriteLine($"Try to Enable \"{p.pMeta.Name}\"");
                     p.OnStart();
                 }
                 catch (Exception ex)
@@ -99,7 +98,6 @@ namespace Kaoiji
                 Plugin p = Plugins[i];
                 try
                 {
-                    Console.WriteLine($"Try to Disable \"{p.pMeta.Name}\"");
                     p.OnStop();
                 }
                 catch (Exception ex)
