@@ -7,15 +7,20 @@ using System.Threading.Tasks;
 
 using Kaoiji.enums;
 using Kaoiji.objects;
+using Kaoiji.packets;
 
 namespace Kaoiji.handler
 {
     [RegisterHandler(HandlerTypes.Login)]
-    public class LoginHandler : BaseHandler
+    public class LoginHandler : IHandler
     {
-        public override void Run(Presence presence, object data, HttpListenerResponse writer)
+        public void Run(Presence presence, object data)
         {
-            Console.WriteLine(data);
+            Console.WriteLine("Call");
+            PacketWriter pw = new PacketWriter();
+            pw.Protocol_Negotiation();
+            pw.LoginResponse<LoginResponses>(LoginResponses.FAILED);
+            pw.WritePackets(presence.OutputStream);
         }
     }
 }

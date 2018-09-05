@@ -9,9 +9,9 @@ using Kaoiji.objects;
 
 namespace Kaoiji.handler
 {
-    public abstract class BaseHandler
+    public interface IHandler
     {
-        public abstract void Run(Presence presence, object data, HttpListenerResponse writer);
+        void Run(Presence presence, object data);
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
@@ -26,35 +26,35 @@ namespace Kaoiji.handler
 
     public class Handlers
     {
-        private static Dictionary<HandlerTypes, List<BaseHandler>> hndls = new Dictionary<HandlerTypes, List<BaseHandler>>();
+        private static Dictionary<HandlerTypes, List<IHandler>> hndls = new Dictionary<HandlerTypes, List<IHandler>>();
 
         public static void Init()
         {
-            foreach (BaseHandler x in Reflector.GetEnumerableOfType<BaseHandler>())
+            foreach (IHandler x in Reflector.GetEnumerableOfType<IHandler>())
             {
                 TypeInfo typeInfo = x.GetType().GetTypeInfo();
                 var attrs = typeInfo.GetCustomAttributes();
                 foreach (RegisterHandlerAttribute attr in attrs)
                 {
                     if (!hndls.ContainsKey(attr.Kind))
-                        hndls[attr.Kind] = new List<BaseHandler>();
-                    hndls[attr.Kind].Add((BaseHandler)Activator.CreateInstance(x.GetType()));
+                        hndls[attr.Kind] = new List<IHandler>();
+                    hndls[attr.Kind].Add((IHandler)Activator.CreateInstance(x.GetType()));
                 }
             }
         }
 
-        public static List<BaseHandler> GetHandlers(HandlerTypes type)
+        public static List<IHandler> GetHandlers(HandlerTypes type)
         {
             if (hndls.ContainsKey(type))
                 return hndls[type];
             else
-                return new List<BaseHandler>();
+                return new List<IHandler>();
         }
 
-        public static void RunHandlers(List<BaseHandler> h, Presence p, object data, HttpListenerResponse writer)
+        public static void RunHandlers(List<IHandler> h, Presence p, object data, HttpListenerResponse writer)
         {
-            foreach (BaseHandler hndl in h)
-                hndl.Run(p, data, writer);
+            foreach (IHandler hndl in h)
+                hndl.Run(p, data);
         }
     }
 }
