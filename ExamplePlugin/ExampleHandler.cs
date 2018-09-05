@@ -13,15 +13,14 @@ using Kaoiji.packets;
 namespace ExamplePlugin
 {
     [RegisterHandler(HandlerTypes.Login)]
-    class ExampleHandler : BaseHandler
+    class ExampleHandler : IHandler
     {
-        public override void Run(Presence presence, object data, HttpListenerResponse writer)
+        public void Run(Presence presence, object data)
         {
-            PacketList pl = new PacketList();
             Console.WriteLine("[ExamplePlugin] Token: {0}", presence);
-            pl.Append(new Announce($"Your Token: {presence.Token}"));
-            writer.ContentLength64 += pl.ToBinary().Length;
-            writer.OutputStream.Write(pl.ToBinary(), (int) writer.OutputStream.Position, pl.ToBinary().Length);
+            PacketWriter pw = new PacketWriter();
+            pw.Announce($"Your Token: {presence.Token}");
+            pw.WritePackets(presence.OutputStream);
         }
     }
 }
