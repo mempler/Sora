@@ -1,7 +1,0 @@
-﻿{
-  "Name": "ExamplePlugin",
-  "Description;": "an Example Plugin",
-  "Version": 1.0,
-  "Plugin": "ExamplePlugin.dll",
-  "Dependencies": []
-}
