@@ -24,7 +24,7 @@ namespace Sora.Handler
             var packetId = (PacketId) req.Reader.ReadInt16();
             req.Reader.ReadBoolean();
             req.Reader.ReadInt32(); // we dont need it anymore since we handle everything using req.Reader
-            // ReSharper disable once SwitchStatementMissingSomeCases
+
             switch (packetId)
             {
                 case PacketId.ClientSendUserStatus:

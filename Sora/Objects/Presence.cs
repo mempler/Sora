@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Sora.Helpers;
-using Sora.Packets;
+using Sora.Packets.Server;
 
 namespace Sora.Objects
 {

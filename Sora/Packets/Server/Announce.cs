@@ -1,7 +1,7 @@
 ﻿using Sora.Enums;
 using Sora.Helpers;
 
-namespace Sora.Packets
+namespace Sora.Packets.Server
 {
     public class Announce : IPacketSerializer
     {
