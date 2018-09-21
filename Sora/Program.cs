@@ -52,7 +52,7 @@ namespace Sora
             LoadPlugins();
             Handlers.InitHandlers(Assembly.GetAssembly(typeof(Program)), false);
             _server.Run();
-            while(true) { }
+            while(true) { Thread.Sleep(500); } // Prevent tons of CPU Usage
         }
 
         private static void LoadPlugins()
