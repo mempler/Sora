@@ -1,0 +1,5 @@
+﻿<Plugin Name="Example Plugin" Version="1.0.0"> <!-- You need to have atleast Name and Version! -->
+
+  <!-- If you want to load a dependencie put it into the plugin folder. it get loaded automaticly with this plugin. -->
+  
+</Plugin>

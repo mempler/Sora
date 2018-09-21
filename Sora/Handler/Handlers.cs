@@ -9,9 +9,15 @@ namespace Sora.Handler
     internal static class Handlers
     {
         private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers = new Dictionary<HandlerTypes, List<MethodInfo>>();
-        public static void InitHandlers()
+        public static void InitHandlers(Assembly ass, bool reload)
         {
-            var methods = Assembly.GetAssembly(typeof(HandlerAttribute)).GetTypes()
+            if (reload)
+            {
+                _handlers = null;
+                GC.Collect(); // Collect garbage.
+                _handlers = new Dictionary<HandlerTypes, List<MethodInfo>>();
+            }
+            var methods = ass.GetTypes()
                 .SelectMany(t => t.GetMethods())
                 .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
                 .ToArray();

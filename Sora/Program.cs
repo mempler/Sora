@@ -1,6 +1,9 @@
 using System;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Xml.Linq;
 using NLog;
 using Sora.Handler;
 using Sora.Server;
@@ -31,7 +34,7 @@ namespace Sora
             Logger = LogManager.GetCurrentClassLogger();
             try
             {
-                Logger.Debug("Start Initalization");
+                Logger.Info("Start Initalization");
                 SetConsoleCtrlHandler(ConsoleCtrlCheck, true);
                 _server = new HttpServer(5001);
                 Logger.Info("Initalization Success");
@@ -40,15 +43,34 @@ namespace Sora
             {
                 Logger.Error(ex);
             }
-            Handlers.InitHandlers();;
         }
 
         [STAThread]
         private static void Main(string[] args)
         {
             Initialize();
+            LoadPlugins();
+            Handlers.InitHandlers(Assembly.GetAssembly(typeof(Program)), false);
             _server.Run();
             while(true) { }
+        }
+
+        private static void LoadPlugins()
+        {
+            Logger.Info("Start loading plugins!");
+            if (!Directory.Exists("Plugins")) Directory.CreateDirectory("Plugins");
+
+            foreach (var f in Directory.GetFiles("Plugins")) // Press F for File
+            {
+                var file = Assembly.LoadFrom(f);
+                var fs = file.GetManifestResourceStream(file.GetName().Name +".plugin.xml");
+                if (fs == null) continue;
+                var doc = XDocument.Load(fs);
+                if (doc.Root != null)
+                    Logger.Info(
+                        $"Loaded plugin: {doc.Root.Attribute("Name")?.Value}. Version: {doc.Root.Attribute("Version")?.Value}");
+            }
+            Logger.Info("Finish loading plugins!");
         }
 
         #if _WINDOWS

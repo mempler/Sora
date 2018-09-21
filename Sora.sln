@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora", "Sora\Sora.csproj", "{8F272BCA-61A5-41BB-AE63-648AF5671823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sora", "Sora\Sora.csproj", "{8F272BCA-61A5-41BB-AE63-648AF5671823}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugin\ExamplePlugin.csproj", "{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{F357BCA8-CE01-4AE4-8C27-643B54CC9214}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{93D09E01-30F2-4B3B-88F7-EC2E62AB3840}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +21,17 @@ Global
 		{8F272BCA-61A5-41BB-AE63-648AF5671823}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F272BCA-61A5-41BB-AE63-648AF5671823}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F272BCA-61A5-41BB-AE63-648AF5671823}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8F272BCA-61A5-41BB-AE63-648AF5671823} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
+		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}
