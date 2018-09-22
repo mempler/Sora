@@ -17,6 +17,7 @@ namespace Sora.Objects
             presence.BeginSeason = DateTime.Now;
             presences[presence.Token] = presence;
         }
+
         public static void EndPresence(Presence presence, bool forceful)
         {
             if (forceful && presences.ContainsKey(presence.Token))
@@ -34,7 +35,7 @@ namespace Sora.Objects
         public string Token;
         public MStreamWriter Stream;
         public DateTime BeginSeason;
-        public bool LastRequest = false;
+        public bool LastRequest;
 
         private readonly MemoryStream _str;
 
