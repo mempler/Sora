@@ -1,6 +1,6 @@
 ﻿namespace Sora.Enums
 {
-    public enum LoginResponses : int
+    public enum LoginResponses
     {
         Failed = -1,
         Outdated = -2,
