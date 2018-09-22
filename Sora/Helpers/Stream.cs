@@ -143,7 +143,7 @@ namespace Sora.Helpers
         public byte[] ReadBytes()
         {
             var len = ReadInt32();
-            return len > 0 ? ReadBytes(len) : len < 0 ? null : (new byte[0]);
+            return len > 0 ? base.ReadBytes(len) : len < 0 ? null : (new byte[0]);
         }
         public List<T> ReadList<T>()
             where T : IPacketSerializer, new()

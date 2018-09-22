@@ -87,7 +87,6 @@ namespace Sora.Server
             {
                 var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + ((HttpStatusCode)s.StatusCode) + "\r\n" + Header2Str(r, s) + "\r\n");
                 stream.Write(header);
-                Console.WriteLine(s.Writer.ToArray().Length);
                 stream.Write(s.Writer.ToArray());
                 s.Writer.Close();
             }
