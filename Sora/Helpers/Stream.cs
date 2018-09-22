@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using Sora.Enums;
 
 namespace Sora.Helpers
 {
@@ -14,28 +13,35 @@ namespace Sora.Helpers
 
         public static MStreamWriter New()
         {
-            var x = new MemoryStream(2048);
+            var x = new MemoryStream();
             return new MStreamWriter(x);
         }
 
         public void Write(IPacketSerializer packet)
         {
-            Write((short)packet.Id);
-            Write(false);
+            base.Write((short)packet.Id);
+            base.Write((byte)0);
+            /* Packet Data */
             var x = New();
-            packet.Write_to_stream(x);
-            Write((int)x.Length);
+            packet.WriteToStream(x);
+            /* END */
+            base.Write((int)x.Length);
             Write(x);
+            x.Close();
         }
 
-        public void Write(MStreamWriter w) => WriteRawBuffer(w.ToArray());
-        public void Write(string value, bool nullable = false)
+        public void Write(MStreamWriter w)
+        {
+            w.BaseStream.Position = 0;
+            w.BaseStream.CopyTo(BaseStream);
+        }
+        public void Write(string value, bool nullable)
         {
             if (value == null && nullable)
-                Write((byte)0x00);
+                base.Write((byte)0);
             else
             {
-                Write((byte)0x0b);
+                base.Write((byte)0x0b);
                 base.Write(value + "");
             }
         }
@@ -57,7 +63,7 @@ namespace Sora.Helpers
             var count = list.Count;
             Write(count);
             for (var i = 0; i < count; i++)
-                list[i].Write_to_stream(this);
+                list[i].WriteToStream(this);
         }
         public void WriteRawBuffer(byte[] buff) => base.Write(buff);
         public void WriteObject(object obj)
@@ -111,7 +117,7 @@ namespace Sora.Helpers
                         Write((decimal)obj);
                         break;
                     default:
-                        BinaryFormatter b = new BinaryFormatter()
+                        var b = new BinaryFormatter()
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
                             TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
@@ -122,8 +128,8 @@ namespace Sora.Helpers
             }
         }
 
-        public long Length => OutStream.Length;
-        public byte[] ToArray() => ((MemoryStream) OutStream).ToArray();
+        public long Length => BaseStream.Length;
+        public byte[] ToArray() => ((MemoryStream) BaseStream).ToArray();
     }
     public class MStreamReader : BinaryReader
     {
@@ -131,7 +137,7 @@ namespace Sora.Helpers
 
         public override string ReadString()
         {
-            return (ReadByte() == 0x00 ? null : base.ReadString()) ?? throw new InvalidOperationException();
+            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
         }
 
         public byte[] ReadBytes()
@@ -152,7 +158,7 @@ namespace Sora.Helpers
             for (var i = 0; i < count; i++)
             {
                 var obj = new T();
-                obj.Read_from_stream(sr);
+                obj.ReadFromStream(sr);
                 outList.Add(obj);
             }
 

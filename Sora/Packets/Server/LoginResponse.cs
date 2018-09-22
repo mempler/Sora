@@ -5,20 +5,13 @@ namespace Sora.Packets.Server
 {
     internal class LoginResponse : IPacketSerializer
     {
-        protected int Response;
-        public LoginResponse(LoginResponses response) => Response = (int)response;
-        public LoginResponse(int response) => Response = response;
+        protected LoginResponses Response;
+        public LoginResponse(LoginResponses response) => Response = response;
 
-        public PacketId Id => PacketId.ServerAnnounce;
+        public PacketId Id => PacketId.ServerLoginResponse;
 
-        public void Read_from_stream(MStreamReader sr)
-        {
-            Response = sr.ReadInt32();
-        }
+        public void ReadFromStream(MStreamReader sr) => Response = (LoginResponses)sr.ReadInt32();
 
-        public void Write_to_stream(MStreamWriter sw)
-        {
-            sw.Write(Response);
-        }
+        public void WriteToStream(MStreamWriter sw) => sw.Write((int)Response);
     }
 }

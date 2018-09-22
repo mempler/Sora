@@ -10,14 +10,8 @@ namespace Sora.Packets.Server
 
         public PacketId Id => PacketId.ServerAnnounce;
 
-        public void Read_from_stream(MStreamReader sr)
-        {
-            Message = sr.ReadString();
-        }
+        public void ReadFromStream(MStreamReader sr) => Message = sr.ReadString();
 
-        public void Write_to_stream(MStreamWriter sw)
-        {
-            sw.Write(Message);
-        }
+        public void WriteToStream(MStreamWriter sw) => sw.Write(Message, false);
     }
 }

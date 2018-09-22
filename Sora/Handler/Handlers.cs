@@ -33,6 +33,7 @@ namespace Sora.Handler
 
         public static void ExecuteHandler(HandlerTypes type, params object[] args)
         {
+            if (_handlers == null) return;
             if (!_handlers.ContainsKey(type)) return;
             var handlers = _handlers[type];
             foreach (var h in handlers)
