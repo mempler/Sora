@@ -12,6 +12,101 @@ using Sora.Helpers;
 
 namespace Sora.Server
 {
+    public class Req
+    {
+        public Dictionary<string, string> Headers = new Dictionary<string, string>();
+        public MStreamReader Reader;
+        public HttpMethods Method;
+        public string Path;
+    }
+
+    public class Res
+    {
+        public Dictionary<string, string> Headers = new Dictionary<string, string>();
+        public int StatusCode { get; set; } = 200;
+        public MStreamWriter Writer;
+    }
+
+    public class Client
+    {
+        private readonly TcpClient _client;
+        public Client(TcpClient client) => _client = client;
+
+        public void DoStuff()
+        {
+            using (_client)
+            {
+                var sr = new StreamReader(_client.GetStream());
+                var req = ReadHeader(sr);
+                if (req == null) return;
+                var res = new Res {Writer = MStreamWriter.New()};
+                Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
+                WriteRes(_client, req, res);
+            }
+        }
+
+        public Req ReadHeader(StreamReader rd)
+        {
+            var x = new Req();
+            var mainHeader = rd.ReadLine();
+            if (mainHeader == null) return x;
+            var hSplit = mainHeader.Split(' ');
+            if (hSplit.Length < 3) return null;
+            Enum.TryParse(hSplit[0], true, out HttpMethods method);
+            x.Method = method;
+            x.Path = hSplit[1];
+
+            while (true)
+            {
+                var currentLine = rd.ReadLine();
+                if (currentLine != null && currentLine.Trim() == "") break;
+                if (currentLine == null) break;
+                var headSplit = currentLine.Split(':', 2);
+                if (headSplit.Length < 2) break;
+                x.Headers[headSplit[0].Trim()] = headSplit[1].Trim();
+            }
+
+            if (x.Method != HttpMethods.Post) return x;
+           
+            if (!x.Headers.ContainsKey("Content-Length"))
+                return null;
+
+            int.TryParse(x.Headers["Content-Length"], out var byteLength);
+
+            var data = new byte[byteLength];
+            for (var i = 0; i < byteLength; i++)
+                data[i] = (byte) rd.Read();
+
+            x.Reader = new MStreamReader(new MemoryStream(data));
+            return x;
+        }
+
+        public static void WriteRes(TcpClient c, Req r, Res s)
+        {
+            using (var stream = c.GetStream())
+            {
+                var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + ((HttpStatusCode)s.StatusCode) + "\r\n" + Header2Str(r, s) + "\r\n");
+                stream.Write(header);
+                Console.WriteLine(s.Writer.ToArray().Length);
+                stream.Write(s.Writer.ToArray());
+                s.Writer.Close();
+            }
+        }
+
+        public static string Header2Str(Req x, Res s)
+        {
+            var outputStr = string.Empty;
+            s.Headers["cho-protocol"] = "19";
+            s.Headers  ["Connection"] = "keep-alive";
+            s.Headers  ["Keep-Alive"] = "timeout=5, max=100";
+            s.Headers["Content-Type"] = "text/html; charset=UTF-8";
+            s.Headers        ["Host"] = x.Headers["Host"];
+            s.Headers  ["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
+            foreach (var key in s.Headers.Keys)
+                outputStr += $"{key}: {s.Headers[key]}\r\n";
+            return outputStr;
+        }
+    }
     public class HttpServer
     {
         private bool _running;
@@ -48,140 +143,25 @@ namespace Sora.Server
         private void _RunServer()
         {
             _listener.Start();
+            _pool.Start();
             _running = true;
+            _pool.MaxThreads = 64; // Let us handle up to 64 connections at the same time.
+            _pool.MinThreads = 16;
             while (true)
             {
                 if (!_running)
                 {
                     _listener.Stop();
                     break;
-                } 
-                var client = _listener.AcceptTcpClient();
-                _pool.QueueWorkItem(_HandleClient, client);
-            }
-        }
-
-        private static void _HandleClient(TcpClient client)
-        {
-            try
-            {
-                Program.Logger.Debug("Incomming TCP Connection!");
-                using (client)
-                {
-                    using (var s = client.GetStream())
-                    {
-                        var buff = new byte[client.ReceiveBufferSize];
-                        s.Read(buff, 0, client.ReceiveBufferSize);
-                        var httpString = Encoding.UTF8.GetString(buff);
-
-                        var http = httpString.Split('\n');
-                        if (http.Length < 3)
-                            return;
-                        if (!(http[0].StartsWith("GET") || http[0].StartsWith("POST")))
-                        {
-                            var o = Encoding.UTF8.GetBytes(
-                                "HTTP/1.1 400 Bad Request" +
-                                "Host: Kaoiji\r\n" +
-                                "\r\n" +
-                                "Bad Request!"
-                            );
-                            s.Write(o, 0, o.Length);
-                            return;
-                        }
-
-                        if (http[0].StartsWith("GET"))
-                        {
-                            byte[] o;
-                            if (File.Exists("Resource/index.html"))
-                            {
-                                o = Encoding.UTF8.GetBytes(
-                                    "HTTP/1.1 200 OK\r\n" +
-                                    "Host: Kaoiji\r\n" +
-                                    "\r\n" +
-                                    File.ReadAllText("Resource/index.html")
-                                );
-                            }
-                            else
-                            {
-                                o = Encoding.UTF8.GetBytes(
-                                    "HTTP/1.1 200 OK\r\n" +
-                                    "Host: Kaoiji\r\n" +
-                                    "\r\n" +
-                                    "Sora a C# Written Bancho!"
-                                );
-                            }
-                            s.Write(o, 0, o.Length);
-                            return;
-                        }
-
-                        var readHeaders = true;
-                        var r = new Req();
-                        foreach (var hs in http)
-                        {
-                            if (hs.Trim().StartsWith("POST") && hs.Trim().EndsWith("HTTP/1.1")) continue;
-                            if (hs.Trim() == "") readHeaders = false;
-                            if (!readHeaders) continue;
-                            var vx = hs.Split(':');
-                            if (vx.Length < 2) continue;
-                            r.Headers[vx[0].Trim()] = vx[1].Trim();
-                        }
-
-                        var ts = new MemoryStream();
-                        var x = new Res
-                        {
-                            StatusCode = 404, // as default
-                            Writer = new MStreamWriter(ts)
-                        };
-
-                        Handlers.ExecuteHandler(HandlerTypes.PacketHandler, r, x);
-
-                        using (var outputstream = new MStreamWriter(s))
-                        {
-                            var oxx = Encoding.UTF8.GetBytes(
-                                $"HTTP/1.1 {GetStatus(x)}\r\n" +
-                                Header2Str(x)
-                            );
-                            outputstream.WriteRawBuffer(oxx);
-                            x.Writer.BaseStream.Position = 0;
-                            x.Writer.BaseStream.CopyTo(outputstream.BaseStream);
-                            x.Writer.Close();
-                        }
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Program.Logger.Error(ex);
-            }
-        }
 
-        private static string Header2Str(Res s)
-        {
-            var outputStr = string.Empty;
-            s.Headers["Host"] = "Bancho";
-            foreach (var key in s.Headers.Keys)
-                outputStr += $"{key}: ${s.Headers[key]}\r\n";
-            outputStr += "\n";
-            return outputStr;
-        }
-
-        private static string GetStatus(Res s)
-        {
-            var outputStr = $"{s.StatusCode} Unknown";
-            return outputStr;
+                _pool.QueueWorkItem(new Client(_listener.AcceptTcpClient()).DoStuff);
+            }
         }
     }
 
-    public class Req
+    public enum HttpMethods
     {
-        public Dictionary<string, string> Headers = new Dictionary<string, string>();
-        public MStreamReader Reader;
-    }
-
-    public class Res
-    {
-        public Dictionary<string, string> Headers = new Dictionary<string, string>();
-        public int StatusCode { get; set; }
-        public MStreamWriter Writer;
+        Post,
     }
 }
