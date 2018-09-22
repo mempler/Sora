@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using BCrypt;
 using Sora.Enums;
 
@@ -21,5 +22,24 @@ namespace Sora.Database.Models
         public Privileges Privileges { get; set; } = 0;
 
         public bool IsPassword(string s) => BCryptHelper.CheckPassword(s, Password);
+
+        public static int GetUserId(string username)
+        {
+            using (var db = new SoraContext())
+            {
+                var result = db.Users.Where(t => t.Username == username).Select(e => e).FirstOrDefault();
+                return result?.Id ?? -1;
+            }
+        }
+
+        public static Users GetUser(int userId)
+        {
+            if (userId == -1) return null;
+            using (var db = new SoraContext())
+            {
+                var result = db.Users.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+                return result;
+            }
+        }
     }
 }
