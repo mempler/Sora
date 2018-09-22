@@ -89,7 +89,11 @@ namespace Shared.Database.Models
         public static LeaderboardRx GetLeaderboard(int userId)
         {
             using (var db = new SoraContext())
-                return db.LeaderboardRx.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();;
+            {
+                var result = db.LeaderboardRx.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+                if (result == null) db.LeaderboardRx.Add(new LeaderboardRx {Id = userId});
+                return result ?? new LeaderboardRx {Id = userId};
+            }
         }
 
         public static LeaderboardRx GetLeaderboard(Users user) => GetLeaderboard(user.Id);

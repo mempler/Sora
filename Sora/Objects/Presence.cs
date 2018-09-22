@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Shared.Database.Models;
+using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Packets.Server;
@@ -60,13 +61,25 @@ namespace Sora.Objects
         public bool LastRequest;
 
         public Users User;
+        public UserStats Stats;
+        public LeaderboardStd LeaderboardStd;
+        public LeaderboardRx LeaderboardRx;
+        public LeaderboardTouch LeaderboardTouch;
         public bool BlockNonFriendDm;
         public byte Timezone;
         public byte CountryId;
         public int ClientPermissions;
         public double Lon;
         public double Lat;
-        public uint Rank; 
+        public uint Rank;
+        public byte Status;
+        public string StatusText;
+        public string BeatmapChecksum;
+        public uint CurrentMods;
+        public PlayModes PlayMode;
+        public uint BeatmapId;
+        public bool Touch;
+        public bool Relax;
 
         public Presence()
         {

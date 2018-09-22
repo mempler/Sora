@@ -33,6 +33,10 @@ namespace Sora.Handler
                 }
 
                 pr.User = user;
+                pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(pr.User);
+                pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(pr.User);
+                pr.LeaderboardTouch = LeaderboardTouch.GetLeaderboard(pr.User);
+
                 pr.Timezone = loginData.Timezone;
                 pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
@@ -42,7 +46,7 @@ namespace Sora.Handler
                 res.Writer.Write(new ProtocolNegotiation());
                 res.Writer.Write(new UserPresence(pr));
                 res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr)));
-                Console.WriteLine(Presences.GetUserIds()[0]);
+                res.Writer.Write(new HandleUpdate(pr));
             }
             catch (Exception ex)
             {
