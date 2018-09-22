@@ -80,26 +80,6 @@ namespace Sora.Objects
             return Token == pr.Token;
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (Token != null ? Token.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Stream != null ? Stream.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ BeginSeason.GetHashCode();
-                hashCode = (hashCode * 397) ^ LastRequest.GetHashCode();
-                hashCode = (hashCode * 397) ^ (User != null ? User.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ BlockNonFriendDm.GetHashCode();
-                hashCode = (hashCode * 397) ^ Timezone.GetHashCode();
-                hashCode = (hashCode * 397) ^ CountryId.GetHashCode();
-                hashCode = (hashCode * 397) ^ ClientPermissions;
-                hashCode = (hashCode * 397) ^ Lon.GetHashCode();
-                hashCode = (hashCode * 397) ^ Lat.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) Rank;
-                return hashCode;
-            }
-        }
-
         public void Write(IPacketSerializer p) => Stream.Write(p);
     }
 }
