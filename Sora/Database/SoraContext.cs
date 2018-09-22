@@ -8,7 +8,7 @@ namespace Sora.Database
 {
     public sealed class SoraContext : DbContext
     {
-        public DbSet<Users> Users { get; }
+        public DbSet<Users> Users { get; set; }
         private static readonly bool[] Migrated = { false };
 
         public SoraContext()
