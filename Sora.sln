@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{93D0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jibril", "Jibril\Jibril.csproj", "{26937D32-2FDF-4AE1-98C4-39F99B55F497}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26937D32-2FDF-4AE1-98C4-39F99B55F497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26937D32-2FDF-4AE1-98C4-39F99B55F497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26937D32-2FDF-4AE1-98C4-39F99B55F497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26937D32-2FDF-4AE1-98C4-39F99B55F497}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{8F272BCA-61A5-41BB-AE63-648AF5671823} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
 		{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
 		{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
+		{26937D32-2FDF-4AE1-98C4-39F99B55F497} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}
