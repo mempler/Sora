@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml.Linq;
 using NLog;
-using Sora.Database;
+using Shared.Database;
 using Sora.Handler;
 using Sora.Server;
 

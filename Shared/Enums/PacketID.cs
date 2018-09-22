@@ -1,4 +1,4 @@
-﻿namespace Sora.Enums
+﻿namespace Shared.Enums
 {
     public enum PacketId : short
     {

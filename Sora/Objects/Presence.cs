@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Sora.Helpers;
+using Shared.Database.Models;
+using Shared.Helpers;
+using Shared.Interfaces;
 using Sora.Packets.Server;
 
 namespace Sora.Objects
@@ -37,13 +39,17 @@ namespace Sora.Objects
         public DateTime BeginSeason;
         public bool LastRequest;
 
-        private readonly MemoryStream _str;
+        public Users User;
+        public bool BlockNonFriendDm;
+        public int Timezone;
 
         public Presence()
         {
             Token = Guid.NewGuid().ToString();
-            _str = new MemoryStream();
-            Stream = new MStreamWriter(_str);
+            var str = new MemoryStream();
+            Stream = new MStreamWriter(str);
         }
+
+        public void Write(IPacketSerializer p) => Stream.Write(p);
     }
 }

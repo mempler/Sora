@@ -1,5 +1,8 @@
 ﻿using System;
+using Shared.Database.Models;
+using Shared.Enums;
 using Sora.Enums;
+using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Server;
@@ -11,12 +14,38 @@ namespace Sora.Handler
         [Handler(HandlerTypes.LoginHandler)]
         public void OnLogin(Req req, Res res)
         {
-            Console.WriteLine("Done");
             var pr = new Presence();
             res.Headers["cho-token"] = pr.Token;
-           
-            res.Writer.Write(new LoginResponse(LoginResponses.Failed));
-            res.Writer.Write(new Announce("Hello c# 2.0"));
+            try
+            {
+                var loginData = LoginParser.ParseLogin(req.Reader);
+                if (loginData == null)
+                {
+                    Exception(res);
+                    return;
+                }
+
+                var user = Users.GetUser(Users.GetUserId(loginData.Username));
+                if (user == null)
+                {
+                    LoginFailed(res);
+                    return;
+                }
+
+                pr.User = user;
+                pr.Timezone = loginData.Timezone;
+                pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
+
+                Presences.BeginPresence(pr);
+                Console.WriteLine(user);
+            }
+            catch (Exception ex)
+            {
+                Program.Logger.Error(ex);
+            }
         }
+
+        public void LoginFailed(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Failed));
+        public void Exception(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Exception));
     }
 }

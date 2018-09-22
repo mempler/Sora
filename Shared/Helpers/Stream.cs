@@ -4,8 +4,9 @@ using System.IO;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using Shared.Interfaces;
 
-namespace Sora.Helpers
+namespace Shared.Helpers
 {
     public class MStreamWriter : BinaryWriter
     {

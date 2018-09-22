@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BCrypt;
-using Sora.Enums;
+using Shared.Enums;
 
-namespace Sora.Database.Models
+namespace Shared.Database.Models
 {
     public class Users
     {

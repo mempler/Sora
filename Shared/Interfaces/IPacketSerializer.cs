@@ -1,6 +1,7 @@
-﻿using Sora.Enums;
+﻿using Shared.Enums;
+using Shared.Helpers;
 
-namespace Sora.Helpers
+namespace Shared.Interfaces
 {
     public interface IPacketSerializer
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sora.Enums;
+using Shared.Enums;
 
 namespace Sora.Handler
 {

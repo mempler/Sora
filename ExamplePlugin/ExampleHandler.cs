@@ -1,4 +1,4 @@
-﻿using Sora.Enums;
+﻿using Shared.Enums;
 using Sora.Handler;
 using Sora.Packets.Server;
 using Sora.Server;

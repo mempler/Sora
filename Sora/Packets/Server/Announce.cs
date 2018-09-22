@@ -1,5 +1,6 @@
-﻿using Sora.Enums;
-using Sora.Helpers;
+﻿using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
 
 namespace Sora.Packets.Server
 {

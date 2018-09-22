@@ -6,9 +6,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Amib.Threading;
-using Sora.Enums;
+using Shared.Enums;
+using Shared.Helpers;
 using Sora.Handler;
-using Sora.Helpers;
 
 namespace Sora.Server
 {

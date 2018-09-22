@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Sora.Database.Models;
-using Sora.Helpers;
+using Shared.Database.Models;
+using Shared.Helpers;
 
-namespace Sora.Database
+namespace Shared.Database
 {
     public sealed class SoraContext : DbContext
     {

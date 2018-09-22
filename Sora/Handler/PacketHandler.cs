@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using Sora.Enums;
-using Sora.Helpers;
+using Shared.Enums;
+using Shared.Helpers;
 using Sora.Objects;
 using Sora.Server;
 
