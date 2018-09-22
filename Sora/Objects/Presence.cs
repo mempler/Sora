@@ -11,15 +11,34 @@ namespace Sora.Objects
     public static class Presences
     {
         private static readonly Dictionary<string, Presence> presences = new Dictionary<string, Presence>();
+        public static int UserCount;
 
         public static Presence GetPresence(string token) => presences.TryGetValue(token, out var pr) ? pr : null;
 
+        public static List<int> GetUserIds()
+        {
+            var l = new List<int>();
+            foreach (var presence in presences)
+                l.Add(presence.Value.User.Id);
+            return l;
+        }
+        public static List<int> GetUserIds(Presence pr)
+        {
+            var l = new List<int>();
+            foreach (var presence in presences)
+            {
+                if (presence.Value.User.Id == pr.User.Id) continue;
+                l.Add(presence.Value.User.Id);
+            }
+            return l;
+        }
+        
         public static void BeginPresence(Presence presence)
         {
             presence.BeginSeason = DateTime.Now;
             presences[presence.Token] = presence;
+            UserCount++;
         }
-
         public static void EndPresence(Presence presence, bool forceful)
         {
             if (forceful && presences.ContainsKey(presence.Token))
@@ -30,6 +49,7 @@ namespace Sora.Objects
 
             presence.LastRequest = true;
             presence.Stream.Write(new Announce("Your session has ended!"));
+            UserCount--;
         }
     }
     public class Presence
@@ -41,13 +61,43 @@ namespace Sora.Objects
 
         public Users User;
         public bool BlockNonFriendDm;
-        public int Timezone;
+        public byte Timezone;
+        public byte CountryId;
+        public int ClientPermissions;
+        public double Lon;
+        public double Lat;
+        public uint Rank; 
 
         public Presence()
         {
             Token = Guid.NewGuid().ToString();
             var str = new MemoryStream();
             Stream = new MStreamWriter(str);
+        }
+
+        protected bool Equals(Presence pr)
+        {
+            return Token == pr.Token;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (Token != null ? Token.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Stream != null ? Stream.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ BeginSeason.GetHashCode();
+                hashCode = (hashCode * 397) ^ LastRequest.GetHashCode();
+                hashCode = (hashCode * 397) ^ (User != null ? User.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ BlockNonFriendDm.GetHashCode();
+                hashCode = (hashCode * 397) ^ Timezone.GetHashCode();
+                hashCode = (hashCode * 397) ^ CountryId.GetHashCode();
+                hashCode = (hashCode * 397) ^ ClientPermissions;
+                hashCode = (hashCode * 397) ^ Lon.GetHashCode();
+                hashCode = (hashCode * 397) ^ Lat.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) Rank;
+                return hashCode;
+            }
         }
 
         public void Write(IPacketSerializer p) => Stream.Write(p);

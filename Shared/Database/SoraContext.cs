@@ -9,6 +9,11 @@ namespace Shared.Database
     public sealed class SoraContext : DbContext
     {
         public DbSet<Users> Users { get; set; }
+        public DbSet<UserStats> UserStats { get; set; }
+        public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
+        public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
+        public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
+
         private static readonly bool[] Migrated = { false };
 
         public SoraContext()

@@ -5,7 +5,7 @@ using Sora.Enums;
 
 namespace Sora.Packets.Server
 {
-    internal class LoginResponse : IPacketSerializer
+    public class LoginResponse : IPacketSerializer
     {
         protected LoginResponses Response;
         public LoginResponse(LoginResponses response) => Response = response;

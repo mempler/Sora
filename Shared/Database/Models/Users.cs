@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using BCrypt;
 using Shared.Enums;
@@ -7,6 +8,8 @@ namespace Shared.Database.Models
 {
     public class Users
     {
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
@@ -41,5 +44,8 @@ namespace Shared.Database.Models
                 return result;
             }
         }
+
+        public override string ToString() =>
+            $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
     }
 }

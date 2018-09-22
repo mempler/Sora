@@ -41,6 +41,8 @@ namespace Sora
                 _server = new HttpServer(5001);
                 Logger.Info("Initalization Success");
                 using (var db = new SoraContext()) { }
+
+                AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e) { Logger.Error(ex); };
             }
             catch (Exception ex)
             {

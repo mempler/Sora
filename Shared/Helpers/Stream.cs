@@ -58,13 +58,12 @@ namespace Shared.Helpers
             if (length > 0)
                 base.Write(buff);
         }
-        public void Write<T>(List<T> list)
-            where T : IPacketSerializer
+        public void Write(List<int> list)
         {
             var count = list.Count;
             Write(count);
             for (var i = 0; i < count; i++)
-                list[i].WriteToStream(this);
+                Write(list[i]);
         }
         public void WriteRawBuffer(byte[] buff) => base.Write(buff);
         public void WriteObject(object obj)
@@ -146,23 +145,16 @@ namespace Shared.Helpers
             var len = ReadInt32();
             return len > 0 ? base.ReadBytes(len) : len < 0 ? null : (new byte[0]);
         }
-        public List<T> ReadList<T>()
-            where T : IPacketSerializer, new()
+        public List<int> ReadInt32List()
         {
             var count = ReadInt32();
             if (count < 0)
                 return null;
-            var outList = new List<T>(count);
-
-            var sr = new MStreamReader(BaseStream);
-
+            var outList = new List<int>(count);
             for (var i = 0; i < count; i++)
             {
-                var obj = new T();
-                obj.ReadFromStream(sr);
-                outList.Add(obj);
+                outList.Add(ReadInt32());
             }
-
             return outList;
         }
     }

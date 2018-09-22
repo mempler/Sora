@@ -15,7 +15,7 @@ namespace Sora.Helpers
                 var otherData = s.ReadLine()?.Split('|');
                 if (otherData == null || otherData.Length < 5) return null;
                 l.Build = otherData[0];
-                l.Timezone = int.Parse(otherData[1]);
+                l.Timezone = byte.Parse(otherData[1]);
                 l.DisplayLocation = otherData[2] == "1";
                 l.SecurityHash = otherData[3];
                 l.BlockNonFriendDMs = otherData[4] == "1";
@@ -29,7 +29,7 @@ namespace Sora.Helpers
         public string Username;
         public string Password;
         public string Build;
-        public int Timezone;
+        public byte Timezone;
         public bool DisplayLocation;
         public string SecurityHash;
         public bool BlockNonFriendDMs;

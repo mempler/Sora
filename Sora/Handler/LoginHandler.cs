@@ -37,7 +37,12 @@ namespace Sora.Handler
                 pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
                 Presences.BeginPresence(pr);
-                Console.WriteLine(user);
+
+                Success(res, user.Id);
+                res.Writer.Write(new ProtocolNegotiation());
+                res.Writer.Write(new UserPresence(pr));
+                res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr)));
+                Console.WriteLine(Presences.GetUserIds()[0]);
             }
             catch (Exception ex)
             {
@@ -47,5 +52,6 @@ namespace Sora.Handler
 
         public void LoginFailed(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Failed));
         public void Exception(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Exception));
+        public void Success(Res res, int userid) => res.Writer.Write(new LoginResponse((LoginResponses)userid));
     }
 }
