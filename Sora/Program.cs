@@ -5,11 +5,13 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml.Linq;
 using NLog;
+using Sora.Database;
 using Sora.Handler;
 using Sora.Server;
 
 namespace Sora
 {
+
     internal static class Program
     {
         public static Logger Logger;
@@ -38,6 +40,7 @@ namespace Sora
                 SetConsoleCtrlHandler(ConsoleCtrlCheck, true);
                 _server = new HttpServer(5001);
                 Logger.Info("Initalization Success");
+                using (var db = new SoraContext()) { }
             }
             catch (Exception ex)
             {
@@ -49,10 +52,9 @@ namespace Sora
         private static void Main(string[] args)
         {
             Initialize();
+            Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
             LoadPlugins();
-            Handlers.InitHandlers(Assembly.GetAssembly(typeof(Program)), false);
-            _server.Run();
-            while(true) { Thread.Sleep(500); } // Prevent tons of CPU Usage
+            _server.Run().Join(); // > owo - Justin
         }
 
         private static void LoadPlugins()
@@ -69,6 +71,7 @@ namespace Sora
                 if (doc.Root != null)
                     Logger.Info(
                         $"Loaded plugin: {doc.Root.Attribute("Name")?.Value}. Version: {doc.Root.Attribute("Version")?.Value}");
+                Handlers.InitHandlers(file, false);
             }
             Logger.Info("Finish loading plugins!");
         }
