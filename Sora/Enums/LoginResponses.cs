@@ -8,6 +8,7 @@
         Multiacc = -4,
         Exception = -5,
         Supporteronly = -6,
+        PasswordReset = -7,
         Twofactorauth = -8
     }
 }
