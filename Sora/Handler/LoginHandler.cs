@@ -58,6 +58,7 @@ namespace Sora.Handler
                 res.Writer.Write(new UserPresence(pr));
                 res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr)));
                 res.Writer.Write(new HandleUpdate(pr));
+                LPacketStreams.GetStream("main").Join(pr);
             }
             catch (Exception ex)
             {

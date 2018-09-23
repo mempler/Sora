@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
 using Sora.Objects;
+using Sora.Packets.Client;
 using Sora.Server;
 
 namespace Sora.Handler
@@ -36,6 +38,9 @@ namespace Sora.Handler
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:
+                            var x = new SendUserStatus();
+                            x.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Status);
                             break;
                         case PacketId.ClientSendIrcMessage:
                             break;
@@ -44,6 +49,7 @@ namespace Sora.Handler
                         case PacketId.ClientRequestStatusUpdate:
                             break;
                         case PacketId.ClientPong:
+                            Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
                             break;
                         case PacketId.ClientStartSpectating:
                             break;
@@ -132,6 +138,9 @@ namespace Sora.Handler
                         case PacketId.ClientSpecialJoinMatchChannel:
                             break;
                         case PacketId.ClientSpecialLeaveMatchChannel:
+                            break;
+                        default:
+                            Program.Logger.Debug("[Unknown Packet] " + packetId);
                             break;
                     }
                 }

@@ -5,6 +5,7 @@ using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
+using Sora.Packets.Client;
 using Sora.Packets.Server;
 
 namespace Sora.Objects
@@ -65,21 +66,21 @@ namespace Sora.Objects
         public LeaderboardStd LeaderboardStd;
         public LeaderboardRx LeaderboardRx;
         public LeaderboardTouch LeaderboardTouch;
+        public UserStatus Status = new UserStatus { BeatmapChecksum = "", StatusText = "" }; // Predefined strings to prevent Issues.
+
+        public uint Rank;
+
         public bool BlockNonFriendDm;
-        public byte Timezone;
-        public CountryIds CountryId;
         public int ClientPermissions;
+
+        public CountryIds CountryId;
         public double Lon;
         public double Lat;
-        public uint Rank;
-        public byte Status;
-        public string StatusText = "";
-        public string BeatmapChecksum = "";
-        public uint CurrentMods;
-        public PlayModes PlayMode;
-        public uint BeatmapId;
+        public byte Timezone;
+
         public bool Touch;
         public bool Relax;
+        public bool Disconnected;
 
         public Presence()
         {

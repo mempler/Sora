@@ -38,6 +38,7 @@ namespace Shared.Handlers
             var handlers = _handlers[type];
             foreach (var h in handlers)
             {
+                if(h.IsAbstract) continue;
                 var handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
                 h.Invoke(handlerClass, args);
             }
