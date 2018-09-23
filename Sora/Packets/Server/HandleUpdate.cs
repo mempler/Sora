@@ -28,8 +28,8 @@ namespace Sora.Packets.Server
         {
             sw.Write(Presence.User.Id);
             sw.Write(Presence.Status);
-            sw.Write(Presence.StatusText);
-            sw.Write(Presence.BeatmapChecksum);
+            sw.Write(Presence.StatusText, false);
+            sw.Write(Presence.BeatmapChecksum, false);
             sw.Write(Presence.CurrentMods);
             sw.Write((byte) Presence.PlayMode);
             sw.Write(Presence.BeatmapId);

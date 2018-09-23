@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading;
 using Amib.Threading;
 using Shared.Enums;
+using Shared.Handlers;
 using Shared.Helpers;
-using Sora.Handler;
 
 namespace Sora.Server
 {
@@ -18,6 +18,7 @@ namespace Sora.Server
         public MStreamReader Reader;
         public HttpMethods Method;
         public string Path;
+        public string Ip;
     }
 
     public class Res
@@ -78,6 +79,7 @@ namespace Sora.Server
                 data[i] = (byte) rd.Read();
 
             x.Reader = new MStreamReader(new MemoryStream(data));
+            x.Ip = _client.Client.RemoteEndPoint.ToString().Split(':')[0];
             return x;
         }
 

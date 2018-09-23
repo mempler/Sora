@@ -28,7 +28,7 @@ namespace Sora.Packets.Server
                     Username = sr.ReadString(),
                 },
                 Timezone = sr.ReadByte(),
-                CountryId = sr.ReadByte(),
+                CountryId = (CountryIds)sr.ReadByte(),
                 ClientPermissions = sr.ReadByte(),
                 Lon = sr.ReadDouble(),
                 Lat = sr.ReadDouble(),
@@ -42,9 +42,9 @@ namespace Sora.Packets.Server
                 throw new NoNullAllowedException("Presence cannot be null!");
 
             sw.Write(Presence.User.Id);
-            sw.Write(Presence.User.Username);
+            sw.Write(Presence.User.Username, false);
             sw.Write(Presence.Timezone);
-            sw.Write(Presence.CountryId);
+            sw.Write((byte)Presence.CountryId);
             sw.Write(Presence.ClientPermissions);
             sw.Write(Presence.Lat);
             sw.Write(Presence.Lon);

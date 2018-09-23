@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using Shared.Enums;
 
-namespace Sora.Handler
+namespace Shared.Handlers
 {
-    internal static class Handlers
+    public static class Handlers
     {
         private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers = new Dictionary<HandlerTypes, List<MethodInfo>>();
         public static void InitHandlers(Assembly ass, bool reload)

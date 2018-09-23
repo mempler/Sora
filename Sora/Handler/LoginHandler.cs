@@ -1,6 +1,8 @@
 ﻿using System;
 using Shared.Database.Models;
 using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
 using Sora.Enums;
 using Sora.Helpers;
 using Sora.Objects;
@@ -33,6 +35,15 @@ namespace Sora.Handler
                 }
 
                 pr.User = user;
+
+                if (req.Ip != "127.0.0.1" && req.Ip != "0.0.0.0")
+                {
+                    var data = Localisation.GetData(req.Ip);
+                    pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
+                    if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
+                    if (data.Location.Latitude != null) pr.Lat = (double) data.Location.Latitude;
+                }
+
                 pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(pr.User);
                 pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(pr.User);
                 pr.LeaderboardTouch = LeaderboardTouch.GetLeaderboard(pr.User);

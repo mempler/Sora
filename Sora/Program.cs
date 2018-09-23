@@ -6,7 +6,9 @@ using System.Threading;
 using System.Xml.Linq;
 using NLog;
 using Shared.Database;
-using Sora.Handler;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
 using Sora.Server;
 
 namespace Sora
@@ -38,7 +40,8 @@ namespace Sora
             {
                 Logger.Info("Start Initalization");
                 SetConsoleCtrlHandler(ConsoleCtrlCheck, true);
-                _server = new HttpServer(5001);
+                
+                _server = new HttpServer(Config.ReadConfig().Server.Port);
                 Logger.Info("Initalization Success");
                 using (var db = new SoraContext()) { }
 
@@ -48,13 +51,14 @@ namespace Sora
             {
                 Logger.Error(ex);
             }
+            Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
+            Handlers.ExecuteHandler(HandlerTypes.Initializer);
         }
 
         [STAThread]
         private static void Main(string[] args)
         {
             Initialize();
-            Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
             LoadPlugins();
             _server.Run().Join(); // > owo - Justin
         }

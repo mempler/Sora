@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Shared.Enums;
 
 namespace Shared.Database.Models
 {
@@ -13,7 +14,7 @@ namespace Shared.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public byte CountryId { get; set; }
+        public CountryIds CountryId { get; set; }
 
         
         public static UserStats GetUserStats(int userId)

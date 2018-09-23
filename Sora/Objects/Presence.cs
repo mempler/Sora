@@ -67,14 +67,14 @@ namespace Sora.Objects
         public LeaderboardTouch LeaderboardTouch;
         public bool BlockNonFriendDm;
         public byte Timezone;
-        public byte CountryId;
+        public CountryIds CountryId;
         public int ClientPermissions;
         public double Lon;
         public double Lat;
         public uint Rank;
         public byte Status;
-        public string StatusText;
-        public string BeatmapChecksum;
+        public string StatusText = "";
+        public string BeatmapChecksum = "";
         public uint CurrentMods;
         public PlayModes PlayMode;
         public uint BeatmapId;

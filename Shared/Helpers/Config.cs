@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Shared.Helpers
 {
-    internal static class Config
+    public static class Config
     {
         public static Cfg ReadConfig()
         {
@@ -13,16 +13,16 @@ namespace Shared.Helpers
         }
     }
 
-    internal class Cfg
+    public class Cfg
     {
         public Server Server = new Server() { Port=5001 };
         public MySql MySql = new MySql() { Database = "shiro", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = "" };
     }
-    struct Server
+    public struct Server
     {
         public short Port;
     }
-    struct MySql
+    public struct MySql
     {
         public string Username;
         public string Password;

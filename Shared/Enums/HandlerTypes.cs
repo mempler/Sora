@@ -2,6 +2,7 @@
 {
     public enum HandlerTypes
     {
+        Initializer,
         PacketHandler,
         LoginHandler,
     }
