@@ -88,7 +88,7 @@ namespace Sora.Handler
             }
             catch (Exception ex)
             {
-                Program.Logger.Error(ex);
+                Logger.L.Error(ex);
             }
         }
 

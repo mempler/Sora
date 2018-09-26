@@ -52,7 +52,7 @@ namespace Sora.Handler
             }
             catch (Exception ex)
             {
-                Program.Logger.Error(ex);
+                Logger.L.Error(ex);
                 res.Writer.Write(new LoginResponse(LoginResponses.Exception));
                 return;
             }
@@ -92,8 +92,8 @@ namespace Sora.Handler
                             Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Userids);
                             break;
                         default:
-                            Program.Logger.Debug("PacketId: " + packetId);
-                            Program.Logger.Debug("PacketLength: " + packetData.Length);
+                            Logger.L.Debug("PacketId: " + packetId);
+                            Logger.L.Debug("PacketLength: " + packetData.Length);
                             break;
                     }
                 }
