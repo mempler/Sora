@@ -1,4 +1,30 @@
-﻿using System;
+﻿#region copyright
+/*
+MIT License
+
+Copyright (c) 2018 Robin A. P.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -60,15 +86,15 @@ namespace Sora.Server
             while (true)
             {
                 var currentLine = rd.ReadLine();
-                if (currentLine != null && currentLine.Trim() == "") break;
                 if (currentLine == null) break;
+                if (currentLine.Trim() == "") break;
                 var headSplit = currentLine.Split(':', 2);
                 if (headSplit.Length < 2) break;
                 x.Headers[headSplit[0].Trim()] = headSplit[1].Trim();
             }
 
             if (x.Method != HttpMethods.Post) return x;
-           
+
             if (!x.Headers.ContainsKey("Content-Length"))
                 return null;
 
@@ -146,8 +172,7 @@ namespace Sora.Server
             _listener.Start();
             _pool.Start();
             _running = true;
-            _pool.MaxThreads = 64; // Let us handle up to 64 connections at the same time.
-            _pool.MinThreads = 16;
+            _pool.MaxThreads = 8 * Environment.ProcessorCount; _pool.MinThreads = _pool.MaxThreads;
             while (true)
             {
                 if (!_running)

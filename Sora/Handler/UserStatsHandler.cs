@@ -24,17 +24,24 @@ SOFTWARE.
 */
 #endregion
 
-namespace Sora.Enums
+using System.Collections.Generic;
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
+namespace Sora.Handler
 {
-    public enum LoginResponses
+    internal class UserStatsHandler
     {
-        Failed = -1,
-        Outdated = -2,
-        Banned = -3,
-        Multiacc = -4,
-        Exception = -5,
-        Supporteronly = -6,
-        PasswordReset = -7,
-        Twofactorauth = -8
+        [Handler(HandlerTypes.ClientUserStatsRequest)]
+        private void HandleUserStats(Presence pr, List<int> UserIds)
+        {
+            foreach (var Id in UserIds)
+            {
+                var opr = Presences.GetPresence(Id);
+                pr.Write(new HandleUpdate(opr));
+            }
+        }
     }
 }

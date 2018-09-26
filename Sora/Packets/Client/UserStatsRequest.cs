@@ -24,17 +24,25 @@ SOFTWARE.
 */
 #endregion
 
-namespace Sora.Enums
+using System;
+using System.Collections.Generic;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
+namespace Sora.Packets.Client
 {
-    public enum LoginResponses
+    public class UserStatsRequest : IPacketSerializer
     {
-        Failed = -1,
-        Outdated = -2,
-        Banned = -3,
-        Multiacc = -4,
-        Exception = -5,
-        Supporteronly = -6,
-        PasswordReset = -7,
-        Twofactorauth = -8
+        public PacketId Id => PacketId.ClientUserStatsRequest;
+
+        public List<int> Userids;
+
+        public void ReadFromStream(MStreamReader sr) => Userids = sr.ReadInt32List();
+
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

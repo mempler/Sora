@@ -19,11 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CDBAE606
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Playground\Playground.csproj", "{24E23C8A-9290-44DB-9182-844101DAF4DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared Tests", "Shared Tests\Shared Tests.csproj", "{58268D08-8342-417F-95A3-5A214A9B64BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared Tests", "Shared Tests\Shared Tests.csproj", "{58268D08-8342-417F-95A3-5A214A9B64BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora Tests", "Sora Tests\Sora Tests.csproj", "{52F65B00-3FCC-488E-9CEB-A04DFFA46284}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sora Tests", "Sora Tests\Sora Tests.csproj", "{52F65B00-3FCC-488E-9CEB-A04DFFA46284}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jibril Tests", "Jibril Tests\Jibril Tests.csproj", "{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jibril Tests", "Jibril Tests\Jibril Tests.csproj", "{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,10 +1,38 @@
-﻿using System;
+﻿#region copyright
+/*
+MIT License
+
+Copyright (c) 2018 Robin A. P.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+#endregion
+
+using System;
 using System.IO;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
+using Sora.Enums;
 using Sora.Objects;
 using Sora.Packets.Client;
+using Sora.Packets.Server;
 using Sora.Server;
 
 namespace Sora.Handler
@@ -16,141 +44,66 @@ namespace Sora.Handler
         {
             try
             {
-                if (!req.Headers.ContainsKey("osu-token")) {
+                if (!req.Headers.ContainsKey("osu-token"))
+                {
                     Handlers.ExecuteHandler(HandlerTypes.LoginHandler, req, res);
                     return;
                 }
-                var pr = Presences.GetPresence(req.Headers["osu-token"]);
-                if (pr == null)
-                {
-                    res.StatusCode = 403;
-                    return;
-                }
+            }
+            catch (Exception ex)
+            {
+                Program.Logger.Error(ex);
+                res.Writer.Write(new LoginResponse(LoginResponses.Exception));
+                return;
+            }
 
-                var len = 0;
-                while (req.Reader.BaseStream.Length != len)
+            var pr = Presences.GetPresence(req.Headers["osu-token"]);
+            if (pr == null)
+            {
+                res.StatusCode = 403;
+                return;
+            }
+
+            while (true)
+            {
+                try
                 {
                     var packetId = (PacketId) req.Reader.ReadInt16();
                     req.Reader.ReadBoolean();
                     var packetData = req.Reader.ReadBytes();
-                    len += 2 + 4 + packetData.Length;
                     var packetDataReader = new MStreamReader(new MemoryStream(packetData));
+
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:
-                            var x = new SendUserStatus();
-                            x.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Status);
-                            break;
-                        case PacketId.ClientSendIrcMessage:
-                            break;
-                        case PacketId.ClientExit:
-                            break;
-                        case PacketId.ClientRequestStatusUpdate:
+                            var sendUserStatus = new SendUserStatus();
+                            sendUserStatus.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, sendUserStatus.Status);
                             break;
                         case PacketId.ClientPong:
                             Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
                             break;
-                        case PacketId.ClientStartSpectating:
-                            break;
-                        case PacketId.ClientStopSpectating:
-                            break;
-                        case PacketId.ClientSpectateFrames:
-                            break;
-                        case PacketId.ClientErrorReport:
-                            break;
-                        case PacketId.ClientCantSpectate:
-                            break;
-                        case PacketId.ClientSendIrcMessagePrivate:
-                            break;
-                        case PacketId.ClientLobbyPart:
-                            break;
-                        case PacketId.ClientLobbyJoin:
-                            break;
-                        case PacketId.ClientMatchCreate:
-                            break;
-                        case PacketId.ClientMatchJoin:
-                            break;
-                        case PacketId.ClientMatchPart:
-                            break;
-                        case PacketId.ClientMatchChangeSlot:
-                            break;
-                        case PacketId.ClientMatchReady:
-                            break;
-                        case PacketId.ClientMatchLock:
-                            break;
-                        case PacketId.ClientMatchChangeSettings:
-                            break;
-                        case PacketId.ClientMatchStart:
-                            break;
-                        case PacketId.ClientMatchScoreUpdate:
-                            break;
-                        case PacketId.ClientMatchComplete:
-                            break;
-                        case PacketId.ClientMatchChangeMods:
-                            break;
-                        case PacketId.ClientMatchLoadComplete:
-                            break;
-                        case PacketId.ClientMatchNoBeatmap:
-                            break;
-                        case PacketId.ClientMatchNotReady:
-                            break;
-                        case PacketId.ClientMatchFailed:
-                            break;
-                        case PacketId.ClientMatchHasBeatmap:
-                            break;
-                        case PacketId.ClientMatchSkipRequest:
-                            break;
-                        case PacketId.ClientChannelJoin:
-                            break;
-                        case PacketId.ClientBeatmapInfoRequest:
-                            break;
-                        case PacketId.ClientMatchTransferHost:
-                            break;
-                        case PacketId.ClientFriendAdd:
-                            break;
-                        case PacketId.ClientFriendRemove:
-                            break;
-                        case PacketId.ClientMatchChangeTeam:
-                            break;
-                        case PacketId.ClientChannelLeave:
-                            break;
-                        case PacketId.ClientReceiveUpdates:
-                            break;
-                        case PacketId.ClientSetIrcAwayMessage:
+                        case PacketId.ClientRequestStatusUpdate:
+                            Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
                             break;
                         case PacketId.ClientUserStatsRequest:
-                            break;
-                        case PacketId.ClientInvite:
-                            break;
-                        case PacketId.ClientMatchChangePassword:
-                            break;
-                        case PacketId.ClientSpecialMatchInfoRequest:
-                            break;
-                        case PacketId.ClientUserPresenceRequest:
-                            break;
-                        case PacketId.ClientUserPresenceRequestAll:
-                            break;
-                        case PacketId.ClientUserToggleBlockNonFriendPm:
-                            break;
-                        case PacketId.ClientMatchAbort:
-                            break;
-                        case PacketId.ClientSpecialJoinMatchChannel:
-                            break;
-                        case PacketId.ClientSpecialLeaveMatchChannel:
+                            var x = new UserStatsRequest();
+                            x.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Userids);
                             break;
                         default:
-                            Program.Logger.Debug("[Unknown Packet] " + packetId);
+                            Program.Logger.Debug("PacketId: " + packetId);
+                            Program.Logger.Debug("PacketLength: " + packetData.Length);
                             break;
                     }
                 }
-                if (pr.LastRequest)
-                    Presences.EndPresence(pr, true);
+                catch
+                {
+                    break;
                 }
-            catch
-            {
-                // ignored
             }
+            if (pr.LastRequest)
+                Presences.EndPresence(pr, true);
         }
     }
 }
