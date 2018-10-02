@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resource\index.html">
+    <None Update="index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -43,6 +43,10 @@
     <Reference Include="System.Xml">
       <HintPath>System.Xml</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resource\" />
   </ItemGroup>
 
 </Project>
