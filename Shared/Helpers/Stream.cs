@@ -92,6 +92,7 @@ namespace Shared.Helpers
                 Write(list[i]);
         }
         public void WriteRawBuffer(byte[] buff) => base.Write(buff);
+        public void WriteRawString(string value) => WriteRawBuffer(Encoding.UTF8.GetBytes(value));
         public void WriteObject(object obj)
         {
             if (obj == null)

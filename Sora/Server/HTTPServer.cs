@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Amib.Threading;
@@ -63,12 +64,35 @@ namespace Sora.Server
         {
             using (_client)
             {
-                var sr = new StreamReader(_client.GetStream());
-                var req = ReadHeader(sr);
-                if (req == null) return;
-                var res = new Res {Writer = MStreamWriter.New()};
-                Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
-                WriteRes(_client, req, res);
+                try
+                {
+                    var sr = new StreamReader(_client.GetStream());
+                    var req = ReadHeader(sr);
+                    var res = new Res {Writer = MStreamWriter.New()};
+                    if (req == null)
+                    {
+                        req = new Req
+                        {
+                            Headers = {["Host"] = "Unknown"},
+                            Method = HttpMethods.Get
+                        };
+                    }
+                    if (req.Method == HttpMethods.Get)
+                    {
+                        res.Writer.WriteRawString(
+                            !File.Exists("index.html")
+                                ? @"<html><head><title>Sora - an Strategic bancho.</title></head><body></body></html>"
+                                : File.ReadAllText("index.html"));
+                        WriteRes(_client, req, res);
+                        return;
+                    }
+                    Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
+                    WriteRes(_client, req, res);
+                }
+                catch (Exception ex)
+                {
+                    Logger.L.Error(ex);
+                }
             }
         }
 
@@ -113,7 +137,7 @@ namespace Sora.Server
         {
             using (var stream = c.GetStream())
             {
-                var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + ((HttpStatusCode)s.StatusCode) + "\r\n" + Header2Str(r, s) + "\r\n");
+                var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + (HttpStatusCode)s.StatusCode + "\r\n" + Header2Str(r, s) + "\r\n");
                 stream.Write(header);
                 stream.Write(s.Writer.ToArray());
                 s.Writer.Close();
@@ -188,6 +212,7 @@ namespace Sora.Server
 
     public enum HttpMethods
     {
+        Get,
         Post,
     }
 }

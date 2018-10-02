@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Shared.Enums;
+using Shared.Helpers;
 
 namespace Shared.Handlers
 {
@@ -66,7 +67,14 @@ namespace Shared.Handlers
             {
                 if(h.IsAbstract) continue;
                 var handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
-                h.Invoke(handlerClass, args);
+                try
+                {
+                    h.Invoke(handlerClass, args);
+                }
+                catch (TargetInvocationException tie)
+                {
+                    Logger.L.Error(tie.InnerException);
+                }
             }
         }
     }
