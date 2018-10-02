@@ -38,7 +38,7 @@ namespace Shared.Database.Models
         public int Id { get; set; }
 
         [Required] [DefaultValue(0)]
-        public ulong RankedScoreStd { get; set; }
+        public ulong RankedScoreOsu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong RankedScoreTaiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -47,7 +47,7 @@ namespace Shared.Database.Models
         public ulong RankedScoreMania { get; set; }
 
         [Required] [DefaultValue(0)]
-        public ulong TotalScoreStd { get; set; }
+        public ulong TotalScoreOsu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong TotalScoreTaiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -56,7 +56,7 @@ namespace Shared.Database.Models
         public ulong TotalScoreMania { get; set; }
 
         [Required] [DefaultValue(0)]
-        public ulong Count300Std { get; set; }
+        public ulong Count300Osu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong Count300Taiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -66,7 +66,7 @@ namespace Shared.Database.Models
 
         
         [Required] [DefaultValue(0)]
-        public ulong Count100Std { get; set; }
+        public ulong Count100Osu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong Count100Taiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -76,7 +76,7 @@ namespace Shared.Database.Models
 
                 
         [Required] [DefaultValue(0)]
-        public ulong Count50Std { get; set; }
+        public ulong Count50Osu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong Count50Taiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -86,7 +86,7 @@ namespace Shared.Database.Models
 
                 
         [Required] [DefaultValue(0)]
-        public ulong CountMissStd { get; set; }
+        public ulong CountMissOsu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong CountMissTaiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -95,7 +95,7 @@ namespace Shared.Database.Models
         public ulong CountMissMania { get; set; }
 
         [Required] [DefaultValue(0)]
-        public ulong PlayCountStd { get; set; }
+        public ulong PlayCountOsu { get; set; }
         [Required] [DefaultValue(0)]
         public ulong PlayCountTaiko { get; set; }
         [Required] [DefaultValue(0)]
@@ -104,7 +104,7 @@ namespace Shared.Database.Models
         public ulong PlayCountMania { get; set; }
 
         [Required] [DefaultValue(0)]
-        public double PeppyPointsStd { get; set; }
+        public double PeppyPointsOsu { get; set; }
         [Required] [DefaultValue(0)]
         public double PeppyPointsTaiko { get; set; }
         [Required] [DefaultValue(0)]
