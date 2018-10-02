@@ -68,6 +68,7 @@ namespace Sora.Handler
             {
                 try
                 {
+                    if (req.Reader.BaseStream.Position - req.Reader.BaseStream.Length < 0x0b) break; // Dont handle any invalid packets! (less then bytelength of 0x0b)
                     var packetId = (PacketId) req.Reader.ReadInt16();
                     req.Reader.ReadBoolean();
                     var packetData = req.Reader.ReadBytes();
