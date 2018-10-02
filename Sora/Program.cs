@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Reflection;
 using Shared.Database;
+using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Plugins;
@@ -49,6 +50,7 @@ namespace Sora
                 AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e) { Logger.L.Error(ex); };
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
+                Handlers.ExecuteHandler(HandlerTypes.Initializer);
                 Logger.L.Info("Initalization Success");
             }
             catch (Exception ex)
