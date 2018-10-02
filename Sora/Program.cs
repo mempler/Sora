@@ -25,9 +25,9 @@ SOFTWARE.
 #endregion
 
 using System;
-using System.Runtime.InteropServices;
-using System.Threading;
+using System.Reflection;
 using Shared.Database;
+using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Plugins;
 using Sora.Server;
@@ -39,55 +39,29 @@ namespace Sora
     {
         private static HttpServer _server;
 
-        #if _WINDOWS // This only works for windows so we have to remove it if it's linux or any other OS!
-        [DllImport("Kernel32")]
-        public static extern bool SetConsoleCtrlHandler(HandlerRoutine handler, bool add);
-        public delegate bool HandlerRoutine(CtrlTypes ctrlType);
-
-        public enum CtrlTypes
-        {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT,
-            CTRL_CLOSE_EVENT,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT
-        }
-        #endif
-
         private static void Initialize() {
             try
             {
                 Logger.L.Info("Start Initalization");
-                SetConsoleCtrlHandler(ConsoleCtrlCheck, true);
-                
                 _server = new HttpServer(Config.ReadConfig().Server.Port);
-                Logger.L.Info("Initalization Success");
-                using (var db = new SoraContext()) { }
+                using (new SoraContext()) { } // Initialize Database just once. (Migrate database)
 
                 AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e) { Logger.L.Error(ex); };
+                Loader.LoadPlugins();
+                Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
+                Logger.L.Info("Initalization Success");
             }
             catch (Exception ex)
             {
                 Logger.L.Error(ex);
             }
-            Loader.LoadPlugins();
         }
 
         [STAThread]
-        private static void Main(string[] args)
+        private static void Main()
         {
             Initialize();
             _server.Run();
         }
-       
-
-        #if _WINDOWS
-        private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
-        {
-            _server.Stop();
-            Thread.Sleep(500);
-            return true;
-        }
-        #endif
     }
 }

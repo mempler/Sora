@@ -34,7 +34,7 @@ namespace Sora.Packets.Server
     {
         public PacketId Id => PacketId.ServerProtocolNegotiation;
 
-        public uint Protocol = 19;
+        public uint Protocol = 19; // Latest protocol version
 
         public void ReadFromStream(MStreamReader sr) => Protocol = sr.ReadUInt32();
 

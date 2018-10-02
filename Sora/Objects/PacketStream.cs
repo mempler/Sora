@@ -24,6 +24,7 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using Shared.Enums;
 using Shared.Handlers;
@@ -62,11 +63,12 @@ namespace Sora.Objects
         public void Left(Presence pr) => JoinedPresences[pr.Token] = null;
         public void Left(string token) => JoinedPresences[token] = null;
 
-        public void Broadcast(IPacketSerializer packet, Presence ignorePresence = null)
+        public void Broadcast(IPacketSerializer packet, params Presence[] ignorePresences)
         {
             foreach (var presence in JoinedPresences)
             {
-                if (presence.Value == ignorePresence || presence.Value.Disconnected) continue;
+                if (Array.BinarySearch(ignorePresences, presence) > 0 || presence.Value.Disconnected)
+                    continue;
                 presence.Value.Write(packet);
             }
         }
