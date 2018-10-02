@@ -44,6 +44,7 @@ namespace Sora
             try
             {
                 Logger.L.Info("Start Initalization");
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 _server = new HttpServer(Config.ReadConfig().Server.Port);
                 using (new SoraContext()) { } // Initialize Database just once. (Migrate database)
 
@@ -51,7 +52,8 @@ namespace Sora
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
                 Handlers.ExecuteHandler(HandlerTypes.Initializer);
-                Logger.L.Info("Initalization Success");
+                watch.Stop();
+                Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
             }
             catch (Exception ex)
             {
