@@ -46,10 +46,7 @@ namespace Shared.Database.Models
         public static UserStats GetUserStats(int userId)
         {
             using (var db = new SoraContext())
-            {
-                var result = db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-                return result;
-            }
+                return db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
         }
 
         public static UserStats GetUserStats(Users user) => GetUserStats(user.Id);
