@@ -32,7 +32,6 @@ using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Packets.Client;
-using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
@@ -50,22 +49,18 @@ namespace Sora.Objects
             return null;
         }
 
-        public static List<int> GetUserIds()
+        public static IEnumerable<int> GetUserIds()
         {
-            var l = new List<int>();
             foreach (var presence in presences)
-                l.Add(presence.Value.User.Id);
-            return l;
+                yield return presence.Value.User.Id;
         }
-        public static List<int> GetUserIds(Presence pr)
+        public static IEnumerable<int> GetUserIds(Presence pr)
         {
-            var l = new List<int>();
             foreach (var presence in presences)
             {
                 if (presence.Value.User.Id == pr.User.Id) continue;
-                l.Add(presence.Value.User.Id);
+                yield return presence.Value.User.Id;
             }
-            return l;
         }
         
         public static void BeginPresence(Presence presence)
@@ -83,7 +78,6 @@ namespace Sora.Objects
             }
 
             presence.LastRequest = true;
-            presence.Stream.Write(new Announce("Your session has ended!"));
             UserCount--;
         }
     }

@@ -92,10 +92,103 @@ namespace Sora.Handler
                             x.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Userids);
                             break;
-                        default:
-                            Logger.L.Debug("PacketId: " + packetId);
-                            Logger.L.Debug("PacketLength: " + packetData.Length);
+                        case PacketId.ClientSendIrcMessage:
                             break;
+                        case PacketId.ClientExit:
+                            break;
+                        case PacketId.ClientStartSpectating:
+                            break;
+                        case PacketId.ClientStopSpectating:
+                            break;
+                        case PacketId.ClientSpectateFrames:
+                            break;
+                        case PacketId.ClientErrorReport:
+                            break;
+                        case PacketId.ClientCantSpectate:
+                            break;
+                        case PacketId.ClientSendIrcMessagePrivate:
+                            break;
+
+                        /* Multi */
+                        case PacketId.ClientLobbyPart:
+                            break;
+                        case PacketId.ClientLobbyJoin:
+                            break;
+                        case PacketId.ClientMatchCreate:
+                            break;
+                        case PacketId.ClientMatchJoin:
+                            break;
+                        case PacketId.ClientMatchPart:
+                            break;
+                        case PacketId.ClientMatchChangeSlot:
+                            break;
+                        case PacketId.ClientMatchReady:
+                            break;
+                        case PacketId.ClientMatchLock:
+                            break;
+                        case PacketId.ClientMatchChangeSettings:
+                            break;
+                        case PacketId.ClientMatchStart:
+                            break;
+                        case PacketId.ClientMatchScoreUpdate:
+                            break;
+                        case PacketId.ClientMatchComplete:
+                            break;
+                        case PacketId.ClientMatchChangeMods:
+                            break;
+                        case PacketId.ClientMatchLoadComplete:
+                            break;
+                        case PacketId.ClientMatchNoBeatmap:
+                            break;
+                        case PacketId.ClientMatchNotReady:
+                            break;
+                        case PacketId.ClientMatchFailed:
+                            break;
+                        case PacketId.ClientMatchHasBeatmap:
+                            break;
+                        case PacketId.ClientMatchSkipRequest:
+                            break;
+
+                        /* Multi End */
+                        case PacketId.ClientChannelJoin:
+                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, packetDataReader.ReadString());
+                            break;
+                        case PacketId.ClientBeatmapInfoRequest:
+                            break;
+                        case PacketId.ClientMatchTransferHost:
+                            break;
+                        case PacketId.ClientFriendAdd:
+                            break;
+                        case PacketId.ClientFriendRemove:
+                            break;
+                        case PacketId.ClientMatchChangeTeam:
+                            break;
+                        case PacketId.ClientChannelLeave:
+                            break;
+                        case PacketId.ClientReceiveUpdates:
+                            break;
+                        case PacketId.ClientSetIrcAwayMessage:
+                            break;
+                        case PacketId.ClientInvite:
+                            break;
+                        case PacketId.ClientMatchChangePassword:
+                            break;
+                        case PacketId.ClientSpecialMatchInfoRequest:
+                            break;
+                        case PacketId.ClientUserPresenceRequest:
+                            break;
+                        case PacketId.ClientUserPresenceRequestAll:
+                            break;
+                        case PacketId.ClientUserToggleBlockNonFriendPm:
+                            break;
+                        case PacketId.ClientMatchAbort:
+                            break;
+                        case PacketId.ClientSpecialJoinMatchChannel:
+                            break;
+                        case PacketId.ClientSpecialLeaveMatchChannel:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
                 catch

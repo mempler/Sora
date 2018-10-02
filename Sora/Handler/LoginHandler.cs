@@ -25,6 +25,7 @@ SOFTWARE.
 #endregion
 
 using System;
+using System.Linq;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
@@ -82,8 +83,21 @@ namespace Sora.Handler
                 Success(res, user.Id);
                 res.Writer.Write(new ProtocolNegotiation());
                 res.Writer.Write(new UserPresence(pr));
-                res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr)));
+                res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr).ToList()));
                 res.Writer.Write(new HandleUpdate(pr));
+
+                foreach (var chanAuto in Channels.ChannelsAutoJoin) {
+                    if (chanAuto.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
+                        res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
+                    else if (!chanAuto.AdminOnly)
+                        res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
+
+                    if (chanAuto.JoinChannel(pr))
+                        res.Writer.Write(new ChannelJoinSuccess(chanAuto));
+                    else
+                        res.Writer.Write(new ChannelRevoked(chanAuto));
+                }
+
                 var stream = LPacketStreams.GetStream("main");
                 if (stream == null)
                 {

@@ -25,15 +25,23 @@ SOFTWARE.
 #endregion
 
 using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Objects;
 
-namespace Shared.Enums
+namespace Sora.Packets.Server
 {
-    [Flags]
-    public enum Privileges
+    public class ChannelJoinSuccess : IPacketSerializer
     {
-        Default = 1 << 1,
+        public PacketId Id => PacketId.ServerChannelJoinSuccess;
 
-        CModSilence = 1 << 2,
-        Admin = Default | CModSilence
+        public Channel Channel;
+
+        public ChannelJoinSuccess(Channel channel) => Channel = channel;
+
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+
+        public void WriteToStream(MStreamWriter sw) => sw.Write(Channel.ChannelName);
     }
 }

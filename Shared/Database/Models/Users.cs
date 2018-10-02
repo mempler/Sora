@@ -73,5 +73,7 @@ namespace Shared.Database.Models
 
         public override string ToString() =>
             $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
+
+        public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
     }
 }

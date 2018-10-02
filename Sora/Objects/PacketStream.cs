@@ -35,11 +35,16 @@ namespace Sora.Objects
     public class LPacketStreams
     {
         private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();
-
+        private static bool _initialized;
+        
         [Handler(HandlerTypes.Initializer)]
         public static void Initialize()
         {
-            JoinStream("main", new PacketStream());
+            if (_initialized) return;
+            _initialized = true;
+            NewStream(new PacketStream("main"));
+            NewStream(new PacketStream("admin")); // Admin stream, only admins will join.
+            NewStream(new PacketStream("lobby")); // Little prepare for later.
         }
 
         public static PacketStream GetStream(string name)
@@ -47,16 +52,20 @@ namespace Sora.Objects
             PacketStreams.TryGetValue(name, out var x);
             return x;
         }
-        public static void JoinStream(string name, PacketStream str) =>
-            PacketStreams[name] = str;
 
-        public static void LeaveStream(string name) =>
+        public static void NewStream(PacketStream str) =>
+            PacketStreams[str.StreamName] = str;
+
+        public static void RemoveStream(string name) =>
             PacketStreams[name] = null;
     }
 
     public class PacketStream
     {
+        public PacketStream(string name) => StreamName = name;
+
         public Dictionary<string, Presence> JoinedPresences = new Dictionary<string, Presence>();
+        public string StreamName { get; }
 
         public void Join(Presence pr) => JoinedPresences[pr.Token] = pr;
 
