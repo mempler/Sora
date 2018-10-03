@@ -73,6 +73,9 @@ namespace Sora.Handler
                     req.Reader.ReadBoolean();
                     var packetData = req.Reader.ReadBytes();
                     var packetDataReader = new MStreamReader(new MemoryStream(packetData));
+
+                    if (packetId != PacketId.ClientPong)
+                        Logger.L.Debug($"Packet: {packetId} Length: {packetData.Length} Data: {BitConverter.ToString(packetData).Replace("-","")}");
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:
@@ -89,15 +92,12 @@ namespace Sora.Handler
                         case PacketId.ClientUserStatsRequest:
                             var userStatsRequest = new UserStatsRequest();
                             userStatsRequest.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, userStatsRequest.Userids);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr, userStatsRequest.Userids);
                             break;
                         case PacketId.ClientChannelJoin:
                             var channelJoin = new ChannelJoin();
                             channelJoin.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
-                            break;
-                        default:
-                            Logger.L.Debug($"Packet: {packetId}. Length: {packetData.Length}");
                             break;
                     }
                 }
