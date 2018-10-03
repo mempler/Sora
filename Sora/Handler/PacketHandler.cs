@@ -68,12 +68,11 @@ namespace Sora.Handler
             {
                 try
                 {
-                    if (req.Reader.BaseStream.Position - req.Reader.BaseStream.Length < 0x0b) break; // Dont handle any invalid packets! (less then bytelength of 0x0b)
+                    if (req.Reader.BaseStream.Length - req.Reader.BaseStream.Position < 7) break; // Dont handle any invalid packets! (less then bytelength of 0x07)
                     var packetId = (PacketId) req.Reader.ReadInt16();
                     req.Reader.ReadBoolean();
                     var packetData = req.Reader.ReadBytes();
                     var packetDataReader = new MStreamReader(new MemoryStream(packetData));
-
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:
@@ -88,114 +87,30 @@ namespace Sora.Handler
                             Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
                             break;
                         case PacketId.ClientUserStatsRequest:
-                            var x = new UserStatsRequest();
-                            x.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, x.Userids);
+                            var userStatsRequest = new UserStatsRequest();
+                            userStatsRequest.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, userStatsRequest.Userids);
                             break;
-                        case PacketId.ClientSendIrcMessage:
-                            break;
-                        case PacketId.ClientExit:
-                            break;
-                        case PacketId.ClientStartSpectating:
-                            break;
-                        case PacketId.ClientStopSpectating:
-                            break;
-                        case PacketId.ClientSpectateFrames:
-                            break;
-                        case PacketId.ClientErrorReport:
-                            break;
-                        case PacketId.ClientCantSpectate:
-                            break;
-                        case PacketId.ClientSendIrcMessagePrivate:
-                            break;
-
-                        /* Multi */
-                        case PacketId.ClientLobbyPart:
-                            break;
-                        case PacketId.ClientLobbyJoin:
-                            break;
-                        case PacketId.ClientMatchCreate:
-                            break;
-                        case PacketId.ClientMatchJoin:
-                            break;
-                        case PacketId.ClientMatchPart:
-                            break;
-                        case PacketId.ClientMatchChangeSlot:
-                            break;
-                        case PacketId.ClientMatchReady:
-                            break;
-                        case PacketId.ClientMatchLock:
-                            break;
-                        case PacketId.ClientMatchChangeSettings:
-                            break;
-                        case PacketId.ClientMatchStart:
-                            break;
-                        case PacketId.ClientMatchScoreUpdate:
-                            break;
-                        case PacketId.ClientMatchComplete:
-                            break;
-                        case PacketId.ClientMatchChangeMods:
-                            break;
-                        case PacketId.ClientMatchLoadComplete:
-                            break;
-                        case PacketId.ClientMatchNoBeatmap:
-                            break;
-                        case PacketId.ClientMatchNotReady:
-                            break;
-                        case PacketId.ClientMatchFailed:
-                            break;
-                        case PacketId.ClientMatchHasBeatmap:
-                            break;
-                        case PacketId.ClientMatchSkipRequest:
-                            break;
-
-                        /* Multi End */
                         case PacketId.ClientChannelJoin:
-                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, packetDataReader.ReadString());
-                            break;
-                        case PacketId.ClientBeatmapInfoRequest:
-                            break;
-                        case PacketId.ClientMatchTransferHost:
-                            break;
-                        case PacketId.ClientFriendAdd:
-                            break;
-                        case PacketId.ClientFriendRemove:
-                            break;
-                        case PacketId.ClientMatchChangeTeam:
-                            break;
-                        case PacketId.ClientChannelLeave:
-                            break;
-                        case PacketId.ClientReceiveUpdates:
-                            break;
-                        case PacketId.ClientSetIrcAwayMessage:
-                            break;
-                        case PacketId.ClientInvite:
-                            break;
-                        case PacketId.ClientMatchChangePassword:
-                            break;
-                        case PacketId.ClientSpecialMatchInfoRequest:
-                            break;
-                        case PacketId.ClientUserPresenceRequest:
-                            break;
-                        case PacketId.ClientUserPresenceRequestAll:
-                            break;
-                        case PacketId.ClientUserToggleBlockNonFriendPm:
-                            break;
-                        case PacketId.ClientMatchAbort:
-                            break;
-                        case PacketId.ClientSpecialJoinMatchChannel:
-                            break;
-                        case PacketId.ClientSpecialLeaveMatchChannel:
+                            var channelJoin = new ChannelJoin();
+                            channelJoin.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            Logger.L.Debug($"Packet: {packetId}. Length: {packetData.Length}");
+                            break;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Logger.L.Error(ex);
                     break;
                 }
             }
+            
+            pr.GetOutput()
+                .WriteTo(res.Writer.BaseStream);
+
             if (pr.LastRequest)
                 Presences.EndPresence(pr, true);
         }

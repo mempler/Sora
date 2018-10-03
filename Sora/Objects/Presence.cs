@@ -81,6 +81,7 @@ namespace Sora.Objects
             UserCount--;
         }
     }
+
     public class Presence
     {
         public string Token;
@@ -117,6 +118,21 @@ namespace Sora.Objects
         }
 
         protected bool Equals(Presence pr) => Token == pr.Token;
+
+        public MemoryStream GetOutput(bool reset = true)
+        {
+            var copy = new MemoryStream();
+            var pos = Stream.BaseStream.Position;
+            Stream.BaseStream.Position = 0;
+            Stream.BaseStream.CopyTo(copy);
+            Stream.BaseStream.Position = pos;
+
+            if (!reset) return copy;
+
+            Stream = new MStreamWriter(new MemoryStream());
+            GC.Collect(); // Collect the mess we made.
+            return copy;
+        }
 
 
         public void Write(IPacketSerializer p) => Stream.Write(p);
