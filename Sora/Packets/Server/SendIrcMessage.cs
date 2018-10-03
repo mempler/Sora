@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -14,13 +12,14 @@ namespace Sora.Packets.Server
         public string ChannelTarget;
         public int SenderId;
     }
-    public class Message : IPacketSerializer
+
+    public class SendIrcMessage : IPacketSerializer
     {
         public PacketId Id => PacketId.ClientSendIrcMessage;
 
         public MessageStruct Msg;
 
-        public Message(MessageStruct message)  => Msg = message;
+        public SendIrcMessage(MessageStruct message)  => Msg = message;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
 
