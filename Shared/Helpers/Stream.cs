@@ -174,14 +174,12 @@ namespace Shared.Helpers
         }
         public List<int> ReadInt32List()
         {
-            var count = ReadInt32();
+            var count = ReadInt16();
             if (count < 0)
                 return null;
             var outList = new List<int>(count);
             for (var i = 0; i < count; i++)
-            {
                 outList.Add(ReadInt32());
-            }
             return outList;
         }
     }
