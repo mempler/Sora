@@ -35,11 +35,11 @@ namespace Sora.Handler
     internal class UserStatsHandler
     {
         [Handler(HandlerTypes.ClientUserStatsRequest)]
-        private void HandleUserStats(Presence pr, List<int> UserIds)
+        private void HandleUserStats(Presence pr, IEnumerable<int> userIds)
         {
-            foreach (var Id in UserIds)
+            foreach (var id in userIds)
             {
-                var opr = Presences.GetPresence(Id);
+                var opr = Presences.GetPresence(id);
                 pr.Write(new HandleUpdate(opr));
             }
         }
