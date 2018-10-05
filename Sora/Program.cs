@@ -31,6 +31,7 @@ using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Plugins;
+using Sora.Objects;
 using Sora.Server;
 
 namespace Sora
@@ -65,6 +66,7 @@ namespace Sora
         private static void Main()
         {
             Initialize();
+            Presences.TimeoutCheck();
             _server.Run();
         }
     }

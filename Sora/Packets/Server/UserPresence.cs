@@ -33,7 +33,7 @@ using Sora.Objects;
 
 namespace Sora.Packets.Server
 {
-    public class UserPresence : IPacketSerializer
+    public class UserPresence : IPacket
     {
         public PacketId Id => PacketId.ServerUserPresence;
 

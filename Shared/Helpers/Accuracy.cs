@@ -33,6 +33,8 @@ namespace Shared.Helpers
         public static double GetAccuracy(ulong count300, ulong count100, ulong count50, ulong countMiss,
             ulong countGeki, ulong countKatu, PlayModes playMode)
         {
+            if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
+                return 1;
             switch (playMode)
             {
                 case PlayModes.Osu:

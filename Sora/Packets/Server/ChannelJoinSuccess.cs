@@ -32,7 +32,7 @@ using Sora.Objects;
 
 namespace Sora.Packets.Server
 {
-    public class ChannelJoinSuccess : IPacketSerializer
+    public class ChannelJoinSuccess : IPacket
     {
         public PacketId Id => PacketId.ServerChannelJoinSuccess;
 

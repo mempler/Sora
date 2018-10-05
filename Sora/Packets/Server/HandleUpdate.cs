@@ -32,7 +32,7 @@ using Sora.Objects;
 
 namespace Sora.Packets.Server
 {
-    public class HandleUpdate : IPacketSerializer
+    public class HandleUpdate : IPacket
     {
         public PacketId Id => PacketId.ServerHandleOsuUpdate;
 

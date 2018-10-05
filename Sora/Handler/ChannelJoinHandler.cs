@@ -32,7 +32,7 @@ using Sora.Packets.Server;
 
 namespace Sora.Handler
 {
-    public class ChannelJoinHandler
+    internal class ChannelJoinHandler
     {
         [Handler(HandlerTypes.ClientChannelJoin)]
         public void OnChannelJoin(Presence pr, string channelName)
@@ -46,6 +46,8 @@ namespace Sora.Handler
 
             if (channel.JoinChannel(pr))
                 pr.Write(new ChannelJoinSuccess(channel));
+
+            channel?.BoundStream.Broadcast(new ChannelAvailable(channel));
         }
     }
 }

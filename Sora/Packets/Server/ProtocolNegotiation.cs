@@ -30,7 +30,7 @@ using Shared.Interfaces;
 
 namespace Sora.Packets.Server
 {
-    public class ProtocolNegotiation : IPacketSerializer
+    public class ProtocolNegotiation : IPacket
     {
         public PacketId Id => PacketId.ServerProtocolNegotiation;
 

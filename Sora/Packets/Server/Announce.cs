@@ -30,7 +30,7 @@ using Shared.Interfaces;
 
 namespace Sora.Packets.Server
 {
-    public class Announce : IPacketSerializer
+    public class Announce : IPacket
     {
         public string Message;
         public Announce(string message) => Message = message;

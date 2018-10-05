@@ -32,7 +32,7 @@ using Shared.Interfaces;
 
 namespace Sora.Packets.Client
 {
-    public class UserStatsRequest : IPacketSerializer
+    public class UserStatsRequest : IPacket
     {
         public PacketId Id => PacketId.ClientUserStatsRequest;
 

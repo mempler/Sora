@@ -31,7 +31,7 @@ using Sora.Enums;
 
 namespace Sora.Packets.Server
 {
-    public class LoginResponse : IPacketSerializer
+    public class LoginResponse : IPacket
     {
         protected LoginResponses Response;
         public LoginResponse(LoginResponses response) => Response = response;

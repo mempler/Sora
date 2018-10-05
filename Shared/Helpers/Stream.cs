@@ -44,7 +44,7 @@ namespace Shared.Helpers
             return new MStreamWriter(x);
         }
 
-        public void Write(IPacketSerializer packet)
+        public void Write(IPacket packet)
         {
             base.Write((short)packet.Id);
             base.Write((byte)0);

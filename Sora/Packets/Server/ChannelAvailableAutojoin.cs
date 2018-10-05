@@ -31,7 +31,7 @@ using Sora.Objects;
 
 namespace Sora.Packets.Server
 {
-    public class ChannelAvailableAutojoin : IPacketSerializer
+    public class ChannelAvailableAutojoin : IPacket
     {
         public PacketId Id => PacketId.ServerChannelAvailableAutojoin;
 

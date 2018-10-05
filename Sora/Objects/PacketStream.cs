@@ -72,7 +72,7 @@ namespace Sora.Objects
         public void Left(Presence pr) => JoinedPresences[pr.Token] = null;
         public void Left(string token) => JoinedPresences[token] = null;
 
-        public void Broadcast(IPacketSerializer packet, params Presence[] ignorePresences)
+        public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {
             foreach (var presence in JoinedPresences)
             {

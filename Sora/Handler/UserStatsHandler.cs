@@ -24,6 +24,7 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using Shared.Enums;
 using Shared.Handlers;
@@ -35,7 +36,7 @@ namespace Sora.Handler
     internal class UserStatsHandler
     {
         [Handler(HandlerTypes.ClientUserStatsRequest)]
-        private void HandleUserStats(Presence pr, IEnumerable<int> userIds)
+        public void HandleUserStats(Presence pr, List<int> userIds)
         {
             foreach (var id in userIds)
             {

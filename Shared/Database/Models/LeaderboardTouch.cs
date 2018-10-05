@@ -117,8 +117,10 @@ namespace Shared.Database.Models
             using (var db = new SoraContext())
             {
                 var result = db.LeaderboardTouch.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-                if (result == null) db.LeaderboardTouch.Add(new LeaderboardTouch {Id = userId});
-                return result ?? new LeaderboardTouch {Id = userId};
+                if (result != null) return result;
+                db.LeaderboardTouch.Add(new LeaderboardTouch {Id = userId});
+                db.SaveChanges();
+                return new LeaderboardTouch {Id = userId};
             }
         }
 

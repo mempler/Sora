@@ -31,7 +31,7 @@ using Shared.Interfaces;
 
 namespace Sora.Packets.Server
 {
-    public class PresenceBundle : IPacketSerializer
+    public class PresenceBundle : IPacket
     {
         public PacketId Id => PacketId.ServerUserPresenceBundle;
 

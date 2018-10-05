@@ -26,13 +26,26 @@ SOFTWARE.
 
 using Shared.Enums;
 using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Objects;
 
-namespace Shared.Interfaces
+namespace Sora.Packets.Server
 {
-    public interface IPacketSerializer
+    public class ChannelAvailable : IPacket
     {
-        PacketId Id { get; }
-        void ReadFromStream(MStreamReader sr);
-        void WriteToStream(MStreamWriter sw);
+        public PacketId Id => PacketId.ServerChannelAvailable;
+
+        public Channel Channel;
+
+        public ChannelAvailable(Channel channel) => Channel = channel;
+
+        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
+
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(Channel.ChannelName, false);
+            sw.Write(Channel.ChannelTopic, true);
+            sw.Write((short)Channel.UserCount);
+        }
     }
 }

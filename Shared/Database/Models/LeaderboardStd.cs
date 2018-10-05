@@ -118,8 +118,10 @@ namespace Shared.Database.Models
             using (var db = new SoraContext())
             {
                 var result = db.LeaderboardStd.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-                if (result == null) db.LeaderboardStd.Add(new LeaderboardStd {Id = userId});
-                return result ?? new LeaderboardStd {Id = userId};
+                if (result != null) return result;
+                db.LeaderboardStd.Add(new LeaderboardStd {Id = userId});
+                db.SaveChanges();
+                return new LeaderboardStd {Id = userId};
             }
         }
 

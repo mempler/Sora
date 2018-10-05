@@ -98,6 +98,12 @@ namespace Sora.Handler
                         res.Writer.Write(new ChannelRevoked(chanAuto));
                 }
 
+                foreach (var chan in Channels.Channels_)
+                    if (chan.Value.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
+                        res.Writer.Write(new ChannelAvailable(chan.Value));
+                    else if (!chan.Value.AdminOnly)
+                        res.Writer.Write(new ChannelAvailable(chan.Value));
+
                 var stream = LPacketStreams.GetStream("main");
                 if (stream == null)
                 {

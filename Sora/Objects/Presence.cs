@@ -26,7 +26,9 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Helpers;
@@ -38,7 +40,6 @@ namespace Sora.Objects
     public static class Presences
     {
         private static readonly Dictionary<string, Presence> presences = new Dictionary<string, Presence>();
-        public static int UserCount;
 
         public static Presence GetPresence(string token) => presences.TryGetValue(token, out var pr) ? pr : null;
         public static Presence GetPresence(int userid)
@@ -65,29 +66,52 @@ namespace Sora.Objects
         
         public static void BeginPresence(Presence presence)
         {
-            presence.BeginSeason = DateTime.Now;
+            presence.BeginSeason = DateTime.UtcNow;
+            presence.LastRequest.Start();
             presences[presence.Token] = presence;
-            UserCount++;
         }
         public static void EndPresence(Presence presence, bool forceful)
         {
             if (forceful && presences.ContainsKey(presence.Token))
             {
-                presences[presence.Token] = null;
+                presences[presence.Token].Stream.Close();
+                presences[presence.Token].LastRequest.Stop();
+                presences.Remove(presence.Token);
                 return;
             }
 
-            presence.LastRequest = true;
-            UserCount--;
+            presence.IsLastRequest = true;
+        }
+
+        public static void TimeoutCheck()
+        {
+            new Thread(() =>
+            {
+                while(true) {
+                    try
+                    {
+                        lock (presences) {
+                            foreach (var pr in presences)
+                                pr.Value.TimeoutCheck();
+                        }
+                    }
+                    catch
+                    {
+                        // Don't EVER let the TimeoutCheck Crash. else we've a memoryleak.
+                    }
+                    Thread.Sleep(1000); // wait a second. we dont want high cpu usage.
+                }
+            }).Start();
         }
     }
 
     public class Presence
     {
-        public string Token;
+        public string Token { get; }
         public MStreamWriter Stream;
         public DateTime BeginSeason;
-        public bool LastRequest;
+        public bool IsLastRequest;
+        public Stopwatch LastRequest;
 
         public Users User;
         public UserStats Stats;
@@ -112,6 +136,7 @@ namespace Sora.Objects
 
         public Presence()
         {
+            LastRequest = new Stopwatch();
             Token = Guid.NewGuid().ToString();
             var str = new MemoryStream();
             Stream = new MStreamWriter(str);
@@ -126,15 +151,21 @@ namespace Sora.Objects
             Stream.BaseStream.Position = 0;
             Stream.BaseStream.CopyTo(copy);
             Stream.BaseStream.Position = pos;
+            LastRequest.Restart();
 
             if (!reset) return copy;
 
+            Stream.Close();
             Stream = new MStreamWriter(new MemoryStream());
-            GC.Collect(); // Collect the mess we made.
             return copy;
         }
 
+        public void TimeoutCheck()
+        {
+            if (LastRequest.ElapsedMilliseconds > 30 * 1000)
+                Presences.EndPresence(this, true);
+        }
 
-        public void Write(IPacketSerializer p) => Stream.Write(p);
+        public void Write(IPacket p) => Stream.Write(p);
     }
 }

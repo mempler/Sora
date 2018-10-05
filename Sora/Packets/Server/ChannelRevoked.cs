@@ -32,7 +32,7 @@ using Sora.Objects;
 
 namespace Sora.Packets.Server
 {
-    public class ChannelRevoked : IPacketSerializer
+    public class ChannelRevoked : IPacket
     {
         public PacketId Id => PacketId.ServerChannelRevoked;
 

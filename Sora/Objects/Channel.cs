@@ -34,7 +34,7 @@ namespace Sora.Objects
     public class Channels
     {
         // ReSharper disable once InconsistentNaming
-        private static readonly Dictionary<string, Channel> Channels_ = new Dictionary<string, Channel>();
+        public static readonly Dictionary<string, Channel> Channels_ = new Dictionary<string, Channel>();
         public static readonly List<Channel> ChannelsAutoJoin = new List<Channel>();
         private static bool _initialized;
 
@@ -85,9 +85,9 @@ namespace Sora.Objects
                        PacketStream boundStream = null, Presence boundPresence = null,
                        bool readOnly = false, bool adminOnly = false, bool autoJoin = false)
         {
-            ChannelName = channelName; ChannelTopic = channelTopic; // Feels
-            BoundStream = boundStream; BoundPresence = boundPresence; // Good!
-            ReadOnly = readOnly; AdminOnly = adminOnly; AutoJoin = autoJoin; // Feels bad!
+            ChannelName = channelName; ChannelTopic = channelTopic;
+            BoundStream = boundStream; BoundPresence = boundPresence;
+            ReadOnly = readOnly; AdminOnly = adminOnly; AutoJoin = autoJoin;
         }
 
         public string ChannelName { get; }
@@ -114,7 +114,10 @@ namespace Sora.Objects
             if (AdminOnly && (pr.User.Privileges & Privileges.Admin) != 0)
             {
                 lock (_presences)
+                {
+                    _presences.Remove(pr);
                     _presences.Add(pr);
+                }
 
                 return true;
             }
@@ -122,7 +125,10 @@ namespace Sora.Objects
             if (AdminOnly) { return false; }
 
             lock (_presences)
+            {
+                _presences.Remove(pr);
                 _presences.Add(pr);
+            }
             return true;
         }
 

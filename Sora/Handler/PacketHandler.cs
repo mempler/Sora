@@ -74,7 +74,7 @@ namespace Sora.Handler
                     var packetData = req.Reader.ReadBytes();
                     var packetDataReader = new MStreamReader(new MemoryStream(packetData));
 
-                    if (packetId != PacketId.ClientPong)
+                    if (packetId != PacketId.ClientPong && packetId != PacketId.ClientUserStatsRequest)
                         Logger.L.Debug($"Packet: {packetId} Length: {packetData.Length} Data: {BitConverter.ToString(packetData).Replace("-","")}");
                     switch (packetId)
                     {
@@ -111,7 +111,7 @@ namespace Sora.Handler
             pr.GetOutput()
                 .WriteTo(res.Writer.BaseStream);
 
-            if (pr.LastRequest)
+            if (pr.IsLastRequest)
                 Presences.EndPresence(pr, true);
         }
     }
