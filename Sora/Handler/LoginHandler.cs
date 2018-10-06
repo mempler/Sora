@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
@@ -40,6 +41,7 @@ namespace Sora.Handler
 {
     internal class LoginHandler
     {
+        [UsedImplicitly]
         [Handler(HandlerTypes.LoginHandler)]
         public void OnLogin(Req req, Res res)
         {

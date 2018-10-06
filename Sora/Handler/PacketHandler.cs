@@ -26,6 +26,7 @@ SOFTWARE.
 
 using System;
 using System.IO;
+using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
@@ -39,6 +40,7 @@ namespace Sora.Handler
 {
     internal class PacketHandler
     {
+        [UsedImplicitly]
         [Handler(HandlerTypes.PacketHandler)]
         public void HandlePackets(Req req, Res res)
         {
@@ -98,6 +100,11 @@ namespace Sora.Handler
                             var channelJoin = new ChannelJoin();
                             channelJoin.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
+                            break;
+                        case PacketId.ClientChannelLeave:
+                            var channelLeave = new ChannelLeave();
+                            channelLeave.ReadFromStream(packetDataReader);
+                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr, channelLeave.ChannelName);
                             break;
                     }
                 }

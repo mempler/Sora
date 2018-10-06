@@ -29,10 +29,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using Amib.Threading;
+using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
@@ -181,7 +181,8 @@ namespace Sora.Server
             _serverThread = x;
             return x;
         }
-
+        
+        [UsedImplicitly]
         public void Stop()
         {
             if (_running)
