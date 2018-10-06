@@ -24,26 +24,32 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
-using Sora.Objects;
+using Sora.Enums;
 
 namespace Sora.Packets.Server
 {
-    public class ChannelAvailableAutojoin : IPacket
+    public class HandleUserQuit : IPacket
     {
-        public PacketId Id => PacketId.ServerChannelAvailableAutojoin;
-        public Channel Channel;
+        public PacketId Id => PacketId.ServerAnnounce;
+        public UserQuitStruct UserQuit;
 
-        public ChannelAvailableAutojoin(Channel channel) => Channel = channel;
+        public HandleUserQuit(UserQuitStruct userQuit) => UserQuit = userQuit;
 
-        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Channel.ChannelName, false);
-            sw.Write(Channel.ChannelTopic, true);
-            sw.Write((short)Channel.UserCount);
+            sw.Write(UserQuit.UserId);
+            sw.Write((int)UserQuit.ErrorState);
         }
+    }
+
+    public struct UserQuitStruct
+    {
+        public uint UserId;
+        public ErrorStates ErrorState;
     }
 }

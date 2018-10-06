@@ -42,13 +42,11 @@ namespace Sora.Packets.Server
     public class SendIrcMessage : IPacket
     {
         public PacketId Id => PacketId.ClientSendIrcMessage;
-
         public MessageStruct Msg;
 
         public SendIrcMessage(MessageStruct message)  => Msg = message;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(Msg.Username);

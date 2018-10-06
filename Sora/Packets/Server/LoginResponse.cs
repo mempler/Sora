@@ -24,6 +24,7 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -33,13 +34,12 @@ namespace Sora.Packets.Server
 {
     public class LoginResponse : IPacket
     {
+        public PacketId Id => PacketId.ServerLoginResponse;
         protected LoginResponses Response;
+
         public LoginResponse(LoginResponses response) => Response = response;
 
-        public PacketId Id => PacketId.ServerLoginResponse;
-
-        public void ReadFromStream(MStreamReader sr) => Response = (LoginResponses)sr.ReadInt32();
-
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw) => sw.Write((int)Response);
     }
 }

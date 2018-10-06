@@ -24,26 +24,15 @@ SOFTWARE.
 */
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Objects;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Sora.Packets.Server
+namespace Sora.Enums
 {
-    public class ChannelAvailableAutojoin : IPacket
+    public enum ErrorStates
     {
-        public PacketId Id => PacketId.ServerChannelAvailableAutojoin;
-        public Channel Channel;
-
-        public ChannelAvailableAutojoin(Channel channel) => Channel = channel;
-
-        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
-        public void WriteToStream(MStreamWriter sw)
-        {
-            sw.Write(Channel.ChannelName, false);
-            sw.Write(Channel.ChannelTopic, true);
-            sw.Write((short)Channel.UserCount);
-        }
+        Ok,
+        Update
     }
 }

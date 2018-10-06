@@ -35,13 +35,11 @@ namespace Sora.Packets.Server
     public class ChannelJoinSuccess : IPacket
     {
         public PacketId Id => PacketId.ServerChannelJoinSuccess;
-
         public Channel Channel;
 
         public ChannelJoinSuccess(Channel channel) => Channel = channel;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-
         public void WriteToStream(MStreamWriter sw) => sw.Write(Channel.ChannelName);
     }
 }

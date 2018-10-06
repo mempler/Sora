@@ -61,5 +61,7 @@ namespace Sora.Packets.Client
         public uint CurrentMods;
         public PlayModes Playmode;
         public uint BeatmapId;
+        
+        public override string ToString() => $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
     }
 }

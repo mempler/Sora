@@ -24,8 +24,7 @@ SOFTWARE.
 */
 #endregion
 
-using System.Data;
-using Shared.Database.Models;
+using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -36,35 +35,15 @@ namespace Sora.Packets.Server
     public class UserPresence : IPacket
     {
         public PacketId Id => PacketId.ServerUserPresence;
-
         public Presence Presence;
 
-        public UserPresence() { }
+        public UserPresence(Presence pr) => Presence = pr;
 
-        public UserPresence(Presence pr) { Presence = pr; }
-
-        public void ReadFromStream(MStreamReader sr)
-        {
-            Presence = new Presence
-            {
-                User = new Users
-                {
-                    Id = sr.ReadInt32(),
-                    Username = sr.ReadString(),
-                },
-                Timezone = sr.ReadByte(),
-                CountryId = (CountryIds)sr.ReadByte(),
-                ClientPermissions = sr.ReadByte(),
-                Lon = sr.ReadDouble(),
-                Lat = sr.ReadDouble(),
-                Rank = sr.ReadUInt32()
-            };
-        }
-
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
             if (Presence == null)
-                throw new NoNullAllowedException("Presence cannot be null!");
+                throw new ArgumentNullException();
 
             sw.Write(Presence.User.Id);
             sw.Write(Presence.User.Username, false);

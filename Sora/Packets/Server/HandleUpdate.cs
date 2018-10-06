@@ -35,16 +35,11 @@ namespace Sora.Packets.Server
     public class HandleUpdate : IPacket
     {
         public PacketId Id => PacketId.ServerHandleOsuUpdate;
-
         public Presence Presence;
 
-        public HandleUpdate(Presence presence)
-        {
-            Presence = presence;
-        }
+        public HandleUpdate(Presence presence) => Presence = presence;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(Presence.User.Id);

@@ -34,13 +34,11 @@ namespace Sora.Packets.Server
     public class ChannelAvailable : IPacket
     {
         public PacketId Id => PacketId.ServerChannelAvailable;
-
         public Channel Channel;
 
         public ChannelAvailable(Channel channel) => Channel = channel;
 
         public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
-
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(Channel.ChannelName, false);
