@@ -6,6 +6,10 @@ clone_depth: 1
 image: Visual Studio 2017
 configuration: Debug
 
+environment:
+    WEEBHOOK_URL:
+        secure: 5iyntOmaNX1ztZQHITwehOjGHrTQW9SzqnqigVtYWGs5hbJk6nhzxfw8G+TZiTboZ4Ma04xW7pDcjBjMHEui2FMjuf8raJPFTzR/sE6Xd+Q4CicdfBOdl2cbRmF8XFYtagf4n/K7U1QPVw/0QNetAGbuxZd2r8y4j44IV3FQuHE=
+
 cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
@@ -25,12 +29,10 @@ build:
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" Sora.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml"
-
-notifications:
-- provider: Slack
-  incoming_webhook:
-    secure: 5iyntOmaNX1ztZQHITwehOjGHrTQW9SzqnqigVtYWGs5hbJk6nhzxfw8G+TZiTboZ4Ma04xW7pDcjBjMHEui2FMjuf8raJPFTzR/sE6Xd+Q4CicdfBOdl2cbRmF8XFYtagf4n/K7U1QPVw/0QNetAFv7SvDUzbb5bgonjSsdcxNK4/HCMCRf7pWGSwqIEmpb
-  channel: 448390524622077952
-  on_build_success: true
-  on_build_failure: true
-  on_build_status_changed: true
+  
+ on_success:
+  - ps: Invoke-RestMethod https://raw.githubusercontent.com/k3rn31p4nic/appveyor-discord-webhook/master/send.ps1 -o send.ps1
+  - ps: ./send.ps1 success $env:WEWBHOOK_URL
+on_failure:
+  - ps: Invoke-RestMethod https://raw.githubusercontent.com/k3rn31p4nic/appveyor-discord-webhook/master/send.ps1 -o send.ps1
+  - ps: ./send.ps1 failure $env:WEWBHOOK_URL

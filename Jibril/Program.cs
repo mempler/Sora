@@ -26,9 +26,9 @@ SOFTWARE.
 
 namespace Jibril
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // TODO: PUT CODE HERE.
             // This is gonna be the /web/ server aka Private API
