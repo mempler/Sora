@@ -27,7 +27,6 @@ SOFTWARE.
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using BCrypt;
 using Shared.Enums;
 
 namespace Shared.Database.Models
@@ -50,7 +49,7 @@ namespace Shared.Database.Models
         [Required]
         public Privileges Privileges { get; set; } = 0;
 
-        public bool IsPassword(string s) => BCryptHelper.CheckPassword(s, this.Password);
+        public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(s, this.Password);
 
         public static int GetUserId(string username)
         {
