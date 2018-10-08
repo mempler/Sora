@@ -99,17 +99,21 @@ namespace Sora.Objects
         public PacketStream BoundStream { get; }
         public Presence BoundPresence { get; }
         public bool ReadOnly { get; set; }
-        public bool AdminOnly { get; set; }
-        public bool AutoJoin { get; set; }
+        public bool AdminOnly { get; private set; }
+        public bool AutoJoin { get; private set; }
         public int UserCount
         {
             get
             {
-                if (this._presences == null) return 1;
+                if (this._UserCount > -1) return this._UserCount;
+                if (this._presences == null) return 0;
                 lock (this._presences)
                     return this._presences.Count;
             }
+            set => this._UserCount = value;
         }
+
+        private int _UserCount = -1;
 
         private readonly List<Presence> _presences = new List<Presence>(); // should be { get; } maybe ?
 

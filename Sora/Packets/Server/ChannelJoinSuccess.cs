@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -39,7 +38,7 @@ namespace Sora.Packets.Server
 
         public ChannelJoinSuccess(Channel channel) => this.Channel = channel;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) => this.Channel = new Channel(sr.ReadString());
         public void WriteToStream(MStreamWriter sw) => sw.Write(this.Channel.ChannelName);
     }
 }

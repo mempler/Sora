@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -46,7 +45,16 @@ namespace Sora.Packets.Server
 
         public SendIrcMessage(MessageStruct message)  => this.Msg = message;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            this.Msg = new MessageStruct
+            {
+                Username = sr.ReadString(),
+                Message = sr.ReadString(),
+                ChannelTarget = sr.ReadString(),
+                SenderId = sr.ReadInt32()
+            };
+        }
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(this.Msg.Username);

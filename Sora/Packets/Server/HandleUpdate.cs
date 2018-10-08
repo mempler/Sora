@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -39,7 +38,7 @@ namespace Sora.Packets.Server
 
         public HandleUpdate(Presence presence) => this.Presence = presence;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr){}
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(this.Presence.User.Id);

@@ -39,7 +39,7 @@ namespace Sora.Packets.Server
 
         public UserPresence(Presence pr) => this.Presence = pr;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) { }
         public void WriteToStream(MStreamWriter sw)
         {
             if (this.Presence == null)

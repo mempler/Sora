@@ -62,7 +62,7 @@ namespace Sora.Handler
             Presence pr = Presences.GetPresence(req.Headers["osu-token"]);
             if (pr == null)
             {
-                res.StatusCode = 403;
+                res.StatusCode = 403; // Presence is not known, force the client to send login info.
                 return;
             }
 
@@ -78,6 +78,8 @@ namespace Sora.Handler
 
                     if (packetId != PacketId.ClientPong && packetId != PacketId.ClientUserStatsRequest)
                         Logger.L.Debug($"Packet: {packetId} Length: {packetData.Length} Data: {BitConverter.ToString(packetData).Replace("-","")}");
+                    
+                    // ReSharper disable once SwitchStatementMissingSomeCases
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:

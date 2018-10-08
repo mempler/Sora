@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using Shared.Enums;
 using Shared.Helpers;
@@ -39,7 +38,7 @@ namespace Sora.Packets.Server
 
         public PresenceBundle(List<int> userIds) => this.UserIds = userIds;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) => this.UserIds = sr.ReadInt32List();
 
         public void WriteToStream(MStreamWriter sw) => sw.Write(this.UserIds);
     }

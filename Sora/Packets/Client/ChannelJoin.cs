@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -39,6 +38,6 @@ namespace Sora.Packets.Client
 
         public void ReadFromStream(MStreamReader sr) => this.ChannelName = sr.ReadString();
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.ChannelName, false);
     }
 }

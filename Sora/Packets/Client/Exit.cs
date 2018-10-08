@@ -1,5 +1,4 @@
-﻿using System;
-using Shared.Enums;
+﻿using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
@@ -14,6 +13,6 @@ namespace Sora.Packets.Client
 
         public void ReadFromStream(MStreamReader sr) => this.ErrorState = (ErrorStates) sr.ReadInt32();
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => sw.Write((int) this.ErrorState);
     }
 }

@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
@@ -49,8 +48,15 @@ namespace Sora.Packets.Client
                 BeatmapId = sr.ReadUInt32()
             };
 
-        public void WriteToStream(MStreamWriter sw) =>
-            throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write((byte)this.Status.Status);
+            sw.Write(this.Status.StatusText);
+            sw.Write(this.Status.BeatmapChecksum);
+            sw.Write(this.Status.CurrentMods);
+            sw.Write((byte)this.Status.Playmode);
+            sw.Write(this.Status.BeatmapId);
+        }
     }
 
     public struct UserStatus

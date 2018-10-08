@@ -38,7 +38,7 @@ namespace Sora.Packets.Server
 
         public ChannelAvailable(Channel channel) => this.Channel = channel;
 
-        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) => this.Channel = new Channel(sr.ReadString(), sr.ReadString()) {UserCount = sr.ReadInt32()};
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(this.Channel.ChannelName, false);
