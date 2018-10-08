@@ -1,0 +1,36 @@
+version: b{build}
+pull_requests:
+  do_not_increment_build_number: true
+
+clone_depth: 1
+image: Visual Studio 2017
+configuration: Debug
+
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
+install:
+  - cmd: git submodule update --init --recursive
+  - cmd: choco install resharper-clt -y
+  - cmd: choco install nvika -y
+  
+before_build:
+  - cmd: nuget restore -verbosity quiet
+
+build:
+  parallel: true
+  verbosity: minimal
+
+after_build:
+  - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" Sora.sln > NUL
+  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+
+notifications:
+- provider: Slack
+  incoming_webhook:
+    secure: 5iyntOmaNX1ztZQHITwehOjGHrTQW9SzqnqigVtYWGs5hbJk6nhzxfw8G+TZiTboZ4Ma04xW7pDcjBjMHEui2FMjuf8raJPFTzR/sE6Xd+Q4CicdfBOdl2cbRmF8XFYtagf4n/K7U1QPVw/0QNetAFv7SvDUzbb5bgonjSsdcxNK4/HCMCRf7pWGSwqIEmpb
+  channel: 448390524622077952
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
