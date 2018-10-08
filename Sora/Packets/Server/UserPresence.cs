@@ -37,22 +37,22 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerUserPresence;
         public Presence Presence;
 
-        public UserPresence(Presence pr) => Presence = pr;
+        public UserPresence(Presence pr) => this.Presence = pr;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            if (Presence == null)
+            if (this.Presence == null)
                 throw new ArgumentNullException();
 
-            sw.Write(Presence.User.Id);
-            sw.Write(Presence.User.Username, false);
-            sw.Write(Presence.Timezone);
-            sw.Write((byte)Presence.CountryId);
-            sw.Write(Presence.ClientPermissions);
-            sw.Write(Presence.Lat);
-            sw.Write(Presence.Lon);
-            sw.Write(Presence.Rank);
+            sw.Write(this.Presence.User.Id);
+            sw.Write(this.Presence.User.Username, false);
+            sw.Write(this.Presence.Timezone);
+            sw.Write((byte) this.Presence.CountryId);
+            sw.Write(this.Presence.ClientPermissions);
+            sw.Write(this.Presence.Lat);
+            sw.Write(this.Presence.Lon);
+            sw.Write(this.Presence.Rank);
         }
     }
 }

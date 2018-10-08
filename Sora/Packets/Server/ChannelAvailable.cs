@@ -36,14 +36,14 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerChannelAvailable;
         public Channel Channel;
 
-        public ChannelAvailable(Channel channel) => Channel = channel;
+        public ChannelAvailable(Channel channel) => this.Channel = channel;
 
         public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Channel.ChannelName, false);
-            sw.Write(Channel.ChannelTopic, true);
-            sw.Write((short)Channel.UserCount);
+            sw.Write(this.Channel.ChannelName, false);
+            sw.Write(this.Channel.ChannelTopic, true);
+            sw.Write((short) this.Channel.UserCount);
         }
     }
 }

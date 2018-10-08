@@ -58,17 +58,17 @@ namespace Sora.Server
     public class Client
     {
         private readonly TcpClient _client;
-        public Client(TcpClient client) => _client = client;
+        public Client(TcpClient client) => this._client = client;
 
         public void DoStuff()
         {
-            using (_client)
+            using (this._client)
             {
                 try
                 {
-                    var sr = new StreamReader(_client.GetStream());
-                    var req = ReadHeader(sr);
-                    var res = new Res {Writer = MStreamWriter.New()};
+                    StreamReader sr = new StreamReader(this._client.GetStream());
+                    Req req = this.ReadHeader(sr);
+                    Res res = new Res {Writer = MStreamWriter.New()};
                     if (req == null)
                     {
                         req = new Req
@@ -83,11 +83,11 @@ namespace Sora.Server
                             !File.Exists("index.html")
                                 ? @"<html><head><title>Sora - an Strategic bancho.</title></head><body></body></html>"
                                 : File.ReadAllText("index.html"));
-                        WriteRes(_client, req, res);
+                        WriteRes(this._client, req, res);
                         return;
                     }
                     Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
-                    WriteRes(_client, req, res);
+                    WriteRes(this._client, req, res);
                 }
                 catch (Exception ex)
                 {
@@ -98,8 +98,8 @@ namespace Sora.Server
 
         public Req ReadHeader(StreamReader rd)
         {
-            var x = new Req();
-            var mainHeader = rd.ReadLine();
+            Req x = new Req();
+            string mainHeader = rd.ReadLine();
             if (mainHeader == null) return x;
             var hSplit = mainHeader.Split(' ');
             if (hSplit.Length < 3) return null;
@@ -109,7 +109,7 @@ namespace Sora.Server
 
             while (true)
             {
-                var currentLine = rd.ReadLine();
+                string currentLine = rd.ReadLine();
                 if (currentLine == null) break;
                 if (currentLine.Trim() == "") break;
                 var headSplit = currentLine.Split(':', 2);
@@ -122,20 +122,20 @@ namespace Sora.Server
             if (!x.Headers.ContainsKey("Content-Length"))
                 return null;
 
-            int.TryParse(x.Headers["Content-Length"], out var byteLength);
+            int.TryParse(x.Headers["Content-Length"], out int byteLength);
 
             var data = new byte[byteLength];
-            for (var i = 0; i < byteLength; i++)
+            for (int i = 0; i < byteLength; i++)
                 data[i] = (byte) rd.Read();
 
             x.Reader = new MStreamReader(new MemoryStream(data));
-            x.Ip = _client.Client.RemoteEndPoint.ToString().Split(':')[0];
+            x.Ip = this._client.Client.RemoteEndPoint.ToString().Split(':')[0];
             return x;
         }
 
         public static void WriteRes(TcpClient c, Req r, Res s)
         {
-            using (var stream = c.GetStream())
+            using (NetworkStream stream = c.GetStream())
             {
                 var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + (HttpStatusCode)s.StatusCode + "\r\n" + Header2Str(r, s) + "\r\n");
                 stream.Write(header);
@@ -146,14 +146,14 @@ namespace Sora.Server
 
         public static string Header2Str(Req x, Res s)
         {
-            var outputStr = string.Empty;
+            string outputStr = string.Empty;
             s.Headers["cho-protocol"] = "19";
             s.Headers  ["Connection"] = "keep-alive";
             s.Headers  ["Keep-Alive"] = "timeout=5, max=100";
             s.Headers["Content-Type"] = "text/html; charset=UTF-8";
             s.Headers        ["Host"] = x.Headers["Host"];
             s.Headers  ["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
-            foreach (var key in s.Headers.Keys)
+            foreach (string key in s.Headers.Keys)
                 outputStr += $"{key}: {s.Headers[key]}\r\n";
             return outputStr;
         }
@@ -167,46 +167,47 @@ namespace Sora.Server
 
         public HttpServer(short port)
         {
-            _running = false;
-            _listener = new TcpListener(IPAddress.Any, port);
-            _pool = new SmartThreadPool();
+            this._running = false;
+            this._listener = new TcpListener(IPAddress.Any, port);
+            this._pool = new SmartThreadPool();
         }
 
         public Thread Run()
         {
-            if (_running)
+            if (this._running)
                 throw new Exception("Address already in use!");
-            var x = new Thread(_RunServer);
+            Thread x = new Thread(this._RunServer);
             x.Start();
-            _serverThread = x;
+            this._serverThread = x;
             return x;
         }
         
         [UsedImplicitly]
         public void Stop()
         {
-            if (_running)
+            if (this._running)
                 throw new Exception("Cannot stop while already stopped!");
             
             Thread.Sleep(100);
-            _serverThread.Abort();
+            this._serverThread.Abort();
         }
 
         private void _RunServer()
         {
-            _listener.Start();
-            _pool.Start();
-            _running = true;
-            _pool.MaxThreads = 8 * Environment.ProcessorCount; _pool.MinThreads = _pool.MaxThreads;
+            this._listener.Start();
+            this._pool.Start();
+            this._running = true;
+            this._pool.MaxThreads = 8 * Environment.ProcessorCount;
+            this._pool.MinThreads = this._pool.MaxThreads;
             while (true)
             {
-                if (!_running)
+                if (!this._running)
                 {
-                    _listener.Stop();
+                    this._listener.Stop();
                     break;
                 }
 
-                _pool.QueueWorkItem(new Client(_listener.AcceptTcpClient()).DoStuff);
+                this._pool.QueueWorkItem(new Client(this._listener.AcceptTcpClient()).DoStuff);
             }
         }
     }

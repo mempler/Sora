@@ -37,10 +37,10 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerUserPresenceBundle;
         public List<int> UserIds;
 
-        public PresenceBundle(List<int> userIds) => UserIds = userIds;
+        public PresenceBundle(List<int> userIds) => this.UserIds = userIds;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(UserIds);
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.UserIds);
     }
 }

@@ -37,9 +37,9 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerLoginResponse;
         protected LoginResponses Response;
 
-        public LoginResponse(LoginResponses response) => Response = response;
+        public LoginResponse(LoginResponses response) => this.Response = response;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-        public void WriteToStream(MStreamWriter sw) => sw.Write((int)Response);
+        public void WriteToStream(MStreamWriter sw) => sw.Write((int) this.Response);
     }
 }

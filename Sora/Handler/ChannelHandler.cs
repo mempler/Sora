@@ -38,7 +38,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientChannelJoin)]
         public void OnChannelJoin(Presence pr, string channelName)
         {
-            var channel = Channels.GetChannel(channelName);
+            Channel channel = Channels.GetChannel(channelName);
             if (channel == null)
             {
                 pr.Write(new ChannelRevoked(channelName));
@@ -55,7 +55,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientChannelLeave)]
         public void OnChannelLeave(Presence pr, string channelName)
         {
-            var channel = Channels.GetChannel(channelName);
+            Channel channel = Channels.GetChannel(channelName);
             if (channel == null)
             {
                 pr.Write(new ChannelRevoked(channelName));

@@ -24,9 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shared.Enums;
 using Shared.Helpers;
@@ -40,22 +37,22 @@ namespace Shared_Tests.Tests
         [TestMethod]
         public void TestAccuracyOsu()
         {
-            var acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Osu);
+            double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Osu);
         }
         [TestMethod]
         public void TestAccuracyTaiko()
         {
-            var acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Taiko);
+            double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Taiko);
         }
         [TestMethod]
         public void TestAccuracyCtb()
         {
-            var acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Ctb);
+            double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Ctb);
         }
         [TestMethod]
         public void TestAccuracyMania()
         {
-            var acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Mania);
+            double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Mania);
         }
     }
 }

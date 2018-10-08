@@ -1,20 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="plugin.xml" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="plugin.xml" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\Sora\Sora.csproj" />
   </ItemGroup>
-
 </Project>

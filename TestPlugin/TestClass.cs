@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TestPlugin
+﻿namespace TestPlugin
 {
     public class TestClass
     {
@@ -10,7 +8,7 @@ namespace TestPlugin
 
         public void T4()
         {
-            var i2 = 0;
+            int i2 = 0;
             while (true) if (i2 % 80 == 0) break; else i2 += 4;
         }
     }

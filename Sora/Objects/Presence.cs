@@ -41,7 +41,7 @@ namespace Sora.Objects
     {
         private static readonly Dictionary<string, Presence> presences = new Dictionary<string, Presence>();
 
-        public static Presence GetPresence(string token) => presences.TryGetValue(token, out var pr) ? pr : null;
+        public static Presence GetPresence(string token) => presences.TryGetValue(token, out Presence pr) ? pr : null;
         public static Presence GetPresence(int userid)
         {
             foreach (var presence in presences)
@@ -136,36 +136,36 @@ namespace Sora.Objects
 
         public Presence()
         {
-            LastRequest = new Stopwatch();
-            Token = Guid.NewGuid().ToString();
-            var str = new MemoryStream();
-            Stream = new MStreamWriter(str);
+            this.LastRequest = new Stopwatch();
+            this.Token = Guid.NewGuid().ToString();
+            MemoryStream str = new MemoryStream();
+            this.Stream = new MStreamWriter(str);
         }
 
-        protected bool Equals(Presence pr) => Token == pr.Token;
+        protected bool Equals(Presence pr) => this.Token == pr.Token;
 
         public MemoryStream GetOutput(bool reset = true)
         {
-            var copy = new MemoryStream();
-            var pos = Stream.BaseStream.Position;
-            Stream.BaseStream.Position = 0;
-            Stream.BaseStream.CopyTo(copy);
-            Stream.BaseStream.Position = pos;
-            LastRequest.Restart();
+            MemoryStream copy = new MemoryStream();
+            long pos = this.Stream.BaseStream.Position;
+            this.Stream.BaseStream.Position = 0;
+            this.Stream.BaseStream.CopyTo(copy);
+            this.Stream.BaseStream.Position = pos;
+            this.LastRequest.Restart();
 
             if (!reset) return copy;
 
-            Stream.Close();
-            Stream = new MStreamWriter(new MemoryStream());
+            this.Stream.Close();
+            this.Stream = new MStreamWriter(new MemoryStream());
             return copy;
         }
 
         public void TimeoutCheck()
         {
-            if (LastRequest.ElapsedMilliseconds > 30 * 1000)
+            if (this.LastRequest.ElapsedMilliseconds > 30 * 1000)
                 Presences.EndPresence(this, true);
         }
 
-        public void Write(IPacket p) => Stream.Write(p);
+        public void Write(IPacket p) => this.Stream.Write(p);
     }
 }

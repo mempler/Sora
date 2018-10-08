@@ -49,7 +49,7 @@ namespace Sora.Objects
 
         public static PacketStream GetStream(string name)
         {
-            PacketStreams.TryGetValue(name, out var x);
+            PacketStreams.TryGetValue(name, out PacketStream x);
             return x;
         }
 
@@ -62,19 +62,19 @@ namespace Sora.Objects
 
     public class PacketStream
     {
-        public PacketStream(string name) => StreamName = name;
+        public PacketStream(string name) => this.StreamName = name;
 
         public Dictionary<string, Presence> JoinedPresences = new Dictionary<string, Presence>();
         public string StreamName { get; }
 
-        public void Join(Presence pr) => JoinedPresences[pr.Token] = pr;
+        public void Join(Presence pr) => this.JoinedPresences[pr.Token] = pr;
 
-        public void Left(Presence pr) => JoinedPresences[pr.Token] = null;
-        public void Left(string token) => JoinedPresences[token] = null;
+        public void Left(Presence pr) => this.JoinedPresences[pr.Token] = null;
+        public void Left(string token) => this.JoinedPresences[token] = null;
 
         public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {
-            foreach (var presence in JoinedPresences)
+            foreach (var presence in this.JoinedPresences)
             {
                 if (Array.BinarySearch(ignorePresences, presence) > 0 || presence.Value.Disconnected)
                     continue;

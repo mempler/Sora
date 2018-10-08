@@ -37,9 +37,9 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerChannelJoinSuccess;
         public Channel Channel;
 
-        public ChannelJoinSuccess(Channel channel) => Channel = channel;
+        public ChannelJoinSuccess(Channel channel) => this.Channel = channel;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Channel.ChannelName);
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Channel.ChannelName);
     }
 }

@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
@@ -41,7 +40,7 @@ namespace Sora.Handler
         public void HandleUserStatus(Presence pr, UserStatus status)
         {
             pr.Status = status;
-            var main = LPacketStreams.GetStream("main");
+            PacketStream main = LPacketStreams.GetStream("main");
             main.Broadcast(new UserPresence(pr));
             main.Broadcast(new HandleUpdate(pr));
         }

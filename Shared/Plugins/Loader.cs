@@ -27,25 +27,23 @@ SOFTWARE.
 using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
-using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 
 namespace Shared.Plugins
 {
-    public class Loader
+    public static class Loader
     {
         public static void LoadPlugins()
         {
             Logger.L.Info("Start loading plugins!");
             if (!Directory.Exists("Plugins")) Directory.CreateDirectory("Plugins");
 
-            foreach (var f in Directory.GetFiles("Plugins")) // Press F for File
+            foreach (string f in Directory.GetFiles("Plugins")) // Press F for File
             {
-                var file = Assembly.LoadFrom(f);
-                var fs = file.GetManifestResourceStream(file.GetName().Name +".plugin.xml");
+                Assembly file = Assembly.LoadFrom(f);
+                Stream fs = file.GetManifestResourceStream($"{file.GetName().Name}.plugin.xml");
                 if (fs == null) continue;
-                var doc = XDocument.Load(fs);
+                XDocument doc = XDocument.Load(fs);
                 if (doc.Root != null)
                     Logger.L.Info(
                         $"Loaded plugin: {doc.Root.Attribute("Name")?.Value}. Version: {doc.Root.Attribute("Version")?.Value}");

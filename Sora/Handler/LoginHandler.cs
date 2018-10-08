@@ -27,6 +27,7 @@ SOFTWARE.
 using System;
 using System.Linq;
 using JetBrains.Annotations;
+using MaxMind.GeoIP2.Responses;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
@@ -45,18 +46,18 @@ namespace Sora.Handler
         [Handler(HandlerTypes.LoginHandler)]
         public void OnLogin(Req req, Res res)
         {
-            var pr = new Presence();
+            Presence pr = new Presence();
             res.Headers["cho-token"] = pr.Token;
             try
             {
-                var loginData = LoginParser.ParseLogin(req.Reader);
+                Login loginData = LoginParser.ParseLogin(req.Reader);
                 if (loginData == null)
                 {
                     Exception(res);
                     return;
                 }
 
-                var user = Users.GetUser(Users.GetUserId(loginData.Username));
+                Users user = Users.GetUser(Users.GetUserId(loginData.Username));
                 if (user == null)
                 {
                     LoginFailed(res);
@@ -67,7 +68,7 @@ namespace Sora.Handler
 
                 if (req.Ip != "127.0.0.1" && req.Ip != "0.0.0.0")
                 {
-                    var data = Localisation.GetData(req.Ip);
+                    CityResponse data = Localisation.GetData(req.Ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
                     if (data.Location.Latitude != null) pr.Lat = (double) data.Location.Latitude;
@@ -88,7 +89,7 @@ namespace Sora.Handler
                 res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr).ToList()));
                 res.Writer.Write(new HandleUpdate(pr));
 
-                foreach (var chanAuto in Channels.ChannelsAutoJoin) {
+                foreach (Channel chanAuto in Channels.ChannelsAutoJoin) {
                     if (chanAuto.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
                         res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
                     else if (!chanAuto.AdminOnly)
@@ -106,7 +107,7 @@ namespace Sora.Handler
                     else if (!chan.Value.AdminOnly)
                         res.Writer.Write(new ChannelAvailable(chan.Value));
 
-                var stream = LPacketStreams.GetStream("main");
+                PacketStream stream = LPacketStreams.GetStream("main");
                 if (stream == null)
                 {
                     Exception(res);
@@ -120,8 +121,8 @@ namespace Sora.Handler
             }
         }
 
-        public void LoginFailed(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Failed));
-        public void Exception(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Exception));
-        public void Success(Res res, int userid) => res.Writer.Write(new LoginResponse((LoginResponses)userid));
+        private static void LoginFailed(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Failed));
+        private static void Exception(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Exception));
+        private static void Success(Res res, int userid) => res.Writer.Write(new LoginResponse((LoginResponses)userid));
     }
 }

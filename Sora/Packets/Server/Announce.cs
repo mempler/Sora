@@ -36,9 +36,9 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerAnnounce;
         public string Message;
 
-        public Announce(string message) => Message = message;
+        public Announce(string message) => this.Message = message;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Message, false);
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Message, false);
     }
 }

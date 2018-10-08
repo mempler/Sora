@@ -50,13 +50,13 @@ namespace Shared.Database.Models
         [Required]
         public Privileges Privileges { get; set; } = 0;
 
-        public bool IsPassword(string s) => BCryptHelper.CheckPassword(s, Password);
+        public bool IsPassword(string s) => BCryptHelper.CheckPassword(s, this.Password);
 
         public static int GetUserId(string username)
         {
-            using (var db = new SoraContext())
+            using (SoraContext db = new SoraContext())
             {
-                var result = db.Users.Where(t => t.Username == username).Select(e => e).FirstOrDefault();
+                Users result = db.Users.Where(t => t.Username == username).Select(e => e).FirstOrDefault();
                 return result?.Id ?? -1;
             }
         }
@@ -64,16 +64,16 @@ namespace Shared.Database.Models
         public static Users GetUser(int userId)
         {
             if (userId == -1) return null;
-            using (var db = new SoraContext())
+            using (SoraContext db = new SoraContext())
             {
-                var result = db.Users.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+                Users result = db.Users.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
                 return result;
             }
         }
 
         public override string ToString() =>
-            $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
+            $"ID: {this.Id}, Email: {this.Email}, Privileges: {this.Privileges}";
 
-        public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
+        public bool HasPrivileges(Privileges privileges) => (this.Privileges & privileges) != 0;
     }
 }

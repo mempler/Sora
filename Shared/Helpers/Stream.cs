@@ -38,29 +38,25 @@ namespace Shared.Helpers
     {
         public MStreamWriter(Stream s) : base(s, Encoding.UTF8) { }
 
-        public static MStreamWriter New()
-        {
-            var x = new MemoryStream();
-            return new MStreamWriter(x);
-        }
+        public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
 
         public void Write(IPacket packet)
         {
             base.Write((short)packet.Id);
             base.Write((byte)0);
             /* Packet Data */
-            var x = New();
+            MStreamWriter x = New();
             packet.WriteToStream(x);
             /* END */
             base.Write((int)x.Length);
-            Write(x);
+            this.Write(x);
             x.Close();
         }
 
-        public void Write(MStreamWriter w)
+        public void Write(BinaryWriter w)
         {
             w.BaseStream.Position = 0;
-            w.BaseStream.CopyTo(BaseStream);
+            w.BaseStream.CopyTo(this.BaseStream);
         }
         public void Write(string value, bool nullable)
         {
@@ -74,112 +70,108 @@ namespace Shared.Helpers
         }
         public override void Write(string value)
         {
-            Write((byte)0x0b);
+            this.Write((byte)0x0b);
             base.Write(value);
         }
         public override void Write(byte[] buff)
         {
             int length = buff.Length;
-            Write(length);
+            this.Write(length);
             if (length > 0)
                 base.Write(buff);
         }
         public void Write(List<int> list)
         {
-            var count = list.Count;
-            Write(count);
-            for (var i = 0; i < count; i++)
-                Write(list[i]);
+            int count = list.Count;
+            this.Write(count);
+            for (int i = 0; i < count; i++) this.Write(list[i]);
         }
         public void WriteRawBuffer(byte[] buff) => base.Write(buff);
-        public void WriteRawString(string value) => WriteRawBuffer(Encoding.UTF8.GetBytes(value));
+        public void WriteRawString(string value) => this.WriteRawBuffer(Encoding.UTF8.GetBytes(value));
         public void WriteObject(object obj)
         {
             if (obj == null)
-                Write((byte)0x00);
+                this.Write((byte)0x00);
             else
             {
                 switch (obj.GetType().Name)
                 {
                     case "Boolean":
-                        Write((bool)obj);
+                        this.Write((bool)obj);
                         break;
                     case "Byte":
-                        Write((byte)obj);
+                        this.Write((byte)obj);
                         break;
                     case "UInt16":
-                        Write((ushort)obj);
+                        this.Write((ushort)obj);
                         break;
                     case "UInt32":
-                        Write((uint)obj);
+                        this.Write((uint)obj);
                         break;
                     case "UInt64":
-                        Write((ulong)obj);
+                        this.Write((ulong)obj);
                         break;
                     case "SByte":
-                        Write((sbyte)obj);
+                        this.Write((sbyte)obj);
                         break;
                     case "Int16":
-                        Write((short)obj);
+                        this.Write((short)obj);
                         break;
                     case "Int32":
-                        Write((int)obj);
+                        this.Write((int)obj);
                         break;
                     case "Int64":
-                        Write((long)obj);
+                        this.Write((long)obj);
                         break;
                     case "Char":
-                        Write((char)obj);
+                        this.Write((char)obj);
                         break;
                     case "String":
-                        Write((string)obj);
+                        this.Write((string)obj);
                         break;
                     case "Single":
-                        Write((float)obj);
+                        this.Write((float)obj);
                         break;
                     case "Double":
-                        Write((double)obj);
+                        this.Write((double)obj);
                         break;
                     case "Decimal":
-                        Write((decimal)obj);
+                        this.Write((decimal)obj);
                         break;
                     default:
-                        var b = new BinaryFormatter()
+                        BinaryFormatter b = new BinaryFormatter()
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
                             TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
                         };
-                        b.Serialize(BaseStream, obj);
+                        b.Serialize(this.BaseStream, obj);
                         break;
                 }
             }
         }
 
-        public long Length => BaseStream.Length;
-        public byte[] ToArray() => ((MemoryStream) BaseStream).ToArray();
+        public long Length => this.BaseStream.Length;
+        public byte[] ToArray() => ((MemoryStream) this.BaseStream).ToArray();
     }
     public class MStreamReader : BinaryReader
     {
         public MStreamReader(Stream s) : base(s, Encoding.UTF8) { }
 
-        public override string ReadString()
-        {
-            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
-        }
+        public override string ReadString() => (this.ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
 
         public byte[] ReadBytes()
         {
-            var len = ReadInt32();
+            int len = this.ReadInt32();
             return len > 0 ? base.ReadBytes(len) : len < 0 ? null : (new byte[0]);
         }
         public List<int> ReadInt32List()
         {
-            var count = ReadInt16();
+            short count = this.ReadInt16();
             if (count < 0)
                 return null;
             var outList = new List<int>(count);
-            for (var i = 0; i < count; i++)
-                outList.Add(ReadInt32());
+            for (int i = 0; i < count; i++)
+                outList.Add(this.ReadInt32());
             return outList;
         }
     }

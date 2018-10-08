@@ -44,15 +44,15 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ClientSendIrcMessage;
         public MessageStruct Msg;
 
-        public SendIrcMessage(MessageStruct message)  => Msg = message;
+        public SendIrcMessage(MessageStruct message)  => this.Msg = message;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Msg.Username);
-            sw.Write(Msg.Message);
-            sw.Write(Msg.ChannelTarget);
-            sw.Write(Msg.SenderId);
+            sw.Write(this.Msg.Username);
+            sw.Write(this.Msg.Message);
+            sw.Write(this.Msg.ChannelTarget);
+            sw.Write(this.Msg.SenderId);
         }
     }
 }

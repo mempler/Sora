@@ -39,7 +39,7 @@ namespace Sora.Packets.Client
         public MessageStruct Msg;
 
         public void ReadFromStream(MStreamReader sr) =>
-            Msg = new MessageStruct
+            this.Msg = new MessageStruct
             {
                 Username = sr.ReadString(),
                 Message = sr.ReadString(),

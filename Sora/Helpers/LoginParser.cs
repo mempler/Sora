@@ -33,8 +33,8 @@ namespace Sora.Helpers
     {
         public static Login ParseLogin(MStreamReader reader)
         {
-            var l = new Login();
-            using (var s = new StreamReader(reader.BaseStream))
+            Login l = new Login();
+            using (StreamReader s = new StreamReader(reader.BaseStream))
             {
                 l.Username = s.ReadLine();
                 l.Password = s.ReadLine();

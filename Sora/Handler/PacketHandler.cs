@@ -59,7 +59,7 @@ namespace Sora.Handler
                 return;
             }
 
-            var pr = Presences.GetPresence(req.Headers["osu-token"]);
+            Presence pr = Presences.GetPresence(req.Headers["osu-token"]);
             if (pr == null)
             {
                 res.StatusCode = 403;
@@ -70,18 +70,18 @@ namespace Sora.Handler
             {
                 try
                 {
-                    if (req.Reader.BaseStream.Length - req.Reader.BaseStream.Position < 7) break; // Dont handle any invalid packets! (less then bytelength of 0x07)
-                    var packetId = (PacketId) req.Reader.ReadInt16();
+                    if (req.Reader.BaseStream.Length - req.Reader.BaseStream.Position < 7) break; // Dont handle any invalid packets! (less then bytelength of 7)
+                    PacketId packetId = (PacketId) req.Reader.ReadInt16();
                     req.Reader.ReadBoolean();
                     var packetData = req.Reader.ReadBytes();
-                    var packetDataReader = new MStreamReader(new MemoryStream(packetData));
+                    MStreamReader packetDataReader = new MStreamReader(new MemoryStream(packetData));
 
                     if (packetId != PacketId.ClientPong && packetId != PacketId.ClientUserStatsRequest)
                         Logger.L.Debug($"Packet: {packetId} Length: {packetData.Length} Data: {BitConverter.ToString(packetData).Replace("-","")}");
                     switch (packetId)
                     {
                         case PacketId.ClientSendUserStatus:
-                            var sendUserStatus = new SendUserStatus();
+                            SendUserStatus sendUserStatus = new SendUserStatus();
                             sendUserStatus.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, sendUserStatus.Status);
                             break;
@@ -92,17 +92,17 @@ namespace Sora.Handler
                             Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
                             break;
                         case PacketId.ClientUserStatsRequest:
-                            var userStatsRequest = new UserStatsRequest();
+                            UserStatsRequest userStatsRequest = new UserStatsRequest();
                             userStatsRequest.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr, userStatsRequest.Userids);
                             break;
                         case PacketId.ClientChannelJoin:
-                            var channelJoin = new ChannelJoin();
+                            ChannelJoin channelJoin = new ChannelJoin();
                             channelJoin.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
                             break;
                         case PacketId.ClientChannelLeave:
-                            var channelLeave = new ChannelLeave();
+                            ChannelLeave channelLeave = new ChannelLeave();
                             channelLeave.ReadFromStream(packetDataReader);
                             Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr, channelLeave.ChannelName);
                             break;

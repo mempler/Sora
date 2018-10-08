@@ -66,7 +66,7 @@ namespace Sora.Objects
 
         public static void RemoveChannel(string channelName)
         {
-            var chan = GetChannel(channelName);
+            Channel chan = GetChannel(channelName);
             if (chan == null) return;
             ChannelsAutoJoin.Remove(chan);
             Channels_.Remove(chan.ChannelName);
@@ -74,7 +74,7 @@ namespace Sora.Objects
 
         public static Channel GetChannel(string channelName)
         {
-            Channels_.TryGetValue(channelName, out var x);
+            Channels_.TryGetValue(channelName, out Channel x);
             return x;
         }
     }
@@ -85,9 +85,13 @@ namespace Sora.Objects
                        PacketStream boundStream = null, Presence boundPresence = null,
                        bool readOnly = false, bool adminOnly = false, bool autoJoin = false)
         {
-            ChannelName = channelName; ChannelTopic = channelTopic;
-            BoundStream = boundStream; BoundPresence = boundPresence;
-            ReadOnly = readOnly; AdminOnly = adminOnly; AutoJoin = autoJoin;
+            this.ChannelName = channelName;
+            this.ChannelTopic = channelTopic;
+            this.BoundStream = boundStream;
+            this.BoundPresence = boundPresence;
+            this.ReadOnly = readOnly;
+            this.AdminOnly = adminOnly;
+            this.AutoJoin = autoJoin;
         }
 
         public string ChannelName { get; }
@@ -101,9 +105,9 @@ namespace Sora.Objects
         {
             get
             {
-                if (_presences == null) return 1;
-                lock (_presences)
-                    return _presences.Count;
+                if (this._presences == null) return 1;
+                lock (this._presences)
+                    return this._presences.Count;
             }
         }
 
@@ -111,23 +115,23 @@ namespace Sora.Objects
 
         public bool JoinChannel(Presence pr)
         {
-            if (AdminOnly && (pr.User.Privileges & Privileges.Admin) != 0)
+            if (this.AdminOnly && (pr.User.Privileges & Privileges.Admin) != 0)
             {
-                lock (_presences)
+                lock (this._presences)
                 {
-                    _presences.Remove(pr);
-                    _presences.Add(pr);
+                    this._presences.Remove(pr);
+                    this._presences.Add(pr);
                 }
 
                 return true;
             }
 
-            if (AdminOnly) { return false; }
+            if (this.AdminOnly) { return false; }
 
-            lock (_presences)
+            lock (this._presences)
             {
-                _presences.Remove(pr);
-                _presences.Add(pr);
+                this._presences.Remove(pr);
+                this._presences.Add(pr);
             }
             return true;
         }
@@ -136,8 +140,7 @@ namespace Sora.Objects
         {
             try
             {
-                lock (_presences)
-                    _presences.Remove(pr);
+                lock (this._presences) this._presences.Remove(pr);
                 return true;
             }
             catch { return false; }
@@ -145,10 +148,10 @@ namespace Sora.Objects
 
         public void WriteMessage(Presence pr, string message)
         {
-            if (ReadOnly) return;
-            if (BoundStream == null && BoundPresence != null)
+            if (this.ReadOnly) return;
+            if (this.BoundStream == null && this.BoundPresence != null)
             {
-                BoundPresence.Write(
+                this.BoundPresence.Write(
                     new SendIrcMessage(
                         new MessageStruct {
                             Username = pr.User.Username,
@@ -160,11 +163,11 @@ namespace Sora.Objects
                 return;
             }
             // Prevent crashing.
-            BoundStream?.Broadcast(
+            this.BoundStream?.Broadcast(
                 new SendIrcMessage(
                     new MessageStruct {
                          Username = pr.User.Username,
-                         ChannelTarget = ChannelName,
+                         ChannelTarget = this.ChannelName,
                          Message = message,
                          SenderId = pr.User.Id
                     }
@@ -172,6 +175,6 @@ namespace Sora.Objects
             pr);
         }
 
-        public override string ToString() => $"Channel: {ChannelName} ChannelTopic: {ChannelTopic} BoundStream: {BoundStream?.StreamName} ChannelOwner: {BoundPresence?.User?.Username}";
+        public override string ToString() => $"Channel: {this.ChannelName} ChannelTopic: {this.ChannelTopic} BoundStream: {this.BoundStream?.StreamName} ChannelOwner: {this.BoundPresence?.User?.Username}";
     }
 }

@@ -49,9 +49,9 @@ namespace Shared.Handlers
                 .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
                 .ToArray();
 
-            foreach (var handler in methods)
+            foreach (MethodInfo handler in methods)
             {
-                var type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0].Type;
+                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0].Type;
                 if (!_handlers.ContainsKey(type))
                     _handlers[type] = new List<MethodInfo>();
                 _handlers[type].Add(handler);
@@ -63,9 +63,9 @@ namespace Shared.Handlers
             if (_handlers == null) return;
             if (!_handlers.ContainsKey(type)) return;
             var handlers = _handlers[type];
-            foreach (var h in handlers)
+            foreach (MethodInfo h in handlers)
             {
-                var handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
+                object handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
                 try
                 {
                     h.Invoke(handlerClass, args);
@@ -81,7 +81,7 @@ namespace Shared.Handlers
     [AttributeUsage(AttributeTargets.Method)]
     public class HandlerAttribute : Attribute
     {
-        public HandlerTypes Type;
-        public HandlerAttribute(HandlerTypes t) => Type = t;
+        public readonly HandlerTypes Type;
+        public HandlerAttribute(HandlerTypes t) => this.Type = t;
     }
 }

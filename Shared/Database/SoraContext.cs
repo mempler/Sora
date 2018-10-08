@@ -48,14 +48,14 @@ namespace Shared.Database
             lock ( Migrated )
                 if ( !Migrated[0] )
                 {
-                    Database.Migrate();
+                    this.Database.Migrate();
                     Migrated[0] = true;
                 }
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var cfg = Config.ReadConfig();
+            Cfg cfg = Config.ReadConfig();
             if (cfg.MySql.Hostname == null)
                 Environment.Exit(1);
             optionsBuilder.UseMySql(

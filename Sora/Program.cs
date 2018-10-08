@@ -25,6 +25,7 @@ SOFTWARE.
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using Shared.Database;
 using Shared.Enums;
@@ -45,7 +46,7 @@ namespace Sora
             try
             {
                 Logger.L.Info("Start Initalization");
-                var watch = System.Diagnostics.Stopwatch.StartNew();
+                Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
                 _server = new HttpServer(Config.ReadConfig().Server.Port);
                 using (new SoraContext()) { } // Initialize Database just once. (Migrate database)
 

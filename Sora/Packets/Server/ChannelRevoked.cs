@@ -37,10 +37,10 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerChannelRevoked;
         public Channel Channel;
 
-        public ChannelRevoked(Channel channel) => Channel = channel;
-        public ChannelRevoked(string channel) => Channel = new Channel(channel);
+        public ChannelRevoked(Channel channel) => this.Channel = channel;
+        public ChannelRevoked(string channel) => this.Channel = new Channel(channel);
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Channel.ChannelName);
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Channel.ChannelName);
     }
 }

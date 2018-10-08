@@ -37,13 +37,13 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerAnnounce;
         public UserQuitStruct UserQuit;
 
-        public HandleUserQuit(UserQuitStruct userQuit) => UserQuit = userQuit;
+        public HandleUserQuit(UserQuitStruct userQuit) => this.UserQuit = userQuit;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(UserQuit.UserId);
-            sw.Write((int)UserQuit.ErrorState);
+            sw.Write(this.UserQuit.UserId);
+            sw.Write((int) this.UserQuit.ErrorState);
         }
     }
 

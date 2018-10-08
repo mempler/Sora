@@ -30,6 +30,7 @@ namespace Shared.Helpers
 {
     public static class Logger
     {
-        public static NLog.Logger L = LogManager.GetCurrentClassLogger();
+        // TODO: Make own logger.
+        public static readonly NLog.Logger L = LogManager.GetCurrentClassLogger();
     }
 }

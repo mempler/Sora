@@ -37,6 +37,6 @@ namespace Sora.Packets.Server
         public uint Protocol = 19; // Latest known protocol version
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Protocol);
+        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Protocol);
     }
 }

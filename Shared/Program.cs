@@ -33,7 +33,7 @@ namespace Shared
     {
         static void Main()
         {
-            using (var db = new SoraContext()) { }
+            using (SoraContext db = new SoraContext()) { }
         }
     }
 }

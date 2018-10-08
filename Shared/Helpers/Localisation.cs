@@ -36,20 +36,20 @@ using MaxMind.GeoIP2.Responses;
 
 namespace Shared.Helpers
 {
-    public class Localisation
+    public static class Localisation
     {
         [Handler(HandlerTypes.Initializer)]
         public static void Initialize()
         {
             if (Directory.Exists("geoip") && Directory.Exists("geoip/GeoLite2-City") && File.Exists("geoip/GeoLite2-City/GeoLite2-City.mmdb")) return;
 
-            var request = WebRequest.Create("http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz");
-            using (var response = request.GetResponse())
+            WebRequest request = WebRequest.Create("http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz");
+            using (WebResponse response = request.GetResponse())
             {
-                var maxMindTarGz = response.GetResponseStream();
+                Stream maxMindTarGz = response.GetResponseStream();
                 Stream gzipStream = new GZipInputStream(maxMindTarGz);
 
-                var tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
+                TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
                 tarArchive.ExtractContents("geoip");
                 tarArchive.Close();
 
@@ -57,7 +57,7 @@ namespace Shared.Helpers
                 maxMindTarGz?.Close();
             }
 
-            foreach (var dir in Directory.GetDirectories("geoip"))
+            foreach (string dir in Directory.GetDirectories("geoip"))
             {
                 if (dir.Contains("GeoLite2-City"))
                 {
@@ -68,21 +68,16 @@ namespace Shared.Helpers
 
         public static CityResponse GetData(string ip)
         {
-            using (var client = new DatabaseReader("geoip/GeoLite2-City/GeoLite2-City.mmdb"))
-            {
+            using (DatabaseReader client = new DatabaseReader("geoip/GeoLite2-City/GeoLite2-City.mmdb"))
                 return client.City(ip);
-            }
         }
 
         public static CountryIds StringToCountryId(string x)
         {
-            if (Enum.TryParse(typeof(CountryIds), x, true, out var o))
+            if (Enum.TryParse(typeof(CountryIds), x, true, out object o))
                 return (CountryIds)o;
             return CountryIds.BL;
         }
-        public static string CountryIdToString(CountryIds x)
-        {
-            return x.ToString();
-        }
+        public static string CountryIdToString(CountryIds x) => x.ToString();
     }
 }

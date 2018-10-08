@@ -25,14 +25,11 @@ SOFTWARE.
 #endregion
 
 using Shared.Enums;
-using Shared.Helpers;
 
 namespace Shared.Interfaces
 {
-    public interface IPacket
+    public interface IPacket : ISerializer
     {
         PacketId Id { get; }
-        void ReadFromStream(MStreamReader sr);
-        void WriteToStream(MStreamWriter sw);
     }
 }

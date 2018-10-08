@@ -38,7 +38,7 @@ namespace Sora.Packets.Client
 
         public List<int> Userids;
 
-        public void ReadFromStream(MStreamReader sr) => Userids = sr.ReadInt32List();
+        public void ReadFromStream(MStreamReader sr) => this.Userids = sr.ReadInt32List();
 
         public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
     }

@@ -24,6 +24,7 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -33,16 +34,21 @@ namespace Shared.Helpers
     {
         public static Cfg ReadConfig()
         {
-            if (!File.Exists("config.json"))
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(new Cfg(), Formatting.Indented));
-            return JsonConvert.DeserializeObject<Cfg>(File.ReadAllText("config.json"));
+            if (File.Exists("config.json")) return JsonConvert.DeserializeObject<Cfg>(File.ReadAllText("config.json"));
+            Cfg cfg = new Cfg();
+            
+            File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
+            Logger.L.Info("Config has been created! please edit.");
+            Environment.Exit(0);
+
+            return cfg;
         }
     }
 
     public class Cfg
     {
         public Server Server = new Server() { Port=5001 };
-        public MySql MySql = new MySql() { Database = "shiro", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = "" };
+        public MySql MySql = new MySql() { Database="gigamons", Hostname="127.0.0.1", Username="root", Port=3306, Password="" };
     }
     public struct Server
     {

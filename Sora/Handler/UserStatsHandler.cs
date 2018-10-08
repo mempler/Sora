@@ -24,7 +24,6 @@ SOFTWARE.
 */
 #endregion
 
-using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Shared.Enums;
@@ -40,9 +39,9 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientUserStatsRequest)]
         public void HandleUserStats(Presence pr, List<int> userIds)
         {
-            foreach (var id in userIds)
+            foreach (int id in userIds)
             {
-                var opr = Presences.GetPresence(id);
+                Presence opr = Presences.GetPresence(id);
                 pr.Write(new UserPresence(opr));
                 pr.Write(new HandleUpdate(opr));
             }

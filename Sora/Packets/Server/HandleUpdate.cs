@@ -37,176 +37,152 @@ namespace Sora.Packets.Server
         public PacketId Id => PacketId.ServerHandleOsuUpdate;
         public Presence Presence;
 
-        public HandleUpdate(Presence presence) => Presence = presence;
+        public HandleUpdate(Presence presence) => this.Presence = presence;
 
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Presence.User.Id);
-            sw.Write((byte)Presence.Status.Status);
-            sw.Write(Presence.Status.StatusText, false);
-            sw.Write(Presence.Status.BeatmapChecksum, false);
-            sw.Write(Presence.Status.CurrentMods);
-            sw.Write((byte) Presence.Status.Playmode);
-            sw.Write(Presence.Status.BeatmapId);
-            if (Presence.Relax)
+            sw.Write(this.Presence.User.Id);
+            sw.Write((byte) this.Presence.Status.Status);
+            sw.Write(this.Presence.Status.StatusText, false);
+            sw.Write(this.Presence.Status.BeatmapChecksum, false);
+            sw.Write(this.Presence.Status.CurrentMods);
+            sw.Write((byte) this.Presence.Status.Playmode);
+            sw.Write(this.Presence.Status.BeatmapId);
+            if (this.Presence.Relax)
             {
-                switch (Presence.Status.Playmode)
+                switch (this.Presence.Status.Playmode)
                 {
                     case PlayModes.Osu:
-                        sw.Write(Presence.LeaderboardRx.RankedScoreOsu);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardRx.Count300Osu,
-                            Presence.LeaderboardRx.Count100Osu, Presence.LeaderboardRx.Count50Osu,
-                            Presence.LeaderboardRx.CountMissOsu, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardRx.PlayCountOsu);
-                        sw.Write(Presence.LeaderboardRx.TotalScoreOsu);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardRx.PeppyPointsOsu);
+                        sw.Write(this.Presence.LeaderboardRx.RankedScoreOsu);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardRx.Count300Osu, this.Presence.LeaderboardRx.Count100Osu, this.Presence.LeaderboardRx.Count50Osu, this.Presence.LeaderboardRx.CountMissOsu, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardRx.PlayCountOsu);
+                        sw.Write(this.Presence.LeaderboardRx.TotalScoreOsu);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardRx.PeppyPointsOsu);
                         break;
                     case PlayModes.Taiko:
-                        sw.Write(Presence.LeaderboardRx.RankedScoreTaiko);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardRx.Count300Taiko,
-                            Presence.LeaderboardRx.Count100Taiko, Presence.LeaderboardRx.Count50Taiko,
-                            Presence.LeaderboardRx.CountMissTaiko, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardRx.PlayCountTaiko);
-                        sw.Write(Presence.LeaderboardRx.TotalScoreTaiko);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardRx.PeppyPointsTaiko);
+                        sw.Write(this.Presence.LeaderboardRx.RankedScoreTaiko);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardRx.Count300Taiko, this.Presence.LeaderboardRx.Count100Taiko, this.Presence.LeaderboardRx.Count50Taiko, this.Presence.LeaderboardRx.CountMissTaiko, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardRx.PlayCountTaiko);
+                        sw.Write(this.Presence.LeaderboardRx.TotalScoreTaiko);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardRx.PeppyPointsTaiko);
                         break;
                     case PlayModes.Ctb:
-                        sw.Write(Presence.LeaderboardRx.RankedScoreCtb);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardRx.Count300Ctb,
-                            Presence.LeaderboardRx.Count100Ctb, Presence.LeaderboardRx.Count50Ctb,
-                            Presence.LeaderboardRx.CountMissCtb, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardRx.PlayCountCtb);
-                        sw.Write(Presence.LeaderboardRx.TotalScoreCtb);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardRx.PeppyPointsCtb);
+                        sw.Write(this.Presence.LeaderboardRx.RankedScoreCtb);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardRx.Count300Ctb, this.Presence.LeaderboardRx.Count100Ctb, this.Presence.LeaderboardRx.Count50Ctb, this.Presence.LeaderboardRx.CountMissCtb, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardRx.PlayCountCtb);
+                        sw.Write(this.Presence.LeaderboardRx.TotalScoreCtb);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardRx.PeppyPointsCtb);
                         break;
                     case PlayModes.Mania:
-                        sw.Write(Presence.LeaderboardRx.RankedScoreMania);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardRx.Count300Mania,
-                            Presence.LeaderboardRx.Count100Mania, Presence.LeaderboardRx.Count50Mania,
-                            Presence.LeaderboardRx.CountMissMania, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardRx.PlayCountMania);
-                        sw.Write(Presence.LeaderboardRx.TotalScoreMania);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardRx.PeppyPointsMania);
+                        sw.Write(this.Presence.LeaderboardRx.RankedScoreMania);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardRx.Count300Mania, this.Presence.LeaderboardRx.Count100Mania, this.Presence.LeaderboardRx.Count50Mania, this.Presence.LeaderboardRx.CountMissMania, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardRx.PlayCountMania);
+                        sw.Write(this.Presence.LeaderboardRx.TotalScoreMania);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardRx.PeppyPointsMania);
                         break;
                     default:
                         sw.Write((ulong)0);
                         sw.Write((float)0);
                         sw.Write((uint)0);
                         sw.Write((ulong)0);
-                        sw.Write(Presence.Rank);
+                        sw.Write(this.Presence.Rank);
                         sw.Write((ushort)0);
                         break;
                 }
             }
-            else if (Presence.Touch)
+            else if (this.Presence.Touch)
             {
-                switch (Presence.Status.Playmode)
+                switch (this.Presence.Status.Playmode)
                 {
                     case PlayModes.Osu:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreOsu);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Osu,
-                            Presence.LeaderboardTouch.Count100Osu, Presence.LeaderboardTouch.Count50Osu,
-                            Presence.LeaderboardTouch.CountMissOsu, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardTouch.PlayCountOsu);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreOsu);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardTouch.PeppyPointsOsu);
+                        sw.Write(this.Presence.LeaderboardTouch.RankedScoreOsu);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardTouch.Count300Osu, this.Presence.LeaderboardTouch.Count100Osu, this.Presence.LeaderboardTouch.Count50Osu, this.Presence.LeaderboardTouch.CountMissOsu, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardTouch.PlayCountOsu);
+                        sw.Write(this.Presence.LeaderboardTouch.TotalScoreOsu);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardTouch.PeppyPointsOsu);
                         break;
                     case PlayModes.Taiko:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreTaiko);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Taiko,
-                            Presence.LeaderboardTouch.Count100Taiko, Presence.LeaderboardTouch.Count50Taiko,
-                            Presence.LeaderboardTouch.CountMissTaiko, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardTouch.PlayCountTaiko);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreTaiko);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardTouch.PeppyPointsTaiko);
+                        sw.Write(this.Presence.LeaderboardTouch.RankedScoreTaiko);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardTouch.Count300Taiko, this.Presence.LeaderboardTouch.Count100Taiko, this.Presence.LeaderboardTouch.Count50Taiko, this.Presence.LeaderboardTouch.CountMissTaiko, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardTouch.PlayCountTaiko);
+                        sw.Write(this.Presence.LeaderboardTouch.TotalScoreTaiko);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardTouch.PeppyPointsTaiko);
                         break;
                     case PlayModes.Ctb:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreCtb);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Ctb,
-                            Presence.LeaderboardTouch.Count100Ctb, Presence.LeaderboardTouch.Count50Ctb,
-                            Presence.LeaderboardTouch.CountMissCtb, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardTouch.PlayCountCtb);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreCtb);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardTouch.PeppyPointsCtb);
+                        sw.Write(this.Presence.LeaderboardTouch.RankedScoreCtb);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardTouch.Count300Ctb, this.Presence.LeaderboardTouch.Count100Ctb, this.Presence.LeaderboardTouch.Count50Ctb, this.Presence.LeaderboardTouch.CountMissCtb, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardTouch.PlayCountCtb);
+                        sw.Write(this.Presence.LeaderboardTouch.TotalScoreCtb);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardTouch.PeppyPointsCtb);
                         break;
                     case PlayModes.Mania:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreMania);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Mania,
-                            Presence.LeaderboardTouch.Count100Mania, Presence.LeaderboardTouch.Count50Mania,
-                            Presence.LeaderboardTouch.CountMissMania, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardTouch.PlayCountMania);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreMania);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardTouch.PeppyPointsMania);
+                        sw.Write(this.Presence.LeaderboardTouch.RankedScoreMania);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardTouch.Count300Mania, this.Presence.LeaderboardTouch.Count100Mania, this.Presence.LeaderboardTouch.Count50Mania, this.Presence.LeaderboardTouch.CountMissMania, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardTouch.PlayCountMania);
+                        sw.Write(this.Presence.LeaderboardTouch.TotalScoreMania);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardTouch.PeppyPointsMania);
                         break;
                     default:
                         sw.Write((ulong)0);
                         sw.Write((float)0);
                         sw.Write((uint)0);
                         sw.Write((ulong)0);
-                        sw.Write(Presence.Rank);
+                        sw.Write(this.Presence.Rank);
                         sw.Write((ushort)0);
                         break;
                 }
             }
             else
             {
-                switch (Presence.Status.Playmode)
+                switch (this.Presence.Status.Playmode)
                 {
                     case PlayModes.Osu:
-                        sw.Write(Presence.LeaderboardStd.RankedScoreOsu);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardStd.Count300Osu,
-                            Presence.LeaderboardStd.Count100Osu, Presence.LeaderboardStd.Count50Osu,
-                            Presence.LeaderboardStd.CountMissOsu, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardStd.PlayCountOsu);
-                        sw.Write(Presence.LeaderboardStd.TotalScoreOsu);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardStd.PeppyPointsOsu);
+                        sw.Write(this.Presence.LeaderboardStd.RankedScoreOsu);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardStd.Count300Osu, this.Presence.LeaderboardStd.Count100Osu, this.Presence.LeaderboardStd.Count50Osu, this.Presence.LeaderboardStd.CountMissOsu, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardStd.PlayCountOsu);
+                        sw.Write(this.Presence.LeaderboardStd.TotalScoreOsu);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardStd.PeppyPointsOsu);
                         break;
                     case PlayModes.Taiko:
-                        sw.Write(Presence.LeaderboardStd.RankedScoreTaiko);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardStd.Count300Taiko,
-                            Presence.LeaderboardStd.Count100Taiko, Presence.LeaderboardStd.Count50Taiko,
-                            Presence.LeaderboardStd.CountMissTaiko, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardStd.PlayCountTaiko);
-                        sw.Write(Presence.LeaderboardStd.TotalScoreTaiko);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardStd.PeppyPointsTaiko);
+                        sw.Write(this.Presence.LeaderboardStd.RankedScoreTaiko);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardStd.Count300Taiko, this.Presence.LeaderboardStd.Count100Taiko, this.Presence.LeaderboardStd.Count50Taiko, this.Presence.LeaderboardStd.CountMissTaiko, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardStd.PlayCountTaiko);
+                        sw.Write(this.Presence.LeaderboardStd.TotalScoreTaiko);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardStd.PeppyPointsTaiko);
                         break;
                     case PlayModes.Ctb:
-                        sw.Write(Presence.LeaderboardStd.RankedScoreCtb);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardStd.Count300Ctb,
-                            Presence.LeaderboardStd.Count100Ctb, Presence.LeaderboardStd.Count50Ctb,
-                            Presence.LeaderboardStd.CountMissCtb, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardStd.PlayCountCtb);
-                        sw.Write(Presence.LeaderboardStd.TotalScoreCtb);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardStd.PeppyPointsCtb);
+                        sw.Write(this.Presence.LeaderboardStd.RankedScoreCtb);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardStd.Count300Ctb, this.Presence.LeaderboardStd.Count100Ctb, this.Presence.LeaderboardStd.Count50Ctb, this.Presence.LeaderboardStd.CountMissCtb, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardStd.PlayCountCtb);
+                        sw.Write(this.Presence.LeaderboardStd.TotalScoreCtb);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardStd.PeppyPointsCtb);
                         break;
                     case PlayModes.Mania:
-                        sw.Write(Presence.LeaderboardStd.RankedScoreMania);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardStd.Count300Mania,
-                            Presence.LeaderboardStd.Count100Mania, Presence.LeaderboardStd.Count50Mania,
-                            Presence.LeaderboardStd.CountMissMania, 0, 0, Presence.Status.Playmode));
-                        sw.Write((uint)Presence.LeaderboardStd.PlayCountMania);
-                        sw.Write(Presence.LeaderboardStd.TotalScoreMania);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort)Presence.LeaderboardStd.PeppyPointsMania);
+                        sw.Write(this.Presence.LeaderboardStd.RankedScoreMania);
+                        sw.Write((float) Accuracy.GetAccuracy(this.Presence.LeaderboardStd.Count300Mania, this.Presence.LeaderboardStd.Count100Mania, this.Presence.LeaderboardStd.Count50Mania, this.Presence.LeaderboardStd.CountMissMania, 0, 0, this.Presence.Status.Playmode));
+                        sw.Write((uint) this.Presence.LeaderboardStd.PlayCountMania);
+                        sw.Write(this.Presence.LeaderboardStd.TotalScoreMania);
+                        sw.Write(this.Presence.Rank);
+                        sw.Write((ushort) this.Presence.LeaderboardStd.PeppyPointsMania);
                         break;
                     default:
                         sw.Write((ulong)0);
                         sw.Write((float)0);
                         sw.Write((uint)0);
                         sw.Write((ulong)0);
-                        sw.Write(Presence.Rank);
+                        sw.Write(this.Presence.Rank);
                         sw.Write((ushort)0);
                         break;
                 }

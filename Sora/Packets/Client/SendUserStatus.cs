@@ -39,7 +39,7 @@ namespace Sora.Packets.Client
         public UserStatus Status;
 
         public void ReadFromStream(MStreamReader sr) =>
-            Status = new UserStatus
+            this.Status = new UserStatus
             {
                 Status = (Status) sr.ReadByte(),
                 StatusText = sr.ReadString(),
@@ -62,6 +62,6 @@ namespace Sora.Packets.Client
         public PlayModes Playmode;
         public uint BeatmapId;
         
-        public override string ToString() => $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
+        public override string ToString() => $"Status: {this.Status}, StatusText: {this.StatusText}, BeatmapChecksum: {this.CurrentMods}, Playmode: {this.Playmode}, BeatmapId: {this.BeatmapId}";
     }
 }
