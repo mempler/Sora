@@ -24,7 +24,7 @@ build:
 
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" Sora.sln > NUL
-  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+  - cmd: NVika parsereport "inspectcodereport.xml"
 
 notifications:
 - provider: Slack
