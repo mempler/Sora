@@ -63,6 +63,11 @@ namespace Sora.Handler
                     LoginFailed(res);
                     return;
                 }
+                if (!user.IsPassword(loginData.Password))
+                {
+                    LoginFailed(res);
+                    return;
+                }
 
                 pr.User = user;
 
