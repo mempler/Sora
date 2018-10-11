@@ -25,13 +25,14 @@ SOFTWARE.
 #endregion
 
 using System.Collections.Generic;
+using System.Threading;
 using Shared.Enums;
 using Shared.Handlers;
 using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
-    public class Channels
+    public static class Channels
     {
         // ReSharper disable once InconsistentNaming
         public static readonly Dictionary<string, Channel> Channels_ = new Dictionary<string, Channel>();
@@ -101,14 +102,21 @@ namespace Sora.Objects
         public bool ReadOnly { get; set; }
         public bool AdminOnly { get; private set; }
         public bool AutoJoin { get; private set; }
+        
+        private Mutex mut = new Mutex();
+        
         public int UserCount
         {
             get
             {
                 if (this._UserCount > -1) return this._UserCount;
                 if (this._presences == null) return 0;
-                lock (this._presences)
-                    return this._presences.Count;
+                
+                this.mut.WaitOne();
+                int c = this._presences.Count;
+                this.mut.ReleaseMutex();
+                
+                return c;
             }
             set => this._UserCount = value;
         }
@@ -140,14 +148,16 @@ namespace Sora.Objects
             return true;
         }
 
-        public bool LeaveChannel(Presence pr)
+        public void LeaveChannel(Presence pr)
         {
             try
             {
                 lock (this._presences) this._presences.Remove(pr);
-                return true;
             }
-            catch { return false; }
+            catch
+            {
+                // Ignored
+            }
         }
 
         public void WriteMessage(Presence pr, string message)
