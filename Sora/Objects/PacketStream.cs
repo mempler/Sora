@@ -32,7 +32,7 @@ using Shared.Interfaces;
 
 namespace Sora.Objects
 {
-    public class LPacketStreams
+    public static class LPacketStreams
     {
         private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();
         private static bool _initialized;
@@ -42,6 +42,7 @@ namespace Sora.Objects
         {
             if (_initialized) return;
             _initialized = true;
+            
             NewStream(new PacketStream("main"));
             NewStream(new PacketStream("admin")); // Admin stream, only admins will join.
             NewStream(new PacketStream("lobby")); // Little prepare for later.

@@ -29,9 +29,9 @@ using Shared.Database;
 // Only used for Migration. so just ignore it ^^
 namespace Shared
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        private static void Main()
         {
             using (SoraContext db = new SoraContext()) { }
         }
