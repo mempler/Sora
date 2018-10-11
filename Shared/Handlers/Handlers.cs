@@ -65,6 +65,18 @@ namespace Shared.Handlers
             var handlers = _handlers[type];
             foreach (MethodInfo h in handlers)
             {
+                if (h.IsStatic)
+                {
+                    try
+                    {
+                        h.Invoke(null, args);
+                    }
+                    catch (TargetInvocationException tie)
+                    {
+                        Logger.L.Error(tie.InnerException);
+                    }
+                    return; // Dont handle it as a non static method. just return.
+                }
                 object handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
                 try
                 {
