@@ -34,7 +34,7 @@ namespace Shared.Helpers
             ulong countGeki, ulong countKatu, PlayModes playMode)
         {
             if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
-                return 1;
+                return 0;
             switch (playMode)
             {
                 case PlayModes.Osu:
