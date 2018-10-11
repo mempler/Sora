@@ -28,6 +28,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using Shared.Database;
+using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
@@ -54,6 +55,18 @@ namespace Sora
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
                 Handlers.ExecuteHandler(HandlerTypes.Initializer);
+                
+                // Create Sora (bot)
+                if (Users.GetUser(100) == null)
+                    Users.InsertUser(new Users
+                    {
+                        Id = 100,
+                        Username = "Sora",
+                        Email = "bot@gigamons.de",
+                        Password = "",
+                        Privileges = 0
+                    });
+                
                 watch.Stop();
                 Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
             }
