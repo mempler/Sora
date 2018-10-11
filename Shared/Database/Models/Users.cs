@@ -27,7 +27,10 @@ SOFTWARE.
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Shared.Enums;
+using Shared.Helpers;
 
 namespace Shared.Database.Models
 {
@@ -49,7 +52,7 @@ namespace Shared.Database.Models
         [Required]
         public Privileges Privileges { get; set; } = 0;
 
-        public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(s, this.Password);
+        public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), this.Password);
 
         public static int GetUserId(string username)
         {
@@ -68,6 +71,33 @@ namespace Shared.Database.Models
                 Users result = db.Users.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
                 return result;
             }
+        }
+
+        public static void InsertUser(params Users[] users)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                db.Users.AddRange(users);
+                db.SaveChanges();
+            }
+        }
+
+        public static Users NewUser(string username, string password, string email = "", Privileges privileges = 0, bool insert = true)
+        {
+            var md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
+            
+            string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
+            Users u = new Users
+            {
+                Username = username,
+                Password = bcryptPass,
+                Email = email,
+                Privileges = privileges
+            };
+            if (insert)
+                InsertUser(u);
+
+            return u;
         }
 
         public override string ToString() =>
