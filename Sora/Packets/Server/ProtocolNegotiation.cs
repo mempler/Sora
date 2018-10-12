@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -32,10 +34,11 @@ namespace Sora.Packets.Server
 {
     public class ProtocolNegotiation : IPacket
     {
-        public PacketId Id => PacketId.ServerProtocolNegotiation;
         public uint Protocol = 19; // Latest known protocol version
+        public PacketId Id => PacketId.ServerProtocolNegotiation;
 
-        public void ReadFromStream(MStreamReader sr) => this.Protocol = sr.ReadUInt32();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Protocol);
+        public void ReadFromStream(MStreamReader sr) { Protocol = sr.ReadUInt32(); }
+
+        public void WriteToStream(MStreamWriter sw) { sw.Write(Protocol); }
     }
 }

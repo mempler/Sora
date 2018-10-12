@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,9 +23,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using MaxMind.GeoIP2.Responses;
@@ -32,11 +35,11 @@ using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
+using Shared.Server;
 using Sora.Enums;
 using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Server;
-using Sora.Server;
 
 namespace Sora.Handler
 {
@@ -63,6 +66,7 @@ namespace Sora.Handler
                     LoginFailed(res);
                     return;
                 }
+
                 if (!user.IsPassword(loginData.Password))
                 {
                     LoginFailed(res);
@@ -76,25 +80,26 @@ namespace Sora.Handler
                     CityResponse data = Localisation.GetData(req.Ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
-                    if (data.Location.Latitude != null) pr.Lat = (double) data.Location.Latitude;
+                    if (data.Location.Latitude != null) pr.Lat  = (double) data.Location.Latitude;
                 }
 
-                pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(pr.User);
-                pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(pr.User);
+                pr.LeaderboardStd   = LeaderboardStd.GetLeaderboard(pr.User);
+                pr.LeaderboardRx    = LeaderboardRx.GetLeaderboard(pr.User);
                 pr.LeaderboardTouch = LeaderboardTouch.GetLeaderboard(pr.User);
 
-                pr.Timezone = loginData.Timezone;
+                pr.Timezone         = loginData.Timezone;
                 pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
-                Presences.BeginPresence(pr);
+                LPresences.BeginPresence(pr);
 
                 Success(res, user.Id);
                 res.Writer.Write(new ProtocolNegotiation());
                 res.Writer.Write(new UserPresence(pr));
-                res.Writer.Write(new PresenceBundle(Presences.GetUserIds(pr).ToList()));
+                res.Writer.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
                 res.Writer.Write(new HandleUpdate(pr));
 
-                foreach (Channel chanAuto in Channels.ChannelsAutoJoin) {
+                foreach (Channel chanAuto in Channels.ChannelsAutoJoin)
+                {
                     if (chanAuto.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
                         res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
                     else if (!chanAuto.AdminOnly)
@@ -106,7 +111,7 @@ namespace Sora.Handler
                         res.Writer.Write(new ChannelRevoked(chanAuto));
                 }
 
-                foreach (var chan in Channels.Channels_)
+                foreach (KeyValuePair<string, Channel> chan in Channels.Channels_)
                     if (chan.Value.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
                         res.Writer.Write(new ChannelAvailable(chan.Value));
                     else if (!chan.Value.AdminOnly)
@@ -118,16 +123,19 @@ namespace Sora.Handler
                     Exception(res);
                     return;
                 }
+
                 stream.Join(pr);
             }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-            }
+            catch (Exception ex) { Logger.L.Error(ex); }
         }
 
-        private static void LoginFailed(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Failed));
-        private static void Exception(Res res) => res.Writer.Write(new LoginResponse(LoginResponses.Exception));
-        private static void Success(Res res, int userid) => res.Writer.Write(new LoginResponse((LoginResponses)userid));
+        private static void LoginFailed(Res res) { res.Writer.Write(new LoginResponse(LoginResponses.Failed)); }
+
+        private static void Exception(Res res) { res.Writer.Write(new LoginResponse(LoginResponses.Exception)); }
+
+        private static void Success(Res res, int userid)
+        {
+            res.Writer.Write(new LoginResponse((LoginResponses) userid));
+        }
     }
 }

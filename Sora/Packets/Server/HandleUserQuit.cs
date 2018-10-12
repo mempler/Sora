@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -33,23 +35,25 @@ namespace Sora.Packets.Server
 {
     public class HandleUserQuit : IPacket
     {
-        public PacketId Id => PacketId.ServerAnnounce;
         public UserQuitStruct UserQuit;
 
-        public HandleUserQuit(UserQuitStruct userQuit) => this.UserQuit = userQuit;
+        public HandleUserQuit(UserQuitStruct userQuit) { UserQuit = userQuit; }
+
+        public PacketId Id => PacketId.ServerAnnounce;
 
         public void ReadFromStream(MStreamReader sr)
         {
-            this.UserQuit = new UserQuitStruct
+            UserQuit = new UserQuitStruct
             {
-                UserId = sr.ReadUInt32(),
+                UserId     = sr.ReadUInt32(),
                 ErrorState = (ErrorStates) sr.ReadInt32()
             };
         }
+
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(this.UserQuit.UserId);
-            sw.Write((int) this.UserQuit.ErrorState);
+            sw.Write(UserQuit.UserId);
+            sw.Write((int) UserQuit.ErrorState);
         }
     }
 

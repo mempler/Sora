@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,13 +23,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 namespace Jibril
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             // TODO: PUT CODE HERE.
             // This is gonna be the /web/ server aka Private API

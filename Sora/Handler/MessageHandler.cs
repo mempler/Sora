@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,13 +23,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
-namespace Sora.Enums
+using JetBrains.Annotations;
+using Shared.Database.Models;
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
+namespace Sora.Handler
 {
-    public enum ChannelTypes
+    public class MessageHandler
     {
-        Public,
-        Private
+        [UsedImplicitly]
+        [Handler(HandlerTypes.ClientSendIrcMessage)]
+        [Handler(HandlerTypes.ClientSendIrcMessagePrivate)]
+        public void HandleMessage(Presence pr, MessageStruct message)
+        {
+            Channel chan = null;
+            if (message.ChannelTarget.StartsWith("#"))
+            {
+                chan = Channels.GetChannel(message.ChannelTarget);
+                if (chan == null)
+                {
+                    pr.Write(new ChannelRevoked(message.ChannelTarget));
+                    return;
+                }
+            } else
+            {
+                // Other persence
+                Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));
+                if (opr == null) return;
+                opr.PrivateChannel.WriteMessage(pr, message.Message);
+            }
+
+            chan?.WriteMessage(pr, message.Message);
+        }
     }
 }

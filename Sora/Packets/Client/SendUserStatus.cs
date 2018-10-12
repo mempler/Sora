@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -33,29 +35,30 @@ namespace Sora.Packets.Client
 {
     public class SendUserStatus : IPacket
     {
+        public UserStatus Status;
         public PacketId Id => PacketId.ClientSendUserStatus;
 
-        public UserStatus Status;
-
-        public void ReadFromStream(MStreamReader sr) =>
-            this.Status = new UserStatus
+        public void ReadFromStream(MStreamReader sr)
+        {
+            Status = new UserStatus
             {
-                Status = (Status) sr.ReadByte(),
-                StatusText = sr.ReadString(),
+                Status          = (Status) sr.ReadByte(),
+                StatusText      = sr.ReadString(),
                 BeatmapChecksum = sr.ReadString(),
-                CurrentMods = sr.ReadUInt32(),
-                Playmode = (PlayModes) sr.ReadByte(),
-                BeatmapId = sr.ReadUInt32()
+                CurrentMods     = sr.ReadUInt32(),
+                Playmode        = (PlayModes) sr.ReadByte(),
+                BeatmapId       = sr.ReadUInt32()
             };
+        }
 
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write((byte)this.Status.Status);
-            sw.Write(this.Status.StatusText);
-            sw.Write(this.Status.BeatmapChecksum);
-            sw.Write(this.Status.CurrentMods);
-            sw.Write((byte)this.Status.Playmode);
-            sw.Write(this.Status.BeatmapId);
+            sw.Write((byte) Status.Status);
+            sw.Write(Status.StatusText);
+            sw.Write(Status.BeatmapChecksum);
+            sw.Write(Status.CurrentMods);
+            sw.Write((byte) Status.Playmode);
+            sw.Write(Status.BeatmapId);
         }
     }
 
@@ -67,7 +70,11 @@ namespace Sora.Packets.Client
         public uint CurrentMods;
         public PlayModes Playmode;
         public uint BeatmapId;
-        
-        public override string ToString() => $"Status: {this.Status}, StatusText: {this.StatusText}, BeatmapChecksum: {this.CurrentMods}, Playmode: {this.Playmode}, BeatmapId: {this.BeatmapId}";
+
+        public override string ToString()
+        {
+            return
+                $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
+        }
     }
 }

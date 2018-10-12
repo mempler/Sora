@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -36,13 +38,13 @@ namespace Sora.Objects
     {
         private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();
         private static bool _initialized;
-        
+
         [Handler(HandlerTypes.Initializer)]
         public static void Initialize()
         {
             if (_initialized) return;
             _initialized = true;
-            
+
             NewStream(new PacketStream("main"));
             NewStream(new PacketStream("admin")); // Admin stream, only admins will join.
             NewStream(new PacketStream("lobby")); // Little prepare for later.
@@ -54,30 +56,30 @@ namespace Sora.Objects
             return x;
         }
 
-        public static void NewStream(PacketStream str) =>
-            PacketStreams[str.StreamName] = str;
+        public static void NewStream(PacketStream str) { PacketStreams[str.StreamName] = str; }
 
-        public static void RemoveStream(string name) =>
-            PacketStreams[name] = null;
+        public static void RemoveStream(string name) { PacketStreams[name] = null; }
     }
 
     public class PacketStream
     {
-        public PacketStream(string name) => this.StreamName = name;
+        private readonly Dictionary<string, Presence> _joinedPresences = new Dictionary<string, Presence>();
 
-        public Dictionary<string, Presence> JoinedPresences = new Dictionary<string, Presence>();
+        public PacketStream(string name) { StreamName = name; }
+
         public string StreamName { get; }
 
-        public void Join(Presence pr) => this.JoinedPresences[pr.Token] = pr;
+        public void Join(Presence pr) { _joinedPresences[pr.Token] = pr; }
 
-        public void Left(Presence pr) => this.JoinedPresences[pr.Token] = null;
-        public void Left(string token) => this.JoinedPresences[token] = null;
+        public void Left(Presence pr) { _joinedPresences[pr.Token] = null; }
+
+        public void Left(string token) { _joinedPresences[token] = null; }
 
         public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {
-            foreach (var presence in this.JoinedPresences)
+            foreach (KeyValuePair<string, Presence> presence in _joinedPresences)
             {
-                if (Array.BinarySearch(ignorePresences, presence) > 0 || presence.Value.Disconnected)
+                if (Array.BinarySearch(ignorePresences, presence) > 0 || presence.Value.Stream.BaseStream.CanWrite)
                     continue;
                 presence.Value.Write(packet);
             }

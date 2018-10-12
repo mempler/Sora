@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,14 +23,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
-using System;
+
 // ReSharper disable InconsistentNaming
 
 namespace Shared.Enums
 {
-    public enum CountryIds : Byte
+    public enum CountryIds : byte
     {
         BL = 0,
         AD = 3,
@@ -245,6 +247,6 @@ namespace Shared.Enums
         GG = 248,
         IM = 249,
         JE = 250,
-        MF = 252,
+        MF = 252
     }
 }

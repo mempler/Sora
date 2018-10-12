@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -34,24 +36,26 @@ namespace Shared.Database
 {
     public sealed class SoraContext : DbContext
     {
-        public DbSet<Users> Users { get; set; }
-        public DbSet<UserStats> UserStats { get; set; }
-        public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
-        public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
-        public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
-
         private static readonly bool[] Migrated = { false };
 
         public SoraContext()
         {
             if (Migrated[0]) return;
-            lock ( Migrated )
-                if ( !Migrated[0] )
+            lock (Migrated)
+            {
+                if (!Migrated[0])
                 {
-                    this.Database.Migrate();
+                    Database.Migrate();
                     Migrated[0] = true;
                 }
+            }
         }
+
+        public DbSet<Users> Users { get; set; }
+        public DbSet<UserStats> UserStats { get; set; }
+        public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
+        public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
+        public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

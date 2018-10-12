@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -36,7 +38,7 @@ namespace Shared.Helpers
         {
             if (File.Exists("config.json")) return JsonConvert.DeserializeObject<Cfg>(File.ReadAllText("config.json"));
             Cfg cfg = new Cfg();
-            
+
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.L.Info("Config has been created! please edit.");
             Environment.Exit(0);
@@ -47,13 +49,17 @@ namespace Shared.Helpers
 
     public class Cfg
     {
-        public Server Server = new Server() { Port=5001 };
-        public MySql MySql = new MySql() { Database="gigamons", Hostname="127.0.0.1", Username="root", Port=3306, Password="" };
+        public MySql MySql = new MySql
+            { Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = "" };
+
+        public Server Server = new Server { Port = 5001 };
     }
+
     public struct Server
     {
         public short Port;
     }
+
     public struct MySql
     {
         public string Username;

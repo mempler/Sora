@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -33,12 +35,11 @@ namespace Sora.Packets.Client
 {
     public class UserStatsRequest : IPacket
     {
+        public List<int> Userids;
         public PacketId Id => PacketId.ClientUserStatsRequest;
 
-        public List<int> Userids;
+        public void ReadFromStream(MStreamReader sr) { Userids = sr.ReadInt32List(); }
 
-        public void ReadFromStream(MStreamReader sr) => this.Userids = sr.ReadInt32List();
-
-        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Userids);
+        public void WriteToStream(MStreamWriter sw) { sw.Write(Userids); }
     }
 }

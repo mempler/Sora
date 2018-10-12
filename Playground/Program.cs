@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,8 +23,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#endregion
 
+#endregion
 
 /* Just a playground for me to play around. */
 
@@ -31,11 +32,8 @@ using System;
 
 namespace Playground
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
-        {
-            Console.ReadLine();
-        }
+        private static void Main() { Console.ReadLine(); }
     }
 }

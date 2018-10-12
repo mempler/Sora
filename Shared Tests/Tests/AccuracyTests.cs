@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,11 +23,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shared.Enums;
 using Shared.Helpers;
+
+// ReSharper disable All
 
 namespace Shared_Tests.Tests
 {
@@ -39,16 +43,19 @@ namespace Shared_Tests.Tests
         {
             double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Osu);
         }
+
         [TestMethod]
         public void TestAccuracyTaiko()
         {
             double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Taiko);
         }
+
         [TestMethod]
         public void TestAccuracyCtb()
         {
             double acc = Accuracy.GetAccuracy(582, 12, 40, 1, 900, 121, PlayModes.Ctb);
         }
+
         [TestMethod]
         public void TestAccuracyMania()
         {

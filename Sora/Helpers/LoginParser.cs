@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.IO;
@@ -38,26 +40,27 @@ namespace Sora.Helpers
             {
                 l.Username = s.ReadLine();
                 l.Password = s.ReadLine();
-                var otherData = s.ReadLine()?.Split('|');
+                string[] otherData = s.ReadLine()?.Split('|');
                 if (otherData == null || otherData.Length < 5) return null;
-                l.Build = otherData[0];
-                l.Timezone = byte.Parse(otherData[1]);
-                l.DisplayLocation = otherData[2] == "1";
-                l.SecurityHash = otherData[3];
+                l.Build             = otherData[0];
+                l.Timezone          = byte.Parse(otherData[1]);
+                l.DisplayLocation   = otherData[2] == "1";
+                l.SecurityHash      = otherData[3];
                 l.BlockNonFriendDMs = otherData[4] == "1";
             }
+
             return l;
         }
     }
 
     public class Login
     {
-        public string Username;
-        public string Password;
-        public string Build;
-        public byte Timezone;
-        public bool DisplayLocation;
-        public string SecurityHash;
         public bool BlockNonFriendDMs;
+        public string Build;
+        public bool DisplayLocation;
+        public string Password;
+        public string SecurityHash;
+        public byte Timezone;
+        public string Username;
     }
 }

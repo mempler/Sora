@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -35,7 +37,9 @@ namespace Shared.Handlers
 {
     public static class Handlers
     {
-        private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers = new Dictionary<HandlerTypes, List<MethodInfo>>();
+        private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers =
+            new Dictionary<HandlerTypes, List<MethodInfo>>();
+
         public static void InitHandlers(Assembly ass, bool reload)
         {
             if (reload)
@@ -44,14 +48,16 @@ namespace Shared.Handlers
                 GC.Collect(); // Collect garbage.
                 _handlers = new Dictionary<HandlerTypes, List<MethodInfo>>();
             }
-            var methods = ass.GetTypes()
-                .SelectMany(t => t.GetMethods())
-                .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
-                .ToArray();
+
+            MethodInfo[] methods = ass.GetTypes()
+                                      .SelectMany(t => t.GetMethods())
+                                      .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
+                                      .ToArray();
 
             foreach (MethodInfo handler in methods)
             {
-                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0].Type;
+                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0]
+                    .Type;
                 if (!_handlers.ContainsKey(type))
                     _handlers[type] = new List<MethodInfo>();
                 _handlers[type].Add(handler);
@@ -62,38 +68,30 @@ namespace Shared.Handlers
         {
             if (_handlers == null) return;
             if (!_handlers.ContainsKey(type)) return;
-            var handlers = _handlers[type];
+            List<MethodInfo> handlers = _handlers[type];
             foreach (MethodInfo h in handlers)
             {
                 if (h.IsStatic)
                 {
-                    try
-                    {
-                        h.Invoke(null, args);
-                    }
-                    catch (TargetInvocationException tie)
-                    {
-                        Logger.L.Error(tie.InnerException);
-                    }
+                    try { h.Invoke(null, args); }
+                    catch (TargetInvocationException tie) { Logger.L.Error(tie.InnerException); }
+
                     return; // Dont handle it as a non static method. just return.
                 }
-                object handlerClass = Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
-                try
-                {
-                    h.Invoke(handlerClass, args);
-                }
-                catch (TargetInvocationException tie)
-                {
-                    Logger.L.Error(tie.InnerException);
-                }
+
+                object handlerClass =
+                    Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
+                try { h.Invoke(handlerClass, args); }
+                catch (TargetInvocationException tie) { Logger.L.Error(tie.InnerException); }
             }
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class HandlerAttribute : Attribute
     {
         public readonly HandlerTypes Type;
-        public HandlerAttribute(HandlerTypes t) => this.Type = t;
+
+        public HandlerAttribute(HandlerTypes t) { Type = t; }
     }
 }

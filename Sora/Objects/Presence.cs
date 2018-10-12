@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -29,6 +31,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using JetBrains.Annotations;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Helpers;
@@ -37,46 +40,59 @@ using Sora.Packets.Client;
 
 namespace Sora.Objects
 {
-    public static class Presences
+    public static class LPresences
     {
-        private static readonly Dictionary<string, Presence> presences = new Dictionary<string, Presence>();
+        private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
 
-        public static Presence GetPresence(string token) => presences.TryGetValue(token, out Presence pr) ? pr : null;
+        public static Presence GetPresence(string token)
+        {
+            return Presences.TryGetValue(token, out Presence pr) ? pr : null;
+        }
+
         public static Presence GetPresence(int userid)
         {
-            foreach (var presence in presences)
+            foreach (KeyValuePair<string, Presence> presence in Presences)
                 if (presence.Value.User.Id == userid)
                     return presence.Value;
             return null;
         }
 
+        [UsedImplicitly]
         public static IEnumerable<int> GetUserIds()
         {
-            foreach (var presence in presences)
+            foreach (KeyValuePair<string, Presence> presence in Presences)
                 yield return presence.Value.User.Id;
         }
+
         public static IEnumerable<int> GetUserIds(Presence pr)
         {
-            foreach (var presence in presences)
+            foreach (KeyValuePair<string, Presence> presence in Presences)
             {
                 if (presence.Value.User.Id == pr.User.Id) continue;
                 yield return presence.Value.User.Id;
             }
         }
-        
+
         public static void BeginPresence(Presence presence)
         {
-            presence.BeginSeason = DateTime.UtcNow;
+            // TODO: Add total playtime.
+            //presence.BeginSeason = DateTime.UtcNow;
             presence.LastRequest.Start();
-            presences[presence.Token] = presence;
+            Presences[presence.Token] = presence;
+            Channels.AddChannel(new Channel(presence.User.Username));
         }
+
         public static void EndPresence(Presence presence, bool forceful)
         {
-            if (forceful && presences.ContainsKey(presence.Token))
+            if (forceful && Presences.ContainsKey(presence.Token))
             {
-                presences[presence.Token].Stream.Close();
-                presences[presence.Token].LastRequest.Stop();
-                presences.Remove(presence.Token);
+                Presences[presence.Token].Stream.Close();
+                Presences[presence.Token].LastRequest.Stop();
+                Channels.RemoveChannel(Presences[presence.Token].PrivateChannel);
+                Presences.Remove(presence.Token);
+                foreach (PacketStream str in Presences[presence.Token].JoinedStreams)
+                    str.Left(Presences[presence.Token]);
+
                 return;
             }
 
@@ -87,11 +103,13 @@ namespace Sora.Objects
         {
             new Thread(() =>
             {
-                while(true) {
+                while (true)
+                {
                     try
                     {
-                        lock (presences) {
-                            foreach (var pr in presences)
+                        lock (Presences)
+                        {
+                            foreach (KeyValuePair<string, Presence> pr in Presences)
                                 pr.Value.TimeoutCheck();
                         }
                     }
@@ -99,73 +117,99 @@ namespace Sora.Objects
                     {
                         // Don't EVER let the TimeoutCheck Crash. else we've a memoryleak.
                     }
+
                     Thread.Sleep(1000); // wait a second. we dont want high cpu usage.
                 }
             }).Start();
         }
     }
 
-    public class Presence
+    public class Presence : IComparable
     {
-        public string Token { get; }
-        public MStreamWriter Stream;
-        public DateTime BeginSeason;
-        public bool IsLastRequest;
-        public Stopwatch LastRequest;
+        //public bool Disconnected;
 
-        public Users User;
-        public UserStats Stats;
-        public LeaderboardStd LeaderboardStd;
-        public LeaderboardRx LeaderboardRx;
-        public LeaderboardTouch LeaderboardTouch;
-        public UserStatus Status = new UserStatus { BeatmapChecksum = "", StatusText = "" }; // Predefined strings to prevent Issues.
-
-        public uint Rank;
+        public readonly List<PacketStream> JoinedStreams = new List<PacketStream>();
+        public readonly Stopwatch LastRequest;
 
         public bool BlockNonFriendDm;
         public int ClientPermissions;
 
         public CountryIds CountryId;
-        public double Lon;
+
+        //public DateTime BeginSeason;
+        public bool IsLastRequest;
         public double Lat;
+        public LeaderboardRx LeaderboardRx;
+
+        //public UserStats Stats;
+        public LeaderboardStd LeaderboardStd;
+        public LeaderboardTouch LeaderboardTouch;
+        public double Lon;
+
+        public bool Relax;
+
+        public UserStatus
+            Status = new UserStatus { BeatmapChecksum = "", StatusText = "" }; // Predefined strings to prevent Issues.
+
+        public MStreamWriter Stream;
         public byte Timezone;
 
         public bool Touch;
-        public bool Relax;
-        public bool Disconnected;
+
+        public Users User;
 
         public Presence()
         {
-            this.LastRequest = new Stopwatch();
-            this.Token = Guid.NewGuid().ToString();
+            LastRequest = new Stopwatch();
+            Token       = Guid.NewGuid().ToString();
             MemoryStream str = new MemoryStream();
-            this.Stream = new MStreamWriter(str);
+            Stream = new MStreamWriter(str);
         }
 
-        protected bool Equals(Presence pr) => this.Token == pr.Token;
+        public string Token { get; }
+
+        public uint Rank => 0;
+
+        public Channel PrivateChannel => Channels.GetChannel(User.Username);
+
+        public int CompareTo(object obj)
+        {
+            if (obj.GetType() != typeof(Presence)) return -1;
+            if (!(obj is Presence pr)) return -1;
+            return pr.Token == Token ? 0 : 1;
+        }
+
+        protected bool Equals(Presence pr) { return Token == pr.Token; }
 
         public MemoryStream GetOutput(bool reset = true)
         {
             MemoryStream copy = new MemoryStream();
-            long pos = this.Stream.BaseStream.Position;
-            this.Stream.BaseStream.Position = 0;
-            this.Stream.BaseStream.CopyTo(copy);
-            this.Stream.BaseStream.Position = pos;
-            this.LastRequest.Restart();
+            long         pos  = Stream.BaseStream.Position;
+            Stream.BaseStream.Position = 0;
+            Stream.BaseStream.CopyTo(copy);
+            Stream.BaseStream.Position = pos;
+            LastRequest.Restart();
 
             if (!reset) return copy;
 
-            this.Stream.Close();
-            this.Stream = new MStreamWriter(new MemoryStream());
+            using (Stream)
+            {
+                // Dispose after chaning stream.
+                Stream = new MStreamWriter(new MemoryStream());
+            }
+
             return copy;
         }
 
         public void TimeoutCheck()
         {
-            if (this.LastRequest.ElapsedMilliseconds > 30 * 1000)
-                Presences.EndPresence(this, true);
+            if (LastRequest.ElapsedMilliseconds > 30 * 1000)
+                LPresences.EndPresence(this, true);
         }
 
-        public void Write(IPacket p) => this.Stream.Write(p);
+        public void Write(IPacket p)
+        {
+            if (p != null) Stream?.Write(p);
+        }
     }
 }

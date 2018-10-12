@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,97 +23,106 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Amib.Threading;
-using JetBrains.Annotations;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 
-namespace Sora.Server
+namespace Shared.Server
 {
     public class Req
     {
         public Dictionary<string, string> Headers = new Dictionary<string, string>();
-        public MStreamReader Reader;
+        public string Ip;
         public HttpMethods Method;
         public string Path;
-        public string Ip;
+        public MStreamReader Reader;
     }
 
     public class Res
     {
-        public Dictionary<string, string> Headers = new Dictionary<string, string>();
-        public int StatusCode { get; set; } = 200;
+        public readonly Dictionary<string, string> Headers = new Dictionary<string, string>();
         public MStreamWriter Writer;
+        public int StatusCode { get; set; } = 200;
     }
 
     public class Client
     {
-        private readonly TcpClient _client;
-        public Client(TcpClient client) => this._client = client;
+        private readonly Socket _socket;
+
+        public Client(Socket socket) { _socket = socket; }
 
         public void DoStuff()
         {
-            using (this._client)
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            using (_socket)
             {
                 try
                 {
-                    StreamReader sr = new StreamReader(this._client.GetStream());
-                    Req req = this.ReadHeader(sr);
-                    Res res = new Res {Writer = MStreamWriter.New()};
-                    if (req == null)
+                    using (NetworkStream stream = new NetworkStream(_socket))
                     {
-                        req = new Req
+                        StreamReader sr  = new StreamReader(stream);
+                        Req          req = ReadHeader(sr);
+                        Res          res = new Res { Writer = MStreamWriter.New() };
+                        if (req == null)
+                            req = new Req
+                            {
+                                Headers = { ["Host"] = "Unknown" },
+                                Method  = HttpMethods.Get
+                            };
+
+                        if (req.Method == HttpMethods.Get)
                         {
-                            Headers = {["Host"] = "Unknown"},
-                            Method = HttpMethods.Get
-                        };
+                            res.Writer.WriteRawString(
+                                !File.Exists("index.html")
+                                    ? @"<html><head><title>Sora - an Strategic bancho.</title></head><body></body></html>"
+                                    : File.ReadAllText("index.html"));
+                            WriteRes(stream, req, res);
+                            return;
+                        }
+
+                        Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
+                        WriteRes(stream, req, res);
+                        watch.Stop();
                     }
-                    if (req.Method == HttpMethods.Get)
-                    {
-                        res.Writer.WriteRawString(
-                            !File.Exists("index.html")
-                                ? @"<html><head><title>Sora - an Strategic bancho.</title></head><body></body></html>"
-                                : File.ReadAllText("index.html"));
-                        WriteRes(this._client, req, res);
-                        return;
-                    }
-                    Handlers.ExecuteHandler(HandlerTypes.PacketHandler, req, res);
-                    WriteRes(this._client, req, res);
                 }
                 catch (Exception ex)
                 {
                     Logger.L.Error(ex);
+                    watch.Stop();
                 }
+
+                Logger.L.Debug($"Request took {watch.Elapsed.Milliseconds} ms");
             }
         }
 
-        public Req ReadHeader(StreamReader rd)
+        private Req ReadHeader(TextReader rd)
         {
-            Req x = new Req();
+            Req    x          = new Req();
             string mainHeader = rd.ReadLine();
             if (mainHeader == null) return x;
-            var hSplit = mainHeader.Split(' ');
+            string[] hSplit = mainHeader.Split(' ');
             if (hSplit.Length < 3) return null;
             Enum.TryParse(hSplit[0], true, out HttpMethods method);
             x.Method = method;
-            x.Path = hSplit[1];
+            x.Path   = hSplit[1];
 
             while (true)
             {
                 string currentLine = rd.ReadLine();
                 if (currentLine == null) break;
                 if (currentLine.Trim() == "") break;
-                var headSplit = currentLine.Split(':', 2);
+                string[] headSplit = currentLine.Split(':', 2);
                 if (headSplit.Length < 2) break;
                 x.Headers[headSplit[0].Trim()] = headSplit[1].Trim();
             }
@@ -124,90 +134,91 @@ namespace Sora.Server
 
             int.TryParse(x.Headers["Content-Length"], out int byteLength);
 
-            var data = new byte[byteLength];
+            byte[] data = new byte[byteLength];
             for (int i = 0; i < byteLength; i++)
                 data[i] = (byte) rd.Read();
 
             x.Reader = new MStreamReader(new MemoryStream(data));
-            x.Ip = this._client.Client.RemoteEndPoint.ToString().Split(':')[0];
+            x.Ip     = _socket.RemoteEndPoint.ToString().Split(':')[0];
             return x;
         }
 
-        public static void WriteRes(TcpClient c, Req r, Res s)
+        private static void WriteRes(Stream stream, Req r, Res s)
         {
-            using (NetworkStream stream = c.GetStream())
-            {
-                var header = Encoding.ASCII.GetBytes("HTTP/1.1 "+s.StatusCode+" " + (HttpStatusCode)s.StatusCode + "\r\n" + Header2Str(r, s) + "\r\n");
-                stream.Write(header);
-                stream.Write(s.Writer.ToArray());
-                s.Writer.Close();
-            }
+            if (!stream.CanWrite) return; // Stream already closed, client closed it.
+            byte[] header =
+                Encoding.ASCII.GetBytes(
+                    $"HTTP/1.1 {s.StatusCode} {(HttpStatusCode) s.StatusCode}\r\n{Header2Str(r, s)}\r\n");
+            stream.Write(header);
+            stream.Write(s.Writer.ToArray());
         }
 
-        public static string Header2Str(Req x, Res s)
+        private static string Header2Str(Req x, Res s)
         {
             string outputStr = string.Empty;
             s.Headers["cho-protocol"] = "19";
-            s.Headers  ["Connection"] = "keep-alive";
-            s.Headers  ["Keep-Alive"] = "timeout=5, max=100";
+            s.Headers["Connection"]   = "keep-alive";
+            s.Headers["Keep-Alive"]   = "timeout=60, max=100";
             s.Headers["Content-Type"] = "text/html; charset=UTF-8";
-            s.Headers        ["Host"] = x.Headers["Host"];
-            s.Headers  ["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
+            s.Headers["Host"]         = x.Headers["Host"];
+            s.Headers["cho-server"]   = "Sora (https://github.com/Mempler/Sora)";
             foreach (string key in s.Headers.Keys)
                 outputStr += $"{key}: {s.Headers[key]}\r\n";
             return outputStr;
         }
     }
+
     public class HttpServer
     {
-        private bool _running;
         private readonly TcpListener _listener;
-        private readonly SmartThreadPool _pool;
+        private bool _running;
         private Thread _serverThread;
 
         public HttpServer(short port)
         {
-            this._running = false;
-            this._listener = new TcpListener(IPAddress.Any, port);
-            this._pool = new SmartThreadPool();
+            _running  = false;
+            _listener = new TcpListener(IPAddress.Any, port);
         }
 
         public Thread Run()
         {
-            if (this._running)
+            if (_running)
                 throw new Exception("Address already in use!");
-            Thread x = new Thread(this._RunServer);
+            Thread x = new Thread(_RunServer);
             x.Start();
-            this._serverThread = x;
+            _serverThread = x;
             return x;
         }
-        
-        [UsedImplicitly]
+
         public void Stop()
         {
-            if (this._running)
+            if (_running)
                 throw new Exception("Cannot stop while already stopped!");
-            
+
             Thread.Sleep(100);
-            this._serverThread.Abort();
+            _serverThread.Abort();
         }
 
         private void _RunServer()
         {
-            this._listener.Start();
-            this._pool.Start();
-            this._running = true;
-            this._pool.MaxThreads = 8 * Environment.ProcessorCount;
-            this._pool.MinThreads = this._pool.MaxThreads;
+            _listener.Start();
+            _running = true;
+            _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            ConnectionRecieverLoop();
+        }
+
+        private async void ConnectionRecieverLoop()
+        {
             while (true)
             {
-                if (!this._running)
+                if (!_running)
                 {
-                    this._listener.Stop();
+                    _listener.Stop();
                     break;
                 }
 
-                this._pool.QueueWorkItem(new Client(this._listener.AcceptTcpClient()).DoStuff);
+                Socket sock = await _listener.AcceptSocketAsync();
+                new Thread(new Client(sock).DoStuff).Start();
             }
         }
     }
@@ -215,6 +226,6 @@ namespace Sora.Server
     public enum HttpMethods
     {
         Get,
-        Post,
+        Post
     }
 }

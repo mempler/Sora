@@ -7,247 +7,247 @@ namespace Shared.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "TotalScoreStd",
-                table: "LeaderboardTouch",
-                newName: "TotalScoreOsu");
+                "TotalScoreStd",
+                "LeaderboardTouch",
+                "TotalScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreStd",
-                table: "LeaderboardTouch",
-                newName: "RankedScoreOsu");
+                "RankedScoreStd",
+                "LeaderboardTouch",
+                "RankedScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountStd",
-                table: "LeaderboardTouch",
-                newName: "PlayCountOsu");
+                "PlayCountStd",
+                "LeaderboardTouch",
+                "PlayCountOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsStd",
-                table: "LeaderboardTouch",
-                newName: "PeppyPointsOsu");
+                "PeppyPointsStd",
+                "LeaderboardTouch",
+                "PeppyPointsOsu");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissStd",
-                table: "LeaderboardTouch",
-                newName: "CountMissOsu");
+                "CountMissStd",
+                "LeaderboardTouch",
+                "CountMissOsu");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Std",
-                table: "LeaderboardTouch",
-                newName: "Count50Osu");
+                "Count50Std",
+                "LeaderboardTouch",
+                "Count50Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Std",
-                table: "LeaderboardTouch",
-                newName: "Count300Osu");
+                "Count300Std",
+                "LeaderboardTouch",
+                "Count300Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Std",
-                table: "LeaderboardTouch",
-                newName: "Count100Osu");
+                "Count100Std",
+                "LeaderboardTouch",
+                "Count100Osu");
 
             migrationBuilder.RenameColumn(
-                name: "TotalScoreStd",
-                table: "LeaderboardStd",
-                newName: "TotalScoreOsu");
+                "TotalScoreStd",
+                "LeaderboardStd",
+                "TotalScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreStd",
-                table: "LeaderboardStd",
-                newName: "RankedScoreOsu");
+                "RankedScoreStd",
+                "LeaderboardStd",
+                "RankedScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountStd",
-                table: "LeaderboardStd",
-                newName: "PlayCountOsu");
+                "PlayCountStd",
+                "LeaderboardStd",
+                "PlayCountOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsStd",
-                table: "LeaderboardStd",
-                newName: "PeppyPointsOsu");
+                "PeppyPointsStd",
+                "LeaderboardStd",
+                "PeppyPointsOsu");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissStd",
-                table: "LeaderboardStd",
-                newName: "CountMissOsu");
+                "CountMissStd",
+                "LeaderboardStd",
+                "CountMissOsu");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Std",
-                table: "LeaderboardStd",
-                newName: "Count50Osu");
+                "Count50Std",
+                "LeaderboardStd",
+                "Count50Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Std",
-                table: "LeaderboardStd",
-                newName: "Count300Osu");
+                "Count300Std",
+                "LeaderboardStd",
+                "Count300Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Std",
-                table: "LeaderboardStd",
-                newName: "Count100Osu");
+                "Count100Std",
+                "LeaderboardStd",
+                "Count100Osu");
 
             migrationBuilder.RenameColumn(
-                name: "TotalScoreStd",
-                table: "LeaderboardRx",
-                newName: "TotalScoreOsu");
+                "TotalScoreStd",
+                "LeaderboardRx",
+                "TotalScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreStd",
-                table: "LeaderboardRx",
-                newName: "RankedScoreOsu");
+                "RankedScoreStd",
+                "LeaderboardRx",
+                "RankedScoreOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountStd",
-                table: "LeaderboardRx",
-                newName: "PlayCountOsu");
+                "PlayCountStd",
+                "LeaderboardRx",
+                "PlayCountOsu");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsStd",
-                table: "LeaderboardRx",
-                newName: "PeppyPointsOsu");
+                "PeppyPointsStd",
+                "LeaderboardRx",
+                "PeppyPointsOsu");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissStd",
-                table: "LeaderboardRx",
-                newName: "CountMissOsu");
+                "CountMissStd",
+                "LeaderboardRx",
+                "CountMissOsu");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Std",
-                table: "LeaderboardRx",
-                newName: "Count50Osu");
+                "Count50Std",
+                "LeaderboardRx",
+                "Count50Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Std",
-                table: "LeaderboardRx",
-                newName: "Count300Osu");
+                "Count300Std",
+                "LeaderboardRx",
+                "Count300Osu");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Std",
-                table: "LeaderboardRx",
-                newName: "Count100Osu");
+                "Count100Std",
+                "LeaderboardRx",
+                "Count100Osu");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "TotalScoreOsu",
-                table: "LeaderboardTouch",
-                newName: "TotalScoreStd");
+                "TotalScoreOsu",
+                "LeaderboardTouch",
+                "TotalScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreOsu",
-                table: "LeaderboardTouch",
-                newName: "RankedScoreStd");
+                "RankedScoreOsu",
+                "LeaderboardTouch",
+                "RankedScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountOsu",
-                table: "LeaderboardTouch",
-                newName: "PlayCountStd");
+                "PlayCountOsu",
+                "LeaderboardTouch",
+                "PlayCountStd");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsOsu",
-                table: "LeaderboardTouch",
-                newName: "PeppyPointsStd");
+                "PeppyPointsOsu",
+                "LeaderboardTouch",
+                "PeppyPointsStd");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissOsu",
-                table: "LeaderboardTouch",
-                newName: "CountMissStd");
+                "CountMissOsu",
+                "LeaderboardTouch",
+                "CountMissStd");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Osu",
-                table: "LeaderboardTouch",
-                newName: "Count50Std");
+                "Count50Osu",
+                "LeaderboardTouch",
+                "Count50Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Osu",
-                table: "LeaderboardTouch",
-                newName: "Count300Std");
+                "Count300Osu",
+                "LeaderboardTouch",
+                "Count300Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Osu",
-                table: "LeaderboardTouch",
-                newName: "Count100Std");
+                "Count100Osu",
+                "LeaderboardTouch",
+                "Count100Std");
 
             migrationBuilder.RenameColumn(
-                name: "TotalScoreOsu",
-                table: "LeaderboardStd",
-                newName: "TotalScoreStd");
+                "TotalScoreOsu",
+                "LeaderboardStd",
+                "TotalScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreOsu",
-                table: "LeaderboardStd",
-                newName: "RankedScoreStd");
+                "RankedScoreOsu",
+                "LeaderboardStd",
+                "RankedScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountOsu",
-                table: "LeaderboardStd",
-                newName: "PlayCountStd");
+                "PlayCountOsu",
+                "LeaderboardStd",
+                "PlayCountStd");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsOsu",
-                table: "LeaderboardStd",
-                newName: "PeppyPointsStd");
+                "PeppyPointsOsu",
+                "LeaderboardStd",
+                "PeppyPointsStd");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissOsu",
-                table: "LeaderboardStd",
-                newName: "CountMissStd");
+                "CountMissOsu",
+                "LeaderboardStd",
+                "CountMissStd");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Osu",
-                table: "LeaderboardStd",
-                newName: "Count50Std");
+                "Count50Osu",
+                "LeaderboardStd",
+                "Count50Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Osu",
-                table: "LeaderboardStd",
-                newName: "Count300Std");
+                "Count300Osu",
+                "LeaderboardStd",
+                "Count300Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Osu",
-                table: "LeaderboardStd",
-                newName: "Count100Std");
+                "Count100Osu",
+                "LeaderboardStd",
+                "Count100Std");
 
             migrationBuilder.RenameColumn(
-                name: "TotalScoreOsu",
-                table: "LeaderboardRx",
-                newName: "TotalScoreStd");
+                "TotalScoreOsu",
+                "LeaderboardRx",
+                "TotalScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "RankedScoreOsu",
-                table: "LeaderboardRx",
-                newName: "RankedScoreStd");
+                "RankedScoreOsu",
+                "LeaderboardRx",
+                "RankedScoreStd");
 
             migrationBuilder.RenameColumn(
-                name: "PlayCountOsu",
-                table: "LeaderboardRx",
-                newName: "PlayCountStd");
+                "PlayCountOsu",
+                "LeaderboardRx",
+                "PlayCountStd");
 
             migrationBuilder.RenameColumn(
-                name: "PeppyPointsOsu",
-                table: "LeaderboardRx",
-                newName: "PeppyPointsStd");
+                "PeppyPointsOsu",
+                "LeaderboardRx",
+                "PeppyPointsStd");
 
             migrationBuilder.RenameColumn(
-                name: "CountMissOsu",
-                table: "LeaderboardRx",
-                newName: "CountMissStd");
+                "CountMissOsu",
+                "LeaderboardRx",
+                "CountMissStd");
 
             migrationBuilder.RenameColumn(
-                name: "Count50Osu",
-                table: "LeaderboardRx",
-                newName: "Count50Std");
+                "Count50Osu",
+                "LeaderboardRx",
+                "Count50Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count300Osu",
-                table: "LeaderboardRx",
-                newName: "Count300Std");
+                "Count300Osu",
+                "LeaderboardRx",
+                "Count300Std");
 
             migrationBuilder.RenameColumn(
-                name: "Count100Osu",
-                table: "LeaderboardRx",
-                newName: "Count100Std");
+                "Count100Osu",
+                "LeaderboardRx",
+                "Count100Std");
         }
     }
 }

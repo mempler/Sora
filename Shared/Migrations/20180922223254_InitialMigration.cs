@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -34,183 +36,173 @@ namespace Shared.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "LeaderboardRx",
-                columns: table => new
+                "LeaderboardRx",
+                table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RankedScoreStd = table.Column<ulong>(nullable: false),
-                    RankedScoreTaiko = table.Column<ulong>(nullable: false),
-                    RankedScoreCtb = table.Column<ulong>(nullable: false),
-                    RankedScoreMania = table.Column<ulong>(nullable: false),
-                    TotalScoreStd = table.Column<ulong>(nullable: false),
-                    TotalScoreTaiko = table.Column<ulong>(nullable: false),
-                    TotalScoreCtb = table.Column<ulong>(nullable: false),
-                    TotalScoreMania = table.Column<ulong>(nullable: false),
-                    Count300Std = table.Column<ulong>(nullable: false),
-                    Count300Taiko = table.Column<ulong>(nullable: false),
-                    Count300Ctb = table.Column<ulong>(nullable: false),
-                    Count300Mania = table.Column<ulong>(nullable: false),
-                    Count100Std = table.Column<ulong>(nullable: false),
-                    Count100Taiko = table.Column<ulong>(nullable: false),
-                    Count100Ctb = table.Column<ulong>(nullable: false),
-                    Count100Mania = table.Column<ulong>(nullable: false),
-                    Count50Std = table.Column<ulong>(nullable: false),
-                    Count50Taiko = table.Column<ulong>(nullable: false),
-                    Count50Ctb = table.Column<ulong>(nullable: false),
-                    Count50Mania = table.Column<ulong>(nullable: false),
-                    CountMissStd = table.Column<ulong>(nullable: false),
-                    CountMissTaiko = table.Column<ulong>(nullable: false),
-                    CountMissCtb = table.Column<ulong>(nullable: false),
-                    CountMissMania = table.Column<ulong>(nullable: false),
-                    PlayCountStd = table.Column<ulong>(nullable: false),
-                    PlayCountTaiko = table.Column<ulong>(nullable: false),
-                    PlayCountCtb = table.Column<ulong>(nullable: false),
-                    PlayCountMania = table.Column<ulong>(nullable: false),
-                    PeppyPointsStd = table.Column<double>(nullable: false),
-                    PeppyPointsTaiko = table.Column<double>(nullable: false),
-                    PeppyPointsCtb = table.Column<double>(nullable: false),
-                    PeppyPointsMania = table.Column<double>(nullable: false)
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    RankedScoreStd   = table.Column<ulong>(),
+                    RankedScoreTaiko = table.Column<ulong>(),
+                    RankedScoreCtb   = table.Column<ulong>(),
+                    RankedScoreMania = table.Column<ulong>(),
+                    TotalScoreStd    = table.Column<ulong>(),
+                    TotalScoreTaiko  = table.Column<ulong>(),
+                    TotalScoreCtb    = table.Column<ulong>(),
+                    TotalScoreMania  = table.Column<ulong>(),
+                    Count300Std      = table.Column<ulong>(),
+                    Count300Taiko    = table.Column<ulong>(),
+                    Count300Ctb      = table.Column<ulong>(),
+                    Count300Mania    = table.Column<ulong>(),
+                    Count100Std      = table.Column<ulong>(),
+                    Count100Taiko    = table.Column<ulong>(),
+                    Count100Ctb      = table.Column<ulong>(),
+                    Count100Mania    = table.Column<ulong>(),
+                    Count50Std       = table.Column<ulong>(),
+                    Count50Taiko     = table.Column<ulong>(),
+                    Count50Ctb       = table.Column<ulong>(),
+                    Count50Mania     = table.Column<ulong>(),
+                    CountMissStd     = table.Column<ulong>(),
+                    CountMissTaiko   = table.Column<ulong>(),
+                    CountMissCtb     = table.Column<ulong>(),
+                    CountMissMania   = table.Column<ulong>(),
+                    PlayCountStd     = table.Column<ulong>(),
+                    PlayCountTaiko   = table.Column<ulong>(),
+                    PlayCountCtb     = table.Column<ulong>(),
+                    PlayCountMania   = table.Column<ulong>(),
+                    PeppyPointsStd   = table.Column<double>(),
+                    PeppyPointsTaiko = table.Column<double>(),
+                    PeppyPointsCtb   = table.Column<double>(),
+                    PeppyPointsMania = table.Column<double>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeaderboardRx", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_LeaderboardRx", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "LeaderboardStd",
-                columns: table => new
+                "LeaderboardStd",
+                table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RankedScoreStd = table.Column<ulong>(nullable: false),
-                    RankedScoreTaiko = table.Column<ulong>(nullable: false),
-                    RankedScoreCtb = table.Column<ulong>(nullable: false),
-                    RankedScoreMania = table.Column<ulong>(nullable: false),
-                    TotalScoreStd = table.Column<ulong>(nullable: false),
-                    TotalScoreTaiko = table.Column<ulong>(nullable: false),
-                    TotalScoreCtb = table.Column<ulong>(nullable: false),
-                    TotalScoreMania = table.Column<ulong>(nullable: false),
-                    Count300Std = table.Column<ulong>(nullable: false),
-                    Count300Taiko = table.Column<ulong>(nullable: false),
-                    Count300Ctb = table.Column<ulong>(nullable: false),
-                    Count300Mania = table.Column<ulong>(nullable: false),
-                    Count100Std = table.Column<ulong>(nullable: false),
-                    Count100Taiko = table.Column<ulong>(nullable: false),
-                    Count100Ctb = table.Column<ulong>(nullable: false),
-                    Count100Mania = table.Column<ulong>(nullable: false),
-                    Count50Std = table.Column<ulong>(nullable: false),
-                    Count50Taiko = table.Column<ulong>(nullable: false),
-                    Count50Ctb = table.Column<ulong>(nullable: false),
-                    Count50Mania = table.Column<ulong>(nullable: false),
-                    CountMissStd = table.Column<ulong>(nullable: false),
-                    CountMissTaiko = table.Column<ulong>(nullable: false),
-                    CountMissCtb = table.Column<ulong>(nullable: false),
-                    CountMissMania = table.Column<ulong>(nullable: false),
-                    PlayCountStd = table.Column<ulong>(nullable: false),
-                    PlayCountTaiko = table.Column<ulong>(nullable: false),
-                    PlayCountCtb = table.Column<ulong>(nullable: false),
-                    PlayCountMania = table.Column<ulong>(nullable: false),
-                    PeppyPointsStd = table.Column<double>(nullable: false),
-                    PeppyPointsTaiko = table.Column<double>(nullable: false),
-                    PeppyPointsCtb = table.Column<double>(nullable: false),
-                    PeppyPointsMania = table.Column<double>(nullable: false)
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    RankedScoreStd   = table.Column<ulong>(),
+                    RankedScoreTaiko = table.Column<ulong>(),
+                    RankedScoreCtb   = table.Column<ulong>(),
+                    RankedScoreMania = table.Column<ulong>(),
+                    TotalScoreStd    = table.Column<ulong>(),
+                    TotalScoreTaiko  = table.Column<ulong>(),
+                    TotalScoreCtb    = table.Column<ulong>(),
+                    TotalScoreMania  = table.Column<ulong>(),
+                    Count300Std      = table.Column<ulong>(),
+                    Count300Taiko    = table.Column<ulong>(),
+                    Count300Ctb      = table.Column<ulong>(),
+                    Count300Mania    = table.Column<ulong>(),
+                    Count100Std      = table.Column<ulong>(),
+                    Count100Taiko    = table.Column<ulong>(),
+                    Count100Ctb      = table.Column<ulong>(),
+                    Count100Mania    = table.Column<ulong>(),
+                    Count50Std       = table.Column<ulong>(),
+                    Count50Taiko     = table.Column<ulong>(),
+                    Count50Ctb       = table.Column<ulong>(),
+                    Count50Mania     = table.Column<ulong>(),
+                    CountMissStd     = table.Column<ulong>(),
+                    CountMissTaiko   = table.Column<ulong>(),
+                    CountMissCtb     = table.Column<ulong>(),
+                    CountMissMania   = table.Column<ulong>(),
+                    PlayCountStd     = table.Column<ulong>(),
+                    PlayCountTaiko   = table.Column<ulong>(),
+                    PlayCountCtb     = table.Column<ulong>(),
+                    PlayCountMania   = table.Column<ulong>(),
+                    PeppyPointsStd   = table.Column<double>(),
+                    PeppyPointsTaiko = table.Column<double>(),
+                    PeppyPointsCtb   = table.Column<double>(),
+                    PeppyPointsMania = table.Column<double>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeaderboardStd", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_LeaderboardStd", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "LeaderboardTouch",
-                columns: table => new
+                "LeaderboardTouch",
+                table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RankedScoreStd = table.Column<ulong>(nullable: false),
-                    RankedScoreTaiko = table.Column<ulong>(nullable: false),
-                    RankedScoreCtb = table.Column<ulong>(nullable: false),
-                    RankedScoreMania = table.Column<ulong>(nullable: false),
-                    TotalScoreStd = table.Column<ulong>(nullable: false),
-                    TotalScoreTaiko = table.Column<ulong>(nullable: false),
-                    TotalScoreCtb = table.Column<ulong>(nullable: false),
-                    TotalScoreMania = table.Column<ulong>(nullable: false),
-                    Count300Std = table.Column<ulong>(nullable: false),
-                    Count300Taiko = table.Column<ulong>(nullable: false),
-                    Count300Ctb = table.Column<ulong>(nullable: false),
-                    Count300Mania = table.Column<ulong>(nullable: false),
-                    Count100Std = table.Column<ulong>(nullable: false),
-                    Count100Taiko = table.Column<ulong>(nullable: false),
-                    Count100Ctb = table.Column<ulong>(nullable: false),
-                    Count100Mania = table.Column<ulong>(nullable: false),
-                    Count50Std = table.Column<ulong>(nullable: false),
-                    Count50Taiko = table.Column<ulong>(nullable: false),
-                    Count50Ctb = table.Column<ulong>(nullable: false),
-                    Count50Mania = table.Column<ulong>(nullable: false),
-                    CountMissStd = table.Column<ulong>(nullable: false),
-                    CountMissTaiko = table.Column<ulong>(nullable: false),
-                    CountMissCtb = table.Column<ulong>(nullable: false),
-                    CountMissMania = table.Column<ulong>(nullable: false),
-                    PlayCountStd = table.Column<ulong>(nullable: false),
-                    PlayCountTaiko = table.Column<ulong>(nullable: false),
-                    PlayCountCtb = table.Column<ulong>(nullable: false),
-                    PlayCountMania = table.Column<ulong>(nullable: false),
-                    PeppyPointsStd = table.Column<double>(nullable: false),
-                    PeppyPointsTaiko = table.Column<double>(nullable: false),
-                    PeppyPointsCtb = table.Column<double>(nullable: false),
-                    PeppyPointsMania = table.Column<double>(nullable: false)
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    RankedScoreStd   = table.Column<ulong>(),
+                    RankedScoreTaiko = table.Column<ulong>(),
+                    RankedScoreCtb   = table.Column<ulong>(),
+                    RankedScoreMania = table.Column<ulong>(),
+                    TotalScoreStd    = table.Column<ulong>(),
+                    TotalScoreTaiko  = table.Column<ulong>(),
+                    TotalScoreCtb    = table.Column<ulong>(),
+                    TotalScoreMania  = table.Column<ulong>(),
+                    Count300Std      = table.Column<ulong>(),
+                    Count300Taiko    = table.Column<ulong>(),
+                    Count300Ctb      = table.Column<ulong>(),
+                    Count300Mania    = table.Column<ulong>(),
+                    Count100Std      = table.Column<ulong>(),
+                    Count100Taiko    = table.Column<ulong>(),
+                    Count100Ctb      = table.Column<ulong>(),
+                    Count100Mania    = table.Column<ulong>(),
+                    Count50Std       = table.Column<ulong>(),
+                    Count50Taiko     = table.Column<ulong>(),
+                    Count50Ctb       = table.Column<ulong>(),
+                    Count50Mania     = table.Column<ulong>(),
+                    CountMissStd     = table.Column<ulong>(),
+                    CountMissTaiko   = table.Column<ulong>(),
+                    CountMissCtb     = table.Column<ulong>(),
+                    CountMissMania   = table.Column<ulong>(),
+                    PlayCountStd     = table.Column<ulong>(),
+                    PlayCountTaiko   = table.Column<ulong>(),
+                    PlayCountCtb     = table.Column<ulong>(),
+                    PlayCountMania   = table.Column<ulong>(),
+                    PeppyPointsStd   = table.Column<double>(),
+                    PeppyPointsTaiko = table.Column<double>(),
+                    PeppyPointsCtb   = table.Column<double>(),
+                    PeppyPointsMania = table.Column<double>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeaderboardTouch", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_LeaderboardTouch", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
+                "Users",
+                table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Username = table.Column<string>(nullable: false),
-                    Password = table.Column<string>(nullable: false),
-                    Email = table.Column<string>(nullable: false),
-                    Privileges = table.Column<int>(nullable: false)
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    Username   = table.Column<string>(),
+                    Password   = table.Column<string>(),
+                    Email      = table.Column<string>(),
+                    Privileges = table.Column<int>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Users", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "UserStats",
-                columns: table => new
+                "UserStats",
+                table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CountryId = table.Column<byte>(nullable: false)
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    CountryId = table.Column<byte>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserStats", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_UserStats", x => x.Id); });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "LeaderboardRx");
+                "LeaderboardRx");
 
             migrationBuilder.DropTable(
-                name: "LeaderboardStd");
+                "LeaderboardStd");
 
             migrationBuilder.DropTable(
-                name: "LeaderboardTouch");
+                "LeaderboardTouch");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                "Users");
 
             migrationBuilder.DropTable(
-                name: "UserStats");
+                "UserStats");
         }
     }
 }

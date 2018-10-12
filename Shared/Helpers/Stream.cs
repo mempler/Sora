@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -38,140 +40,149 @@ namespace Shared.Helpers
     {
         public MStreamWriter(Stream s) : base(s, Encoding.UTF8) { }
 
-        public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
+        public long Length => BaseStream.Length;
+
+        public static MStreamWriter New() { return new MStreamWriter(new MemoryStream()); }
 
         public void Write(IPacket packet)
         {
-            base.Write((short)packet.Id);
-            base.Write((byte)0);
+            base.Write((short) packet.Id);
+            base.Write((byte) 0);
             /* Packet Data */
             MStreamWriter x = New();
             packet.WriteToStream(x);
             /* END */
-            base.Write((int)x.Length);
-            this.Write(x);
+            base.Write((int) x.Length);
+            Write(x);
             x.Close();
         }
 
         public void Write(BinaryWriter w)
         {
             w.BaseStream.Position = 0;
-            w.BaseStream.CopyTo(this.BaseStream);
+            w.BaseStream.CopyTo(BaseStream);
         }
+
         public void Write(string value, bool nullable)
         {
-            if (value == null && nullable)
-                base.Write((byte)0);
-            else
+            if (value == null && nullable) { base.Write((byte) 0); } else
             {
-                base.Write((byte)0x0b);
+                base.Write((byte) 0x0b);
                 base.Write(value + "");
             }
         }
+
         public override void Write(string value)
         {
-            this.Write((byte)0x0b);
+            Write((byte) 0x0b);
             base.Write(value);
         }
+
         public override void Write(byte[] buff)
         {
             int length = buff.Length;
-            this.Write(length);
+            Write(length);
             if (length > 0)
                 base.Write(buff);
         }
+
         public void Write(List<int> list)
         {
             int count = list.Count;
-            this.Write(count);
-            for (int i = 0; i < count; i++) this.Write(list[i]);
+            Write(count);
+            for (int i = 0; i < count; i++) Write(list[i]);
         }
-        public void WriteRawBuffer(byte[] buff) => base.Write(buff);
-        public void WriteRawString(string value) => this.WriteRawBuffer(Encoding.UTF8.GetBytes(value));
+
+        public void WriteRawBuffer(byte[] buff) { base.Write(buff); }
+
+        public void WriteRawString(string value) { WriteRawBuffer(Encoding.UTF8.GetBytes(value)); }
+
         public void WriteObject(object obj)
         {
             if (obj == null)
-                this.Write((byte)0x00);
+                Write((byte) 0x00);
             else
-            {
                 switch (obj.GetType().Name)
                 {
                     case "Boolean":
-                        this.Write((bool)obj);
+                        Write((bool) obj);
                         break;
                     case "Byte":
-                        this.Write((byte)obj);
+                        Write((byte) obj);
                         break;
                     case "UInt16":
-                        this.Write((ushort)obj);
+                        Write((ushort) obj);
                         break;
                     case "UInt32":
-                        this.Write((uint)obj);
+                        Write((uint) obj);
                         break;
                     case "UInt64":
-                        this.Write((ulong)obj);
+                        Write((ulong) obj);
                         break;
                     case "SByte":
-                        this.Write((sbyte)obj);
+                        Write((sbyte) obj);
                         break;
                     case "Int16":
-                        this.Write((short)obj);
+                        Write((short) obj);
                         break;
                     case "Int32":
-                        this.Write((int)obj);
+                        Write((int) obj);
                         break;
                     case "Int64":
-                        this.Write((long)obj);
+                        Write((long) obj);
                         break;
                     case "Char":
-                        this.Write((char)obj);
+                        Write((char) obj);
                         break;
                     case "String":
-                        this.Write((string)obj);
+                        Write((string) obj);
                         break;
                     case "Single":
-                        this.Write((float)obj);
+                        Write((float) obj);
                         break;
                     case "Double":
-                        this.Write((double)obj);
+                        Write((double) obj);
                         break;
                     case "Decimal":
-                        this.Write((decimal)obj);
+                        Write((decimal) obj);
                         break;
                     default:
-                        BinaryFormatter b = new BinaryFormatter()
+                        BinaryFormatter b = new BinaryFormatter
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
+                            TypeFormat     = FormatterTypeStyle.TypesWhenNeeded
                         };
-                        b.Serialize(this.BaseStream, obj);
+                        b.Serialize(BaseStream, obj);
                         break;
                 }
-            }
         }
 
-        public long Length => this.BaseStream.Length;
-        public byte[] ToArray() => ((MemoryStream) this.BaseStream).ToArray();
+        public byte[] ToArray() { return ((MemoryStream) BaseStream).ToArray(); }
     }
+
     public class MStreamReader : BinaryReader
     {
         public MStreamReader(Stream s) : base(s, Encoding.UTF8) { }
 
-        public override string ReadString() => (this.ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
+        public override string ReadString()
+        {
+            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
+        }
 
         public byte[] ReadBytes()
         {
-            int len = this.ReadInt32();
-            return len > 0 ? base.ReadBytes(len) : len < 0 ? null : (new byte[0]);
+            int len = ReadInt32();
+            return len > 0 ? base.ReadBytes(len) : len < 0 ? null : new byte[0];
         }
+
         public List<int> ReadInt32List()
         {
-            short count = this.ReadInt16();
+            short count = ReadInt16();
             if (count < 0)
                 return null;
-            var outList = new List<int>(count);
+            List<int> outList = new List<int>(count);
             for (int i = 0; i < count; i++)
-                outList.Add(this.ReadInt32());
+                outList.Add(ReadInt32());
             return outList;
         }
     }

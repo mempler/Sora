@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -32,12 +34,14 @@ namespace Sora.Packets.Server
 {
     public class Announce : IPacket
     {
-        public PacketId Id => PacketId.ServerAnnounce;
         public string Message;
 
-        public Announce(string message) => this.Message = message;
+        public Announce(string message) { Message = message; }
 
-        public void ReadFromStream(MStreamReader sr) => this.Message = sr.ReadString();
-        public void WriteToStream(MStreamWriter sw) => sw.Write(this.Message, false);
+        public PacketId Id => PacketId.ServerAnnounce;
+
+        public void ReadFromStream(MStreamReader sr) { Message = sr.ReadString(); }
+
+        public void WriteToStream(MStreamWriter sw) { sw.Write(Message, false); }
     }
 }
