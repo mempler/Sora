@@ -27,7 +27,7 @@ SOFTWARE.
 #endregion
 
 
-// ReSharper disable InconsistentNaming
+// ReSharper disable All
 
 namespace Shared.Enums
 {
