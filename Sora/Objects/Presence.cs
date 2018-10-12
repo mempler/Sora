@@ -112,13 +112,15 @@ namespace Sora.Objects
                             foreach (KeyValuePair<string, Presence> pr in Presences)
                                 pr.Value.TimeoutCheck();
                         }
+
+                        if (Presences == null) break;
                     }
                     catch
                     {
-                        // Don't EVER let the TimeoutCheck Crash. else we've a memoryleak.
+                        // Don't EVER let the TimeoutCheck Crash. else we've a Memory Leak.
                     }
 
-                    Thread.Sleep(1000); // wait a second. we dont want high cpu usage.
+                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
                 }
             }).Start();
         }
@@ -128,6 +130,7 @@ namespace Sora.Objects
     {
         //public bool Disconnected;
 
+        // ReSharper disable once CollectionNeverUpdated.Global
         public readonly List<PacketStream> JoinedStreams = new List<PacketStream>();
         public readonly Stopwatch LastRequest;
 

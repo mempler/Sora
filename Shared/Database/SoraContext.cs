@@ -51,10 +51,19 @@ namespace Shared.Database
             }
         }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<Users> Users { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<UserStats> UserStats { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
