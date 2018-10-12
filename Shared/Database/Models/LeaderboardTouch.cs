@@ -37,9 +37,10 @@ namespace Shared.Database.Models
 {
     public class LeaderboardTouch
     {
+        [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        private int Id { get; set; }
+        public int Id { get; set; }
 
         [Required] [DefaultValue(0)] public ulong RankedScoreOsu { get; set; }
         [Required] [DefaultValue(0)] public ulong RankedScoreTaiko { get; set; }
