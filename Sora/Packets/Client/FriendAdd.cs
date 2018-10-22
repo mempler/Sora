@@ -26,17 +26,26 @@ SOFTWARE.
 
 #endregion
 
-/*
-namespace Sora.Objects
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
+namespace Sora.Packets.Client
 {
-    public class SpectatorStream : PacketStream
+    public class FriendAdd : IPacket
     {
-        private Presence _boundPresence;
+        public PacketId Id => PacketId.ClientFriendAdd;
+
+        public int FriendId;
         
-        public SpectatorStream(string name, Presence boundPresence) : base(name)
+        public void ReadFromStream(MStreamReader sr)
         {
-            _boundPresence = boundPresence;
+            FriendId = sr.ReadInt32();
+        }
+
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
-*/

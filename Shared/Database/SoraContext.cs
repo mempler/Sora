@@ -58,6 +58,9 @@ namespace Shared.Database
         public DbSet<UserStats> UserStats { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public DbSet<Friends> Friends { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global

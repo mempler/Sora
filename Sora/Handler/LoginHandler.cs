@@ -90,6 +90,7 @@ namespace Sora.Handler
                 Success(dataWriter, user.Id);
                 dataWriter.Write(new ProtocolNegotiation());
                 dataWriter.Write(new UserPresence(pr));
+                dataWriter.Write(new FriendsList(Friends.GetFriends(pr.User.Id).ToList()));
                 dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
                 dataWriter.Write(new HandleUpdate(pr));
 

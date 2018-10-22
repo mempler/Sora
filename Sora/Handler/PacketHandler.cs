@@ -82,6 +82,16 @@ namespace Sora.Handler
                     exit.ReadFromStream(packetDataReader);
                     Handlers.ExecuteHandler(HandlerTypes.ClientExit, pr, exit.ErrorState);
                     break;
+                case PacketId.ClientFriendAdd:
+                    FriendAdd friendAdd = new FriendAdd();
+                    friendAdd.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientFriendAdd, pr, friendAdd.FriendId);
+                    break;
+                case PacketId.ClientFriendRemove:
+                    FriendRemove friendRemove = new FriendRemove();
+                    friendRemove.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientFriendRemove, pr, friendRemove.FriendId);
+                    break;
                 default:
                     Logger.L.Debug($"PacketId: {packetId}");
                     break;

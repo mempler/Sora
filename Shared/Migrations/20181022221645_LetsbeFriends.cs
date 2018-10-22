@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 
 /*
 MIT License
@@ -26,17 +26,34 @@ SOFTWARE.
 
 #endregion
 
-/*
-namespace Sora.Objects
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+namespace Shared.Migrations
 {
-    public class SpectatorStream : PacketStream
+    public partial class LetsbeFriends : Migration
     {
-        private Presence _boundPresence;
-        
-        public SpectatorStream(string name, Presence boundPresence) : base(name)
+        protected override void Up(MigrationBuilder migrationBuilder)
         {
-            _boundPresence = boundPresence;
+            migrationBuilder.CreateTable(
+                "Friends",
+                table => new
+                {
+                    Id = table.Column<int>()
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(),
+                    FriendId = table.Column<int>()
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friends", x => x.Id);
+                });
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Friends");
         }
     }
 }
-*/
