@@ -68,7 +68,7 @@ namespace Shared.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Cfg cfg = Config.ReadConfig();
+            Config cfg = Config.ReadConfig();
             if (cfg.MySql.Hostname == null)
                 Environment.Exit(1);
             optionsBuilder.UseMySql(

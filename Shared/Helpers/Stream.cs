@@ -88,7 +88,7 @@ namespace Shared.Helpers
 
         public void Write(List<int> list)
         {
-            int count = list.Count;
+            short count = (short)list.Count;
             Write(count);
             for (int i = 0; i < count; i++) Write(list[i]);
         }
@@ -179,7 +179,7 @@ namespace Shared.Helpers
         {
             short count = ReadInt16();
             if (count < 0)
-                return null;
+                return new List<int>();
             List<int> outList = new List<int>(count);
             for (int i = 0; i < count; i++)
                 outList.Add(ReadInt32());

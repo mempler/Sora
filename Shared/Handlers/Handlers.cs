@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Helpers;
 
@@ -87,7 +88,8 @@ namespace Shared.Handlers
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [MeansImplicitUse]
+    [AttributeUsage(AttributeTargets.Method)]
     public class HandlerAttribute : Attribute
     {
         public readonly HandlerTypes Type;
