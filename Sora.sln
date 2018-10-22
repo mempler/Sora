@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sora Tests", "Sora Tests\So
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jibril Tests", "Jibril Tests\Jibril Tests.csproj", "{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketDebugger", "PacketDebugger\PacketDebugger.csproj", "{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,10 +57,6 @@ Global
 		{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22554B2E-33F7-4B74-9A41-1FD757B5E2CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,7 +69,6 @@ Global
 		{24E23C8A-9290-44DB-9182-844101DAF4DF} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{52F65B00-3FCC-488E-9CEB-A04DFFA46284} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{22554B2E-33F7-4B74-9A41-1FD757B5E2CB} = {CDBAE606-50E3-429D-8769-73773D992957}
-		{8BDA23A7-FD47-4905-BC21-E3F81ED56C4E} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}
