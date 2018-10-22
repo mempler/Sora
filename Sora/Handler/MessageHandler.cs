@@ -26,7 +26,6 @@ SOFTWARE.
 
 #endregion
 
-using JetBrains.Annotations;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
@@ -37,29 +36,34 @@ namespace Sora.Handler
 {
     public class MessageHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.ClientSendIrcMessage)]
-        [Handler(HandlerTypes.ClientSendIrcMessagePrivate)]
-        public void HandleMessage(Presence pr, MessageStruct message)
+        public void HandlePublicMessage(Presence pr, MessageStruct message)
         {
-            Channel chan = null;
-            if (message.ChannelTarget.StartsWith("#"))
+            Channel chan = Channels.GetChannel(message.ChannelTarget);
+            
+            if (chan == null)
             {
-                chan = Channels.GetChannel(message.ChannelTarget);
-                if (chan == null)
-                {
-                    pr.Write(new ChannelRevoked(message.ChannelTarget));
-                    return;
-                }
-            } else
+                pr.Write(new ChannelRevoked(message.ChannelTarget));
+                return;
+            }
+            
+            chan.WriteMessage(pr, message.Message);
+        }
+
+        [Handler(HandlerTypes.ClientSendIrcMessagePrivate)]
+        public void HandlePrivateMessage(Presence pr, MessageStruct message)
+        {
+            Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));            
+            if (opr == null) return;
+            Channel chan = opr.PrivateChannel;
+
+            if (chan == null)
             {
-                // Other persence
-                Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));
-                if (opr == null) return;
-                opr.PrivateChannel.WriteMessage(pr, message.Message);
+                pr.Write(new ChannelRevoked(message.ChannelTarget));
+                return;
             }
 
-            chan?.WriteMessage(pr, message.Message);
+            chan.WriteMessage(pr, message.Message);
         }
     }
 }

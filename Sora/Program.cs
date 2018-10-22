@@ -35,8 +35,8 @@ using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Plugins;
-using Shared.Server;
 using Sora.Objects;
+using Sora.Server;
 
 namespace Sora
 {
@@ -50,13 +50,16 @@ namespace Sora
             {
                 Logger.L.Info("Start Initalization");
                 Stopwatch watch = Stopwatch.StartNew();
-                _server = new HttpServer(Config.ReadConfig().Server.Port);
-                using (new SoraContext()) { } // Initialize Database just once. (Migrate database)
+                Config conf = Config.ReadConfig();
+                _server = new HttpServer(conf.Server.Hostname, conf.Server.Port);
+                using (new SoraContext()){ } // Initialize Database. (Migrate database)
 
                 AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
                 {
                     Logger.L.Error(ex);
+                    Logger.L.Error(e);
                 };
+
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
                 Handlers.ExecuteHandler(HandlerTypes.Initializer);
@@ -75,7 +78,11 @@ namespace Sora
                 watch.Stop();
                 Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
             }
-            catch (Exception ex) { Logger.L.Error(ex); }
+            catch (Exception ex)
+            {
+                Logger.L.Error(ex);
+                Environment.Exit(1); // an CRITICAL error. close everything.
+            }
         }
 
         [STAThread]

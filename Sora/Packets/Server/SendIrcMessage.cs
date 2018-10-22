@@ -46,7 +46,7 @@ namespace Sora.Packets.Server
 
         public SendIrcMessage(MessageStruct message) { Msg = message; }
 
-        public PacketId Id => PacketId.ClientSendIrcMessage;
+        public PacketId Id => PacketId.ServerSendMessage;
 
         public void ReadFromStream(MStreamReader sr)
         {

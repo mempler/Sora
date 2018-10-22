@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 
 /*
 MIT License
@@ -26,40 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-
-namespace Sora.Packets.Server
+namespace Sora.Objects
 {
-    public class HandleUserQuit : IPacket
+    public class SpectatorStream : PacketStream
     {
-        public PacketId Id => PacketId.ServerHandleUserQuit;
-        
-        public UserQuitStruct UserQuit;
-
-        public HandleUserQuit(UserQuitStruct userQuit) { UserQuit = userQuit; }
-
-        public void ReadFromStream(MStreamReader sr)
-        {
-            UserQuit = new UserQuitStruct
-            {
-                UserId     = sr.ReadInt32(),
-                ErrorState = (ErrorStates) sr.ReadInt32()
-            };
-        }
-
-        public void WriteToStream(MStreamWriter sw)
-        {
-            sw.Write(UserQuit.UserId);
-            sw.Write((int) UserQuit.ErrorState);
-        }
-    }
-
-    public struct UserQuitStruct
-    {
-        public int UserId;
-        public ErrorStates ErrorState;
+        public SpectatorStream(string name) : base(name) { }
     }
 }

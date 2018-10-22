@@ -26,111 +26,66 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.IO;
-using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
-using Shared.Server;
-using Sora.Enums;
 using Sora.Objects;
 using Sora.Packets.Client;
-using Sora.Packets.Server;
 using SendIrcMessage = Sora.Packets.Client.SendIrcMessage;
 
 namespace Sora.Handler
 {
     internal class PacketHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.PacketHandler)]
-        public void HandlePackets(Req req, Res res)
+        public void HandlePackets(Presence pr, PacketId packetId, MStreamReader packetDataReader)
         {
-            try
+            switch (packetId)
             {
-                if (!req.Headers.ContainsKey("osu-token"))
-                {
-                    Handlers.ExecuteHandler(HandlerTypes.LoginHandler, req, res);
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-                res.Writer.Write(new LoginResponse(LoginResponses.Exception));
-                return;
-            }
-
-            Presence pr = LPresences.GetPresence(req.Headers["osu-token"]);
-            if (pr == null)
-            {
-                res.StatusCode = 403; // Presence is not known, force the client to send login info.
-                return;
-            }
-
-            while (true)
-                try
-                {
-                    if (req.Reader.BaseStream.Length - req.Reader.BaseStream.Position < 7)
-                        break; // Dont handle any invalid packets! (less then bytelength of 7)
-                    PacketId packetId = (PacketId) req.Reader.ReadInt16();
-                    req.Reader.ReadBoolean();
-                    byte[]        packetData       = req.Reader.ReadBytes();
-                    MStreamReader packetDataReader = new MStreamReader(new MemoryStream(packetData));
-
-                    if (packetId != PacketId.ClientPong && packetId != PacketId.ClientUserStatsRequest)
-                        Logger.L.Debug(
-                            $"Packet: {packetId} Length: {packetData.Length} Data: {BitConverter.ToString(packetData).Replace("-", "")}");
-
-                    // ReSharper disable once SwitchStatementMissingSomeCases
-                    switch (packetId)
-                    {
-                        case PacketId.ClientSendUserStatus:
-                            SendUserStatus sendUserStatus = new SendUserStatus();
-                            sendUserStatus.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, sendUserStatus.Status);
-                            break;
-                        case PacketId.ClientPong:
-                            Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
-                            break;
-                        case PacketId.ClientRequestStatusUpdate:
-                            Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
-                            break;
-                        case PacketId.ClientUserStatsRequest:
-                            UserStatsRequest userStatsRequest = new UserStatsRequest();
-                            userStatsRequest.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr, userStatsRequest.Userids);
-                            break;
-                        case PacketId.ClientChannelJoin:
-                            ChannelJoin channelJoin = new ChannelJoin();
-                            channelJoin.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
-                            break;
-                        case PacketId.ClientChannelLeave:
-                            ChannelLeave channelLeave = new ChannelLeave();
-                            channelLeave.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr, channelLeave.ChannelName);
-                            break;
-                        case PacketId.ClientSendIrcMessage:
-                            SendIrcMessage msg = new SendIrcMessage();
-                            msg.ReadFromStream(packetDataReader);
-                            Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessage, pr, msg.Msg);
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.L.Error(ex);
+                case PacketId.ClientSendUserStatus:
+                    SendUserStatus sendUserStatus = new SendUserStatus();
+                    sendUserStatus.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr, sendUserStatus.Status);
                     break;
-                }
-
-            if (res.Writer.BaseStream.CanWrite)
-                pr.GetOutput()
-                  .WriteTo(res.Writer.BaseStream);
-
-            if (pr.IsLastRequest)
-                LPresences.EndPresence(pr, true);
+                case PacketId.ClientPong:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
+                    break;
+                case PacketId.ClientRequestStatusUpdate:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
+                    break;
+                case PacketId.ClientUserStatsRequest:
+                    UserStatsRequest userStatsRequest = new UserStatsRequest();
+                    userStatsRequest.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr, userStatsRequest.Userids);
+                    break;
+                case PacketId.ClientChannelJoin:
+                    ChannelJoin channelJoin = new ChannelJoin();
+                    channelJoin.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr, channelJoin.ChannelName);
+                    break;
+                case PacketId.ClientChannelLeave:
+                    ChannelLeave channelLeave = new ChannelLeave();
+                    channelLeave.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr, channelLeave.ChannelName);
+                    break;
+                case PacketId.ClientSendIrcMessagePrivate:
+                case PacketId.ClientSendIrcMessage:
+                    SendIrcMessage msg = new SendIrcMessage();
+                    msg.ReadFromStream(packetDataReader);
+                    if (msg.Msg.ChannelTarget.StartsWith("#"))
+                        Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessage, pr, msg.Msg);
+                    else
+                        Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessagePrivate, pr, msg.Msg);
+                    break;
+                case PacketId.ClientExit:
+                    Exit exit = new Exit();
+                    exit.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientExit, pr, exit.ErrorState);
+                    break;
+                default:
+                    Logger.L.Debug($"PacketId: {packetId}");
+                    break;
+            }
         }
     }
 }

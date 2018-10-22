@@ -27,9 +27,9 @@ SOFTWARE.
 #endregion
 
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
+using Sora.Enums;
 using Sora.Objects;
 using Sora.Packets.Server;
 
@@ -37,13 +37,27 @@ namespace Sora.Handler
 {
     internal class UserStatsHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.ClientUserStatsRequest)]
         public void HandleUserStats(Presence pr, List<int> userIds)
         {
             foreach (int id in userIds)
             {
+                if (id == pr.User.Id)
+                {
+                    pr.Write(new UserPresence(pr));
+                    pr.Write(new HandleUpdate(pr));
+                    continue;
+                }
                 Presence opr = LPresences.GetPresence(id);
+                if (opr == null)
+                {
+                    pr.Write(new HandleUserQuit(new UserQuitStruct
+                    {
+                        UserId = id,
+                        ErrorState = ErrorStates.Ok
+                    }));
+                    continue;
+                }
                 pr.Write(new UserPresence(opr));
                 pr.Write(new HandleUpdate(opr));
             }

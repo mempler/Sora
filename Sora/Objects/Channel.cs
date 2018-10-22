@@ -36,7 +36,6 @@ namespace Sora.Objects
 {
     public static class Channels
     {
-        // ReSharper disable once InconsistentNaming
         public static readonly Dictionary<string, Channel> Channels_ = new Dictionary<string, Channel>();
         public static readonly List<Channel> ChannelsAutoJoin = new List<Channel>();
         private static bool _initialized;
@@ -182,8 +181,7 @@ namespace Sora.Objects
                 );
                 return;
             }
-
-            // Prevent crashing.
+            
             BoundStream?.Broadcast(
                 new SendIrcMessage(
                     new MessageStruct
@@ -193,8 +191,7 @@ namespace Sora.Objects
                         Message       = message,
                         SenderId      = pr.User.Id
                     }
-                ),
-                pr);
+                ), pr);
         }
 
         public override string ToString()

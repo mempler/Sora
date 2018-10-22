@@ -26,7 +26,6 @@ SOFTWARE.
 
 #endregion
 
-using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
 using Sora.Objects;
@@ -36,7 +35,6 @@ namespace Sora.Handler
 {
     internal class ChannelHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.ClientChannelJoin)]
         public void OnChannelJoin(Presence pr, string channelName)
         {
@@ -46,14 +44,14 @@ namespace Sora.Handler
                 pr.Write(new ChannelRevoked(channelName));
                 return;
             }
-
+            channel.LeaveChannel(pr); // leave channel before joining to fix some Issues.
+            
             if (channel.JoinChannel(pr))
                 pr.Write(new ChannelJoinSuccess(channel));
 
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));
         }
 
-        [UsedImplicitly]
         [Handler(HandlerTypes.ClientChannelLeave)]
         public void OnChannelLeave(Presence pr, string channelName)
         {

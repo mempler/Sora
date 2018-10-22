@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 
 /*
 MIT License
@@ -27,39 +27,26 @@ SOFTWARE.
 #endregion
 
 using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
+using Shared.Handlers;
 using Sora.Enums;
+using Sora.Objects;
+using Sora.Packets.Server;
 
-namespace Sora.Packets.Server
+namespace Sora.Handler
 {
-    public class HandleUserQuit : IPacket
+    public class ExitHandler
     {
-        public PacketId Id => PacketId.ServerHandleUserQuit;
-        
-        public UserQuitStruct UserQuit;
-
-        public HandleUserQuit(UserQuitStruct userQuit) { UserQuit = userQuit; }
-
-        public void ReadFromStream(MStreamReader sr)
+        [Handler(HandlerTypes.ClientExit)]
+        public void OnExit(Presence pr, ErrorStates err)
         {
-            UserQuit = new UserQuitStruct
+            LPresences.EndPresence(pr, true);
+            PacketStream MainStream = LPacketStreams.GetStream("main");
+            
+            MainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
             {
-                UserId     = sr.ReadInt32(),
-                ErrorState = (ErrorStates) sr.ReadInt32()
-            };
+                UserId     = pr.User.Id,
+                ErrorState = err
+            }), pr);
         }
-
-        public void WriteToStream(MStreamWriter sw)
-        {
-            sw.Write(UserQuit.UserId);
-            sw.Write((int) UserQuit.ErrorState);
-        }
-    }
-
-    public struct UserQuitStruct
-    {
-        public int UserId;
-        public ErrorStates ErrorState;
     }
 }

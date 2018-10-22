@@ -29,13 +29,11 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using MaxMind.GeoIP2.Responses;
 using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
-using Shared.Server;
 using Sora.Enums;
 using Sora.Helpers;
 using Sora.Objects;
@@ -45,39 +43,36 @@ namespace Sora.Handler
 {
     internal class LoginHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.LoginHandler)]
-        public void OnLogin(Req req, Res res)
+        public void OnLogin(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string Ip)
         {
-            Presence pr = new Presence();
-            res.Headers["cho-token"] = pr.Token;
             try
             {
-                Login loginData = LoginParser.ParseLogin(req.Reader);
+                Login loginData = LoginParser.ParseLogin(dataReader);
                 if (loginData == null)
                 {
-                    Exception(res);
+                    Exception(dataWriter);
                     return;
                 }
 
                 Users user = Users.GetUser(Users.GetUserId(loginData.Username));
                 if (user == null)
                 {
-                    LoginFailed(res);
+                    LoginFailed(dataWriter);
                     return;
                 }
 
                 if (!user.IsPassword(loginData.Password))
                 {
-                    LoginFailed(res);
+                    LoginFailed(dataWriter);
                     return;
                 }
 
                 pr.User = user;
 
-                if (req.Ip != "127.0.0.1" && req.Ip != "0.0.0.0")
+                if (Ip != "127.0.0.1" && Ip != "0.0.0.0")
                 {
-                    CityResponse data = Localisation.GetData(req.Ip);
+                    CityResponse data = Localisation.GetData(Ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
                     if (data.Location.Latitude != null) pr.Lat  = (double) data.Location.Latitude;
@@ -92,50 +87,54 @@ namespace Sora.Handler
 
                 LPresences.BeginPresence(pr);
 
-                Success(res, user.Id);
-                res.Writer.Write(new ProtocolNegotiation());
-                res.Writer.Write(new UserPresence(pr));
-                res.Writer.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
-                res.Writer.Write(new HandleUpdate(pr));
+                Success(dataWriter, user.Id);
+                dataWriter.Write(new ProtocolNegotiation());
+                dataWriter.Write(new UserPresence(pr));
+                dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
+                dataWriter.Write(new HandleUpdate(pr));
 
                 foreach (Channel chanAuto in Channels.ChannelsAutoJoin)
                 {
                     if (chanAuto.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
-                        res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
+                        dataWriter.Write(new ChannelAvailableAutojoin(chanAuto));
                     else if (!chanAuto.AdminOnly)
-                        res.Writer.Write(new ChannelAvailableAutojoin(chanAuto));
+                        dataWriter.Write(new ChannelAvailableAutojoin(chanAuto));
 
                     if (chanAuto.JoinChannel(pr))
-                        res.Writer.Write(new ChannelJoinSuccess(chanAuto));
+                        dataWriter.Write(new ChannelJoinSuccess(chanAuto));
                     else
-                        res.Writer.Write(new ChannelRevoked(chanAuto));
+                        dataWriter.Write(new ChannelRevoked(chanAuto));
                 }
 
                 foreach (KeyValuePair<string, Channel> chan in Channels.Channels_)
                     if (chan.Value.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
-                        res.Writer.Write(new ChannelAvailable(chan.Value));
+                        dataWriter.Write(new ChannelAvailable(chan.Value));
                     else if (!chan.Value.AdminOnly)
-                        res.Writer.Write(new ChannelAvailable(chan.Value));
+                        dataWriter.Write(new ChannelAvailable(chan.Value));
 
                 PacketStream stream = LPacketStreams.GetStream("main");
                 if (stream == null)
                 {
-                    Exception(res);
+                    Exception(dataWriter);
                     return;
                 }
 
+                stream.Broadcast(new PresenceSingle(pr.User.Id));
+                stream.Broadcast(new HandleUpdate(pr));
                 stream.Join(pr);
             }
-            catch (Exception ex) { Logger.L.Error(ex); }
+            catch (Exception ex)
+            {
+                Logger.L.Error(ex);
+                Exception(dataWriter);
+            }
         }
 
-        private static void LoginFailed(Res res) { res.Writer.Write(new LoginResponse(LoginResponses.Failed)); }
+        private static void LoginFailed(MStreamWriter dataWriter) => dataWriter.Write(new LoginResponse(LoginResponses.Failed));
 
-        private static void Exception(Res res) { res.Writer.Write(new LoginResponse(LoginResponses.Exception)); }
+        private static void Exception(MStreamWriter dataWriter) => dataWriter.Write(new LoginResponse(LoginResponses.Exception));
 
-        private static void Success(Res res, int userid)
-        {
-            res.Writer.Write(new LoginResponse((LoginResponses) userid));
-        }
+        private static void Success(MStreamWriter dataWriter, int userid) =>
+            dataWriter.Write(new LoginResponse((LoginResponses) userid));
     }
 }

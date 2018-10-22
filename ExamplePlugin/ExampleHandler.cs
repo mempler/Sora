@@ -28,7 +28,8 @@ SOFTWARE.
 
 using Shared.Enums;
 using Shared.Handlers;
-using Shared.Server;
+using Shared.Helpers;
+using Sora.Objects;
 using Sora.Packets.Server;
 
 namespace ExamplePlugin
@@ -37,10 +38,10 @@ namespace ExamplePlugin
     {
         // Let the Handler loader know that this is an LoginHandler
         [Handler(HandlerTypes.LoginHandler)]
-        public void SomeLoginHandler(Req req, Res res) // a Login handler need those args.
+        public void SomeLoginHandler(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string Ip) // a Login handler need those args.
         {
             // Write an Announce Packet to client.
-            res.Writer.Write(new Announce("Hello World!"));
+            dataWriter.Write(new Announce("Hello World!"));
 
             // Done, you've successfully send an Hello World Packet!
         }

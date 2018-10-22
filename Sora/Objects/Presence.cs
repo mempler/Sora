@@ -51,9 +51,10 @@ namespace Sora.Objects
 
         public static Presence GetPresence(int userid)
         {
-            foreach (KeyValuePair<string, Presence> presence in Presences)
+            foreach (KeyValuePair<string, Presence> presence in Presences) {
                 if (presence.Value.User.Id == userid)
                     return presence.Value;
+            }
             return null;
         }
 
@@ -77,9 +78,10 @@ namespace Sora.Objects
         {
             // TODO: Add total playtime.
             //presence.BeginSeason = DateTime.UtcNow;
+            if (presence == null) return;
             presence.LastRequest.Start();
-            Presences[presence.Token] = presence;
-            Channels.AddChannel(new Channel(presence.User.Username));
+            Presences.Add(presence.Token, presence);
+            Channels.AddChannel(new Channel(presence.User.Username, "", null, presence));
         }
 
         public static void EndPresence(Presence presence, bool forceful)
@@ -89,10 +91,11 @@ namespace Sora.Objects
                 Presences[presence.Token].Stream.Close();
                 Presences[presence.Token].LastRequest.Stop();
                 Channels.RemoveChannel(Presences[presence.Token].PrivateChannel);
-                Presences.Remove(presence.Token);
+                
                 foreach (PacketStream str in Presences[presence.Token].JoinedStreams)
                     str.Left(Presences[presence.Token]);
-
+                
+                Presences.Remove(presence.Token);
                 return;
             }
 
@@ -107,17 +110,14 @@ namespace Sora.Objects
                 {
                     try
                     {
-                        lock (Presences)
-                        {
-                            foreach (KeyValuePair<string, Presence> pr in Presences)
-                                pr.Value.TimeoutCheck();
-                        }
+                        foreach (KeyValuePair<string, Presence> pr in Presences)
+                            pr.Value.TimeoutCheck();
 
                         if (Presences == null) break;
                     }
                     catch
                     {
-                        // Don't EVER let the TimeoutCheck Crash. else we've a Memory Leak.
+                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
                     }
 
                     Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
@@ -188,6 +188,7 @@ namespace Sora.Objects
         {
             MemoryStream copy = new MemoryStream();
             long         pos  = Stream.BaseStream.Position;
+            
             Stream.BaseStream.Position = 0;
             Stream.BaseStream.CopyTo(copy);
             Stream.BaseStream.Position = pos;
@@ -206,12 +207,13 @@ namespace Sora.Objects
 
         public void TimeoutCheck()
         {
-            if (LastRequest.ElapsedMilliseconds > 30 * 1000)
+            if (LastRequest.Elapsed.TotalSeconds > 30)
                 LPresences.EndPresence(this, true);
         }
 
         public void Write(IPacket p)
         {
+            if (!Stream.BaseStream.CanWrite) return;
             if (p != null) Stream?.Write(p);
         }
     }

@@ -26,8 +26,8 @@ SOFTWARE.
 
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Interfaces;
@@ -79,7 +79,7 @@ namespace Sora.Objects
         {
             foreach (KeyValuePair<string, Presence> presence in _joinedPresences)
             {
-                if (Array.BinarySearch(ignorePresences, presence) > 0 || presence.Value.Stream.BaseStream.CanWrite)
+                if (ignorePresences.Contains(presence.Value))
                     continue;
                 presence.Value.Write(packet);
             }

@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 
 /*
 MIT License
@@ -29,37 +29,25 @@ SOFTWARE.
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
-using Sora.Enums;
 
 namespace Sora.Packets.Server
 {
-    public class HandleUserQuit : IPacket
+    public class PresenceSingle : IPacket
     {
-        public PacketId Id => PacketId.ServerHandleUserQuit;
+        public PacketId Id => PacketId.ServerUserPresenceSingle;
+
+        public int UserId;
+
+        public PresenceSingle(int userId) => UserId = userId;
         
-        public UserQuitStruct UserQuit;
-
-        public HandleUserQuit(UserQuitStruct userQuit) { UserQuit = userQuit; }
-
         public void ReadFromStream(MStreamReader sr)
         {
-            UserQuit = new UserQuitStruct
-            {
-                UserId     = sr.ReadInt32(),
-                ErrorState = (ErrorStates) sr.ReadInt32()
-            };
+            throw new System.NotImplementedException();
         }
 
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(UserQuit.UserId);
-            sw.Write((int) UserQuit.ErrorState);
+            sw.Write(UserId);
         }
-    }
-
-    public struct UserQuitStruct
-    {
-        public int UserId;
-        public ErrorStates ErrorState;
     }
 }

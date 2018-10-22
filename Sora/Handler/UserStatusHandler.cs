@@ -26,7 +26,6 @@ SOFTWARE.
 
 #endregion
 
-using JetBrains.Annotations;
 using Shared.Enums;
 using Shared.Handlers;
 using Sora.Objects;
@@ -37,7 +36,6 @@ namespace Sora.Handler
 {
     internal class UserStatusHandler
     {
-        [UsedImplicitly]
         [Handler(HandlerTypes.ClientSendUserStatus)]
         public void HandleUserStatus(Presence pr, UserStatus status)
         {
