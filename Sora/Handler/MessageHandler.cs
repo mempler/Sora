@@ -39,8 +39,20 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientSendIrcMessage)]
         public void HandlePublicMessage(Presence pr, MessageStruct message)
         {
-            Channel chan = Channels.GetChannel(message.ChannelTarget);
-            
+            Channel chan;
+            switch (message.ChannelTarget)
+            {
+                case "#spectator":
+                    chan = pr.Spectator?.SpecChannel;
+                    break;
+                case "#multiplayer":
+                    chan = null; // No multiplayer yet.
+                    break;
+                default:
+                    chan = Channels.GetChannel(message.ChannelTarget);
+                    break;
+            }
+
             if (chan == null)
             {
                 pr.Write(new ChannelRevoked(message.ChannelTarget));

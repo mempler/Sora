@@ -26,17 +26,36 @@ SOFTWARE.
 
 #endregion
 
-namespace Sora.Objects
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Packets.Client;
+
+namespace Sora.Packets.Server
 {
-    public class SpectatorStream : PacketStream
+    public class SpectatorFrames : IPacket
     {
-        public Presence BoundPresence;
-        public Channel SpecChannel;
-        
-        public SpectatorStream(string name, Presence boundPresence) : base(name)
+        public PacketId Id => PacketId.ServerSpectateFrames;
+
+        public SpectatorFrame Frames;
+
+        public void ReadFromStream(MStreamReader sr)
         {
-            SpecChannel = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
-            BoundPresence = boundPresence;
+            throw new System.NotImplementedException();
+        }
+
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(Frames.Extra);
+            new ReplayFrames
+            {
+                Frames = Frames.ReplayFrames
+            }.WriteToStream(sw);
+            sw.Write(Frames.Action);
+            new ScoreFrames
+            {
+                Frame = Frames.ScoreFrame
+            }.WriteToStream(sw);
         }
     }
 }

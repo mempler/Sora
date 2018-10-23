@@ -26,6 +26,7 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
@@ -91,6 +92,19 @@ namespace Sora.Handler
                     FriendRemove friendRemove = new FriendRemove();
                     friendRemove.ReadFromStream(packetDataReader);
                     Handlers.ExecuteHandler(HandlerTypes.ClientFriendRemove, pr, friendRemove.FriendId);
+                    break;
+                case PacketId.ClientStartSpectating:
+                    StartSpectating startSpectating = new StartSpectating();
+                    startSpectating.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientStartSpectating, pr, startSpectating.ToSpectateId);
+                    break;
+                case PacketId.ClientStopSpectating:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
+                    break;
+                case PacketId.ClientSpectateFrames:
+                    SpectatorFrames spectateFrames = new SpectatorFrames();
+                    spectateFrames.ReadFromStream(packetDataReader);
+                    Handlers.ExecuteHandler(HandlerTypes.ClientSpectateFrames, pr, spectateFrames.Frames);
                     break;
                 default:
                     Logger.L.Debug($"PacketId: {packetId}");

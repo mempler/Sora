@@ -160,7 +160,8 @@ namespace Sora.Objects
         public bool Touch;
 
         public Users User;
-
+        public SpectatorStream Spectator;
+        
         public Presence()
         {
             LastRequest = new Stopwatch();

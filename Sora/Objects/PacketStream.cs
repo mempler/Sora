@@ -69,6 +69,8 @@ namespace Sora.Objects
 
         public string StreamName { get; }
 
+        public int JoinedUsers => _joinedPresences.Count;
+
         public void Join(Presence pr) { _joinedPresences[pr.Token] = pr; }
 
         public void Left(Presence pr) { _joinedPresences[pr.Token] = null; }

@@ -26,17 +26,21 @@ SOFTWARE.
 
 #endregion
 
-namespace Sora.Objects
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
+namespace Sora.Handler
 {
-    public class SpectatorStream : PacketStream
+    public class PongHandler
     {
-        public Presence BoundPresence;
-        public Channel SpecChannel;
-        
-        public SpectatorStream(string name, Presence boundPresence) : base(name)
+        [Handler(HandlerTypes.ClientPong)]
+        public void OnPong(Presence pr)
         {
-            SpecChannel = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
-            BoundPresence = boundPresence;
+            if (pr.Spectator == null || pr.Spectator?.BoundPresence == pr) return;
+            pr.Spectator?.Broadcast(new UserPresence(pr));
+            pr.Spectator?.Broadcast(new HandleUpdate(pr));
         }
     }
 }
