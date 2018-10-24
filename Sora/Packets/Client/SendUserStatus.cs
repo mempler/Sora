@@ -1,5 +1,4 @@
 ﻿#region copyright
-
 /*
 MIT License
 
@@ -23,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using Shared.Enums;
@@ -46,7 +44,7 @@ namespace Sora.Packets.Client
                 StatusText      = sr.ReadString(),
                 BeatmapChecksum = sr.ReadString(),
                 CurrentMods     = sr.ReadUInt32(),
-                Playmode        = (PlayModes) sr.ReadByte(),
+                Playmode        = (PlayMode) sr.ReadByte(),
                 BeatmapId       = sr.ReadUInt32()
             };
         }
@@ -68,7 +66,7 @@ namespace Sora.Packets.Client
         public string StatusText;
         public string BeatmapChecksum;
         public uint CurrentMods;
-        public PlayModes Playmode;
+        public PlayMode Playmode;
         public uint BeatmapId;
 
         public override string ToString()

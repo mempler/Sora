@@ -1,5 +1,4 @@
 #region copyright
-
 /*
 MIT License
 
@@ -23,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using System;
@@ -61,6 +59,7 @@ public abstract class Client
         public override void DoWork()
         {
             Console.WriteLine("Browser connection");
+            Console.WriteLine(Request.Url);
             Response.Close();
         }
     }
@@ -118,15 +117,9 @@ public abstract class Client
                                 break; // Dont handle any invalid packets! (less then bytelength of 7)
 
                             PacketId packetId = (PacketId) mr.ReadInt16();
-                            mr.ReadBoolean();
-                            byte[] packetData = mr.ReadBytes();
+                            mr.BaseStream.Position -= 2;
 
-                            using (MemoryStream packetDataStream = new MemoryStream(packetData))
-                            using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
-                            {
-                                Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
-                                                                        packetDataReader);
-                            }
+                            Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId, mr);
                         }
                         catch (Exception ex)
                         {

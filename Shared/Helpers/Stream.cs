@@ -1,5 +1,4 @@
 ﻿#region copyright
-
 /*
 MIT License
 
@@ -23,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using System;
@@ -42,15 +40,17 @@ namespace Shared.Helpers
 
         public long Length => BaseStream.Length;
 
-        public static MStreamWriter New() { return new MStreamWriter(new MemoryStream()); }
 
+        public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
+        
+        public void Write(ISerializer seri) => seri.WriteToStream(this);
         public void Write(IPacket packet)
         {
             using(MStreamWriter x = New()){
                 base.Write((short) packet.Id);
                 base.Write((byte) 0);
                 /* Packet Data */
-                packet.WriteToStream(x);
+                x.Write((ISerializer) packet);
                 /* END */
                 base.Write((int) x.Length);
                 Write(x);
@@ -185,6 +185,20 @@ namespace Shared.Helpers
             for (int i = 0; i < count; i++)
                 outList.Add(ReadInt32());
             return outList;
+        }
+
+        public T ReadPacket<T>() where T : IPacket, new()
+        {
+            T packet = new T();
+            ReadInt16();
+            ReadByte();
+            byte[] rawPacketData = ReadBytes();
+            using(MStreamWriter x = MStreamWriter.New()){
+                x.WriteRawBuffer(rawPacketData);
+                x.BaseStream.Position = 0;
+                packet.ReadFromStream(new MStreamReader(x.BaseStream));
+            }
+            return packet;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿#region copyright
-
 /*
 MIT License
 
@@ -23,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using Shared.Enums;
@@ -33,21 +31,21 @@ namespace Shared.Helpers
     public static class Accuracy
     {
         public static double GetAccuracy(ulong count300, ulong count100, ulong count50, ulong countMiss,
-                                         ulong countGeki, ulong countKatu, PlayModes playMode)
+                                         ulong countGeki, ulong countKatu, PlayMode playMode)
         {
             if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
                 return 0;
             switch (playMode)
             {
-                case PlayModes.Osu:
+                case PlayMode.Osu:
                     return count50 * 50 + count100 * 100 +
                         count300 * 300 / ((double) countMiss + count50 + count300 + count100 * 300);
-                case PlayModes.Taiko:
+                case PlayMode.Taiko:
                     return count50 * 50 + count300 * 100 / ((double) countMiss + count100 + count300 * 100);
-                case PlayModes.Ctb:
+                case PlayMode.Ctb:
                     return count300 + count100 + count50 / (double) count300 + count100 + count50 + count300 +
                         countKatu;
-                case PlayModes.Mania:
+                case PlayMode.Mania:
                     return count50 * 50 + count100 * 100 + countKatu * 200 + count300 * 300 + countGeki * 300 /
                         ((double) countMiss + count50 + count100 + count300 + countGeki + countKatu * 300);
                 default:

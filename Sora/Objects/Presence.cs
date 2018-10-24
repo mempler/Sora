@@ -1,5 +1,4 @@
 ﻿#region copyright
-
 /*
 MIT License
 
@@ -23,7 +22,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using System;
@@ -39,7 +37,6 @@ using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
 using Sora.Packets.Client;
-using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
@@ -166,14 +163,7 @@ namespace Sora.Objects
 
         public Users User;
         public SpectatorStream Spectator;
-        
-        public Presence()
-        {
-            LastRequest = new Stopwatch();
-            Token       = Guid.NewGuid().ToString();
-            MemoryStream str = new MemoryStream();
-            Stream = new MStreamWriter(str);
-        }
+        public MultiplayerRoom JoinedRoom;
 
         public string Token { get; }
 
@@ -181,6 +171,14 @@ namespace Sora.Objects
 
         public Channel PrivateChannel => LChannels.GetChannel(User.Username);
 
+        public Presence()
+        {
+            LastRequest = new Stopwatch();
+            Token       = Guid.NewGuid().ToString();
+            MemoryStream str = new MemoryStream();
+            Stream = new MStreamWriter(str);
+        }
+        
         public int CompareTo(object obj)
         {
             if (obj.GetType() != typeof(Presence)) return -1;
