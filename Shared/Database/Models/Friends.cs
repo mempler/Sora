@@ -52,24 +52,24 @@ namespace Shared.Database.Models
                 return db.Friends.Where(t => t.UserId == userId).Select(x => x.FriendId).ToList();
         }
 
-        public static void AddFriend(int userId, int FriendId)
+        public static void AddFriend(int userId, int friendId)
         {
             using (SoraContext db = new SoraContext())
             {
                 db.Friends.Add(new Friends
                 {
                     UserId   = userId,
-                    FriendId = FriendId
+                    FriendId = friendId
                 });
                 db.SaveChanges();
             }
         }
         
-        public static void RemoveFriend(int userId, int FriendId)
+        public static void RemoveFriend(int userId, int friendId)
         {
             using (SoraContext db = new SoraContext())
             {
-                db.RemoveRange(db.Friends.Where(x => x.UserId == userId && x.FriendId == FriendId));
+                db.RemoveRange(db.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
                 db.SaveChanges();
             }
         }

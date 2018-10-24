@@ -48,6 +48,7 @@ namespace Sora.Handler
                 opr.Spectator.Join(opr);
                 opr.Write(new ChannelJoinSuccess(opr.Spectator.SpecChannel));
             }
+            
             pr.Spectator = opr.Spectator;
 
             opr.Spectator.Join(pr);
@@ -72,11 +73,20 @@ namespace Sora.Handler
             pr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
             
             pr.Spectator = null;
+            
             if (opr.Spectator.JoinedUsers > 0) return;
+            
             opr.Spectator.Left(opr);
             opr.Spectator.SpecChannel.LeaveChannel(opr);
+            opr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
             opr.Spectator = null;
         }
+
+        [Handler(HandlerTypes.ClientCantSpectate)]
+        public void OnUserCantSpectate(Presence pr)
+        {
+            pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
+        } 
 
         [Handler(HandlerTypes.ClientSpectateFrames)]
         public void OnBroadcastingFrames(Presence pr, SpectatorFrame frames)

@@ -26,7 +26,6 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
@@ -100,6 +99,9 @@ namespace Sora.Handler
                     break;
                 case PacketId.ClientStopSpectating:
                     Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
+                    break;
+                case PacketId.ClientCantSpectate:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientCantSpectate, pr);
                     break;
                 case PacketId.ClientSpectateFrames:
                     SpectatorFrames spectateFrames = new SpectatorFrames();

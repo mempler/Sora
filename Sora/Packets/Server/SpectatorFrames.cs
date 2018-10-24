@@ -47,15 +47,13 @@ namespace Sora.Packets.Server
         public void WriteToStream(MStreamWriter sw)
         {
             sw.Write(Frames.Extra);
-            new ReplayFrames
+            sw.Write((short)Frames.ReplayFrames.Count);
+            foreach (ReplayFrame replayFrame in Frames.ReplayFrames)
             {
-                Frames = Frames.ReplayFrames
-            }.WriteToStream(sw);
+                new ReplayFrames{ Frame = replayFrame }.WriteToStream(sw);
+            }
             sw.Write(Frames.Action);
-            new ScoreFrames
-            {
-                Frame = Frames.ScoreFrame
-            }.WriteToStream(sw);
+            new ScoreFrames{ Frame = Frames.ScoreFrame }.WriteToStream(sw);
         }
     }
 }

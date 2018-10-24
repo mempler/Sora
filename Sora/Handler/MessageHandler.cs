@@ -49,7 +49,7 @@ namespace Sora.Handler
                     chan = null; // No multiplayer yet.
                     break;
                 default:
-                    chan = Channels.GetChannel(message.ChannelTarget);
+                    chan = LChannels.GetChannel(message.ChannelTarget);
                     break;
             }
 

@@ -40,9 +40,9 @@ namespace Sora.Handler
         public void OnExit(Presence pr, ErrorStates err)
         {
             LPresences.EndPresence(pr, true);
-            PacketStream MainStream = LPacketStreams.GetStream("main");
-            
-            MainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
+            PacketStream mainStream = LPacketStreams.GetStream("main");
+
+            mainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
             {
                 UserId     = pr.User.Id,
                 ErrorState = err

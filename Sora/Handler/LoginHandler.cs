@@ -44,7 +44,7 @@ namespace Sora.Handler
     internal class LoginHandler
     {
         [Handler(HandlerTypes.LoginHandler)]
-        public void OnLogin(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string Ip)
+        public void OnLogin(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string ip)
         {
             try
             {
@@ -70,9 +70,9 @@ namespace Sora.Handler
 
                 pr.User = user;
 
-                if (Ip != "127.0.0.1" && Ip != "0.0.0.0")
+                if (ip != "127.0.0.1" && ip != "0.0.0.0")
                 {
-                    CityResponse data = Localisation.GetData(Ip);
+                    CityResponse data = Localisation.GetData(ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
                     if (data.Location.Latitude != null) pr.Lat  = (double) data.Location.Latitude;
@@ -94,7 +94,7 @@ namespace Sora.Handler
                 dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
                 dataWriter.Write(new HandleUpdate(pr));
 
-                foreach (Channel chanAuto in Channels.ChannelsAutoJoin)
+                foreach (Channel chanAuto in LChannels.ChannelsAutoJoin)
                 {
                     if (chanAuto.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
                         dataWriter.Write(new ChannelAvailableAutojoin(chanAuto));
@@ -107,7 +107,7 @@ namespace Sora.Handler
                         dataWriter.Write(new ChannelRevoked(chanAuto));
                 }
 
-                foreach (KeyValuePair<string, Channel> chan in Channels.Channels_)
+                foreach (KeyValuePair<string, Channel> chan in LChannels.Channels)
                     if (chan.Value.AdminOnly && pr.User.HasPrivileges(Privileges.Admin))
                         dataWriter.Write(new ChannelAvailable(chan.Value));
                     else if (!chan.Value.AdminOnly)

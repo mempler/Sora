@@ -34,9 +34,12 @@ using System.Threading;
 using JetBrains.Annotations;
 using Shared.Database.Models;
 using Shared.Enums;
+using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Interfaces;
+using Sora.Enums;
 using Sora.Packets.Client;
+using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
@@ -81,25 +84,27 @@ namespace Sora.Objects
             if (presence == null) return;
             presence.LastRequest.Start();
             Presences.Add(presence.Token, presence);
-            Channels.AddChannel(new Channel(presence.User.Username, "", null, presence));
+            LChannels.AddChannel(new Channel(presence.User.Username, "", null, presence));
         }
 
-        public static void EndPresence(Presence presence, bool forceful)
+        public static void EndPresence(Presence pr, bool forceful)
         {
-            if (forceful && Presences.ContainsKey(presence.Token))
+            if (forceful && Presences.ContainsKey(pr.Token))
             {
-                Presences[presence.Token].Stream.Close();
-                Presences[presence.Token].LastRequest.Stop();
-                Channels.RemoveChannel(Presences[presence.Token].PrivateChannel);
+                pr.Stream.Close();
+                pr.LastRequest.Stop();
+                LChannels.RemoveChannel(pr.PrivateChannel);
                 
-                foreach (PacketStream str in Presences[presence.Token].JoinedStreams)
-                    str.Left(Presences[presence.Token]);
+                foreach (PacketStream str in pr.JoinedStreams)
+                    str.Left(pr);
                 
-                Presences.Remove(presence.Token);
+                Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
+                
+                Presences.Remove(pr.Token);
                 return;
             }
 
-            presence.IsLastRequest = true;
+            pr.IsLastRequest = true;
         }
 
         public static void TimeoutCheck()
@@ -174,7 +179,7 @@ namespace Sora.Objects
 
         public uint Rank => 0;
 
-        public Channel PrivateChannel => Channels.GetChannel(User.Username);
+        public Channel PrivateChannel => LChannels.GetChannel(User.Username);
 
         public int CompareTo(object obj)
         {
@@ -208,8 +213,14 @@ namespace Sora.Objects
 
         public void TimeoutCheck()
         {
-            if (LastRequest.Elapsed.TotalSeconds > 30)
-                LPresences.EndPresence(this, true);
+            if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
+            PacketStream MainStream = LPacketStreams.GetStream("main");
+            MainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
+            {
+                UserId     = User.Id,
+                ErrorState = ErrorStates.Ok
+            }), this);
+            LPresences.EndPresence(this, true);
         }
 
         public void Write(IPacket p)

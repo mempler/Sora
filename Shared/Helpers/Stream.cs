@@ -46,15 +46,16 @@ namespace Shared.Helpers
 
         public void Write(IPacket packet)
         {
-            base.Write((short) packet.Id);
-            base.Write((byte) 0);
-            /* Packet Data */
-            MStreamWriter x = New();
-            packet.WriteToStream(x);
-            /* END */
-            base.Write((int) x.Length);
-            Write(x);
-            x.Close();
+            using(MStreamWriter x = New()){
+                base.Write((short) packet.Id);
+                base.Write((byte) 0);
+                /* Packet Data */
+                packet.WriteToStream(x);
+                /* END */
+                base.Write((int) x.Length);
+                Write(x);
+                x.Close();
+            }
         }
 
         public void Write(BinaryWriter w)

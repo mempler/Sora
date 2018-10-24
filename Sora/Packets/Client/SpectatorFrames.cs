@@ -19,15 +19,20 @@ namespace Sora.Packets.Client
             {
                 Extra = sr.ReadInt32()
             };
-            ReplayFrames rframes = new ReplayFrames();
-            rframes.ReadFromStream(sr);
-            Frames.ReplayFrames = rframes.Frames;
 
+            int count = sr.ReadInt16();
+            Frames.ReplayFrames = new List<ReplayFrame>(count);
+            for (int i = 0; i < count; i++)
+            {
+                ReplayFrames rframes = new ReplayFrames();
+                rframes.ReadFromStream(sr);
+                Frames.ReplayFrames.Add(rframes.Frame);
+            }
             Frames.Action = sr.ReadByte();
             
-            ScoreFrames sframes = new ScoreFrames();
-            sframes.ReadFromStream(sr);
-            Frames.ScoreFrame = sframes.Frame;
+            ScoreFrames sframe = new ScoreFrames();
+            sframe.ReadFromStream(sr);
+            Frames.ScoreFrame = sframe.Frame;
         }
 
         public void WriteToStream(MStreamWriter sw)
@@ -38,34 +43,27 @@ namespace Sora.Packets.Client
 
     public class ReplayFrames : ISerializer
     {
-        public List<ReplayFrame> Frames = new List<ReplayFrame>();
+        public ReplayFrame Frame;
 
         public void ReadFromStream(MStreamReader sr)
         {
-            short count = sr.ReadInt16();
-            for (short i = 0; i < count; i++)
-                Frames.Add(new ReplayFrame
-                {
-                    ButtonState   = sr.ReadByte(),
-                    Button        = sr.ReadByte(),
-                    MouseX        = sr.ReadSingle(),
-                    MouseY        = sr.ReadSingle(),
-                    Time          = sr.ReadInt32()
-                });
+            Frame = new ReplayFrame
+            {
+                ButtonState   = sr.ReadByte(),
+                Button        = sr.ReadByte(),
+                MouseX        = sr.ReadSingle(),
+                MouseY        = sr.ReadSingle(),
+                Time          = sr.ReadInt32()
+            };
         }
 
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write((short)Frames.Count);
-            Console.WriteLine(Frames.Count);
-            foreach (ReplayFrame frame in Frames)
-            {
-                sw.Write(frame.ButtonState);
-                sw.Write(frame.Button);
-                sw.Write(frame.MouseX);
-                sw.Write(frame.MouseY);
-                sw.Write(frame.Time);
-            }
+            sw.Write(Frame.ButtonState);
+            sw.Write(Frame.Button);
+            sw.Write(Frame.MouseX);
+            sw.Write(Frame.MouseY);
+            sw.Write(Frame.Time);
         }
     }
     public class ScoreFrames : ISerializer

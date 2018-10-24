@@ -8,15 +8,15 @@ namespace Sora.Handler
     public class FriendHandler
     {
         [Handler(HandlerTypes.ClientFriendAdd)]
-        public void OnFriendAdd(Presence pr, int FriendId)
+        public void OnFriendAdd(Presence pr, int friendId)
         {
-            Friends.AddFriend(pr.User.Id, FriendId);
+            Friends.AddFriend(pr.User.Id, friendId);
         }
 
         [Handler(HandlerTypes.ClientFriendRemove)]
-        public void OnFriendRemove(Presence pr, int FriendId)
+        public void OnFriendRemove(Presence pr, int friendId)
         {
-            Friends.RemoveFriend(pr.User.Id, FriendId);
+            Friends.RemoveFriend(pr.User.Id, friendId);
         }
     }
 }

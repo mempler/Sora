@@ -34,9 +34,9 @@ using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
-    public static class Channels
+    public static class LChannels
     {
-        public static readonly Dictionary<string, Channel> Channels_ = new Dictionary<string, Channel>();
+        public static readonly Dictionary<string, Channel> Channels = new Dictionary<string, Channel>();
         public static readonly List<Channel> ChannelsAutoJoin = new List<Channel>();
         private static bool _initialized;
 
@@ -61,13 +61,13 @@ namespace Sora.Objects
         {
             if (channel.AutoJoin)
                 ChannelsAutoJoin.Add(channel);
-            Channels_.TryAdd(channel.ChannelName, channel);
+            Channels.TryAdd(channel.ChannelName, channel);
         }
 
         public static void RemoveChannel(Channel channel)
         {
             ChannelsAutoJoin.Remove(channel);
-            Channels_.Remove(channel.ChannelName);
+            Channels.Remove(channel.ChannelName);
         }
 
         public static void RemoveChannel(string channelName)
@@ -75,12 +75,12 @@ namespace Sora.Objects
             Channel chan = GetChannel(channelName);
             if (chan == null) return;
             ChannelsAutoJoin.Remove(chan);
-            Channels_.Remove(chan.ChannelName);
+            Channels.Remove(chan.ChannelName);
         }
 
         public static Channel GetChannel(string channelName)
         {
-            Channels_.TryGetValue(channelName, out Channel x);
+            Channels.TryGetValue(channelName, out Channel x);
             return x;
         }
     }
