@@ -45,7 +45,6 @@ namespace Sora.Handler
                 if (id == pr.User.Id)
                 {
                     pr.Write(new UserPresence(pr));
-                    pr.Write(new HandleUpdate(pr));
                     continue;
                 }
                 Presence opr = LPresences.GetPresence(id);
@@ -59,7 +58,6 @@ namespace Sora.Handler
                     continue;
                 }
                 pr.Write(new UserPresence(opr));
-                pr.Write(new HandleUpdate(opr));
             }
         }
     }

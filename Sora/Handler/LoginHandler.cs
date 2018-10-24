@@ -119,8 +119,9 @@ namespace Sora.Handler
                     Exception(dataWriter);
                     return;
                 }
-
+               
                 stream.Broadcast(new PresenceSingle(pr.User.Id));
+                stream.Broadcast(new UserPresence(pr)); 
                 stream.Broadcast(new HandleUpdate(pr));
                 stream.Join(pr);
             }
