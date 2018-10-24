@@ -214,12 +214,7 @@ namespace Sora.Objects
         public void TimeoutCheck()
         {
             if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
-            PacketStream MainStream = LPacketStreams.GetStream("main");
-            MainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
-            {
-                UserId     = User.Id,
-                ErrorState = ErrorStates.Ok
-            }), this);
+            Handlers.ExecuteHandler(HandlerTypes.ClientExit, this, ErrorStates.Ok);
             LPresences.EndPresence(this, true);
         }
 

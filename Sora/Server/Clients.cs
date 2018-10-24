@@ -89,10 +89,10 @@ public abstract class Client
                         {
                             pr                               = new Presence();
                             Response.Headers["cho-token"]    = pr.Token;
-                            string Ip                        = Response.Headers["X-Forwarded-For"];
-                            if (string.IsNullOrEmpty(Ip)) Ip = "127.0.0.1";
+                            string ip                        = Response.Headers["X-Forwarded-For"];
+                            if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
 
-                            Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, Ip);
+                            Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, ip);
                             return;
                         }
                     }
