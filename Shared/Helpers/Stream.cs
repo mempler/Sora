@@ -187,6 +187,22 @@ namespace Shared.Helpers
             return outList;
         }
 
+        public T ReadPacket<T>() where T : IPacket, new()
+        {
+            T packet = new T();
+            ReadInt16();
+            ReadByte();
+            byte[] rawPacketData = ReadBytes();
+            using (MStreamWriter x = MStreamWriter.New())
+            {
+                x.WriteRawBuffer(rawPacketData);
+                x.BaseStream.Position = 0;
+                packet.ReadFromStream(new MStreamReader(x.BaseStream));
+            }
+
+            return packet;
+        }
+
         public T ReadPacketData<T>() where T : IPacket, new()
         {
             T packet = new T();
