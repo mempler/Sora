@@ -42,7 +42,7 @@ namespace Sora.Handler
             {
                 case PacketId.ClientSendUserStatus:
                     Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr,
-                                            data.ReadPacket<SendUserStatus>().Status);
+                                            data.ReadPacketData<SendUserStatus>().Status);
                     break;
                 case PacketId.ClientPong:
                     Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
@@ -52,19 +52,19 @@ namespace Sora.Handler
                     break;
                 case PacketId.ClientUserStatsRequest:
                     Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr,
-                                            data.ReadPacket<UserStatsRequest>().Userids);
+                                            data.ReadPacketData<UserStatsRequest>().Userids);
                     break;
                 case PacketId.ClientChannelJoin:
                     Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr,
-                                            data.ReadPacket<ChannelJoin>().ChannelName);
+                                            data.ReadPacketData<ChannelJoin>().ChannelName);
                     break;
                 case PacketId.ClientChannelLeave:
                     Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr,
-                                            data.ReadPacket<ChannelLeave>().ChannelName);
+                                            data.ReadPacketData<ChannelLeave>().ChannelName);
                     break;
                 case PacketId.ClientSendIrcMessagePrivate:
                 case PacketId.ClientSendIrcMessage:
-                    SendIrcMessage msg = data.ReadPacket<SendIrcMessage>();
+                    SendIrcMessage msg = data.ReadPacketData<SendIrcMessage>();
                     if (msg.Msg.ChannelTarget.StartsWith("#"))
                         Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessage, pr, msg.Msg);
                     else
@@ -72,19 +72,19 @@ namespace Sora.Handler
                     break;
                 case PacketId.ClientExit:
                     Handlers.ExecuteHandler(HandlerTypes.ClientExit, pr,
-                                            data.ReadPacket<Exit>().ErrorState);
+                                            data.ReadPacketData<Exit>().ErrorState);
                     break;
                 case PacketId.ClientFriendAdd:
                     Handlers.ExecuteHandler(HandlerTypes.ClientFriendAdd, pr,
-                                            data.ReadPacket<FriendAdd>().FriendId);
+                                            data.ReadPacketData<FriendAdd>().FriendId);
                     break;
                 case PacketId.ClientFriendRemove:
                     Handlers.ExecuteHandler(HandlerTypes.ClientFriendRemove, pr,
-                                            data.ReadPacket<FriendRemove>().FriendId);
+                                            data.ReadPacketData<FriendRemove>().FriendId);
                     break;
                 case PacketId.ClientStartSpectating:
                     Handlers.ExecuteHandler(HandlerTypes.ClientStartSpectating, pr,
-                                            data.ReadPacket<StartSpectating>().ToSpectateId);
+                                            data.ReadPacketData<StartSpectating>().ToSpectateId);
                     break;
                 case PacketId.ClientStopSpectating:
                     Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
@@ -94,11 +94,11 @@ namespace Sora.Handler
                     break;
                 case PacketId.ClientSpectateFrames:
                     Handlers.ExecuteHandler(HandlerTypes.ClientSpectateFrames, pr,
-                                            data.ReadPacket<SpectatorFrames>().Frames);
+                                            data.ReadPacketData<SpectatorFrames>().Frames);
                     break;
                 case PacketId.ClientReceiveUpdates:
                     Handlers.ExecuteHandler(HandlerTypes.ClientReceiveUpdates, pr,
-                                            data.ReadPacket<Packets.Client.ReceiveUpdates>().UserId);
+                                            data.ReadPacketData<Packets.Client.ReceiveUpdates>().UserId);
                     break;
                 case PacketId.ClientLobbyJoin:
                     Handlers.ExecuteHandler(HandlerTypes.ClientLobbyJoin, pr);
@@ -108,7 +108,7 @@ namespace Sora.Handler
                     break;
                 case PacketId.ClientMatchCreate:
                     Handlers.ExecuteHandler(HandlerTypes.ClientMatchCreate, pr,
-                                            data.ReadPacket<MatchCreate>().Room);
+                                            data.ReadPacketData<MatchCreate>().Room);
                     break;
                 default:
                     Logger.L.Debug($"PacketId: {packetId}");

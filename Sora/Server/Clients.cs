@@ -117,9 +117,15 @@ public abstract class Client
                                 break; // Dont handle any invalid packets! (less then bytelength of 7)
 
                             PacketId packetId = (PacketId) mr.ReadInt16();
-                            mr.BaseStream.Position -= 2;
+                            mr.ReadBoolean();
+                            byte[] packetData = mr.ReadBytes();
 
-                            Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId, mr);
+                            using (MemoryStream packetDataStream = new MemoryStream(packetData))
+                            using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
+                            {
+                                Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
+                                                                        packetDataReader);
+                            }
                         }
                         catch (Exception ex)
                         {
