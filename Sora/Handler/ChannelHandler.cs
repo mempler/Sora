@@ -36,9 +36,19 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientChannelJoin)]
         public void OnChannelJoin(Presence pr, string channelName)
         {
-            Channel channel = LChannels.GetChannel(channelName);
-            if (channelName == "#spectator")
-                channel = pr.Spectator?.SpecChannel;
+            Channel channel;
+            switch (channelName)
+            {
+                case "#spectator":
+                    channel = pr.Spectator?.SpecChannel;
+                    break;
+                case "#multiplayer":
+                    channel = pr.JoinedRoom?.Channel;
+                    break;
+                default:
+                    channel = LChannels.GetChannel(channelName);
+                    break;
+            }
             if (channel == null)
             {
                 pr.Write(new ChannelRevoked(channelName));
@@ -55,15 +65,23 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientChannelLeave)]
         public void OnChannelLeave(Presence pr, string channelName)
         {
-            Channel channel = LChannels.GetChannel(channelName);
-            if (channelName == "#spectator")
-                channel = pr.Spectator?.SpecChannel;
-            if (channel == null)
+            Channel channel;
+            switch (channelName)
             {
+                case "#spectator":
+                    channel = pr.Spectator?.SpecChannel;
+                    break;
+                case "#multiplayer":
+                    channel = pr.JoinedRoom?.Channel;
+                    break;
+                default:
+                    channel = LChannels.GetChannel(channelName);
+                    break;
+            }
+            if (channel == null) {
                 pr.Write(new ChannelRevoked(channelName));
                 return;
             }
-
             channel.LeaveChannel(pr);
 
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));

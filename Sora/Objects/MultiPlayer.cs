@@ -24,6 +24,7 @@ SOFTWARE.
 */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,24 +37,26 @@ namespace Sora.Objects
 {
     public static class MultiplayerLobby
     {
-        private static long _matches = -1;
+        private static long _matches;
         public static Dictionary<long, MultiplayerRoom> Rooms = new Dictionary<long, MultiplayerRoom>();
 
-        public static IEnumerable<MultiplayerRoom> GetRooms()
+        public static IEnumerable<MultiplayerRoom> GetRooms() => Rooms.Select(x => x.Value);
+
+        public static MultiplayerRoom GetRoom(long matchId)
         {
-            foreach (KeyValuePair<long, MultiplayerRoom> room in Rooms)
-                yield return room.Value;
+            return Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
         }
-        
-        public static void Add(MultiplayerRoom room)
+
+        public static long Add(MultiplayerRoom room)
         {
-            room.MatchId = _matches;
-            Rooms.Add(_matches++, room);
+            room.MatchId = _matches++;
+            Rooms.Add(room.MatchId, room);
+            return room.MatchId;
         }
 
         public static void Remove(long matchId)
         {
-            if (Rooms.ContainsKey(matchId)) return;
+            if (!Rooms.ContainsKey(matchId)) return;
             Rooms.Remove(matchId);
         }
     }
@@ -71,7 +74,7 @@ namespace Sora.Objects
         }
     }
     
-    public class MultiplayerRoom : ISerializer
+    public class MultiplayerRoom : ISerializer, ICloneable
     {
         private const int MaxPlayers = 16;
         
@@ -89,8 +92,11 @@ namespace Sora.Objects
         public PlayMode PlayMode;
         public ScoringType ScoringType;
         public TeamType TeamType;
-        public byte SpecialModes;
+        public MatchSpecialModes SpecialModes;
         public int Seed;
+        public int NeedLoad = 0;
+        
+        public Channel Channel = new Channel("#multiplayer");
 
         public MultiplayerRoom()
         {
@@ -133,9 +139,9 @@ namespace Sora.Objects
             PlayMode = (PlayMode) sr.ReadByte();
             ScoringType = (ScoringType) sr.ReadByte();
             TeamType = (TeamType) sr.ReadByte();
-            SpecialModes = sr.ReadByte();
+            SpecialModes = (MatchSpecialModes) sr.ReadByte();
             
-            if ((SpecialModes & 0x1) > 0)
+            if (SpecialModes == MatchSpecialModes.Freemods)
                 for (int i = 0; i < MaxPlayers; i++)
                     Slots[i].Mods = (Mod) sr.ReadUInt32();
             
@@ -171,9 +177,9 @@ namespace Sora.Objects
             sw.Write((byte) PlayMode);
             sw.Write((byte) ScoringType);
             sw.Write((byte) TeamType);
-            sw.Write(SpecialModes);
+            sw.Write((byte) SpecialModes);
 
-            if (SpecialModes > 0)
+            if (SpecialModes == MatchSpecialModes.Freemods)
                 foreach (MultiplayerSlot slot in Slots)
                     sw.Write((uint) slot.Mods);
 
@@ -182,7 +188,6 @@ namespace Sora.Objects
         #endregion
         
         #region Default Stuff
-
         public override string ToString()
         {
             StringBuilder rawSlot = new StringBuilder();
@@ -207,12 +212,14 @@ namespace Sora.Objects
                    $"Seed: {Seed}";
         }
 
+        public object Clone() => MemberwiseClone();
         #endregion
 
         #region Multiplayer Stuff
 
-        public bool Join(Presence pr)
+        public bool Join(Presence pr, string password)
         {
+            if (Password.Trim() != password.Trim()) return false;
             MultiplayerSlot slot = Slots.First(x => x.UserId == -1 && x.Status == MultiSlotStatus.Open || x.Status == MultiSlotStatus.Quit);
             if (slot == null) return false;
             slot.UserId = pr.User.Id;
@@ -223,17 +230,41 @@ namespace Sora.Objects
 
         public bool Leave(Presence pr)
         {
-            MultiplayerSlot slot = Slots.First(x => x.UserId == pr.User.Id && x.Status != MultiSlotStatus.Open ||
-                                                    x.Status == MultiSlotStatus.Quit);
+            MultiplayerSlot slot = Slots.First(x => x.UserId == pr.User.Id);
             
             if (slot == null) return false;
             
             slot.UserId = -1;
-            slot.Status = MultiSlotStatus.Open;
+            slot.Status = MultiSlotStatus.Quit;
             slot.Team = MultiSlotTeam.NoTeam;
             slot.Mods = Mod.None;
             pr.JoinedRoom = null;
             return true;
+        }
+
+        public bool Leave(int userId)
+        {
+            MultiplayerSlot slot = Slots.First(x => x.UserId == userId);
+
+            if (slot == null) return false;
+
+            slot.UserId   = -1;
+            slot.Status   = MultiSlotStatus.Open;
+            slot.Team     = MultiSlotTeam.NoTeam;
+            slot.Mods     = Mod.None;
+            return true;
+        }
+        
+        public void Broadcast(IPacket packet)
+        {
+            foreach (MultiplayerSlot slot in Slots.Where(x => x.UserId != -1))
+            {
+                Presence pr = LPresences.GetPresence(slot.UserId);
+                if (pr == null)
+                    Leave(slot.UserId);
+                else
+                    pr.Write(packet);
+            }
         }
         
         #endregion

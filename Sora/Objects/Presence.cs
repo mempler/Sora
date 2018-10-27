@@ -96,6 +96,8 @@ namespace Sora.Objects
                     str.Left(pr);
                 
                 Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
+                Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, pr);
+                Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, pr);
                 
                 Presences.Remove(pr.Token);
                 return;
@@ -164,7 +166,7 @@ namespace Sora.Objects
         public Users User;
         public SpectatorStream Spectator;
         public MultiplayerRoom JoinedRoom;
-
+    
         public string Token { get; }
 
         public uint Rank => 0;
@@ -213,6 +215,8 @@ namespace Sora.Objects
         {
             if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
             Handlers.ExecuteHandler(HandlerTypes.ClientExit, this, ErrorStates.Ok);
+            Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, this);
+            Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, this);
             LPresences.EndPresence(this, true);
         }
 

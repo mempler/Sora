@@ -27,7 +27,7 @@ build:
   verbosity: minimal
 
 after_build:
-  - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" --severity="ERROR" Sora.sln > NUL
+  - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" --severity="WARNING" Sora.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
   
 on_success:

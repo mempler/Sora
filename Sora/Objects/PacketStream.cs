@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shared.Enums;
 using Shared.Handlers;
+using Shared.Helpers;
 using Shared.Interfaces;
 
 namespace Sora.Objects
@@ -45,7 +46,7 @@ namespace Sora.Objects
 
             NewStream(new PacketStream("main"));
             NewStream(new PacketStream("admin")); // Admin stream, only admins will join.
-            NewStream(new PacketStream("lobby")); // Little prepare for later.
+            NewStream(new PacketStream("lobby"));
         }
 
         public static PacketStream GetStream(string name)
@@ -69,19 +70,28 @@ namespace Sora.Objects
 
         public int JoinedUsers => _joinedPresences.Count;
 
-        public void Join(Presence pr) { _joinedPresences[pr.Token] = pr; }
+        public void Join(Presence pr) { _joinedPresences.Add(pr.Token, pr); }
 
-        public void Left(Presence pr) { _joinedPresences[pr.Token] = null; }
+        public void Left(Presence pr) { _joinedPresences.Remove(pr.Token); }
 
-        public void Left(string token) { _joinedPresences[token] = null; }
+        public void Left(string token) { _joinedPresences.Remove(token); }
 
         public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {
             foreach (KeyValuePair<string, Presence> presence in _joinedPresences)
             {
+                if (presence.Value == null)
+                {
+                    Left(presence.Key);
+                    continue;
+                }
                 if (ignorePresences.Contains(presence.Value))
                     continue;
-                presence.Value.Write(packet);
+                
+                if (packet == null)
+                    Logger.L.Error("PACKET IS NULL!");
+                
+                presence.Value?.Write(packet);
             }
         }
     }

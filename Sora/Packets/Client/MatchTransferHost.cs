@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 /*
 MIT License
 
@@ -24,29 +24,26 @@ SOFTWARE.
 */
 #endregion
 
-using System;
-using System.Text;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
 
-namespace Shared.Helpers
+namespace Sora.Packets.Client
 {
-    public static class Hex
+    public class MatchTransferHost : IPacket
     {
-        // https://stackoverflow.com/questions/724862/converting-from-hex-to-string
-        public static byte[] FromHex(string hex)
-        {
-            hex = hex.Replace("-", "");
-            byte[] raw                                  = new byte[hex.Length / 2];
-            for (int i = 0; i < raw.Length; i++) raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+        public PacketId Id => PacketId.ClientMatchTransferHost;
 
-            return raw;
+        public int SlotId;
+
+        public void ReadFromStream(MStreamReader sr)
+        {
+            SlotId = sr.ReadInt32();
         }
 
-        public static string ToHex(byte[] data)
+        public void WriteToStream(MStreamWriter sw)
         {
-            StringBuilder hex = new StringBuilder(data.Length * 2);
-            foreach (byte d in data)
-                hex.AppendFormat("{0:x2}", d);
-            return hex.ToString();
+            throw new System.NotImplementedException();
         }
     }
 }

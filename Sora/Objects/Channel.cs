@@ -51,6 +51,7 @@ namespace Sora.Objects
                                    autoJoin: true));
             AddChannel(new Channel("#userlog", "Osu! default channel.", LPacketStreams.GetStream("main"),
                                    readOnly: true));
+            AddChannel(new Channel("#lobby", "Osu! default channel", LPacketStreams.GetStream("main")));
             AddChannel(new Channel("#admin", "Admin. is an administration channel.", LPacketStreams.GetStream("admin"),
                                    adminOnly: true, autoJoin: true));
         }

@@ -209,5 +209,16 @@ namespace Shared.Helpers
             packet.ReadFromStream(this);
             return packet;
         }
+
+        public byte[] ReadToEnd()
+        {
+            List<byte> x = new List<byte>();
+            while (BaseStream.Position != BaseStream.Length)
+            {
+                x.Add(ReadByte());
+            }
+
+            return x.ToArray();
+        }
     }
 }
