@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Helpers;
-
 namespace Shared.Interfaces
 {
+    using Helpers;
+
     public interface ISerializer
     {
         void ReadFromStream(MStreamReader sr);

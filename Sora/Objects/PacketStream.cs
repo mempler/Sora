@@ -26,15 +26,15 @@ SOFTWARE.
 
 #endregion
 
-using System.Collections.Generic;
-using System.Linq;
-using Shared.Enums;
-using Shared.Handlers;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Objects
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public static class LPacketStreams
     {
         private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();

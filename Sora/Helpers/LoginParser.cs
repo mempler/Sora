@@ -26,11 +26,11 @@ SOFTWARE.
 
 #endregion
 
-using System.IO;
-using Shared.Helpers;
-
 namespace Sora.Helpers
 {
+    using System.IO;
+    using Shared.Helpers;
+
     internal class LoginParser
     {
         public static Login ParseLogin(MStreamReader reader)

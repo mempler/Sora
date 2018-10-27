@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using NLog;
-
 namespace Shared.Helpers
 {
+    using NLog;
+
     public static class Logger
     {
         public static readonly NLog.Logger L = LogManager.GetCurrentClassLogger();

@@ -26,15 +26,14 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Handlers;
-using Shared.Helpers;
-using Sora.Objects;
-using Sora.Packets.Client;
-using SendIrcMessage = Sora.Packets.Client.SendIrcMessage;
-
 namespace Sora.Handler
 {
+    using Objects;
+    using Packets.Client;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+
     internal class PacketHandler
     {
         [Handler(HandlerTypes.PacketHandler)]

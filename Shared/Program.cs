@@ -26,7 +26,7 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Database;
+
 
 // ReSharper disable All
 
@@ -34,6 +34,8 @@ using Shared.Database;
 
 namespace Shared
 {
+    using Database;
+
     internal class Program
     {
         private static void Main()

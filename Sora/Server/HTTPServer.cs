@@ -26,19 +26,19 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Net;
-using Amib.Threading;
-
 namespace Sora.Server
 {
+    using System;
+    using System.Net;
+    using Amib.Threading;
+
 #region Server
 
     public class HttpServer
     {
         private readonly HttpListener _listener;
-        private bool _running;
         private readonly SmartThreadPool _pool;
+        private bool _running;
 
         public HttpServer(string hostname = "localhost", short port = 5001)
         {

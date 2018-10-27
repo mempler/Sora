@@ -26,12 +26,12 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Objects;
-
 namespace Sora.Handler
 {
+    using Objects;
+    using Shared.Enums;
+    using Shared.Handlers;
+
     public class ReceiveUpdates
     {
         [Handler(HandlerTypes.ClientReceiveUpdates)]

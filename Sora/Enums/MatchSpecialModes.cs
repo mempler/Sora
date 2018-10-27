@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using System;
-
 namespace Sora.Enums
 {
+    using System;
+
     [Flags]
     public enum MatchSpecialModes : byte { Normal, Freemods }
 }

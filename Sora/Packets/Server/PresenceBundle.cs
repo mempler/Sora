@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using System.Collections.Generic;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Server
 {
+    using System.Collections.Generic;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class PresenceBundle : IPacket
     {
         public List<int> UserIds;

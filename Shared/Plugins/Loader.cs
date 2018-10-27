@@ -26,13 +26,14 @@ SOFTWARE.
 
 #endregion
 
-using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
-using Shared.Helpers;
-
 namespace Shared.Plugins
 {
+    using System.IO;
+    using System.Reflection;
+    using System.Xml.Linq;
+    using Handlers;
+    using Helpers;
+
     public static class Loader
     {
         public static void LoadPlugins()
@@ -49,7 +50,7 @@ namespace Shared.Plugins
                 if (doc.Root != null)
                     Logger.L.Info(
                         $"Loaded plugin: {doc.Root.Attribute("Name")?.Value}. Version: {doc.Root.Attribute("Version")?.Value}");
-                Handlers.Handlers.InitHandlers(file, false);
+                Handlers.InitHandlers(file, false);
             }
 
             Logger.L.Info("Finish loading plugins!");

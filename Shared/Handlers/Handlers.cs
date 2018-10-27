@@ -26,16 +26,16 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using JetBrains.Annotations;
-using Shared.Enums;
-using Shared.Helpers;
-
 namespace Shared.Handlers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using Enums;
+    using Helpers;
+    using JetBrains.Annotations;
+
     public static class Handlers
     {
         private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers =

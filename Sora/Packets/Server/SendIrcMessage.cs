@@ -26,12 +26,12 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Server
 {
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public struct MessageStruct
     {
         public string Username;
@@ -42,11 +42,10 @@ namespace Sora.Packets.Server
 
     public class SendIrcMessage : IPacket
     {
-        public PacketId Id => PacketId.ServerSendMessage;
-
         public MessageStruct Msg;
 
         public SendIrcMessage(MessageStruct message) => Msg = message;
+        public PacketId Id => PacketId.ServerSendMessage;
 
         public void ReadFromStream(MStreamReader sr) => Msg = new MessageStruct
         {

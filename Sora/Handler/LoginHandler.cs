@@ -26,21 +26,21 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using MaxMind.GeoIP2.Responses;
-using Shared.Database.Models;
-using Shared.Enums;
-using Shared.Handlers;
-using Shared.Helpers;
-using Sora.Enums;
-using Sora.Helpers;
-using Sora.Objects;
-using Sora.Packets.Server;
-
 namespace Sora.Handler
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Enums;
+    using Helpers;
+    using MaxMind.GeoIP2.Responses;
+    using Objects;
+    using Packets.Server;
+    using Shared.Database.Models;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+
     internal class LoginHandler
     {
         [Handler(HandlerTypes.LoginHandler)]

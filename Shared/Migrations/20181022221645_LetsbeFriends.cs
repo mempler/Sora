@@ -26,11 +26,11 @@ SOFTWARE.
 
 #endregion
 
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-
 namespace Shared.Migrations
 {
+    using Microsoft.EntityFrameworkCore.Metadata;
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class LetsbeFriends : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(

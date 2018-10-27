@@ -26,16 +26,16 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using Shared.Interfaces;
-
 namespace Shared.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Runtime.Serialization.Formatters;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.Text;
+    using Interfaces;
+
     public class MStreamWriter : BinaryWriter
     {
         public MStreamWriter(Stream s) : base(s, Encoding.UTF8) { }
@@ -70,7 +70,9 @@ namespace Shared.Helpers
 
         public void Write(string value, bool nullable)
         {
-            if (value == null && nullable) { base.Write((byte) 0); } else
+            if (value == null && nullable)
+                base.Write((byte) 0);
+            else
             {
                 base.Write((byte) 0x0b);
                 base.Write(value + "");
@@ -215,7 +217,7 @@ namespace Shared.Helpers
         public byte[] ReadToEnd()
         {
             List<byte> x = new List<byte>();
-            while (BaseStream.Position != BaseStream.Length) { x.Add(ReadByte()); }
+            while (BaseStream.Position != BaseStream.Length) x.Add(ReadByte());
 
             return x.ToArray();
         }

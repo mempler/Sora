@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
-using System.Collections.Generic;
-using System.Threading;
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Packets.Server;
-
 namespace Sora.Objects
 {
+    using System.Collections.Generic;
+    using System.Threading;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Handlers;
+
     public static class LChannels
     {
         public static readonly Dictionary<string, Channel> Channels = new Dictionary<string, Channel>();
@@ -88,9 +88,8 @@ namespace Sora.Objects
 
     public class Channel
     {
-        private readonly List<Presence> _presences = new List<Presence>(); // should be { get; } maybe ?
-
         private readonly Mutex _mut = new Mutex();
+        private readonly List<Presence> _presences = new List<Presence>(); // should be { get; } maybe ?
 
         private int _userCount = -1;
 
@@ -158,7 +157,7 @@ namespace Sora.Objects
         {
             try
             {
-                lock (_presences) { _presences.Remove(pr); }
+                lock (_presences) _presences.Remove(pr);
             } catch
             {
                 // Ignored

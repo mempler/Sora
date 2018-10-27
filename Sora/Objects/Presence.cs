@@ -26,22 +26,22 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using JetBrains.Annotations;
-using Shared.Database.Models;
-using Shared.Enums;
-using Shared.Handlers;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-using Sora.Packets.Client;
-
 namespace Sora.Objects
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Threading;
+    using Enums;
+    using JetBrains.Annotations;
+    using Packets.Client;
+    using Shared.Database.Models;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public static class LPresences
     {
         private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
@@ -51,10 +51,8 @@ namespace Sora.Objects
         public static Presence GetPresence(int userid)
         {
             foreach (KeyValuePair<string, Presence> presence in Presences)
-            {
                 if (presence.Value.User.Id == userid)
                     return presence.Value;
-            }
 
             return null;
         }
@@ -142,6 +140,7 @@ namespace Sora.Objects
 
         //public DateTime BeginSeason;
         public bool IsLastRequest;
+        public MultiplayerRoom JoinedRoom;
         public double Lat;
         public LeaderboardRx LeaderboardRx;
 
@@ -150,25 +149,17 @@ namespace Sora.Objects
         public LeaderboardTouch LeaderboardTouch;
         public double Lon;
 
+        public bool Relax;
+        public SpectatorStream Spectator;
+
         public UserStatus
             Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.
 
         public MStreamWriter Stream;
         public byte Timezone;
-
-        public bool Relax;
         public bool Touch;
 
         public Users User;
-        public SpectatorStream Spectator;
-        public MultiplayerRoom JoinedRoom;
-
-        public string Token { get; }
-
-        // ReSharper disable once MemberCanBeMadeStatic.Global
-        public uint Rank => 0;
-
-        public Channel PrivateChannel => LChannels.GetChannel(User.Username);
 
         public Presence()
         {
@@ -177,6 +168,13 @@ namespace Sora.Objects
             MemoryStream str = new MemoryStream();
             Stream = new MStreamWriter(str);
         }
+
+        public string Token { get; }
+
+        // ReSharper disable once MemberCanBeMadeStatic.Global
+        public uint Rank => 0;
+
+        public Channel PrivateChannel => LChannels.GetChannel(User.Username);
 
         public int CompareTo(object obj)
         {
@@ -200,10 +198,8 @@ namespace Sora.Objects
             if (!reset) return copy;
 
             using (Stream)
-            {
                 // Dispose after chaning stream.
                 Stream = new MStreamWriter(new MemoryStream());
-            }
 
             return copy;
         }

@@ -26,22 +26,22 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Packets.Client;
-
 namespace Sora.Packets.Server
 {
+    using System;
+    using Client;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class SpectatorFrames : IPacket
     {
-        public PacketId Id => PacketId.ServerSpectateFrames;
-
         public readonly SpectatorFrame Frame;
 
         public SpectatorFrames(SpectatorFrame frames) => Frame = frames;
+        public PacketId Id => PacketId.ServerSpectateFrames;
 
-        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
 
         public void WriteToStream(MStreamWriter sw) => sw.Write(Frame);
     }

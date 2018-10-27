@@ -26,15 +26,17 @@ SOFTWARE.
 
 #endregion
 
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Shared.Database.Models
 {
+    using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Linq;
+
     public class LeaderboardRx
     {
         [Key]

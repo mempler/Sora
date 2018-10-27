@@ -26,18 +26,18 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.IO;
-using System.Net;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Tar;
-using MaxMind.GeoIP2;
-using MaxMind.GeoIP2.Responses;
-using Shared.Enums;
-using Shared.Handlers;
-
 namespace Shared.Helpers
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using Enums;
+    using Handlers;
+    using ICSharpCode.SharpZipLib.GZip;
+    using ICSharpCode.SharpZipLib.Tar;
+    using MaxMind.GeoIP2;
+    using MaxMind.GeoIP2.Responses;
+
     public static class Localisation
     {
         [Handler(HandlerTypes.Initializer)]
@@ -69,9 +69,7 @@ namespace Shared.Helpers
         public static CityResponse GetData(string ip)
         {
             using (DatabaseReader client = new DatabaseReader("geoip/GeoLite2-City/GeoLite2-City.mmdb"))
-            {
                 return client.City(ip);
-            }
         }
 
         public static CountryIds StringToCountryId(string x)

@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Objects;
-using Sora.Packets.Client;
-using Sora.Packets.Server;
-
 namespace Sora.Handler
 {
+    using Objects;
+    using Packets.Client;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Handlers;
+
     internal class UserStatusHandler
     {
         [Handler(HandlerTypes.ClientSendUserStatus)]

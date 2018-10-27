@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-
 namespace Sora.Packets.Server
 {
+    using Enums;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class LoginResponse : IPacket
     {
         protected LoginResponses Response;

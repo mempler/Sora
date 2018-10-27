@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-
 namespace Shared.Interfaces
 {
+    using Enums;
+
     public interface IPacket : ISerializer
     {
         PacketId Id { get; }

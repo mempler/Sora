@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-
 namespace Sora.Packets.Client
 {
+    using Enums;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class SendUserStatus : IPacket
     {
         public UserStatus Status;

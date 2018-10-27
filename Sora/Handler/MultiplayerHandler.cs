@@ -26,19 +26,19 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Enums;
-using Sora.Objects;
-using Sora.Packets.Client;
-using Sora.Packets.Server;
-using MatchScoreUpdate = Sora.Packets.Server.MatchScoreUpdate;
-
 namespace Sora.Handler
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Enums;
+    using Objects;
+    using Packets.Client;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using MatchScoreUpdate = Packets.Server.MatchScoreUpdate;
+
     public class MultiplayerHandler
     {
     #region Lobby

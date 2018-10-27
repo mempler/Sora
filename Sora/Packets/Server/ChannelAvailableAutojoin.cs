@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Objects;
-
 namespace Sora.Packets.Server
 {
+    using Objects;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class ChannelAvailableAutojoin : IPacket
     {
         public Channel Channel;

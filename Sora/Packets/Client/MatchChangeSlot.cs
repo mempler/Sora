@@ -26,20 +26,20 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Client
 {
+    using System;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class MatchChangeSlot : IPacket
     {
-        public PacketId Id => PacketId.ClientMatchChangeSlot;
-
         public int SlotId;
+        public PacketId Id => PacketId.ClientMatchChangeSlot;
 
         public void ReadFromStream(MStreamReader sr) => SlotId = sr.ReadInt32();
 
-        public void WriteToStream(MStreamWriter sw) => throw new System.NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
     }
 }

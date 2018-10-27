@@ -26,20 +26,20 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using Shared.Database;
-using Shared.Database.Models;
-using Shared.Enums;
-using Shared.Handlers;
-using Shared.Helpers;
-using Shared.Plugins;
-using Sora.Objects;
-using Sora.Server;
-
 namespace Sora
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection;
+    using Objects;
+    using Server;
+    using Shared.Database;
+    using Shared.Database.Models;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+    using Shared.Plugins;
+
     internal static class Program
     {
         private static HttpServer _server;

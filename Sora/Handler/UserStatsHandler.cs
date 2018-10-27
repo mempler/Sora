@@ -26,15 +26,15 @@ SOFTWARE.
 
 #endregion
 
-using System.Collections.Generic;
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Enums;
-using Sora.Objects;
-using Sora.Packets.Server;
-
 namespace Sora.Handler
 {
+    using System.Collections.Generic;
+    using Enums;
+    using Objects;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Handlers;
+
     internal class UserStatsHandler
     {
         [Handler(HandlerTypes.ClientUserStatsRequest)]

@@ -26,18 +26,18 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Client
 {
+    using System;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class MatchJoin : IPacket
     {
-        public PacketId Id => PacketId.ClientMatchJoin;
-
         public int MatchId;
         public string Password;
+        public PacketId Id => PacketId.ClientMatchJoin;
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -45,6 +45,6 @@ namespace Sora.Packets.Client
             Password = sr.ReadString();
         }
 
-        public void WriteToStream(MStreamWriter sw) => throw new System.NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
     }
 }

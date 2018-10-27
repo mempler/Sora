@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Shared.Database.Models;
-using Shared.Helpers;
-
 namespace Shared.Database
 {
+    using System;
+    using Helpers;
+    using Microsoft.EntityFrameworkCore;
+    using Models;
+    using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+
     public sealed class SoraContext : DbContext
     {
         private static readonly bool[] Migrated = {false};

@@ -26,21 +26,21 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Objects;
-
 namespace Sora.Packets.Client
 {
+    using System;
+    using Objects;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class MatchChangePassword : IPacket
     {
-        public PacketId Id => PacketId.ClientMatchChangePassword;
-
         public MultiplayerRoom Room;
+        public PacketId Id => PacketId.ClientMatchChangePassword;
 
         public void ReadFromStream(MStreamReader sr) => (Room = new MultiplayerRoom()).ReadFromStream(sr);
 
-        public void WriteToStream(MStreamWriter sw) => throw new System.NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
     }
 }

@@ -26,20 +26,19 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-
 namespace Sora.Packets.Server
 {
+    using Enums;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class HandleUserQuit : IPacket
     {
-        public PacketId Id => PacketId.ServerHandleUserQuit;
-
         public UserQuitStruct UserQuit;
 
         public HandleUserQuit(UserQuitStruct userQuit) => UserQuit = userQuit;
+        public PacketId Id => PacketId.ServerHandleUserQuit;
 
         public void ReadFromStream(MStreamReader sr) => UserQuit = new UserQuitStruct
         {

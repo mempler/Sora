@@ -26,17 +26,18 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.IO;
-using System.Net;
-using Shared.Enums;
-using Shared.Helpers;
-using Sora.Enums;
-using Sora.Objects;
-using Sora.Packets.Server;
-
 namespace Sora.Server
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using Enums;
+    using Objects;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+
     public abstract class Client
     {
         protected Client(HttpListenerRequest request, HttpListenerResponse response)
@@ -45,8 +46,8 @@ namespace Sora.Server
             Response = response;
         }
 
-        public HttpListenerRequest Request { get; private set; }
-        public HttpListenerResponse Response { get; private set; }
+        public HttpListenerRequest Request { get; }
+        public HttpListenerResponse Response { get; }
 
 
         public abstract void DoWork();
@@ -91,7 +92,7 @@ namespace Sora.Server
                             string ip = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
 
-                            Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, ip);
+                            Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, ip);
                             return;
                         }
                     } catch (Exception ex)
@@ -109,7 +110,6 @@ namespace Sora.Server
                     }
 
                     while (true)
-                    {
                         try
                         {
                             if (Request.ContentLength64 - rawReadstream.Position < 7)
@@ -121,16 +121,13 @@ namespace Sora.Server
 
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
-                            {
-                                Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
+                                Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
                                     packetDataReader);
-                            }
                         } catch (Exception ex)
                         {
                             Logger.L.Error(ex);
                             break;
                         }
-                    }
 
                     try
                     {

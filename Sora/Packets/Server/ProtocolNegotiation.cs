@@ -26,17 +26,16 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Server
 {
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class ProtocolNegotiation : IPacket
     {
-        public PacketId Id => PacketId.ServerProtocolNegotiation;
-
         public uint Protocol = 19; // Latest known protocol version
+        public PacketId Id => PacketId.ServerProtocolNegotiation;
 
         public void ReadFromStream(MStreamReader sr) => Protocol = sr.ReadUInt32();
 

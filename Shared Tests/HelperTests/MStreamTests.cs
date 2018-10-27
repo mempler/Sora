@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using NUnit.Framework;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Shared_Tests.HelperTests
 {
+    using NUnit.Framework;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     [TestFixture]
     public class MStreamTests
     {
@@ -56,12 +56,11 @@ namespace Shared_Tests.HelperTests
 
     public class Announce : IPacket
     {
-        public PacketId Id => PacketId.ServerAnnounce;
-
         public string Message;
 
         public Announce() { }
         public Announce(string message) => Message = message;
+        public PacketId Id => PacketId.ServerAnnounce;
 
         public void ReadFromStream(MStreamReader sr) => Message = sr.ReadString();
 

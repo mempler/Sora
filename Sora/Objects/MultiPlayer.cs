@@ -26,18 +26,18 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Enums;
-using Sora.Packets.Server;
-
 namespace Sora.Objects
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Enums;
+    using Packets.Server;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public static class MultiplayerLobby
     {
         private static long _matches;
@@ -63,10 +63,10 @@ namespace Sora.Objects
 
     public class MultiplayerSlot
     {
-        public MultiSlotStatus Status;
-        public int UserId;
-        public MultiSlotTeam Team;
         public Mod Mods;
+        public MultiSlotStatus Status;
+        public MultiSlotTeam Team;
+        public int UserId;
 
         public override string ToString() => $"Status: {Status} UserId: {UserId} Team: {Team} Mods: {Mods}";
 
@@ -76,32 +76,31 @@ namespace Sora.Objects
     public class MultiplayerRoom : ISerializer, ICloneable
     {
         private const int MaxPlayers = 16;
-
-        public long MatchId;
-        public bool InProgress;
-        public MatchType MatchType;
         public Mod ActiveMods;
-        public string Name;
-        public string Password;
-        public string BeatmapName;
         public int BeatmapId;
         public string BeatmapMd5;
-        public MultiplayerSlot[] Slots = new MultiplayerSlot[16];
-        public int HostId;
-        public PlayMode PlayMode;
-        public ScoringType ScoringType;
-        public TeamType TeamType;
-        public MatchSpecialModes SpecialModes;
-        public int Seed;
-        public int NeedLoad;
-        public int PlayingPeople;
+        public string BeatmapName;
 
         public Channel Channel = new Channel("#multiplayer");
+        public int HostId;
+        public bool InProgress;
+
+        public long MatchId;
+        public MatchType MatchType;
+        public string Name;
+        public int NeedLoad;
+        public string Password;
+        public int PlayingPeople;
+        public PlayMode PlayMode;
+        public ScoringType ScoringType;
+        public int Seed;
+        public MultiplayerSlot[] Slots = new MultiplayerSlot[16];
+        public MatchSpecialModes SpecialModes;
+        public TeamType TeamType;
 
         public MultiplayerRoom()
         {
             for (int i = 0; i < MaxPlayers; i++)
-            {
                 Slots[i] = new MultiplayerSlot
                 {
                     // ReSharper disable once ConditionalTernaryEqualBranch
@@ -110,7 +109,6 @@ namespace Sora.Objects
                     Team = MultiSlotTeam.NoTeam,
                     UserId = -1
                 };
-            }
         }
 
     #region ISerializer
@@ -356,7 +354,9 @@ namespace Sora.Objects
 
         public void SetMods(Mod mods, MultiplayerSlot Slot)
         {
-            if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods) { Slot.Mods = fixMods(mods); } else if
+            if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods)
+                Slot.Mods = fixMods(mods);
+            else if
                 (SpecialModes == MatchSpecialModes.Freemods)
                 Slot.Mods = mods;
             else if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)

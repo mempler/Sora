@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using System;
-
 namespace Sora.Enums
 {
+    using System;
+
     // Source https://github.com/HoLLy-HaCKeR/HOPEless/blob/master/HOPEless/osu/Enums_Multiplayer.cs under MIT License.
     [Flags]
     public enum MultiSlotStatus : byte

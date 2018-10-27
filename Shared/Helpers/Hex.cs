@@ -26,11 +26,11 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Text;
-
 namespace Shared.Helpers
 {
+    using System;
+    using System.Text;
+
     public static class Hex
     {
         // https://stackoverflow.com/questions/724862/converting-from-hex-to-string

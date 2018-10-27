@@ -26,11 +26,11 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Text;
-
 namespace Shared.Helpers
 {
+    using System;
+    using System.Text;
+
     public static class Crypto
     {
         public static string RandomString(int n)

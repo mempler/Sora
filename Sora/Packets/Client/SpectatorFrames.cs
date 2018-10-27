@@ -26,20 +26,19 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-
 namespace Sora.Packets.Client
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class SpectatorFrames : IPacket
     {
-        public PacketId Id => PacketId.ClientSpectateFrames;
-
         public SpectatorFrame Frames;
+        public PacketId Id => PacketId.ClientSpectateFrames;
 
         public void ReadFromStream(MStreamReader sr) => Frames = sr.ReadData<SpectatorFrame>();
 
@@ -48,34 +47,27 @@ namespace Sora.Packets.Client
 
     public class ScoreFrame : ISerializer
     {
-        public int Time;
-        public byte Id;
+        public double BonusPortion;
+        public double ComboPortion;
+        public ushort Count100;
 
         public ushort Count300;
-        public ushort Count100;
         public ushort Count50;
         public ushort CountGeki;
         public ushort CountKatu;
         public ushort CountMiss;
-
-        public int TotalScore;
-        public ushort MaxCombo;
         public ushort CurrentCombo;
-        public bool Perfect;
 
         public byte CurrentHp;
-        public byte TagByte;
+        public byte Id;
+        public ushort MaxCombo;
+        public bool Perfect;
 
         public bool ScoreV2;
-        public double ComboPortion;
-        public double BonusPortion;
+        public byte TagByte;
+        public int Time;
 
-        public override string ToString() => $"Time: {Time} Id: {Id}\n" +
-                                             $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
-                                             $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
-                                             $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
-                                             $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
-                                             $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
+        public int TotalScore;
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -119,22 +111,21 @@ namespace Sora.Packets.Client
             sw.Write(ComboPortion);
             sw.Write(BonusPortion);
         }
+
+        public override string ToString() => $"Time: {Time} Id: {Id}\n" +
+                                             $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
+                                             $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
+                                             $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
+                                             $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
+                                             $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
     }
 
     public class SpectatorFrame : ISerializer
     {
+        public byte Action;
         public int Extra;
         public List<ReplayFrame> ReplayFrames;
-        public byte Action;
         public ScoreFrame ScoreFrame;
-
-        public override string ToString()
-        {
-            StringBuilder repframes = new StringBuilder();
-            foreach (ReplayFrame f in ReplayFrames)
-                repframes.Append($"\t{f}\n");
-            return $"Extra: {Extra}\nReplayFrames: [\n{repframes}]\nAction: {Action}\n{ScoreFrame}";
-        }
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -164,18 +155,23 @@ namespace Sora.Packets.Client
             sw.Write(Action);
             sw.Write(ScoreFrame);
         }
+
+        public override string ToString()
+        {
+            StringBuilder repframes = new StringBuilder();
+            foreach (ReplayFrame f in ReplayFrames)
+                repframes.Append($"\t{f}\n");
+            return $"Extra: {Extra}\nReplayFrames: [\n{repframes}]\nAction: {Action}\n{ScoreFrame}";
+        }
     }
 
     public class ReplayFrame : ISerializer
     {
-        public byte ButtonState;
         public byte Button;
+        public byte ButtonState;
         public float MouseX;
         public float MouseY;
         public int Time;
-
-        public override string ToString()
-            => $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -194,5 +190,8 @@ namespace Sora.Packets.Client
             sw.Write(MouseY);
             sw.Write(Time);
         }
+
+        public override string ToString()
+            => $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
     }
 }

@@ -26,12 +26,12 @@ SOFTWARE.
 
 #endregion
 
-using System;
-using System.IO;
-using Newtonsoft.Json;
-
 namespace Shared.Helpers
 {
+    using System;
+    using System.IO;
+    using Newtonsoft.Json;
+
     public class Config
     {
         public MySql MySql = new MySql

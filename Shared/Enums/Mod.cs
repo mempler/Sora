@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
-using System;
-
 namespace Shared.Enums
 {
+    using System;
+
     // Source https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)
     [Flags]
     public enum Mod : uint
@@ -37,7 +37,7 @@ namespace Shared.Enums
         None = 0, NoFail = 1 << 0, Easy = 1 << 1,
         TouchDevice = 1 << 2, Hidden = 1 << 3, HardRock = 1 << 4,
         SuddenDeath = 1 << 5, DoubleTime = 1 << 6, Relax = 1 << 7,
-        HalfTime = 1 << 8, Nightcore = 1 << 9 | DoubleTime, Flashlight = 1 << 10,
+        HalfTime = 1 << 8, Nightcore = (1 << 9) | DoubleTime, Flashlight = 1 << 10,
         Autoplay = 1 << 11, SpunOut = 1 << 12, Relax2 = 1 << 13,
         Perfect = 1 << 14, Key4 = 1 << 15, Key5 = 1 << 16,
         Key6 = 1 << 17, Key7 = 1 << 18, Key8 = 1 << 19,

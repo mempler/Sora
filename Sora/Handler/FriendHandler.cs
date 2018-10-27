@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Database.Models;
-using Shared.Enums;
-using Shared.Handlers;
-using Sora.Objects;
-
 namespace Sora.Handler
 {
+    using Objects;
+    using Shared.Database.Models;
+    using Shared.Enums;
+    using Shared.Handlers;
+
     public class FriendHandler
     {
         [Handler(HandlerTypes.ClientFriendAdd)]

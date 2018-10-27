@@ -26,18 +26,18 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Sora.Objects;
-
 namespace Sora.Packets.Client
 {
+    using System;
+    using Objects;
+    using Shared.Enums;
+    using Shared.Helpers;
+    using Shared.Interfaces;
+
     public class MatchCreate : IPacket
     {
-        public PacketId Id => PacketId.ClientMatchCreate;
-
         public MultiplayerRoom Room;
+        public PacketId Id => PacketId.ClientMatchCreate;
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -45,6 +45,6 @@ namespace Sora.Packets.Client
             Room.ReadFromStream(sr);
         }
 
-        public void WriteToStream(MStreamWriter sw) => throw new System.NotImplementedException();
+        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
     }
 }
