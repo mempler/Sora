@@ -32,6 +32,7 @@ using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
+using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
@@ -72,6 +73,8 @@ namespace Sora.Objects
         {
             return $"Status: {Status} UserId: {UserId} Team: {Team} Mods: {Mods}";
         }
+
+        public bool IsHost(MultiplayerRoom room) => room.HostId == UserId;
     }
     
     public class MultiplayerRoom : ISerializer, ICloneable
@@ -94,7 +97,8 @@ namespace Sora.Objects
         public TeamType TeamType;
         public MatchSpecialModes SpecialModes;
         public int Seed;
-        public int NeedLoad = 0;
+        public int NeedLoad;
+        public int PlayingPeople;
         
         public Channel Channel = new Channel("#multiplayer");
 
@@ -265,6 +269,186 @@ namespace Sora.Objects
                 else
                     pr.Write(packet);
             }
+        }
+
+        public void Invite(Presence pr)
+        {
+            // Took me a while to figure out. i tried osu://mp/matchid/Password.Replace(" ", "_");
+            string inviteUri = $"osump://{MatchId}/{Password.Replace(" ", "_")}";
+            
+            pr.Write(new Invite(new MessageStruct
+            {
+                ChannelTarget = pr.User.Username,
+                Message       = $"\0Hey, I want to play with you! Join me [{inviteUri} {Name}]",
+                Username      = pr.User.Username,
+                SenderId      = pr.User.Id
+            }));
+        }
+
+        public void SetSlot(int SlotId, int userId, MultiSlotStatus status,
+                            MultiSlotTeam team = MultiSlotTeam.NoTeam,
+                            Mod mods = Mod.None)
+        {
+            if (SlotId > MaxPlayers) throw new ArgumentOutOfRangeException();
+
+            MultiplayerSlot slot = Slots[SlotId];
+            slot.UserId = userId;
+            slot.Status = status;
+            slot.Team = team;
+            slot.Mods = mods;
+            
+            Update();
+        }
+
+        public void SetSlot(int SlotId, MultiplayerSlot slot)
+        {
+            if (SlotId > MaxPlayers) throw new ArgumentOutOfRangeException();
+
+            MultiplayerSlot firstslot = Slots[SlotId];
+            firstslot.UserId = slot.UserId;
+            firstslot.Status = slot.Status;
+            firstslot.Team   = slot.Team;
+            firstslot.Mods   = slot.Mods;
+            
+            Update();
+        }
+
+        public void SetSlot(MultiplayerSlot firstslot, MultiplayerSlot secondslot)
+        {
+            firstslot.UserId = secondslot.UserId;
+            firstslot.Status = secondslot.Status;
+            firstslot.Team   = secondslot.Team;
+            firstslot.Mods   = secondslot.Mods;
+            
+            Update();
+        }
+
+        public void ClearSlot(MultiplayerSlot slot)
+        {
+            slot.UserId = -1;
+            slot.Status = MultiSlotStatus.Open;
+            slot.Team   = MultiSlotTeam.NoTeam;
+            slot.Mods   = Mod.None;
+            
+            Update();
+        }
+
+        public void Update()
+        {
+            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(this));
+            Broadcast(new MatchUpdate(this));
+        }
+
+        public void Dispand()
+        {            
+            Broadcast(new MatchDisband(this));
+            MultiplayerLobby.Remove(MatchId);
+            LPacketStreams.GetStream("lobby").Broadcast(new MatchDisband(this));
+        }
+
+        public void SetHost(int userId)
+        {
+            HostId = userId;
+            Update();
+        }
+
+        public void SetRandomHost()
+        {
+            MultiplayerSlot slot = Slots.FirstOrDefault(x => x.UserId != -1);
+            if (slot != null)
+                HostId = slot.UserId;
+            else
+                HostId = -1;
+
+            Update();
+        }
+
+        public void SetMods(Mod mods, MultiplayerSlot Slot)
+        {
+            if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods) {
+                Slot.Mods = fixMods(mods);
+            } else if (SpecialModes == MatchSpecialModes.Freemods)
+                Slot.Mods = mods;
+            else if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)
+                ActiveMods = mods;
+
+            Update();
+        }
+
+        public void ChangeSettings(MultiplayerRoom room)
+        {
+            MatchType    = room.MatchType;
+            ActiveMods   = room.ActiveMods;
+            Name         = room.Name;
+            BeatmapName  = room.BeatmapName;
+            BeatmapId    = room.BeatmapId;
+            BeatmapMd5   = room.BeatmapMd5;
+            HostId       = room.HostId;
+            PlayMode     = room.PlayMode;
+            ScoringType  = room.ScoringType;
+            TeamType     = room.TeamType;
+            SpecialModes = room.SpecialModes;
+            Seed         = room.Seed;
+            
+            Update();
+        }
+
+        public void SetPassword(string password)
+        {
+            Password = password.Replace(" ", "_");
+            Update();
+        }
+
+        public void LockSlot(MultiplayerSlot slot)
+        {
+            if (slot.UserId != -1)
+                Leave(slot.UserId);
+            slot.Mods = Mod.None;
+
+            slot.Status = slot.Status != MultiSlotStatus.Locked
+                ? MultiSlotStatus.Locked
+                : MultiSlotStatus.Open;
+
+            slot.Team = MultiSlotTeam.NoTeam;
+            
+            Update();
+        }
+
+        public void Start()
+        {
+            InProgress = true;
+
+            foreach (MultiplayerSlot slot in Slots.Where(
+                x => x.UserId != -1 && x.Status != MultiSlotStatus.NoMap))
+            {
+                slot.Status = MultiSlotStatus.Playing;
+                ++NeedLoad;
+                ++PlayingPeople;
+            }
+
+            Broadcast(new MatchStart(this));
+            Update();
+        }
+
+        public void LoadComplete()
+        {
+            if (--NeedLoad == 0)
+                Broadcast(new MatchAllPlayersLoaded());
+
+            Update();
+        }
+        
+        private Mod fixMods(Mod mods)
+        {
+            ActiveMods = 0;
+            if ((mods & Mod.DoubleTime) > 0)
+                ActiveMods |= Mod.DoubleTime;
+            if ((mods & Mod.Nightcore) > 0)
+                ActiveMods |= Mod.Nightcore;
+            if ((mods & Mod.HalfTime) > 0)
+               ActiveMods |= Mod.HalfTime;
+                
+            return mods;
         }
         
         #endregion

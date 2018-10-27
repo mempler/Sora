@@ -178,6 +178,10 @@ namespace Sora.Handler
                 case PacketId.ClientMatchLoadComplete:
                     Handlers.ExecuteHandler(HandlerTypes.ClientMatchLoadComplete, pr);
                     break;
+                case PacketId.ClientMatchScoreUpdate:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchScoreUpdate, pr,
+                                            data.ReadData<MatchScoreUpdate>().Frame);
+                    break;
                 #endregion
     
                 #region Other

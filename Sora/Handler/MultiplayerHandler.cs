@@ -31,7 +31,9 @@ using Shared.Enums;
 using Shared.Handlers;
 using Sora.Enums;
 using Sora.Objects;
+using Sora.Packets.Client;
 using Sora.Packets.Server;
+using MatchScoreUpdate = Sora.Packets.Server.MatchScoreUpdate;
 
 namespace Sora.Handler
 {
@@ -62,11 +64,13 @@ namespace Sora.Handler
         {
             room.Password = room.Password.Replace(" ", "_");
             MultiplayerLobby.Add(room);
+            
             if (room.Join(pr, room.Password))
                 pr.Write(new MatchJoinSuccess(room));
             else
                 pr.Write(new MatchJoinFail());
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchNew(room));
+            
+            room.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchPart)]
@@ -75,25 +79,17 @@ namespace Sora.Handler
             if (pr.JoinedRoom == null) return;
             
             MultiplayerRoom room = pr.JoinedRoom;
-            if (room.HostId == pr.User.Id)
-            {
-                MultiplayerSlot slot = room.Slots.FirstOrDefault(x => x.UserId != pr.User.Id && x.UserId != -1);
-                if (slot != null)
-                    room.HostId = slot.UserId;
-                else
-                    room.HostId = -1;
-            }
-
             room.Leave(pr);
+            if (room.HostId == pr.User.Id)
+                room.SetRandomHost();
+            
             if (room.HostId != -1)
             {
-                LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(room));
-                room.Broadcast(new MatchUpdate(room));
+                room.Update();
                 return;
             }
-
-            MultiplayerLobby.Remove(room.MatchId);
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchDisband(room));
+            
+            room.Dispand();
         }
 
         [Handler(HandlerTypes.ClientMatchJoin)]
@@ -105,8 +101,7 @@ namespace Sora.Handler
             else
                 pr.Write(new MatchJoinFail());
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(room));
-            room?.Broadcast(new MatchUpdate(room));
+            room?.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchChangeSlot)]
@@ -114,52 +109,21 @@ namespace Sora.Handler
         {
             if (pr.JoinedRoom == null) return;
             if (slotId > 16) return;
-            MultiplayerSlot oldSlot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
             MultiplayerSlot newSlot = pr.JoinedRoom.Slots[slotId];
             if (newSlot.UserId != -1) return;
-
-            newSlot.UserId = oldSlot.UserId;
-            newSlot.Status = oldSlot.Status;
-            newSlot.Team = oldSlot.Team;
-            newSlot.Mods = oldSlot.Mods;
             
-            oldSlot.UserId = -1;
-            oldSlot.Status = MultiSlotStatus.Open;
-            oldSlot.Team   = MultiSlotTeam.NoTeam;
-            oldSlot.Mods   = Mod.None;
+            MultiplayerSlot oldSlot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.SetSlot(newSlot, oldSlot);
+            pr.JoinedRoom.ClearSlot(oldSlot);
         }
 
         [Handler(HandlerTypes.ClientMatchChangeMods)]
         public void OnMatchChangeMods(Presence pr, Mod mods)
         {
-            if (pr.JoinedRoom == null)
-                return;
-            
-            if (pr.JoinedRoom.SpecialModes == MatchSpecialModes.Freemods)
-            {
-                MultiplayerSlot slot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
-                if (slot == null) return;
-                slot.Mods = mods;
-                if (pr.JoinedRoom.HostId == pr.User.Id)
-                {
-                    pr.JoinedRoom.ActiveMods = 0;
-                    if ((mods & Mod.DoubleTime) > 0)
-                        pr.JoinedRoom.ActiveMods |= Mod.DoubleTime;
-                    if ((mods & Mod.Nightcore) > 0)
-                        pr.JoinedRoom.ActiveMods |= Mod.Nightcore;
-                    if ((mods & Mod.HalfTime) > 0)
-                        pr.JoinedRoom.ActiveMods |= Mod.HalfTime;
-                }
-            } else if (pr.JoinedRoom.HostId == pr.User.Id && pr.JoinedRoom.SpecialModes == MatchSpecialModes.Normal)
-            {
-                pr.JoinedRoom.ActiveMods = mods;
-            }
-
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            MultiplayerSlot slot = pr.JoinedRoom?.Slots.First(x => x.UserId == pr.User.Id);
+            if (slot == null) return;
+            pr.JoinedRoom.SetMods(mods, slot);
         }
         
         [Handler(HandlerTypes.ClientMatchChangeSettings)]
@@ -168,21 +132,7 @@ namespace Sora.Handler
             if (pr.JoinedRoom == null) return;
             if (pr.JoinedRoom.HostId != pr.User.Id) return;
 
-            pr.JoinedRoom.MatchType = room.MatchType;
-            pr.JoinedRoom.ActiveMods = room.ActiveMods;
-            pr.JoinedRoom.Name = room.Name;
-            pr.JoinedRoom.BeatmapName = room.BeatmapName;
-            pr.JoinedRoom.BeatmapId = room.BeatmapId;
-            pr.JoinedRoom.BeatmapMd5 = room.BeatmapMd5;
-            pr.JoinedRoom.HostId = room.HostId;
-            pr.JoinedRoom.PlayMode = room.PlayMode;
-            pr.JoinedRoom.ScoringType = room.ScoringType;
-            pr.JoinedRoom.TeamType = room.TeamType;
-            pr.JoinedRoom.SpecialModes = room.SpecialModes;
-            pr.JoinedRoom.Seed = room.Seed;
-            
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.ChangeSettings(room);
         }
 
         [Handler(HandlerTypes.ClientMatchChangePassword)]
@@ -191,10 +141,7 @@ namespace Sora.Handler
             if (pr.JoinedRoom == null) return;
             if (pr.JoinedRoom.HostId != pr.User.Id) return;
 
-            pr.JoinedRoom.Password    = room.Password.Replace(" ", "_");
-
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.SetPassword(room.Password);
         }
         
         [Handler(HandlerTypes.ClientMatchLock)]
@@ -202,18 +149,8 @@ namespace Sora.Handler
         {
             if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id) return;
             if (slotId > 16) return;
-
-            if (pr.JoinedRoom.Slots[slotId].UserId != -1)
-                pr.JoinedRoom.Leave(pr.JoinedRoom.Slots[slotId].UserId);
-            pr.JoinedRoom.Slots[slotId].Mods = Mod.None;
             
-            pr.JoinedRoom.Slots[slotId].Status = pr.JoinedRoom.Slots[slotId].Status != MultiSlotStatus.Locked ?
-                MultiSlotStatus.Locked : MultiSlotStatus.Open;
-            
-            pr.JoinedRoom.Slots[slotId].Team = MultiSlotTeam.NoTeam;
-            
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.LockSlot(pr.JoinedRoom.Slots[slotId]);
         }
 
         [Handler(HandlerTypes.ClientMatchChangeTeam)]
@@ -238,8 +175,7 @@ namespace Sora.Handler
                     break;
             }
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchReady)]
@@ -250,8 +186,7 @@ namespace Sora.Handler
 
             slot.Status = MultiSlotStatus.Ready;
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchNotReady)]
@@ -262,8 +197,7 @@ namespace Sora.Handler
 
             slot.Status = MultiSlotStatus.NotReady;
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchTransferHost)]
@@ -274,10 +208,7 @@ namespace Sora.Handler
             if (slotId > 16) return;
             MultiplayerSlot slot = pr.JoinedRoom.Slots[slotId];
 
-            pr.JoinedRoom.HostId = slot.UserId;
-            
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.SetHost(slot.UserId);
         }
 
         [Handler(HandlerTypes.ClientMatchNoBeatmap)]
@@ -289,8 +220,7 @@ namespace Sora.Handler
 
             slot.Status = MultiSlotStatus.NoMap;
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Update();
         }
 
         [Handler(HandlerTypes.ClientMatchHasBeatmap)]
@@ -302,25 +232,16 @@ namespace Sora.Handler
 
             slot.Status = MultiSlotStatus.NotReady;
 
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Update();
         }
 
         [Handler(HandlerTypes.ClientInvite)]
         public void OnInvite(Presence pr, int userId)
         {
             if (pr.JoinedRoom == null) return;
-            // Took me a while to figure out. i tried osu://mp/matchid/Password.Replace(" ", "_");
-            string inviteUri = $"osump://{pr.JoinedRoom.MatchId}/{pr.JoinedRoom.Password.Replace(" ", "_")}";
-
             Presence opr = LPresences.GetPresence(userId);
-            opr.Write(new Invite(new MessageStruct
-            {
-                ChannelTarget = pr.User.Username,
-                Message = $"\0Hey, I want to play with you! Join me [{inviteUri} {pr.JoinedRoom.Name}]",
-                Username = pr.User.Username,
-                SenderId = pr.User.Id
-            }));
+            if (opr == null) return;
+            pr.JoinedRoom.Invite(opr);
         }
 
         [Handler(HandlerTypes.ClientMatchStart)]
@@ -328,17 +249,7 @@ namespace Sora.Handler
         {
             if (pr.JoinedRoom == null) return;
             if (pr.JoinedRoom.HostId != pr.User.Id) return;
-
-            pr.JoinedRoom.InProgress = true;
-
-            foreach (MultiplayerSlot slot in pr.JoinedRoom.Slots.Where(x => x.UserId != -1 && x.Status != MultiSlotStatus.NoMap)) {
-                slot.Status = MultiSlotStatus.Playing;
-                ++pr.JoinedRoom.NeedLoad;
-            }
-            
-            pr.JoinedRoom.Broadcast(new MatchStart(pr.JoinedRoom));
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.Start();
         }
 
         [Handler(HandlerTypes.ClientMatchLoadComplete)]
@@ -347,12 +258,17 @@ namespace Sora.Handler
             MultiplayerSlot slot = pr.JoinedRoom?.Slots.FirstOrDefault(x => x.UserId == pr.User.Id);
             if (slot == null) return;
             
-            if (--pr.JoinedRoom.NeedLoad == 0)
-                pr.JoinedRoom.Broadcast(new MatchAllPlayersLoaded());
-            
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(pr.JoinedRoom));
-            pr.JoinedRoom.Broadcast(new MatchUpdate(pr.JoinedRoom));
+            pr.JoinedRoom.LoadComplete();
         }
+
+        [Handler(HandlerTypes.ClientMatchScoreUpdate)]
+        public void OnMatchScoreUpdate(Presence pr, ScoreFrame frame)
+        {
+            if (pr.JoinedRoom == null) return;
+            int slot = pr.JoinedRoom.Slots.Where(y => y.UserId == pr.User.Id).Select((x, i) => i).FirstOrDefault();
+            pr.JoinedRoom.Broadcast(new MatchScoreUpdate(slot, frame));
+        }
+        
         #endregion
     }
 }
