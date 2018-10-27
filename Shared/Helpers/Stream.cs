@@ -202,12 +202,12 @@ namespace Shared.Helpers
 
             return packet;
         }
-
-        public T ReadPacketData<T>() where T : IPacket, new()
+        
+        public T ReadData<T>() where T : ISerializer, new()
         {
-            T packet = new T();
-            packet.ReadFromStream(this);
-            return packet;
+            T data = new T();
+            data.ReadFromStream(this);
+            return data;
         }
 
         public byte[] ReadToEnd()

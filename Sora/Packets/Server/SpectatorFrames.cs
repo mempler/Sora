@@ -35,7 +35,9 @@ namespace Sora.Packets.Server
     {
         public PacketId Id => PacketId.ServerSpectateFrames;
 
-        public SpectatorFrame Frames;
+        public SpectatorFrame Frame;
+
+        public SpectatorFrames(SpectatorFrame frames) => Frame = frames;
 
         public void ReadFromStream(MStreamReader sr)
         {
@@ -44,14 +46,7 @@ namespace Sora.Packets.Server
 
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Frames.Extra);
-            sw.Write((short)Frames.ReplayFrames.Count);
-            foreach (ReplayFrame replayFrame in Frames.ReplayFrames)
-            {
-                new ReplayFrames{ Frame = replayFrame }.WriteToStream(sw);
-            }
-            sw.Write(Frames.Action);
-            new ScoreFrames{ Frame = Frames.ScoreFrame }.WriteToStream(sw);
+            sw.Write(Frame);
         }
     }
 }

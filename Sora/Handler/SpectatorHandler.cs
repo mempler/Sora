@@ -89,10 +89,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientSpectateFrames)]
         public void OnBroadcastingFrames(Presence pr, SpectatorFrame frames)
         {
-            pr.Spectator?.Broadcast(new SpectatorFrames
-            {
-                Frames = frames
-            }, pr);
+            pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
         }
     }
 }
