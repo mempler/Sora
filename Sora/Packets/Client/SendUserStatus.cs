@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -36,18 +38,15 @@ namespace Sora.Packets.Client
         public UserStatus Status;
         public PacketId Id => PacketId.ClientSendUserStatus;
 
-        public void ReadFromStream(MStreamReader sr)
+        public void ReadFromStream(MStreamReader sr) => Status = new UserStatus
         {
-            Status = new UserStatus
-            {
-                Status          = (Status) sr.ReadByte(),
-                StatusText      = sr.ReadString(),
-                BeatmapChecksum = sr.ReadString(),
-                CurrentMods     = sr.ReadUInt32(),
-                Playmode        = (PlayMode) sr.ReadByte(),
-                BeatmapId       = sr.ReadUInt32()
-            };
-        }
+            Status = (Status) sr.ReadByte(),
+            StatusText = sr.ReadString(),
+            BeatmapChecksum = sr.ReadString(),
+            CurrentMods = sr.ReadUInt32(),
+            Playmode = (PlayMode) sr.ReadByte(),
+            BeatmapId = sr.ReadUInt32()
+        };
 
         public void WriteToStream(MStreamWriter sw)
         {
@@ -70,9 +69,6 @@ namespace Sora.Packets.Client
         public uint BeatmapId;
 
         public override string ToString()
-        {
-            return
-                $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
-        }
+            => $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
     }
 }

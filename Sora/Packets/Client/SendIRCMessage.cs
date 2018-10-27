@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -36,16 +38,13 @@ namespace Sora.Packets.Client
         public MessageStruct Msg;
         public PacketId Id => PacketId.ClientSendIrcMessage;
 
-        public void ReadFromStream(MStreamReader sr)
+        public void ReadFromStream(MStreamReader sr) => Msg = new MessageStruct
         {
-            Msg = new MessageStruct
-            {
-                Username      = sr.ReadString(),
-                Message       = sr.ReadString(),
-                ChannelTarget = sr.ReadString(),
-                SenderId      = sr.ReadInt32()
-            };
-        }
+            Username = sr.ReadString(),
+            Message = sr.ReadString(),
+            ChannelTarget = sr.ReadString(),
+            SenderId = sr.ReadInt32()
+        };
 
         public void WriteToStream(MStreamWriter sw)
         {

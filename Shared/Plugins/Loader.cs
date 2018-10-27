@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.IO;
@@ -41,7 +43,7 @@ namespace Shared.Plugins
             foreach (string f in Directory.GetFiles("Plugins")) // Press F for File
             {
                 Assembly file = Assembly.LoadFrom(f);
-                Stream   fs   = file.GetManifestResourceStream($"{file.GetName().Name}.plugin.xml");
+                Stream fs = file.GetManifestResourceStream($"{file.GetName().Name}.plugin.xml");
                 if (fs == null) continue;
                 XDocument doc = XDocument.Load(fs);
                 if (doc.Root != null)

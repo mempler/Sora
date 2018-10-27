@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.ComponentModel;
@@ -55,6 +57,6 @@ namespace Shared.Database.Models
         }
 
         // ReSharper disable once UnusedMember.Global
-        public static UserStats GetUserStats(Users user) { return GetUserStats(user.Id); }
+        public static UserStats GetUserStats(Users user) => GetUserStats(user.Id);
     }
 }

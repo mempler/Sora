@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -29,11 +31,5 @@ using System;
 namespace Shared.Enums
 {
     [Flags]
-    public enum Privileges
-    {
-        Default = 1 << 1,
-
-        CModSilence = 1 << 2,
-        Admin = Default | CModSilence
-    }
+    public enum Privileges { Default = 1 << 1, CModSilence = 1 << 2, Admin = Default | CModSilence }
 }

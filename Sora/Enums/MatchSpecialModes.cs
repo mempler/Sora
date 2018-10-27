@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -29,9 +31,5 @@ using System;
 namespace Sora.Enums
 {
     [Flags]
-    public enum MatchSpecialModes : byte
-    {
-        Normal,
-        Freemods
-    }
+    public enum MatchSpecialModes : byte { Normal, Freemods }
 }

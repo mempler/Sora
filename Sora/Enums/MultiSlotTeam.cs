@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,15 +23,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 namespace Sora.Enums
 {
     // Source https://github.com/ppy/osu-api/wiki
-    public enum MultiSlotTeam : byte
-    {
-        NoTeam,
-        Blue,
-        Red
-    }
+    public enum MultiSlotTeam : byte { NoTeam, Blue, Red }
 }

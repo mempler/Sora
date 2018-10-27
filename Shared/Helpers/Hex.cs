@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -35,7 +37,7 @@ namespace Shared.Helpers
         public static byte[] FromHex(string hex)
         {
             hex = hex.Replace("-", "");
-            byte[] raw                                  = new byte[hex.Length / 2];
+            byte[] raw = new byte[hex.Length / 2];
             for (int i = 0; i < raw.Length; i++) raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
 
             return raw;

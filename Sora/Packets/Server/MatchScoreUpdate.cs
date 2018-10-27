@@ -11,22 +11,15 @@ namespace Sora.Packets.Server
 
         public int SlotId;
         public ScoreFrame Frame;
-        
+
         public MatchScoreUpdate(int slotId, ScoreFrame frame)
         {
             Frame = frame;
             SlotId = slotId;
         }
-        
-        public void ReadFromStream(MStreamReader sr)
-        {
-            Frame = sr.ReadData<ScoreFrame>();
-        }
 
-        public void WriteToStream(MStreamWriter sw)
-        {
-            
-            sw.Write(Frame);
-        }
+        public void ReadFromStream(MStreamReader sr) => Frame = sr.ReadData<ScoreFrame>();
+
+        public void WriteToStream(MStreamWriter sw) => sw.Write(Frame);
     }
 }

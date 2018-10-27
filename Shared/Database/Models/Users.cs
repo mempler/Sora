@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.ComponentModel.DataAnnotations;
@@ -40,18 +42,19 @@ namespace Shared.Database.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required] public string Username { get; set; }
+        [Required]
+        public string Username { get; set; }
 
-        [Required] public string Password { get; set; }
+        [Required]
+        public string Password { get; set; }
 
-        [Required] public string Email { get; set; }
+        [Required]
+        public string Email { get; set; }
 
-        [Required] public Privileges Privileges { get; set; } = 0;
+        [Required]
+        public Privileges Privileges { get; set; } = 0;
 
-        public bool IsPassword(string s)
-        {
-            return BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
-        }
+        public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
 
         public static int GetUserId(string username)
         {
@@ -81,17 +84,18 @@ namespace Shared.Database.Models
             }
         }
 
-        public static Users NewUser(string username, string password, string email = "", Privileges privileges = 0,
-                                    bool insert = true)
+        public static Users NewUser(
+            string username, string password, string email = "", Privileges privileges = 0,
+            bool insert = true)
         {
             byte[] md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
 
             string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
             Users u = new Users
             {
-                Username   = username,
-                Password   = bcryptPass,
-                Email      = email,
+                Username = username,
+                Password = bcryptPass,
+                Email = email,
                 Privileges = privileges
             };
             if (insert)
@@ -100,8 +104,8 @@ namespace Shared.Database.Models
             return u;
         }
 
-        public override string ToString() { return $"ID: {Id}, Email: {Email}, Privileges: {Privileges}"; }
+        public override string ToString() => $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
 
-        public bool HasPrivileges(Privileges privileges) { return (Privileges & privileges) != 0; }
+        public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
     }
 }

@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -49,13 +51,15 @@ namespace Sora.Handler
                     channel = LChannels.GetChannel(channelName);
                     break;
             }
+
             if (channel == null)
             {
                 pr.Write(new ChannelRevoked(channelName));
                 return;
             }
+
             channel.LeaveChannel(pr); // leave channel before joining to fix some Issues.
-            
+
             if (channel.JoinChannel(pr))
                 pr.Write(new ChannelJoinSuccess(channel));
 
@@ -78,10 +82,13 @@ namespace Sora.Handler
                     channel = LChannels.GetChannel(channelName);
                     break;
             }
-            if (channel == null) {
+
+            if (channel == null)
+            {
                 pr.Write(new ChannelRevoked(channelName));
                 return;
             }
+
             channel.LeaveChannel(pr);
 
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));

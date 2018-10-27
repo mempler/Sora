@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -50,12 +52,12 @@ namespace Shared.Handlers
 
             MethodInfo[] methods = ass.GetTypes()
                                       .SelectMany(t => t.GetMethods())
-                                      .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
+                                      .Where(m => m.GetCustomAttributes(typeof (HandlerAttribute), false).Length > 0)
                                       .ToArray();
 
             foreach (MethodInfo handler in methods)
             {
-                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0]
+                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof (HandlerAttribute)))[0]
                     .Type;
                 if (!_handlers.ContainsKey(type))
                     _handlers[type] = new List<MethodInfo>();
@@ -72,16 +74,20 @@ namespace Shared.Handlers
             {
                 if (h.IsStatic)
                 {
-                    try { h.Invoke(null, args); }
-                    catch (TargetInvocationException tie) { Logger.L.Error(tie.InnerException); }
+                    try { h.Invoke(null, args); } catch (TargetInvocationException tie)
+                    {
+                        Logger.L.Error(tie.InnerException);
+                    }
 
                     return; // Dont handle it as a non static method. just return.
                 }
 
                 object handlerClass =
                     Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
-                try { h.Invoke(handlerClass, args); }
-                catch (TargetInvocationException tie) { Logger.L.Error(tie.InnerException); }
+                try { h.Invoke(handlerClass, args); } catch (TargetInvocationException tie)
+                {
+                    Logger.L.Error(tie.InnerException);
+                }
             }
         }
     }
@@ -92,6 +98,6 @@ namespace Shared.Handlers
     {
         public readonly HandlerTypes Type;
 
-        public HandlerAttribute(HandlerTypes t) { Type = t; }
+        public HandlerAttribute(HandlerTypes t) => Type = t;
     }
 }

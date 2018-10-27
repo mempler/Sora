@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Database.Models;
@@ -56,14 +58,14 @@ namespace Sora.Handler
                 pr.Write(new ChannelRevoked(message.ChannelTarget));
                 return;
             }
-            
+
             chan.WriteMessage(pr, message.Message);
         }
 
         [Handler(HandlerTypes.ClientSendIrcMessagePrivate)]
         public void HandlePrivateMessage(Presence pr, MessageStruct message)
         {
-            Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));            
+            Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));
             if (opr == null) return;
             Channel chan = opr.PrivateChannel;
 

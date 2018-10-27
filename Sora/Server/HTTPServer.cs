@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -30,7 +32,8 @@ using Amib.Threading;
 
 namespace Sora.Server
 {
-    #region Server
+#region Server
+
     public class HttpServer
     {
         private readonly HttpListener _listener;
@@ -39,11 +42,13 @@ namespace Sora.Server
 
         public HttpServer(string hostname = "localhost", short port = 5001)
         {
-            _running  = false;
+            _running = false;
             _listener = new HttpListener();
             _listener.Prefixes.Add($"http://{hostname}:{port}/");
             _pool = new SmartThreadPool(
-                60, Environment.ProcessorCount * 16 + 1); // 4 * 16 = 64 + 1 for ServerThread (1 core should handle 16 client connections)
+                60,
+                Environment.ProcessorCount * 16 +
+                1); // 4 * 16 = 64 + 1 for ServerThread (1 core should handle 16 client connections)
         }
 
         public void Run()
@@ -76,45 +81,24 @@ namespace Sora.Server
                 HttpListenerContext context = _listener.GetContext();
 
                 context.Response.Headers["cho-protocol"] = "19";
-                context.Response.Headers["Connection"]   = "keep-alive";
-                context.Response.Headers["Keep-Alive"]   = "timeout=60, max=100";
+                context.Response.Headers["Connection"] = "keep-alive";
+                context.Response.Headers["Keep-Alive"] = "timeout=60, max=100";
                 context.Response.Headers["Content-Type"] = "text/html; charset=UTF-8";
-                context.Response.Headers["cho-server"]   = "Sora (https://github.com/Mempler/Sora)";
+                context.Response.Headers["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
 
                 Client client;
                 if (context.Request.UserAgent == "osu!")
                     client = new OsuClient(context.Request, context.Response);
                 else
                     client = new BrowserClient(context.Request, context.Response);
-                
+
                 _pool.QueueWorkItem(client.DoWork);
             }
         }
     }
-    #endregion
+
+#endregion
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*

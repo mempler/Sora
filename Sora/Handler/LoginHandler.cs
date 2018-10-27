@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -73,14 +75,14 @@ namespace Sora.Handler
                     CityResponse data = Localisation.GetData(ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
-                    if (data.Location.Latitude != null) pr.Lat  = (double) data.Location.Latitude;
+                    if (data.Location.Latitude != null) pr.Lat = (double) data.Location.Latitude;
                 }
 
-                pr.LeaderboardStd   = LeaderboardStd.GetLeaderboard(pr.User);
-                pr.LeaderboardRx    = LeaderboardRx.GetLeaderboard(pr.User);
+                pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(pr.User);
+                pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(pr.User);
                 pr.LeaderboardTouch = LeaderboardTouch.GetLeaderboard(pr.User);
 
-                pr.Timezone         = loginData.Timezone;
+                pr.Timezone = loginData.Timezone;
                 pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
                 LPresences.BeginPresence(pr);
@@ -117,22 +119,23 @@ namespace Sora.Handler
                     Exception(dataWriter);
                     return;
                 }
-               
+
                 stream.Broadcast(new PresenceSingle(pr.User.Id));
-                stream.Broadcast(new UserPresence(pr)); 
+                stream.Broadcast(new UserPresence(pr));
                 stream.Broadcast(new HandleUpdate(pr));
                 stream.Join(pr);
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 Logger.L.Error(ex);
                 Exception(dataWriter);
             }
         }
 
-        private static void LoginFailed(MStreamWriter dataWriter) => dataWriter.Write(new LoginResponse(LoginResponses.Failed));
+        private static void LoginFailed(MStreamWriter dataWriter)
+            => dataWriter.Write(new LoginResponse(LoginResponses.Failed));
 
-        private static void Exception(MStreamWriter dataWriter) => dataWriter.Write(new LoginResponse(LoginResponses.Exception));
+        private static void Exception(MStreamWriter dataWriter)
+            => dataWriter.Write(new LoginResponse(LoginResponses.Exception));
 
         private static void Success(MStreamWriter dataWriter, int userid) =>
             dataWriter.Write(new LoginResponse((LoginResponses) userid));

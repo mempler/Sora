@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -33,15 +35,9 @@ namespace Sora.Packets.Server
     public class MatchAllPlayersLoaded : IPacket
     {
         public PacketId Id => PacketId.ServerMatchAllPlayersLoaded;
-        
-        public void ReadFromStream(MStreamReader sr)
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public void WriteToStream(MStreamWriter sw)
-        {
-            
-        }
+        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
+
+        public void WriteToStream(MStreamWriter sw) { }
     }
 }

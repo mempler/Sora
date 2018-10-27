@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -34,11 +36,13 @@ namespace Shared.Helpers
     {
         public MySql MySql = new MySql
             {Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = ""};
+
         public Server Server = new Server {Hostname = "localhost", Port = 5001};
-        
+
         public static Config ReadConfig()
         {
-            if (File.Exists("config.json")) return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+            if (File.Exists("config.json"))
+                return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
             Config cfg = new Config();
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));

@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using NUnit.Framework;
@@ -34,7 +36,8 @@ namespace Shared_Tests.HelperTests
     [TestFixture]
     public class MStreamTests
     {
-        private const string Message = "Foobar";        
+        private const string Message = "Foobar";
+
         [Test]
         public void TestReadIPacket()
         {
@@ -56,13 +59,10 @@ namespace Shared_Tests.HelperTests
         public PacketId Id => PacketId.ServerAnnounce;
 
         public string Message;
-        
+
         public Announce() { }
-        public Announce(string message)
-        {
-            Message = message;
-        }
-        
+        public Announce(string message) => Message = message;
+
         public void ReadFromStream(MStreamReader sr) => Message = sr.ReadString();
 
         public void WriteToStream(MStreamWriter sw) => sw.Write(Message, false);

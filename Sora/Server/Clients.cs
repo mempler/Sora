@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -35,7 +37,7 @@ using Sora.Packets.Server;
 
 namespace Sora.Server
 {
-public abstract class Client
+    public abstract class Client
     {
         protected Client(HttpListenerRequest request, HttpListenerResponse response)
         {
@@ -47,14 +49,13 @@ public abstract class Client
         public HttpListenerResponse Response { get; private set; }
 
 
-       public abstract void DoWork();
+        public abstract void DoWork();
     }
+
     public class BrowserClient : Client
     {
         public BrowserClient(HttpListenerRequest request, HttpListenerResponse response)
-            : base(request, response)
-        {
-        }
+            : base(request, response) { }
 
         public override void DoWork()
         {
@@ -63,12 +64,11 @@ public abstract class Client
             Response.Close();
         }
     }
+
     public class OsuClient : Client
     {
         public OsuClient(HttpListenerRequest request, HttpListenerResponse response)
-            : base(request, response)
-        {
-        }
+            : base(request, response) { }
 
         public override void DoWork()
         {
@@ -80,22 +80,21 @@ public abstract class Client
                 {
                     Request.InputStream.CopyTo(rawReadstream);
                     rawReadstream.Position = 0;
-                    
+
                     Presence pr;
                     try
                     {
                         if (Request.Headers["osu-token"] == null || Request.Headers["osu-token"] == string.Empty)
                         {
-                            pr                               = new Presence();
-                            Response.Headers["cho-token"]    = pr.Token;
-                            string ip                        = Response.Headers["X-Forwarded-For"];
+                            pr = new Presence();
+                            Response.Headers["cho-token"] = pr.Token;
+                            string ip = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
 
                             Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, ip);
                             return;
                         }
-                    }
-                    catch (Exception ex)
+                    } catch (Exception ex)
                     {
                         Logger.L.Error(ex);
                         mw.Write(new LoginResponse(LoginResponses.Exception));
@@ -124,33 +123,30 @@ public abstract class Client
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
                             {
                                 Shared.Handlers.Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
-                                                                        packetDataReader);
+                                    packetDataReader);
                             }
-                        }
-                        catch (Exception ex)
+                        } catch (Exception ex)
                         {
                             Logger.L.Error(ex);
                             break;
                         }
                     }
-                    
-                    try {
+
+                    try
+                    {
                         if (Response.OutputStream.CanWrite)
                             pr.GetOutput()
                               .WriteTo(Response.OutputStream);
                         Response.Close();
-                    } catch {
+                    } catch
+                    {
                         // Ignored because it may throw an exception.
                     }
 
                     if (pr.IsLastRequest)
                         LPresences.EndPresence(pr, true);
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-            }
+            } catch (Exception ex) { Logger.L.Error(ex); }
         }
     }
 }

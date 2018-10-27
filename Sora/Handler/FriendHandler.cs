@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Database.Models;
@@ -34,15 +36,9 @@ namespace Sora.Handler
     public class FriendHandler
     {
         [Handler(HandlerTypes.ClientFriendAdd)]
-        public void OnFriendAdd(Presence pr, int friendId)
-        {
-            Friends.AddFriend(pr.User.Id, friendId);
-        }
+        public void OnFriendAdd(Presence pr, int friendId) => Friends.AddFriend(pr.User.Id, friendId);
 
         [Handler(HandlerTypes.ClientFriendRemove)]
-        public void OnFriendRemove(Presence pr, int friendId)
-        {
-            Friends.RemoveFriend(pr.User.Id, friendId);
-        }
+        public void OnFriendRemove(Presence pr, int friendId) => Friends.RemoveFriend(pr.User.Id, friendId);
     }
 }

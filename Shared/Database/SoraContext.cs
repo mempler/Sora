@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -34,18 +36,16 @@ namespace Shared.Database
 {
     public sealed class SoraContext : DbContext
     {
-        private static readonly bool[] Migrated = { false };
+        private static readonly bool[] Migrated = {false};
 
         public SoraContext()
         {
             if (Migrated[0]) return;
             lock (Migrated)
             {
-                if (!Migrated[0])
-                {
-                    Database.Migrate();
-                    Migrated[0] = true;
-                }
+                if (Migrated[0]) return;
+                Database.Migrate();
+                Migrated[0] = true;
             }
         }
 

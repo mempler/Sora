@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -42,11 +44,13 @@ namespace Shared.Helpers
 
 
         public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
-        
+
         public void Write(ISerializer seri) => seri.WriteToStream(this);
+
         public void Write(IPacket packet)
         {
-            using(MStreamWriter x = New()){
+            using (MStreamWriter x = New())
+            {
                 base.Write((short) packet.Id);
                 base.Write((byte) 0);
                 /* Packet Data */
@@ -89,14 +93,14 @@ namespace Shared.Helpers
 
         public void Write(List<int> list)
         {
-            short count = (short)list.Count;
+            short count = (short) list.Count;
             Write(count);
             for (int i = 0; i < count; i++) Write(list[i]);
         }
 
-        public void WriteRawBuffer(byte[] buff) { base.Write(buff); }
+        public void WriteRawBuffer(byte[] buff) => base.Write(buff);
 
-        public void WriteRawString(string value) { WriteRawBuffer(Encoding.UTF8.GetBytes(value)); }
+        public void WriteRawString(string value) => WriteRawBuffer(Encoding.UTF8.GetBytes(value));
 
         public void WriteObject(object obj)
         {
@@ -151,14 +155,14 @@ namespace Shared.Helpers
                         BinaryFormatter b = new BinaryFormatter
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat     = FormatterTypeStyle.TypesWhenNeeded
+                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
                         };
                         b.Serialize(BaseStream, obj);
                         break;
                 }
         }
 
-        public byte[] ToArray() { return ((MemoryStream) BaseStream).ToArray(); }
+        public byte[] ToArray() => ((MemoryStream) BaseStream).ToArray();
     }
 
     public class MStreamReader : BinaryReader
@@ -166,9 +170,7 @@ namespace Shared.Helpers
         public MStreamReader(Stream s) : base(s, Encoding.UTF8) { }
 
         public override string ReadString()
-        {
-            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
-        }
+            => (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
 
         public byte[] ReadBytes()
         {
@@ -202,7 +204,7 @@ namespace Shared.Helpers
 
             return packet;
         }
-        
+
         public T ReadData<T>() where T : ISerializer, new()
         {
             T data = new T();
@@ -213,10 +215,7 @@ namespace Shared.Helpers
         public byte[] ReadToEnd()
         {
             List<byte> x = new List<byte>();
-            while (BaseStream.Position != BaseStream.Length)
-            {
-                x.Add(ReadByte());
-            }
+            while (BaseStream.Position != BaseStream.Length) { x.Add(ReadByte()); }
 
             return x.ToArray();
         }

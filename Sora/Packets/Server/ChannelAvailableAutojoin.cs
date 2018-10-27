@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -35,15 +37,12 @@ namespace Sora.Packets.Server
     {
         public Channel Channel;
 
-        public ChannelAvailableAutojoin(Channel channel) { Channel = channel; }
+        public ChannelAvailableAutojoin(Channel channel) => Channel = channel;
 
         public PacketId Id => PacketId.ServerChannelAvailableAutojoin;
 
-        public void ReadFromStream(MStreamReader sr)
-        {
-            Channel = new Channel(sr.ReadString(), sr.ReadString())
-                { UserCount = sr.ReadInt32() };
-        }
+        public void ReadFromStream(MStreamReader sr) => Channel = new Channel(sr.ReadString(), sr.ReadString())
+            {UserCount = sr.ReadInt32()};
 
         public void WriteToStream(MStreamWriter sw)
         {

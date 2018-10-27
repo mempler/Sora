@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -46,7 +48,7 @@ namespace Sora.Handler
                 opr.Spectator.Join(opr);
                 opr.Write(new ChannelJoinSuccess(opr.Spectator.SpecChannel));
             }
-            
+
             pr.Spectator = opr.Spectator;
 
             opr.Spectator.Join(pr);
@@ -62,18 +64,18 @@ namespace Sora.Handler
         {
             if (pr?.Spectator == null) return;
             Presence opr = pr.Spectator.BoundPresence;
-            
+
             opr.Write(new FellowSpectatorLeft(pr.User.Id));
             opr.Spectator.Broadcast(new SpectatorLeft(pr.User.Id));
-            
+
             opr.Spectator.Left(pr);
             opr.Spectator.SpecChannel.LeaveChannel(pr);
             pr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
-            
+
             pr.Spectator = null;
-            
+
             if (opr.Spectator.JoinedUsers > 0) return;
-            
+
             opr.Spectator.Left(opr);
             opr.Spectator.SpecChannel.LeaveChannel(opr);
             opr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
@@ -81,15 +83,10 @@ namespace Sora.Handler
         }
 
         [Handler(HandlerTypes.ClientCantSpectate)]
-        public void OnUserCantSpectate(Presence pr)
-        {
-            pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
-        } 
+        public void OnUserCantSpectate(Presence pr) => pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
 
         [Handler(HandlerTypes.ClientSpectateFrames)]
         public void OnBroadcastingFrames(Presence pr, SpectatorFrame frames)
-        {
-            pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
-        }
+            => pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
     }
 }

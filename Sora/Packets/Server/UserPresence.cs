@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -34,13 +36,13 @@ namespace Sora.Packets.Server
 {
     public class UserPresence : IPacket
     {
-        public readonly Presence Presence;
-
-        public UserPresence(Presence pr) { Presence = pr; }
-
         public PacketId Id => PacketId.ServerUserPresence;
 
-        public void ReadFromStream(MStreamReader sr) { }
+        public readonly Presence Presence;
+
+        public UserPresence(Presence pr) => Presence = pr;
+
+        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
 
         public void WriteToStream(MStreamWriter sw)
         {

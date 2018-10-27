@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -47,13 +49,13 @@ namespace Sora.Objects
 
             AddChannel(new Channel("#osu", "Osu! default channel.", LPacketStreams.GetStream("main"), autoJoin: true));
             AddChannel(new Channel("#announce", "Osu! default channel.", LPacketStreams.GetStream("main"),
-                                   readOnly: true,
-                                   autoJoin: true));
+                readOnly: true,
+                autoJoin: true));
             AddChannel(new Channel("#userlog", "Osu! default channel.", LPacketStreams.GetStream("main"),
-                                   readOnly: true));
+                readOnly: true));
             AddChannel(new Channel("#lobby", "Osu! default channel", LPacketStreams.GetStream("main")));
             AddChannel(new Channel("#admin", "Admin. is an administration channel.", LPacketStreams.GetStream("admin"),
-                                   adminOnly: true, autoJoin: true));
+                adminOnly: true, autoJoin: true));
         }
 
         public static void AddChannel(Channel channel)
@@ -92,17 +94,18 @@ namespace Sora.Objects
 
         private int _userCount = -1;
 
-        public Channel(string channelName, string channelTopic = "",
-                       PacketStream boundStream = null, Presence boundPresence = null,
-                       bool readOnly = false, bool adminOnly = false, bool autoJoin = false)
+        public Channel(
+            string channelName, string channelTopic = "",
+            PacketStream boundStream = null, Presence boundPresence = null,
+            bool readOnly = false, bool adminOnly = false, bool autoJoin = false)
         {
-            ChannelName   = channelName;
-            ChannelTopic  = channelTopic;
-            BoundStream   = boundStream;
+            ChannelName = channelName;
+            ChannelTopic = channelTopic;
+            BoundStream = boundStream;
             BoundPresence = boundPresence;
-            ReadOnly      = readOnly;
-            AdminOnly     = adminOnly;
-            AutoJoin      = autoJoin;
+            ReadOnly = readOnly;
+            AdminOnly = adminOnly;
+            AutoJoin = autoJoin;
         }
 
         public string ChannelName { get; }
@@ -156,8 +159,7 @@ namespace Sora.Objects
             try
             {
                 lock (_presences) { _presences.Remove(pr); }
-            }
-            catch
+            } catch
             {
                 // Ignored
             }
@@ -172,31 +174,28 @@ namespace Sora.Objects
                     new SendIrcMessage(
                         new MessageStruct
                         {
-                            Username      = pr.User.Username,
+                            Username = pr.User.Username,
                             ChannelTarget = pr.User.Username,
-                            Message       = message,
-                            SenderId      = pr.User.Id
+                            Message = message,
+                            SenderId = pr.User.Id
                         })
                 );
                 return;
             }
-            
+
             BoundStream?.Broadcast(
                 new SendIrcMessage(
                     new MessageStruct
                     {
-                        Username      = pr.User.Username,
+                        Username = pr.User.Username,
                         ChannelTarget = ChannelName,
-                        Message       = message,
-                        SenderId      = pr.User.Id
+                        Message = message,
+                        SenderId = pr.User.Id
                     }
                 ), pr);
         }
 
         public override string ToString()
-        {
-            return
-                $"Channel: {ChannelName} ChannelTopic: {ChannelTopic} BoundStream: {BoundStream?.StreamName} ChannelOwner: {BoundPresence?.User?.Username}";
-        }
+            => $"Channel: {ChannelName} ChannelTopic: {ChannelTopic} BoundStream: {BoundStream?.StreamName} ChannelOwner: {BoundPresence?.User?.Username}";
     }
 }

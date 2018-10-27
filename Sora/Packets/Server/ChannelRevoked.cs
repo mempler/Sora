@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -35,14 +37,14 @@ namespace Sora.Packets.Server
     {
         public Channel Channel;
 
-        public ChannelRevoked(Channel channel) { Channel = channel; }
+        public ChannelRevoked(Channel channel) => Channel = channel;
 
-        public ChannelRevoked(string channel) { Channel = new Channel(channel); }
+        public ChannelRevoked(string channel) => Channel = new Channel(channel);
 
         public PacketId Id => PacketId.ServerChannelRevoked;
 
-        public void ReadFromStream(MStreamReader sr) { Channel = new Channel(sr.ReadString()); }
+        public void ReadFromStream(MStreamReader sr) => Channel = new Channel(sr.ReadString());
 
-        public void WriteToStream(MStreamWriter sw) { sw.Write(Channel.ChannelName); }
+        public void WriteToStream(MStreamWriter sw) => sw.Write(Channel.ChannelName);
     }
 }

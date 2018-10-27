@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -37,8 +39,8 @@ namespace Sora.Packets.Client
         public PacketId Id => PacketId.ClientExit;
 
 
-        public void ReadFromStream(MStreamReader sr) { ErrorState = (ErrorStates) sr.ReadInt32(); }
+        public void ReadFromStream(MStreamReader sr) => ErrorState = (ErrorStates) sr.ReadInt32();
 
-        public void WriteToStream(MStreamWriter sw) { sw.Write((int) ErrorState); }
+        public void WriteToStream(MStreamWriter sw) => sw.Write((int) ErrorState);
     }
 }

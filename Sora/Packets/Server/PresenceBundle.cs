@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -35,12 +37,12 @@ namespace Sora.Packets.Server
     {
         public List<int> UserIds;
 
-        public PresenceBundle(List<int> userIds) { UserIds = userIds; }
+        public PresenceBundle(List<int> userIds) => UserIds = userIds;
 
         public PacketId Id => PacketId.ServerUserPresenceBundle;
 
-        public void ReadFromStream(MStreamReader sr) { UserIds = sr.ReadInt32List(); }
+        public void ReadFromStream(MStreamReader sr) => UserIds = sr.ReadInt32List();
 
-        public void WriteToStream(MStreamWriter sw) { sw.Write(UserIds); }
+        public void WriteToStream(MStreamWriter sw) => sw.Write(UserIds);
     }
 }

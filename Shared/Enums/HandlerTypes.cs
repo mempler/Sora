@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,63 +23,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 namespace Shared.Enums
 {
     public enum HandlerTypes
     {
-        Initializer,
-        PacketHandler,
-        LoginHandler,
-        ClientSendUserStatus,
-        ClientSendIrcMessage,
-        ClientExit,
-        ClientRequestStatusUpdate,
-        ClientPong,
-        ClientStartSpectating,
-        ClientStopSpectating,
-        ClientSpectateFrames,
-        ClientErrorReport,
-        ClientCantSpectate,
-        ClientSendIrcMessagePrivate,
-        ClientLobbyPart,
-        ClientLobbyJoin,
-        ClientMatchCreate,
-        ClientMatchJoin,
-        ClientMatchPart,
-        ClientMatchChangeSlot,
-        ClientMatchReady,
-        ClientMatchLock,
-        ClientMatchChangeSettings,
-        ClientMatchStart,
-        ClientMatchScoreUpdate,
-        ClientMatchComplete,
-        ClientMatchChangeMods,
-        ClientMatchLoadComplete,
-        ClientMatchNoBeatmap,
-        ClientMatchNotReady,
-        ClientMatchFailed,
-        ClientMatchHasBeatmap,
-        ClientMatchSkipRequest,
-        ClientChannelJoin,
-        ClientBeatmapInfoRequest,
-        ClientMatchTransferHost,
-        ClientFriendAdd,
-        ClientFriendRemove,
-        ClientMatchChangeTeam,
-        ClientChannelLeave,
-        ClientReceiveUpdates,
-        ClientSetIrcAwayMessage,
-        ClientUserStatsRequest,
-        ClientInvite,
-        ClientMatchChangePassword,
-        ClientSpecialMatchInfoRequest,
-        ClientUserPresenceRequest,
-        ClientUserPresenceRequestAll,
-        ClientUserToggleBlockNonFriendPm,
-        ClientMatchAbort,
-        ClientSpecialJoinMatchChannel,
+        Initializer, PacketHandler, LoginHandler,
+        ClientSendUserStatus, ClientSendIrcMessage, ClientExit,
+        ClientRequestStatusUpdate, ClientPong, ClientStartSpectating,
+        ClientStopSpectating, ClientSpectateFrames, ClientErrorReport,
+        ClientCantSpectate, ClientSendIrcMessagePrivate, ClientLobbyPart,
+        ClientLobbyJoin, ClientMatchCreate, ClientMatchJoin,
+        ClientMatchPart, ClientMatchChangeSlot, ClientMatchReady,
+        ClientMatchLock, ClientMatchChangeSettings, ClientMatchStart,
+        ClientMatchScoreUpdate, ClientMatchComplete, ClientMatchChangeMods,
+        ClientMatchLoadComplete, ClientMatchNoBeatmap, ClientMatchNotReady,
+        ClientMatchFailed, ClientMatchHasBeatmap, ClientMatchSkipRequest,
+        ClientChannelJoin, ClientBeatmapInfoRequest, ClientMatchTransferHost,
+        ClientFriendAdd, ClientFriendRemove, ClientMatchChangeTeam,
+        ClientChannelLeave, ClientReceiveUpdates, ClientSetIrcAwayMessage,
+        ClientUserStatsRequest, ClientInvite, ClientMatchChangePassword,
+        ClientSpecialMatchInfoRequest, ClientUserPresenceRequest, ClientUserPresenceRequestAll,
+        ClientUserToggleBlockNonFriendPm, ClientMatchAbort, ClientSpecialJoinMatchChannel,
         ClientSpecialLeaveMatchChannel
     }
 }

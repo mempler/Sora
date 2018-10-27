@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -36,12 +38,9 @@ namespace ExamplePlugin
     {
         // Let the Handler loader know that this is an LoginHandler
         [Handler(HandlerTypes.LoginHandler)]
-        public void SomeLoginHandler(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string ip) // a Login handler need those args.
-        {
-            // Write an Announce Packet to client.
-            dataWriter.Write(new Announce("Hello World!"));
-
-            // Done, you've successfully send an Hello World Packet!
-        }
+        public void SomeLoginHandler(
+            Presence pr, MStreamWriter dataWriter, MStreamReader dataReader,
+            string ip) // a Login handler need those args.
+            => dataWriter.Write(new Announce("Hello World!"));
     }
 }

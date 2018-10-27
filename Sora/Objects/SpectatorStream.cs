@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 namespace Sora.Objects
@@ -30,7 +32,7 @@ namespace Sora.Objects
     {
         public Presence BoundPresence;
         public Channel SpecChannel;
-        
+
         public SpectatorStream(string name, Presence boundPresence) : base(name)
         {
             SpecChannel = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);

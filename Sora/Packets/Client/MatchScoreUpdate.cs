@@ -9,15 +9,9 @@ namespace Sora.Packets.Client
         public PacketId Id => PacketId.ClientMatchScoreUpdate;
 
         public ScoreFrame Frame;
-        
-        public void ReadFromStream(MStreamReader sr)
-        {
-            Frame = sr.ReadData<ScoreFrame>();
-        }
 
-        public void WriteToStream(MStreamWriter sw)
-        {
-            throw new System.NotImplementedException();
-        }
+        public void ReadFromStream(MStreamReader sr) => Frame = sr.ReadData<ScoreFrame>();
+
+        public void WriteToStream(MStreamWriter sw) => throw new System.NotImplementedException();
     }
 }

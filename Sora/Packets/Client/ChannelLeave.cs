@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Shared.Enums;
@@ -35,8 +37,8 @@ namespace Sora.Packets.Client
         public string ChannelName;
         public PacketId Id => PacketId.ClientChannelJoin;
 
-        public void ReadFromStream(MStreamReader sr) { ChannelName = sr.ReadString(); }
+        public void ReadFromStream(MStreamReader sr) => ChannelName = sr.ReadString();
 
-        public void WriteToStream(MStreamWriter sw) { sw.Write(ChannelName); }
+        public void WriteToStream(MStreamWriter sw) => sw.Write(ChannelName);
     }
 }

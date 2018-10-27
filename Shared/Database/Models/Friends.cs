@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -39,14 +41,17 @@ namespace Shared.Database.Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        
-        [Required] public int UserId { get; set; }
 
-        [Required] [UsedImplicitly] public int FriendId { get; set; }
+        [Required]
+        public int UserId { get; set; }
+
+        [Required]
+        [UsedImplicitly]
+        public int FriendId { get; set; }
 
         public static IEnumerable<int> GetFriends(int userId)
         {
-            using (SoraContext db = new SoraContext()) 
+            using (SoraContext db = new SoraContext())
                 return db.Friends.Where(t => t.UserId == userId).Select(x => x.FriendId).ToList();
         }
 
@@ -56,13 +61,13 @@ namespace Shared.Database.Models
             {
                 db.Friends.Add(new Friends
                 {
-                    UserId   = userId,
+                    UserId = userId,
                     FriendId = friendId
                 });
                 db.SaveChanges();
             }
         }
-        
+
         public static void RemoveFriend(int userId, int friendId)
         {
             using (SoraContext db = new SoraContext())

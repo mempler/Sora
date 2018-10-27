@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -44,17 +46,16 @@ namespace Sora.Objects
     {
         private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
 
-        public static Presence GetPresence(string token)
-        {
-            return Presences.TryGetValue(token, out Presence pr) ? pr : null;
-        }
+        public static Presence GetPresence(string token) => Presences.TryGetValue(token, out Presence pr) ? pr : null;
 
         public static Presence GetPresence(int userid)
         {
-            foreach (KeyValuePair<string, Presence> presence in Presences) {
+            foreach (KeyValuePair<string, Presence> presence in Presences)
+            {
                 if (presence.Value.User.Id == userid)
                     return presence.Value;
             }
+
             return null;
         }
 
@@ -91,14 +92,14 @@ namespace Sora.Objects
                 pr.Stream.Close();
                 pr.LastRequest.Stop();
                 LChannels.RemoveChannel(pr.PrivateChannel);
-                
+
                 foreach (PacketStream str in pr.JoinedStreams)
                     str.Left(pr);
-                
+
                 Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
                 Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, pr);
                 Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, pr);
-                
+
                 Presences.Remove(pr.Token);
                 return;
             }
@@ -106,28 +107,24 @@ namespace Sora.Objects
             pr.IsLastRequest = true;
         }
 
-        public static void TimeoutCheck()
+        public static void TimeoutCheck() => new Thread(() =>
         {
-            new Thread(() =>
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
-                    {
-                        foreach (KeyValuePair<string, Presence> pr in Presences)
-                            pr.Value.TimeoutCheck();
+                    foreach (KeyValuePair<string, Presence> pr in Presences)
+                        pr.Value.TimeoutCheck();
 
-                        if (Presences == null) break;
-                    }
-                    catch
-                    {
-                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
-                    }
-
-                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
+                    if (Presences == null) break;
+                } catch
+                {
+                    // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
                 }
-            }).Start();
-        }
+
+                Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
+            }
+        }).Start();
     }
 
     public class Presence : IComparable
@@ -153,22 +150,22 @@ namespace Sora.Objects
         public LeaderboardTouch LeaderboardTouch;
         public double Lon;
 
-        public bool Relax;
-
         public UserStatus
-            Status = new UserStatus { BeatmapChecksum = "", StatusText = "" }; // Predefined strings to prevent Issues.
+            Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.
 
         public MStreamWriter Stream;
         public byte Timezone;
 
+        public bool Relax;
         public bool Touch;
 
         public Users User;
         public SpectatorStream Spectator;
         public MultiplayerRoom JoinedRoom;
-    
+
         public string Token { get; }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Global
         public uint Rank => 0;
 
         public Channel PrivateChannel => LChannels.GetChannel(User.Username);
@@ -176,25 +173,25 @@ namespace Sora.Objects
         public Presence()
         {
             LastRequest = new Stopwatch();
-            Token       = Guid.NewGuid().ToString();
+            Token = Guid.NewGuid().ToString();
             MemoryStream str = new MemoryStream();
             Stream = new MStreamWriter(str);
         }
-        
+
         public int CompareTo(object obj)
         {
-            if (obj.GetType() != typeof(Presence)) return -1;
+            if (obj.GetType() != typeof (Presence)) return -1;
             if (!(obj is Presence pr)) return -1;
             return pr.Token == Token ? 0 : 1;
         }
 
-        protected bool Equals(Presence pr) { return Token == pr.Token; }
+        protected bool Equals(Presence pr) => Token == pr.Token;
 
         public MemoryStream GetOutput(bool reset = true)
         {
             MemoryStream copy = new MemoryStream();
-            long         pos  = Stream.BaseStream.Position;
-            
+            long pos = Stream.BaseStream.Position;
+
             Stream.BaseStream.Position = 0;
             Stream.BaseStream.CopyTo(copy);
             Stream.BaseStream.Position = pos;

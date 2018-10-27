@@ -1,4 +1,5 @@
 #region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -39,7 +41,8 @@ namespace Sora.Handler
 {
     public class MultiplayerHandler
     {
-        #region Lobby
+    #region Lobby
+
         [Handler(HandlerTypes.ClientLobbyJoin)]
         public void OnLobbyJoin(Presence pr)
         {
@@ -47,29 +50,28 @@ namespace Sora.Handler
             IEnumerable<MultiplayerRoom> rooms = MultiplayerLobby.GetRooms();
             foreach (MultiplayerRoom room in rooms)
                 pr.Write(new MatchNew(room));
-            
+
             lobbyStream.Join(pr);
         }
-        
-        [Handler(HandlerTypes.ClientLobbyPart)]
-        public void OnLobbyLeft(Presence pr)
-        {
-            LPacketStreams.GetStream("lobby").Left(pr);
-        }
-        #endregion
 
-        #region Match
+        [Handler(HandlerTypes.ClientLobbyPart)]
+        public void OnLobbyLeft(Presence pr) => LPacketStreams.GetStream("lobby").Left(pr);
+
+    #endregion
+
+    #region Match
+
         [Handler(HandlerTypes.ClientMatchCreate)]
         public void OnMatchCreate(Presence pr, MultiplayerRoom room)
         {
             room.Password = room.Password.Replace(" ", "_");
             MultiplayerLobby.Add(room);
-            
+
             if (room.Join(pr, room.Password))
                 pr.Write(new MatchJoinSuccess(room));
             else
                 pr.Write(new MatchJoinFail());
-            
+
             room.Update();
         }
 
@@ -77,18 +79,18 @@ namespace Sora.Handler
         public void OnMatchLeave(Presence pr)
         {
             if (pr.JoinedRoom == null) return;
-            
+
             MultiplayerRoom room = pr.JoinedRoom;
             room.Leave(pr);
             if (room.HostId == pr.User.Id)
                 room.SetRandomHost();
-            
+
             if (room.HostId != -1)
             {
                 room.Update();
                 return;
             }
-            
+
             room.Dispand();
         }
 
@@ -111,7 +113,7 @@ namespace Sora.Handler
             if (slotId > 16) return;
             MultiplayerSlot newSlot = pr.JoinedRoom.Slots[slotId];
             if (newSlot.UserId != -1) return;
-            
+
             MultiplayerSlot oldSlot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
 
             pr.JoinedRoom.SetSlot(newSlot, oldSlot);
@@ -125,7 +127,7 @@ namespace Sora.Handler
             if (slot == null) return;
             pr.JoinedRoom.SetMods(mods, slot);
         }
-        
+
         [Handler(HandlerTypes.ClientMatchChangeSettings)]
         public void OnMatchChangeSettings(Presence pr, MultiplayerRoom room)
         {
@@ -143,13 +145,13 @@ namespace Sora.Handler
 
             pr.JoinedRoom.SetPassword(room.Password);
         }
-        
+
         [Handler(HandlerTypes.ClientMatchLock)]
         public void OnMatchLock(Presence pr, int slotId)
         {
             if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id) return;
             if (slotId > 16) return;
-            
+
             pr.JoinedRoom.LockSlot(pr.JoinedRoom.Slots[slotId]);
         }
 
@@ -257,7 +259,7 @@ namespace Sora.Handler
         {
             MultiplayerSlot slot = pr.JoinedRoom?.Slots.FirstOrDefault(x => x.UserId == pr.User.Id);
             if (slot == null) return;
-            
+
             pr.JoinedRoom.LoadComplete();
         }
 
@@ -268,7 +270,7 @@ namespace Sora.Handler
             int slot = pr.JoinedRoom.Slots.Where(y => y.UserId == pr.User.Id).Select((x, i) => i).FirstOrDefault();
             pr.JoinedRoom.Broadcast(new MatchScoreUpdate(slot, frame));
         }
-        
-        #endregion
+
+    #endregion
     }
 }

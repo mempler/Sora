@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -31,27 +33,18 @@ namespace Shared.Migrations
 {
     public partial class LetsbeFriends : Migration
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
-                "Friends",
-                table => new
-                {
-                    Id = table.Column<int>()
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<int>(),
-                    FriendId = table.Column<int>()
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Friends", x => x.Id);
-                });
-        }
+        protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
+            "Friends",
+            table => new
+            {
+                Id = table.Column<int>()
+                          .Annotation("MySql:ValueGenerationStrategy",
+                              MySqlValueGenerationStrategy.IdentityColumn),
+                UserId = table.Column<int>(),
+                FriendId = table.Column<int>()
+            },
+            constraints: table => { table.PrimaryKey("PK_Friends", x => x.Id); });
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "Friends");
-        }
+        protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("Friends");
     }
 }

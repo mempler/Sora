@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 /*
 MIT License
 
@@ -22,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 #endregion
 
 using System;
@@ -49,7 +51,7 @@ namespace Shared.Helpers
             using (WebResponse response = request.GetResponse())
             {
                 Stream maxMindTarGz = response.GetResponseStream();
-                Stream gzipStream   = new GZipInputStream(maxMindTarGz);
+                Stream gzipStream = new GZipInputStream(maxMindTarGz);
 
                 TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
                 tarArchive.ExtractContents("geoip");
@@ -74,12 +76,12 @@ namespace Shared.Helpers
 
         public static CountryIds StringToCountryId(string x)
         {
-            if (Enum.TryParse(typeof(CountryIds), x, true, out object o))
+            if (Enum.TryParse(typeof (CountryIds), x, true, out object o))
                 return (CountryIds) o;
             return CountryIds.BL;
         }
 
         // ReSharper disable once UnusedMember.Global
-        public static string CountryIdToString(CountryIds x) { return x.ToString(); }
+        public static string CountryIdToString(CountryIds x) => x.ToString();
     }
 }
