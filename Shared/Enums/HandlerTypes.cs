@@ -30,23 +30,23 @@ namespace Shared.Enums
 {
     public enum HandlerTypes
     {
-        Initializer, PacketHandler, LoginHandler,
-        ClientSendUserStatus, ClientSendIrcMessage, ClientExit,
-        ClientRequestStatusUpdate, ClientPong, ClientStartSpectating,
-        ClientStopSpectating, ClientSpectateFrames, ClientErrorReport,
-        ClientCantSpectate, ClientSendIrcMessagePrivate, ClientLobbyPart,
-        ClientLobbyJoin, ClientMatchCreate, ClientMatchJoin,
-        ClientMatchPart, ClientMatchChangeSlot, ClientMatchReady,
-        ClientMatchLock, ClientMatchChangeSettings, ClientMatchStart,
-        ClientMatchScoreUpdate, ClientMatchComplete, ClientMatchChangeMods,
-        ClientMatchLoadComplete, ClientMatchNoBeatmap, ClientMatchNotReady,
-        ClientMatchFailed, ClientMatchHasBeatmap, ClientMatchSkipRequest,
-        ClientChannelJoin, ClientBeatmapInfoRequest, ClientMatchTransferHost,
-        ClientFriendAdd, ClientFriendRemove, ClientMatchChangeTeam,
-        ClientChannelLeave, ClientReceiveUpdates, ClientSetIrcAwayMessage,
-        ClientUserStatsRequest, ClientInvite, ClientMatchChangePassword,
-        ClientSpecialMatchInfoRequest, ClientUserPresenceRequest, ClientUserPresenceRequestAll,
-        ClientUserToggleBlockNonFriendPm, ClientMatchAbort, ClientSpecialJoinMatchChannel,
-        ClientSpecialLeaveMatchChannel
+        Initializer, BanchoPacketHandler, BanchoLoginHandler,
+        BanchoSendUserStatus, BanchoSendIrcMessage, BanchoExit,
+        BanchoRequestStatusUpdate, BanchoPong, BanchoStartSpectating,
+        BanchoStopSpectating, BanchoSpectateFrames, BanchoErrorReport,
+        BanchoCantSpectate, BanchoSendIrcMessagePrivate, BanchoLobbyPart,
+        BanchoLobbyJoin, BanchoMatchCreate, BanchoMatchJoin,
+        BanchoMatchPart, BanchoMatchChangeSlot, BanchoMatchReady,
+        BanchoMatchLock, BanchoMatchChangeSettings, BanchoMatchStart,
+        BanchoMatchScoreUpdate, BanchoMatchComplete, BanchoMatchChangeMods,
+        BanchoMatchLoadComplete, BanchoMatchNoBeatmap, BanchoMatchNotReady,
+        BanchoMatchFailed, BanchoMatchHasBeatmap, BanchoMatchSkipRequest,
+        BanchoChannelJoin, BanchoBeatmapInfoRequest, BanchoMatchTransferHost,
+        BanchoFriendAdd, BanchoFriendRemove, BanchoMatchChangeTeam,
+        BanchoChannelLeave, BanchoReceiveUpdates, BanchoSetIrcAwayMessage,
+        BanchoUserStatsRequest, BanchoInvite, BanchoMatchChangePassword,
+        BanchoSpecialMatchInfoRequest, BanchoUserPresenceRequest, BanchoUserPresenceRequestAll,
+        BanchoUserToggleBlockNonFriendPm, BanchoMatchAbort, BanchoSpecialJoinMatchChannel,
+        BanchoSpecialLeaveMatchChannel
     }
 }

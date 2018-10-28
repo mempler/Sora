@@ -37,7 +37,7 @@ namespace Sora.Handler
 
     public class SpectatorHandler
     {
-        [Handler(HandlerTypes.ClientStartSpectating)]
+        [Handler(HandlerTypes.BanchoStartSpectating)]
         public void OnStartSpectating(Presence pr, int userId)
         {
             Presence opr = LPresences.GetPresence(userId);
@@ -59,7 +59,7 @@ namespace Sora.Handler
             opr.Write(new SpectatorJoined(pr.User.Id));
         }
 
-        [Handler(HandlerTypes.ClientStopSpectating)]
+        [Handler(HandlerTypes.BanchoStopSpectating)]
         public void OnStopSpectating(Presence pr)
         {
             if (pr?.Spectator == null) return;
@@ -82,10 +82,10 @@ namespace Sora.Handler
             opr.Spectator = null;
         }
 
-        [Handler(HandlerTypes.ClientCantSpectate)]
+        [Handler(HandlerTypes.BanchoCantSpectate)]
         public void OnUserCantSpectate(Presence pr) => pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
 
-        [Handler(HandlerTypes.ClientSpectateFrames)]
+        [Handler(HandlerTypes.BanchoSpectateFrames)]
         public void OnBroadcastingFrames(Presence pr, SpectatorFrame frames)
             => pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
     }

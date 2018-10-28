@@ -34,7 +34,7 @@ namespace Sora.Handler
 
     public class ReceiveUpdates
     {
-        [Handler(HandlerTypes.ClientReceiveUpdates)]
+        [Handler(HandlerTypes.BanchoReceiveUpdates)]
         public void OnReceiveUpdates(Presence pr, int userId)
         {
             // Idk for what this packet is ^^

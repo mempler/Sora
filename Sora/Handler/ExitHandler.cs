@@ -36,7 +36,7 @@ namespace Sora.Handler
 
     public class ExitHandler
     {
-        [Handler(HandlerTypes.ClientExit)]
+        [Handler(HandlerTypes.BanchoExit)]
         public void OnExit(Presence pr, ErrorStates err)
         {
             LPresences.EndPresence(pr, true);

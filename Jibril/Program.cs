@@ -28,12 +28,53 @@ SOFTWARE.
 
 namespace Jibril
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection;
+    using Server;
+    using Shared.Database;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+    using Shared.Plugins;
+
     internal static class Program
     {
+        private static HttpServer _server;
+        
+        private static void Initialize()
+        {
+            try
+            {
+                Logger.L.Info("Start Initalization");
+                Stopwatch watch = Stopwatch.StartNew();
+                Config conf = Config.ReadConfig(5002);
+                _server = new HttpServer(conf.Server.Hostname, conf.Server.Port);
+                using (new SoraContext()) { } // Initialize Database. (Migrate database)
+
+                AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
+                {
+                    Logger.L.Error(ex);
+                    Logger.L.Error(e);
+                };
+
+                Loader.LoadPlugins();
+                Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
+                Handlers.ExecuteHandler(HandlerTypes.Initializer);
+
+                watch.Stop();
+                Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
+            } catch (Exception ex)
+            {
+                Logger.L.Error(ex);
+            }
+        }
+
+        [STAThread]
         private static void Main()
         {
-            // TODO: PUT CODE HERE.
-            // This is gonna be the /web/ server aka Private API
+            Initialize();
+            _server.Run();
         }
     }
 }

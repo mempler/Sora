@@ -35,7 +35,7 @@ namespace Sora.Handler
 
     public class PongHandler
     {
-        [Handler(HandlerTypes.ClientPong)]
+        [Handler(HandlerTypes.BanchoPong)]
         public void OnPong(Presence pr)
         {
             if (pr.Spectator == null || pr.Spectator?.BoundPresence == pr) return;

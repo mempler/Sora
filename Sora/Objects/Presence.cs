@@ -88,9 +88,9 @@ namespace Sora.Objects
                 foreach (PacketStream str in pr.JoinedStreams)
                     str.Left(pr);
 
-                Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
-                Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, pr);
-                Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, pr);
+                Handlers.ExecuteHandler(HandlerTypes.BanchoStopSpectating, pr);
+                Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, pr);
+                Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, pr);
 
                 Presences.Remove(pr.Token);
                 return;
@@ -201,9 +201,9 @@ namespace Sora.Objects
         public void TimeoutCheck()
         {
             if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
-            Handlers.ExecuteHandler(HandlerTypes.ClientExit, this, ErrorStates.Ok);
-            Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, this);
-            Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, this);
+            Handlers.ExecuteHandler(HandlerTypes.BanchoExit, this, ErrorStates.Ok);
+            Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, this);
+            Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, this);
             LPresences.EndPresence(this, true);
         }
 

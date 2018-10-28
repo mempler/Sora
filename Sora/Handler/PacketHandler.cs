@@ -36,7 +36,7 @@ namespace Sora.Handler
 
     internal class PacketHandler
     {
-        [Handler(HandlerTypes.PacketHandler)]
+        [Handler(HandlerTypes.BanchoPacketHandler)]
         public void HandlePackets(Presence pr, PacketId packetId, MStreamReader data)
         {
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -45,21 +45,21 @@ namespace Sora.Handler
             #region Stats
 
                 case PacketId.ClientSendUserStatus:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientSendUserStatus, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoSendUserStatus, pr,
                         data.ReadData<SendUserStatus>().Status);
                     break;
                 case PacketId.ClientPong:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientPong, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoPong, pr);
                     break;
                 case PacketId.ClientRequestStatusUpdate:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientRequestStatusUpdate, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoRequestStatusUpdate, pr);
                     break;
                 case PacketId.ClientUserStatsRequest:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientUserStatsRequest, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoUserStatsRequest, pr,
                         data.ReadData<UserStatsRequest>().Userids);
                     break;
                 case PacketId.ClientReceiveUpdates:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientReceiveUpdates, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoReceiveUpdates, pr,
                         data.ReadData<Packets.Client.ReceiveUpdates>().UserId);
                     break;
 
@@ -68,11 +68,11 @@ namespace Sora.Handler
             #region Channels
 
                 case PacketId.ClientChannelJoin:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientChannelJoin, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoChannelJoin, pr,
                         data.ReadData<ChannelJoin>().ChannelName);
                     break;
                 case PacketId.ClientChannelLeave:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientChannelLeave, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoChannelLeave, pr,
                         data.ReadData<ChannelLeave>().ChannelName);
                     break;
 
@@ -84,9 +84,9 @@ namespace Sora.Handler
                 case PacketId.ClientSendIrcMessage:
                     SendIrcMessage msg = data.ReadData<SendIrcMessage>();
                     if (msg.Msg.ChannelTarget.StartsWith("#"))
-                        Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessage, pr, msg.Msg);
+                        Handlers.ExecuteHandler(HandlerTypes.BanchoSendIrcMessage, pr, msg.Msg);
                     else
-                        Handlers.ExecuteHandler(HandlerTypes.ClientSendIrcMessagePrivate, pr, msg.Msg);
+                        Handlers.ExecuteHandler(HandlerTypes.BanchoSendIrcMessagePrivate, pr, msg.Msg);
                     break;
 
             #endregion
@@ -94,11 +94,11 @@ namespace Sora.Handler
             #region Friends
 
                 case PacketId.ClientFriendAdd:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientFriendAdd, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoFriendAdd, pr,
                         data.ReadData<FriendAdd>().FriendId);
                     break;
                 case PacketId.ClientFriendRemove:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientFriendRemove, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoFriendRemove, pr,
                         data.ReadData<FriendRemove>().FriendId);
                     break;
 
@@ -107,17 +107,17 @@ namespace Sora.Handler
             #region Spectator
 
                 case PacketId.ClientStartSpectating:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientStartSpectating, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoStartSpectating, pr,
                         data.ReadData<StartSpectating>().ToSpectateId);
                     break;
                 case PacketId.ClientStopSpectating:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientStopSpectating, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoStopSpectating, pr);
                     break;
                 case PacketId.ClientCantSpectate:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientCantSpectate, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoCantSpectate, pr);
                     break;
                 case PacketId.ClientSpectateFrames:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientSpectateFrames, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoSpectateFrames, pr,
                         data.ReadData<SpectatorFrames>().Frames);
                     break;
 
@@ -126,82 +126,82 @@ namespace Sora.Handler
             #region Multi
 
                 case PacketId.ClientLobbyJoin:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientLobbyJoin, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyJoin, pr);
                     break;
                 case PacketId.ClientLobbyPart:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientLobbyPart, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, pr);
                     break;
                 case PacketId.ClientMatchCreate:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchCreate, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchCreate, pr,
                         data.ReadData<MatchCreate>().Room);
                     break;
                 case PacketId.ClientMatchJoin:
                     MatchJoin mJoin = data.ReadData<MatchJoin>();
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchJoin, pr, mJoin.MatchId, mJoin.Password);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchJoin, pr, mJoin.MatchId, mJoin.Password);
                     break;
                 case PacketId.ClientMatchPart:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchPart, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, pr);
                     break;
                 case PacketId.ClientMatchChangeSlot:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchChangeSlot, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchChangeSlot, pr,
                         data.ReadData<MatchChangeSlot>().SlotId);
                     break;
                 case PacketId.ClientMatchChangeMods:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchChangeMods, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchChangeMods, pr,
                         data.ReadData<MatchChangeMods>().Mods);
                     break;
                 case PacketId.ClientMatchLock:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchLock, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchLock, pr,
                         data.ReadData<MatchLock>().SlotId);
                     break;
                 case PacketId.ClientMatchChangeSettings:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchChangeSettings, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchChangeSettings, pr,
                         data.ReadData<MatchChangeSettings>().Room);
                     break;
                 case PacketId.ClientMatchChangePassword:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchChangePassword, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchChangePassword, pr,
                         data.ReadData<MatchChangePassword>().Room);
                     break;
                 case PacketId.ClientMatchChangeTeam:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchChangeTeam, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchChangeTeam, pr);
                     break;
                 case PacketId.ClientMatchReady:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchReady, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchReady, pr);
                     break;
                 case PacketId.ClientMatchNotReady:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchNotReady, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchNotReady, pr);
                     break;
                 case PacketId.ClientMatchTransferHost:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchTransferHost, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchTransferHost, pr,
                         data.ReadData<MatchTransferHost>().SlotId);
                     break;
                 case PacketId.ClientMatchNoBeatmap:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchNoBeatmap, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchNoBeatmap, pr);
                     break;
                 case PacketId.ClientMatchHasBeatmap:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchHasBeatmap, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchHasBeatmap, pr);
                     break;
                 case PacketId.ClientInvite:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientInvite, pr, data.ReadData<Invite>().UserId);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoInvite, pr, data.ReadData<Invite>().UserId);
                     break;
                 case PacketId.ClientMatchStart:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchStart, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchStart, pr);
                     break;
                 case PacketId.ClientMatchLoadComplete:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchLoadComplete, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchLoadComplete, pr);
                     break;
                 case PacketId.ClientMatchScoreUpdate:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchScoreUpdate, pr,
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchScoreUpdate, pr,
                         data.ReadData<MatchScoreUpdate>().Frame);
                     break;
                 case PacketId.ClientMatchFailed:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchFailed, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchFailed, pr);
                     break;
                 case PacketId.ClientMatchSkipRequest:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchSkipRequest, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchSkipRequest, pr);
                     break;
                 case PacketId.ClientMatchComplete:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchComplete, pr);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoMatchComplete, pr);
                     break;
 
             #endregion
@@ -209,7 +209,7 @@ namespace Sora.Handler
             #region Other
 
                 case PacketId.ClientExit:
-                    Handlers.ExecuteHandler(HandlerTypes.ClientExit, pr, data.ReadData<Exit>().ErrorState);
+                    Handlers.ExecuteHandler(HandlerTypes.BanchoExit, pr, data.ReadData<Exit>().ErrorState);
                     break;
                 default:
                     Logger.L.Debug(

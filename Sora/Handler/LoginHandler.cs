@@ -43,7 +43,7 @@ namespace Sora.Handler
 
     internal class LoginHandler
     {
-        [Handler(HandlerTypes.LoginHandler)]
+        [Handler(HandlerTypes.BanchoLoginHandler)]
         public void OnLogin(Presence pr, MStreamWriter dataWriter, MStreamReader dataReader, string ip)
         {
             try

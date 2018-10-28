@@ -92,7 +92,7 @@ namespace Sora.Server
                             string ip = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
 
-                            Handlers.ExecuteHandler(HandlerTypes.LoginHandler, pr, mw, mr, ip);
+                            Handlers.ExecuteHandler(HandlerTypes.BanchoLoginHandler, pr, mw, mr, ip);
                             return;
                         }
                     } catch (Exception ex)
@@ -121,7 +121,7 @@ namespace Sora.Server
 
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
-                                Handlers.ExecuteHandler(HandlerTypes.PacketHandler, pr, packetId,
+                                Handlers.ExecuteHandler(HandlerTypes.BanchoPacketHandler, pr, packetId,
                                     packetDataReader);
                         } catch (Exception ex)
                         {

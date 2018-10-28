@@ -37,7 +37,7 @@ namespace Sora.Handler
 
     internal class UserStatsHandler
     {
-        [Handler(HandlerTypes.ClientUserStatsRequest)]
+        [Handler(HandlerTypes.BanchoUserStatsRequest)]
         public void HandleUserStats(Presence pr, List<int> userIds)
         {
             foreach (int id in userIds)

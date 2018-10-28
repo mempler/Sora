@@ -37,10 +37,10 @@ namespace ExamplePlugin
     internal class ExampleHandler
     {
         // Let the Handler loader know that this is an LoginHandler
-        [Handler(HandlerTypes.LoginHandler)]
+        [Handler(HandlerTypes.BanchoLoginHandler)]
         public void SomeLoginHandler(
             Presence pr, MStreamWriter dataWriter, MStreamReader dataReader,
             string ip) // a Login handler need those args.
-            => dataWriter.Write(new Announce("Hello World!"));
+            => dataWriter.Write(new Announce("Hello World!")); // Write an Hello World message to client.
     }
 }

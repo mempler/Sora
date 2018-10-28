@@ -35,10 +35,10 @@ namespace Sora.Handler
 
     public class FriendHandler
     {
-        [Handler(HandlerTypes.ClientFriendAdd)]
+        [Handler(HandlerTypes.BanchoFriendAdd)]
         public void OnFriendAdd(Presence pr, int friendId) => Friends.AddFriend(pr.User.Id, friendId);
 
-        [Handler(HandlerTypes.ClientFriendRemove)]
+        [Handler(HandlerTypes.BanchoFriendRemove)]
         public void OnFriendRemove(Presence pr, int friendId) => Friends.RemoveFriend(pr.User.Id, friendId);
     }
 }

@@ -35,7 +35,7 @@ namespace Sora.Handler
 
     internal class ChannelHandler
     {
-        [Handler(HandlerTypes.ClientChannelJoin)]
+        [Handler(HandlerTypes.BanchoChannelJoin)]
         public void OnChannelJoin(Presence pr, string channelName)
         {
             Channel channel;
@@ -66,7 +66,7 @@ namespace Sora.Handler
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));
         }
 
-        [Handler(HandlerTypes.ClientChannelLeave)]
+        [Handler(HandlerTypes.BanchoChannelLeave)]
         public void OnChannelLeave(Presence pr, string channelName)
         {
             Channel channel;

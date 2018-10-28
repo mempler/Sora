@@ -36,7 +36,7 @@ namespace Sora.Handler
 
     internal class UserStatusHandler
     {
-        [Handler(HandlerTypes.ClientSendUserStatus)]
+        [Handler(HandlerTypes.BanchoSendUserStatus)]
         public void HandleUserStatus(Presence pr, UserStatus status)
         {
             pr.Status = status;

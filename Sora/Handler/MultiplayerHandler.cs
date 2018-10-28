@@ -42,7 +42,7 @@ namespace Sora.Handler
     {
     #region Lobby
 
-        [Handler(HandlerTypes.ClientLobbyJoin)]
+        [Handler(HandlerTypes.BanchoLobbyJoin)]
         public void OnLobbyJoin(Presence pr)
         {
             PacketStream lobbyStream = LPacketStreams.GetStream("lobby");
@@ -53,14 +53,14 @@ namespace Sora.Handler
             lobbyStream.Join(pr);
         }
 
-        [Handler(HandlerTypes.ClientLobbyPart)]
+        [Handler(HandlerTypes.BanchoLobbyPart)]
         public void OnLobbyLeft(Presence pr) => LPacketStreams.GetStream("lobby").Left(pr);
 
     #endregion
 
     #region Match
 
-        [Handler(HandlerTypes.ClientMatchCreate)]
+        [Handler(HandlerTypes.BanchoMatchCreate)]
         public void OnMatchCreate(Presence pr, MultiplayerRoom room)
         {
             room.Password = room.Password.Replace(" ", "_");
@@ -74,7 +74,7 @@ namespace Sora.Handler
             room.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchPart)]
+        [Handler(HandlerTypes.BanchoMatchPart)]
         public void OnMatchLeave(Presence pr)
         {
             if (pr.JoinedRoom == null) return;
@@ -93,7 +93,7 @@ namespace Sora.Handler
             room.Dispand();
         }
 
-        [Handler(HandlerTypes.ClientMatchJoin)]
+        [Handler(HandlerTypes.BanchoMatchJoin)]
         public void OnMatchJoin(Presence pr, int matchId, string password)
         {
             MultiplayerRoom room = MultiplayerLobby.GetRoom(matchId);
@@ -105,7 +105,7 @@ namespace Sora.Handler
             room?.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchChangeSlot)]
+        [Handler(HandlerTypes.BanchoMatchChangeSlot)]
         public void OnMatchChangeSlot(Presence pr, int slotId)
         {
             if (pr.JoinedRoom == null) return;
@@ -119,7 +119,7 @@ namespace Sora.Handler
             pr.JoinedRoom.ClearSlot(oldSlot);
         }
 
-        [Handler(HandlerTypes.ClientMatchChangeMods)]
+        [Handler(HandlerTypes.BanchoMatchChangeMods)]
         public void OnMatchChangeMods(Presence pr, Mod mods)
         {
             MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
@@ -127,7 +127,7 @@ namespace Sora.Handler
             pr.JoinedRoom.SetMods(mods, slot);
         }
 
-        [Handler(HandlerTypes.ClientMatchChangeSettings)]
+        [Handler(HandlerTypes.BanchoMatchChangeSettings)]
         public void OnMatchChangeSettings(Presence pr, MultiplayerRoom room)
         {
             if (pr.JoinedRoom == null) return;
@@ -136,7 +136,7 @@ namespace Sora.Handler
             pr.JoinedRoom.ChangeSettings(room);
         }
 
-        [Handler(HandlerTypes.ClientMatchChangePassword)]
+        [Handler(HandlerTypes.BanchoMatchChangePassword)]
         public void OnMatchChangePassword(Presence pr, MultiplayerRoom room)
         {
             if (pr.JoinedRoom == null) return;
@@ -145,7 +145,7 @@ namespace Sora.Handler
             pr.JoinedRoom.SetPassword(room.Password);
         }
 
-        [Handler(HandlerTypes.ClientMatchLock)]
+        [Handler(HandlerTypes.BanchoMatchLock)]
         public void OnMatchLock(Presence pr, int slotId)
         {
             if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id) return;
@@ -154,7 +154,7 @@ namespace Sora.Handler
             pr.JoinedRoom.LockSlot(pr.JoinedRoom.Slots[slotId]);
         }
 
-        [Handler(HandlerTypes.ClientMatchChangeTeam)]
+        [Handler(HandlerTypes.BanchoMatchChangeTeam)]
         public void OnMatchChangeTeam(Presence pr)
         {
             MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
@@ -179,7 +179,7 @@ namespace Sora.Handler
             pr.JoinedRoom.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchReady)]
+        [Handler(HandlerTypes.BanchoMatchReady)]
         public void OnMatchReady(Presence pr)
         {
             MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
@@ -190,7 +190,7 @@ namespace Sora.Handler
             pr.JoinedRoom.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchNotReady)]
+        [Handler(HandlerTypes.BanchoMatchNotReady)]
         public void OnMatchNotReady(Presence pr)
         {
             MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
@@ -201,7 +201,7 @@ namespace Sora.Handler
             pr.JoinedRoom.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchTransferHost)]
+        [Handler(HandlerTypes.BanchoMatchTransferHost)]
         public void OnMatchTransferHost(Presence pr, int slotId)
         {
             if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id)
@@ -212,7 +212,7 @@ namespace Sora.Handler
             pr.JoinedRoom.SetHost(slot.UserId);
         }
 
-        [Handler(HandlerTypes.ClientMatchNoBeatmap)]
+        [Handler(HandlerTypes.BanchoMatchNoBeatmap)]
         public void OnMatchNoBeatmap(Presence pr)
         {
             if (pr.JoinedRoom == null)
@@ -224,7 +224,7 @@ namespace Sora.Handler
             pr.JoinedRoom.Update();
         }
 
-        [Handler(HandlerTypes.ClientMatchHasBeatmap)]
+        [Handler(HandlerTypes.BanchoMatchHasBeatmap)]
         public void OnMatchHasBeatmap(Presence pr)
         {
             if (pr.JoinedRoom == null)
@@ -236,7 +236,7 @@ namespace Sora.Handler
             pr.JoinedRoom.Update();
         }
 
-        [Handler(HandlerTypes.ClientInvite)]
+        [Handler(HandlerTypes.BanchoInvite)]
         public void OnInvite(Presence pr, int userId)
         {
             if (pr.JoinedRoom == null) return;
@@ -245,31 +245,31 @@ namespace Sora.Handler
             pr.JoinedRoom.Invite(opr);
         }
 
-        [Handler(HandlerTypes.ClientMatchStart)]
+        [Handler(HandlerTypes.BanchoMatchStart)]
         public void OnMatchStart(Presence pr)
         {
             if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id) return;
             pr.JoinedRoom.Start();
         }
 
-        [Handler(HandlerTypes.ClientMatchLoadComplete)]
+        [Handler(HandlerTypes.BanchoMatchLoadComplete)]
         public void OnMatchLoadComplete(Presence pr)
         {
             if (pr.JoinedRoom?.GetSlotByUserId(pr.User.Id) != null)
                 pr.JoinedRoom.LoadComplete();
         }
 
-        [Handler(HandlerTypes.ClientMatchScoreUpdate)]
+        [Handler(HandlerTypes.BanchoMatchScoreUpdate)]
         public void OnMatchScoreUpdate(Presence pr, ScoreFrame frame)
             => pr.JoinedRoom?.Broadcast(new MatchScoreUpdate(pr.JoinedRoom.GetSlotIdByUserId(pr.User.Id), frame));
 
-        [Handler(HandlerTypes.ClientMatchFailed)]
+        [Handler(HandlerTypes.BanchoMatchFailed)]
         public void OnMatchFailed(Presence pr) => pr.JoinedRoom?.Failed(pr);
 
-        [Handler(HandlerTypes.ClientMatchComplete)]
+        [Handler(HandlerTypes.BanchoMatchComplete)]
         public void OnMatchComplete(Presence pr) => pr.JoinedRoom?.Complete(pr);
 
-        [Handler(HandlerTypes.ClientMatchSkipRequest)]
+        [Handler(HandlerTypes.BanchoMatchSkipRequest)]
         public void OnMatchSkipRequest(Presence pr) => pr.JoinedRoom?.Skip(pr);
 
     #endregion

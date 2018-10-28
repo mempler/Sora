@@ -36,7 +36,7 @@ namespace Sora.Handler
 
     public class MessageHandler
     {
-        [Handler(HandlerTypes.ClientSendIrcMessage)]
+        [Handler(HandlerTypes.BanchoSendIrcMessage)]
         public void HandlePublicMessage(Presence pr, MessageStruct message)
         {
             Channel chan;
@@ -62,7 +62,7 @@ namespace Sora.Handler
             chan.WriteMessage(pr, message.Message);
         }
 
-        [Handler(HandlerTypes.ClientSendIrcMessagePrivate)]
+        [Handler(HandlerTypes.BanchoSendIrcMessagePrivate)]
         public void HandlePrivateMessage(Presence pr, MessageStruct message)
         {
             Presence opr = LPresences.GetPresence(Users.GetUserId(message.ChannelTarget));
