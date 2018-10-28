@@ -30,7 +30,6 @@ namespace Sora.Handler
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Enums;
     using Objects;
     using Packets.Client;
@@ -114,7 +113,7 @@ namespace Sora.Handler
             MultiplayerSlot newSlot = pr.JoinedRoom.Slots[slotId];
             if (newSlot.UserId != -1) return;
 
-            MultiplayerSlot oldSlot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
+            MultiplayerSlot oldSlot = pr.JoinedRoom.GetSlotByUserId(pr.User.Id);
 
             pr.JoinedRoom.SetSlot(newSlot, oldSlot);
             pr.JoinedRoom.ClearSlot(oldSlot);
@@ -123,7 +122,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientMatchChangeMods)]
         public void OnMatchChangeMods(Presence pr, Mod mods)
         {
-            MultiplayerSlot slot = pr.JoinedRoom?.Slots.First(x => x.UserId == pr.User.Id);
+            MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
             if (slot == null) return;
             pr.JoinedRoom.SetMods(mods, slot);
         }
@@ -158,7 +157,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientMatchChangeTeam)]
         public void OnMatchChangeTeam(Presence pr)
         {
-            MultiplayerSlot slot = pr.JoinedRoom?.Slots.First(x => pr.User.Id == x.UserId);
+            MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
             if (slot == null) return;
 
             switch (slot.Team)
@@ -183,7 +182,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientMatchReady)]
         public void OnMatchReady(Presence pr)
         {
-            MultiplayerSlot slot = pr.JoinedRoom?.Slots.First(x => pr.User.Id == x.UserId);
+            MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
             if (slot == null) return;
 
             slot.Status = MultiSlotStatus.Ready;
@@ -194,7 +193,7 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientMatchNotReady)]
         public void OnMatchNotReady(Presence pr)
         {
-            MultiplayerSlot slot = pr.JoinedRoom?.Slots.First(x => pr.User.Id == x.UserId);
+            MultiplayerSlot slot = pr.JoinedRoom?.GetSlotByUserId(pr.User.Id);
             if (slot == null) return;
 
             slot.Status = MultiSlotStatus.NotReady;
@@ -218,7 +217,7 @@ namespace Sora.Handler
         {
             if (pr.JoinedRoom == null)
                 return;
-            MultiplayerSlot slot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
+            MultiplayerSlot slot = pr.JoinedRoom.GetSlotByUserId(pr.User.Id);
 
             slot.Status = MultiSlotStatus.NoMap;
 
@@ -230,7 +229,7 @@ namespace Sora.Handler
         {
             if (pr.JoinedRoom == null)
                 return;
-            MultiplayerSlot slot = pr.JoinedRoom.Slots.First(x => x.UserId == pr.User.Id);
+            MultiplayerSlot slot = pr.JoinedRoom.GetSlotByUserId(pr.User.Id);
 
             slot.Status = MultiSlotStatus.NotReady;
 
