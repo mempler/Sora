@@ -82,6 +82,7 @@ namespace Sora.Objects
         public string BeatmapName;
 
         public Channel Channel = new Channel("#multiplayer");
+        public int FailedPeople;
         public int HostId;
         public bool InProgress;
 
@@ -97,6 +98,7 @@ namespace Sora.Objects
         public MultiplayerSlot[] Slots = new MultiplayerSlot[16];
         public MatchSpecialModes SpecialModes;
         public TeamType TeamType;
+        public int WantSkip;
 
         public MultiplayerRoom()
         {
@@ -416,8 +418,8 @@ namespace Sora.Objects
                 ++PlayingPeople;
             }
 
-            Broadcast(new MatchStart(this));
             Update();
+            Broadcast(new MatchStart(this));
         }
 
         public void LoadComplete()
@@ -426,6 +428,44 @@ namespace Sora.Objects
                 Broadcast(new MatchAllPlayersLoaded());
 
             Update();
+        }
+
+        public void Failed(Presence pr) => Failed(pr.User.Id);
+
+        public void Failed(int userId)
+        {
+            FailedPeople++;
+            Broadcast(new MatchPlayerFailed(GetSlotIdByUserId(userId)));
+        }
+
+        public void Complete(Presence pr) => Complete(pr.User.Id);
+
+        public void Complete(int userId)
+        {
+            PlayingPeople--;
+
+            MultiplayerSlot slot = GetSlotByUserId(userId);
+            slot.Status = MultiSlotStatus.Complete;
+            Update();
+
+            if (PlayingPeople != 0) return;
+
+            foreach (MultiplayerSlot slt in Slots.Where(x => x.Status == MultiSlotStatus.Complete))
+                slt.Status = MultiSlotStatus.NotReady;
+
+            InProgress = false;
+            Update();
+            Broadcast(new MatchComplete());
+        }
+
+        public void Skip(Presence pr) => Skip(pr.User.Id);
+
+        public void Skip(int userId)
+        {
+            WantSkip++;
+            Broadcast(new MatchPlayerSkipped(GetSlotIdByUserId(userId)));
+            if (WantSkip == PlayingPeople)
+                Broadcast(new MatchSkip());
         }
 
         private Mod fixMods(Mod mods)
@@ -439,6 +479,19 @@ namespace Sora.Objects
                 ActiveMods |= Mod.HalfTime;
 
             return mods;
+        }
+
+        public MultiplayerSlot GetSlotByUserId(int userId) => Slots.FirstOrDefault(x => x.UserId == userId);
+
+        public int GetSlotIdByUserId(int userId)
+        {
+            int result = Slots
+                         .Select((v, i) => new {v, i})
+                         .Where(s => s.v.UserId == userId)
+                         .Select(h => h.i)
+                         .FirstOrDefault();
+
+            return result;
         }
 
     #endregion

@@ -249,27 +249,29 @@ namespace Sora.Handler
         [Handler(HandlerTypes.ClientMatchStart)]
         public void OnMatchStart(Presence pr)
         {
-            if (pr.JoinedRoom == null) return;
-            if (pr.JoinedRoom.HostId != pr.User.Id) return;
+            if (pr.JoinedRoom == null || pr.JoinedRoom.HostId != pr.User.Id) return;
             pr.JoinedRoom.Start();
         }
 
         [Handler(HandlerTypes.ClientMatchLoadComplete)]
         public void OnMatchLoadComplete(Presence pr)
         {
-            MultiplayerSlot slot = pr.JoinedRoom?.Slots.FirstOrDefault(x => x.UserId == pr.User.Id);
-            if (slot == null) return;
-
-            pr.JoinedRoom.LoadComplete();
+            if (pr.JoinedRoom?.GetSlotByUserId(pr.User.Id) != null)
+                pr.JoinedRoom.LoadComplete();
         }
 
         [Handler(HandlerTypes.ClientMatchScoreUpdate)]
         public void OnMatchScoreUpdate(Presence pr, ScoreFrame frame)
-        {
-            if (pr.JoinedRoom == null) return;
-            int slot = pr.JoinedRoom.Slots.Where(y => y.UserId == pr.User.Id).Select((x, i) => i).FirstOrDefault();
-            pr.JoinedRoom.Broadcast(new MatchScoreUpdate(slot, frame));
-        }
+            => pr.JoinedRoom?.Broadcast(new MatchScoreUpdate(pr.JoinedRoom.GetSlotIdByUserId(pr.User.Id), frame));
+
+        [Handler(HandlerTypes.ClientMatchFailed)]
+        public void OnMatchFailed(Presence pr) => pr.JoinedRoom?.Failed(pr);
+
+        [Handler(HandlerTypes.ClientMatchComplete)]
+        public void OnMatchComplete(Presence pr) => pr.JoinedRoom?.Complete(pr);
+
+        [Handler(HandlerTypes.ClientMatchSkipRequest)]
+        public void OnMatchSkipRequest(Presence pr) => pr.JoinedRoom?.Skip(pr);
 
     #endregion
     }

@@ -9,12 +9,10 @@ namespace Sora.Packets.Server
     {
         public ScoreFrame Frame;
 
-        public int SlotId;
-
         public MatchScoreUpdate(int slotId, ScoreFrame frame)
         {
             Frame = frame;
-            SlotId = slotId;
+            Frame.Id = (byte) slotId;
         }
 
         public PacketId Id => PacketId.ServerMatchScoreUpdate;

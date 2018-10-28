@@ -32,6 +32,7 @@ namespace Sora.Objects
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using Enums;
     using JetBrains.Annotations;
@@ -46,6 +47,8 @@ namespace Sora.Objects
     {
         private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
 
+        public static IEnumerable<Presence> AllPresences => Presences.Select(x => x.Value);
+
         public static Presence GetPresence(string token) => Presences.TryGetValue(token, out Presence pr) ? pr : null;
 
         public static Presence GetPresence(int userid)
@@ -58,20 +61,11 @@ namespace Sora.Objects
         }
 
         [UsedImplicitly]
-        public static IEnumerable<int> GetUserIds()
-        {
-            foreach (KeyValuePair<string, Presence> presence in Presences)
-                yield return presence.Value.User.Id;
-        }
+        public static IEnumerable<int> GetUserIds() => Presences.Select(x => x.Value.User.Id);
 
-        public static IEnumerable<int> GetUserIds(Presence pr)
-        {
-            foreach (KeyValuePair<string, Presence> presence in Presences)
-            {
-                if (presence.Value.User.Id == pr.User.Id) continue;
-                yield return presence.Value.User.Id;
-            }
-        }
+        public static IEnumerable<int> GetUserIds(Presence pr) => Presences
+                                                                  .Where(x => x.Value.Token != pr.Token)
+                                                                  .Select(z => z.Value.User.Id);
 
         public static void BeginPresence(Presence presence)
         {

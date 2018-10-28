@@ -92,6 +92,12 @@ namespace Sora.Handler
                 dataWriter.Write(new UserPresence(pr));
                 dataWriter.Write(new FriendsList(Friends.GetFriends(pr.User.Id).ToList()));
                 dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
+                foreach (Presence opr in LPresences.AllPresences)
+                {
+                    dataWriter.Write(new UserPresence(opr));
+                    dataWriter.Write(new HandleUpdate(opr));
+                }
+
                 dataWriter.Write(new HandleUpdate(pr));
 
                 foreach (Channel chanAuto in LChannels.ChannelsAutoJoin)

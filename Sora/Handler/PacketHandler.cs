@@ -194,6 +194,15 @@ namespace Sora.Handler
                     Handlers.ExecuteHandler(HandlerTypes.ClientMatchScoreUpdate, pr,
                         data.ReadData<MatchScoreUpdate>().Frame);
                     break;
+                case PacketId.ClientMatchFailed:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchFailed, pr);
+                    break;
+                case PacketId.ClientMatchSkipRequest:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchSkipRequest, pr);
+                    break;
+                case PacketId.ClientMatchComplete:
+                    Handlers.ExecuteHandler(HandlerTypes.ClientMatchComplete, pr);
+                    break;
 
             #endregion
 

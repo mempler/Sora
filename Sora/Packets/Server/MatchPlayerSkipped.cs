@@ -5,15 +5,13 @@ namespace Sora.Packets.Server
     using Shared.Helpers;
     using Shared.Interfaces;
 
-    public class MatchPlayerFailed : IPacket
+    public class MatchPlayerSkipped : IPacket
     {
         public int SlotId;
 
-        public MatchPlayerFailed(int slotId) => SlotId = slotId;
-        public PacketId Id => PacketId.ServerMatchPlayerFailed;
-
+        public MatchPlayerSkipped(int slotId) => SlotId = slotId;
         public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
-
         public void WriteToStream(MStreamWriter sw) => sw.Write(SlotId);
+        public PacketId Id => PacketId.ServerMatchPlayerSkipped;
     }
 }
