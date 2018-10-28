@@ -49,14 +49,9 @@ namespace Jibril
                 Logger.L.Info("Start Initalization");
                 Stopwatch watch = Stopwatch.StartNew();
                 Config conf = Config.ReadConfig(5002);
-                _server = new HttpServer(conf.Server.Hostname, conf.Server.Port);
+                
+                _server = new HttpServer(conf.Server.Port);
                 using (new SoraContext()) { } // Initialize Database. (Migrate database)
-
-                AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
-                {
-                    Logger.L.Error(ex);
-                    Logger.L.Error(e);
-                };
 
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
@@ -74,7 +69,7 @@ namespace Jibril
         private static void Main()
         {
             Initialize();
-            _server.Run();
+            _server.RunAsync().Wait();
         }
     }
 }

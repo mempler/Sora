@@ -29,36 +29,33 @@ SOFTWARE.
 namespace Jibril.Server
 {
     using System;
-    using System.Net;
     using System.Threading;
-    using Amib.Threading;
+    using System.Threading.Tasks;
+    using Shared.Enums;
+    using Shared.Handlers;
+    using Shared.Helpers;
+    using SimpleHttp;
 
 #region Server
 
     public class HttpServer
     {
-        private readonly HttpListener _listener;
-        private readonly SmartThreadPool _pool;
         private bool _running;
+        private CancellationTokenSource cts = new CancellationTokenSource();
+        private short _port;
 
-        public HttpServer(string hostname = "localhost", short port = 5002)
+        public HttpServer(short port = 5001)
         {
+            _port = port;
             _running = false;
-            _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://{hostname}:{port}/");
-            _pool = new SmartThreadPool(
-                60,
-                Environment.ProcessorCount * 16 +
-                1); // 4 * 16 = 64 + 1 for ServerThread (1 core should handle 16 client connections)
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             if (_running)
                 throw new Exception("Server is already running!");
 
-            _pool.Start();
-            new Thread(_RunServer).Start();
+            await _RunServer();
         }
 
         public void Stop()
@@ -67,29 +64,35 @@ namespace Jibril.Server
                 throw new Exception("Cannot stop if already stopped!");
 
             _running = false;
-            _pool.Shutdown(true, TimeSpan.FromMinutes(1));
-            _listener.Stop();
+            cts.Cancel();
         }
 
-        private void _RunServer()
+        private async Task _RunServer()
         {
-            _listener.Start();
-            _running = true;
-
-            while (_running)
+            Route.Add("/web/{handler}", (request, response, args) =>
             {
-                if (!_running) break;
-                HttpListenerContext context = _listener.GetContext();
+                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
+            });
+            
+            Route.Add("/{avatar}", (request, response, args) =>
+            {
+                if (request.Url.Host.StartsWith("a."))
+                    Handlers.ExecuteHandler(HandlerTypes.SharedAvatars, request, response, args);
+                else
+                    response.StatusCode = 404;
+                
+                response.Close();
+            });
+            
+            Route.Error = (request, response, exception) =>
+            {
+                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
+            };
 
-                context.Response.Headers["Connection"] = "keep-alive";
-                context.Response.Headers["Keep-Alive"] = "timeout=60, max=100";
-                context.Response.Headers["Content-Type"] = "text/html; charset=UTF-8";
-                context.Response.Headers["cho-server"] = "Jibril (https://github.com/Mempler/Sora)";
-
-                _pool.QueueWorkItem(new BrowserClient(context.Request, context.Response).DoWork);
-            }
+            await SimpleHttp.HttpServer.ListenAsync(_port, cts.Token, Route.OnHttpRequestAsync);
         }
     }
 
 #endregion
 }
+

@@ -30,7 +30,10 @@ namespace Shared.Enums
 {
     public enum HandlerTypes
     {
-        Initializer, BanchoPacketHandler, BanchoLoginHandler,
+        Initializer,
+        
+        #region Bancho
+        BanchoPacketHandler, BanchoLoginHandler,
         BanchoSendUserStatus, BanchoSendIrcMessage, BanchoExit,
         BanchoRequestStatusUpdate, BanchoPong, BanchoStartSpectating,
         BanchoStopSpectating, BanchoSpectateFrames, BanchoErrorReport,
@@ -47,6 +50,11 @@ namespace Shared.Enums
         BanchoUserStatsRequest, BanchoInvite, BanchoMatchChangePassword,
         BanchoSpecialMatchInfoRequest, BanchoUserPresenceRequest, BanchoUserPresenceRequestAll,
         BanchoUserToggleBlockNonFriendPm, BanchoMatchAbort, BanchoSpecialJoinMatchChannel,
-        BanchoSpecialLeaveMatchChannel
+        BanchoSpecialLeaveMatchChannel,
+        #endregion
+        
+        #region PrivateAPI
+        SharedAvatars
+        #endregion
     }
 }

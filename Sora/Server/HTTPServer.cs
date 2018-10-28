@@ -29,35 +29,30 @@ SOFTWARE.
 namespace Sora.Server
 {
     using System;
-    using System.Net;
-    using Amib.Threading;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using SimpleHttp;
 
 #region Server
 
     public class HttpServer
     {
-        private readonly HttpListener _listener;
-        private readonly SmartThreadPool _pool;
         private bool _running;
+        private CancellationTokenSource cts = new CancellationTokenSource();
+        private short _port;
 
-        public HttpServer(string hostname = "localhost", short port = 5001)
+        public HttpServer(short port = 5001)
         {
+            _port = port;
             _running = false;
-            _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://{hostname}:{port}/");
-            _pool = new SmartThreadPool(
-                60,
-                Environment.ProcessorCount * 16 +
-                1); // 4 * 16 = 64 + 1 for ServerThread (1 core should handle 16 client connections)
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             if (_running)
                 throw new Exception("Server is already running!");
 
-            _pool.Start();
-            _pool.QueueWorkItem(_RunServer, WorkItemPriority.Highest);
+            await _RunServer();
         }
 
         public void Stop()
@@ -66,53 +61,43 @@ namespace Sora.Server
                 throw new Exception("Cannot stop if already stopped!");
 
             _running = false;
-            _pool.Shutdown(true, TimeSpan.FromMinutes(1));
-            _listener.Stop();
+            cts.Cancel();
         }
 
-        private void _RunServer()
+        private async Task _RunServer()
         {
-            _listener.Start();
-            _running = true;
-
-            while (_running)
+            Route.Add("/", (req, res, args) =>
             {
-                if (!_running) break;
-                HttpListenerContext context = _listener.GetContext();
-
-                context.Response.Headers["cho-protocol"] = "19";
-                context.Response.Headers["Connection"] = "keep-alive";
-                context.Response.Headers["Keep-Alive"] = "timeout=60, max=100";
-                context.Response.Headers["Content-Type"] = "text/html; charset=UTF-8";
-                context.Response.Headers["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
+                res.Headers["cho-protocol"] = "19";
+                res.Headers["Connection"] = "keep-alive";
+                res.Headers["Keep-Alive"] = "timeout=60, max=100";
+                res.Headers["Content-Type"] = "text/html; charset=UTF-8";
+                res.Headers["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
 
                 Client client;
-                if (context.Request.UserAgent == "osu!")
-                    client = new OsuClient(context.Request, context.Response);
+                if (req.UserAgent == "osu!")
+                    client = new OsuClient(req, res);
                 else
-                    client = new BrowserClient(context.Request, context.Response);
+                    client = new BrowserClient(req, res);
 
-                _pool.QueueWorkItem(client.DoWork);
-            }
+                client.DoWork();
+            }, "POST");
+
+            Route.Add("/", (req, res, args) =>
+            {
+                Client client;
+                if (req.UserAgent == "osu!")
+                    client = new OsuClient(req, res);
+                else
+                    client = new BrowserClient(req, res);
+
+                client.DoWork();
+            });
+
+            await SimpleHttp.HttpServer.ListenAsync(_port, cts.Token, Route.OnHttpRequestAsync);
         }
     }
 
 #endregion
 }
 
-
-/*
-        private static string HeadersToString(Req x, Res s)
-        {
-            string outputStr = string.Empty;
-            s.Headers["cho-protocol"] = "19";
-            s.Headers["Connection"]   = "keep-alive";
-            s.Headers["Keep-Alive"]   = "timeout=60, max=100";
-            s.Headers["Content-Type"] = "text/html; charset=UTF-8";
-            s.Headers["Host"]         = x.Headers["Host"];
-            s.Headers["cho-server"]   = "Sora (https://github.com/Mempler/Sora)";
-            foreach (string key in s.Headers.Keys)
-                outputStr += $"{key}: {s.Headers[key]}\r\n";
-            return outputStr;
-        }
-*/

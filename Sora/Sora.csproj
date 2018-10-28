@@ -21,9 +21,6 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DevOne.Security.Cryptography.BCrypt">
-      <HintPath>..\..\..\..\.nuget\packages\bcrypt\1.0.0\lib\DevOne.Security.Cryptography.BCrypt.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <HintPath>System</HintPath>
     </Reference>
@@ -33,5 +30,8 @@
     <Reference Include="System.Xml">
       <HintPath>System.Xml</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Simple-HTTP" Version="1.0.6" />
   </ItemGroup>
 </Project>

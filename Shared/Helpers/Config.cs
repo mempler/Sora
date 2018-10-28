@@ -37,13 +37,13 @@ namespace Shared.Helpers
         public MySql MySql = new MySql
             {Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = ""};
 
-        public Server Server = new Server {Hostname = "localhost"};
+        public Server Server;
 
         public static Config ReadConfig(short port = 5001)
         {
             if (File.Exists("config.json"))
                 return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-            Config cfg = new Config{ Server = new Server{Hostname = "localhost", Port = port} };
+            Config cfg = new Config{ Server = new Server{Port = port} };
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.L.Info("Config has been created! please edit.");
@@ -55,7 +55,6 @@ namespace Shared.Helpers
 
     public struct Server
     {
-        public string Hostname;
         public short Port;
     }
 

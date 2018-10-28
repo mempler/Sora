@@ -51,7 +51,7 @@ namespace Sora
                 Logger.L.Info("Start Initalization");
                 Stopwatch watch = Stopwatch.StartNew();
                 Config conf = Config.ReadConfig();
-                _server = new HttpServer(conf.Server.Hostname, conf.Server.Port);
+                _server = new HttpServer(conf.Server.Port);
                 using (new SoraContext()) { } // Initialize Database. (Migrate database)
 
                 AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
@@ -89,7 +89,7 @@ namespace Sora
         {
             Initialize();
             LPresences.TimeoutCheck();
-            _server.Run();
+            _server.RunAsync().Wait();
         }
     }
 }
