@@ -71,7 +71,8 @@ namespace Jibril.Server
         {
             Route.Add("/web/{handler}", (request, response, args) =>
             {
-                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
+                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}. Query is: {request.Url.Query}");
+                response.Close();
             });
             
             Route.Add("/{avatar}", (request, response, args) =>
@@ -87,6 +88,7 @@ namespace Jibril.Server
             Route.Error = (request, response, exception) =>
             {
                 Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
+                response.Close();
             };
 
             await SimpleHttp.HttpServer.ListenAsync(_port, cts.Token, Route.OnHttpRequestAsync);

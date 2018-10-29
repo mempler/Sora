@@ -2,100 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shared.Database;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(SoraContext))]
-    partial class SoraContextModelSnapshot : ModelSnapshot
+    [Migration("20181029044803_AddingScores")]
+    partial class AddingScores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("Shared.Database.Models.Beatmaps", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<float>("Ar");
-
-                    b.Property<string>("Artist")
-                        .IsRequired();
-
-                    b.Property<string>("BeatmapCreator")
-                        .IsRequired();
-
-                    b.Property<int>("BeatmapCreatorId");
-
-                    b.Property<int>("BeatmapSetId");
-
-                    b.Property<float>("Bpm");
-
-                    b.Property<float>("Cs");
-
-                    b.Property<double>("Difficulty");
-
-                    b.Property<string>("DifficultyName")
-                        .IsRequired();
-
-                    b.Property<string>("FileMD5")
-                        .IsRequired();
-
-                    b.Property<int>("HitLength");
-
-                    b.Property<float>("Hp");
-
-                    b.Property<DateTime>("LastUpdate");
-
-                    b.Property<float>("Od");
-
-                    b.Property<int>("PassCount");
-
-                    b.Property<int>("PlayCount");
-
-                    b.Property<byte>("PlayMode");
-
-                    b.Property<DateTime>("RankedDate");
-
-                    b.Property<sbyte>("RankedStatus");
-
-                    b.Property<string>("Tags")
-                        .IsRequired();
-
-                    b.Property<string>("Title")
-                        .IsRequired();
-
-                    b.Property<int>("TotalLength");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BeatmapSetId");
-
-                    b.ToTable("Beatmaps");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.BeatmapSets", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("FavouriteCount");
-
-                    b.Property<DateTime>("LastUpdate");
-
-                    b.Property<int>("PassCount");
-
-                    b.Property<int>("PlayCount");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BeatmapSets");
-                });
 
             modelBuilder.Entity("Shared.Database.Models.Friends", b =>
                 {
@@ -413,14 +335,6 @@ namespace Shared.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserStats");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Beatmaps", b =>
-                {
-                    b.HasOne("Shared.Database.Models.BeatmapSets", "BeatmapSet")
-                        .WithMany()
-                        .HasForeignKey("BeatmapSetId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Shared.Database.Models.Scores", b =>

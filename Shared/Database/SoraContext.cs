@@ -56,6 +56,9 @@ namespace Shared.Database
         public DbSet<UserStats> UserStats { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public DbSet<Scores> Scores { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<Friends> Friends { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
@@ -66,6 +69,12 @@ namespace Shared.Database
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public DbSet<Beatmaps> Beatmaps { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public DbSet<BeatmapSets> BeatmapSets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

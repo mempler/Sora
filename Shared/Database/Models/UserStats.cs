@@ -43,7 +43,7 @@ namespace Shared.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        // ReSharper disable once UnusedMember.Global
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public CountryIds CountryId { get; set; }
 
 
