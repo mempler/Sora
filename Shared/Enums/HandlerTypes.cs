@@ -93,6 +93,7 @@ namespace Shared.Enums
         SharedAvatars,
         SharedScoreboardRequest,
         SharedScoreSubmittion,
+        SharedGetReplay,
 
         #endregion
     }

@@ -7,8 +7,10 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
 using Shared.Enums;
 using Shared.Interfaces;
+using PlayMode = Shared.Enums.PlayMode;
 
 namespace Shared.Database.Models
 {
@@ -150,7 +152,25 @@ namespace Shared.Database.Models
                                              //.Where(score => setPosition(score.s, score.i))
                                              .Take(50);
 
+               
+                
                 result = query.ToArray();
+                foreach (Scores s in result)
+                {
+                    // inefficient but it works.
+                    int selfPosition = db.Scores
+                                         .Where(score => score.FileMD5 == fileMD5 && score.PlayMode == playMode)
+                                         .Where(score
+                                                    => relaxing
+                                                        ? (score.Mods & Mod.Relax) != 0
+                                                        : (score.Mods & Mod.Relax) == 0)
+                                         .Where(score
+                                                    => touching
+                                                        ? (score.Mods & Mod.TouchDevice) != 0
+                                                        : (score.Mods & Mod.TouchDevice) == 0)
+                                         .IndexOf(s);
+                    s.Position = selfPosition;
+                }
             }
 
             return result;
@@ -162,6 +182,12 @@ namespace Shared.Database.Models
             {
                 return db.Scores.Count(score => score.FileMD5 == fileMd5);
             }
+        }
+
+        public static Scores GetScore(int scoreId)
+        {
+            using (SoraContext db = new SoraContext())
+                return db.Scores.First(score => score.Id == scoreId);
         }
 
         public static void InsertScore(Scores score)

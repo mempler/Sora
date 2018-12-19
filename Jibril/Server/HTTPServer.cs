@@ -71,11 +71,6 @@ namespace Jibril.Server
         {
             Route.Add("/web/{handler}", (request, response, args) =>
             {
-                Logger.L.Info(
-                    $"Unknown Path {request.Url.AbsolutePath} " +
-                    $"Method is {request.HttpMethod} " +
-                    $"Query is {request.Url.Query} " +
-                    "Args are " + args["handler"]);
                 switch (args["handler"].Split("?")[0])
                 {
                     case "osu-osz2-getscores.php":
@@ -84,6 +79,10 @@ namespace Jibril.Server
                     case "osu-submit-modular.php":
                         Handlers.ExecuteHandler(HandlerTypes.SharedScoreSubmittion, request, response, args);
                         break;
+                    case "osu-getreplay.php":
+                        Handlers.ExecuteHandler(HandlerTypes.SharedGetReplay, request, response, args);
+                        break;
+                    
                     default:
                         Logger.L.Info(
                             $"Unknown Path {request.Url.AbsolutePath} " +

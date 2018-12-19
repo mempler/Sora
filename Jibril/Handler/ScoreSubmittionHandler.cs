@@ -123,7 +123,7 @@ namespace Jibril.Handler
     
                 s.score.ReplayMD5 = Hex.ToHex(Crypto.GetMd5(stream)) ?? string.Empty;
                 if (!string.IsNullOrEmpty(s.score.ReplayMD5)) {
-                    using (FileStream replayFile = File.Create($"data/replays/{s.score.FileMD5}.rbin"))
+                    using (FileStream replayFile = File.Create($"data/replays/{s.score.ReplayMD5}.rbin"))
                     {
                         stream.Position = 0;
                         stream.WriteTo(replayFile);
