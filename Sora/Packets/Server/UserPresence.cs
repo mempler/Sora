@@ -26,22 +26,29 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Objects;
+
 namespace Sora.Packets.Server
 {
-    using System;
-    using Objects;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class UserPresence : IPacket
     {
         public readonly Presence Presence;
 
-        public UserPresence(Presence pr) => Presence = pr;
+        public UserPresence(Presence pr)
+        {
+            Presence = pr;
+        }
+
         public PacketId Id => PacketId.ServerUserPresence;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            throw new NotImplementedException();
+        }
 
         public void WriteToStream(MStreamWriter sw)
         {

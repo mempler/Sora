@@ -26,15 +26,15 @@ SOFTWARE.
 
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Objects
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public static class LPacketStreams
     {
         private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();
@@ -57,26 +57,44 @@ namespace Sora.Objects
             return x;
         }
 
-        public static void NewStream(PacketStream str) => PacketStreams[str.StreamName] = str;
+        public static void NewStream(PacketStream str)
+        {
+            PacketStreams[str.StreamName] = str;
+        }
 
-        public static void RemoveStream(string name) => PacketStreams[name] = null;
+        public static void RemoveStream(string name)
+        {
+            PacketStreams[name] = null;
+        }
     }
 
     public class PacketStream
     {
         private readonly Dictionary<string, Presence> _joinedPresences = new Dictionary<string, Presence>();
 
-        public PacketStream(string name) => StreamName = name;
+        public PacketStream(string name)
+        {
+            StreamName = name;
+        }
 
         public string StreamName { get; }
 
         public int JoinedUsers => _joinedPresences.Count;
 
-        public void Join(Presence pr) => _joinedPresences.Add(pr.Token, pr);
+        public void Join(Presence pr)
+        {
+            _joinedPresences.Add(pr.Token, pr);
+        }
 
-        public void Left(Presence pr) => _joinedPresences.Remove(pr.Token);
+        public void Left(Presence pr)
+        {
+            _joinedPresences.Remove(pr.Token);
+        }
 
-        public void Left(string token) => _joinedPresences.Remove(token);
+        public void Left(string token)
+        {
+            _joinedPresences.Remove(token);
+        }
 
         public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {

@@ -13,23 +13,24 @@ namespace Shared.Migrations
                 table => new
                 {
                     Id = table.Column<int>()
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<int>(),
-                    FileMD5 = table.Column<string>(),
-                    ScoreMD5 = table.Column<string>(),
-                    ReplayMD5 = table.Column<string>(),
-                    TotalScore = table.Column<int>(),
-                    MaxCombo = table.Column<short>(),
-                    PlayMode = table.Column<byte>(),
-                    Mods = table.Column<uint>(),
-                    Count300 = table.Column<short>(),
-                    Count100 = table.Column<short>(),
-                    Count50 = table.Column<short>(),
-                    CountMiss = table.Column<short>(),
-                    CountGeki = table.Column<short>(),
-                    CountKatu = table.Column<short>(),
-                    Date = table.Column<DateTime>(),
-                    Accuracy = table.Column<double>(),
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId      = table.Column<int>(),
+                    FileMD5     = table.Column<string>(),
+                    ScoreMD5    = table.Column<string>(),
+                    ReplayMD5   = table.Column<string>(),
+                    TotalScore  = table.Column<int>(),
+                    MaxCombo    = table.Column<short>(),
+                    PlayMode    = table.Column<byte>(),
+                    Mods        = table.Column<uint>(),
+                    Count300    = table.Column<short>(),
+                    Count100    = table.Column<short>(),
+                    Count50     = table.Column<short>(),
+                    CountMiss   = table.Column<short>(),
+                    CountGeki   = table.Column<short>(),
+                    CountKatu   = table.Column<short>(),
+                    Date        = table.Column<DateTime>(),
+                    Accuracy    = table.Column<double>(),
                     PeppyPoints = table.Column<double>()
                 },
                 constraints: table =>
@@ -49,6 +50,9 @@ namespace Shared.Migrations
                 "UserId");
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("Scores");
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable("Scores");
+        }
     }
 }

@@ -26,20 +26,26 @@ SOFTWARE.
 
 #endregion
 
+using System.Collections.Generic;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using System.Collections.Generic;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class UserStatsRequest : IPacket
     {
         public List<int> Userids;
         public PacketId Id => PacketId.ClientUserStatsRequest;
 
-        public void ReadFromStream(MStreamReader sr) => Userids = sr.ReadInt32List();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            Userids = sr.ReadInt32List();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Userids);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(Userids);
+        }
     }
 }

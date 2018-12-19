@@ -26,27 +26,30 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Enums;
+
 namespace Sora.Packets.Client
 {
-    using Enums;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class SendUserStatus : IPacket
     {
         public UserStatus Status;
         public PacketId Id => PacketId.ClientSendUserStatus;
 
-        public void ReadFromStream(MStreamReader sr) => Status = new UserStatus
+        public void ReadFromStream(MStreamReader sr)
         {
-            Status = (Status) sr.ReadByte(),
-            StatusText = sr.ReadString(),
-            BeatmapChecksum = sr.ReadString(),
-            CurrentMods = sr.ReadUInt32(),
-            Playmode = (PlayMode) sr.ReadByte(),
-            BeatmapId = sr.ReadUInt32()
-        };
+            Status = new UserStatus
+            {
+                Status          = (Status) sr.ReadByte(),
+                StatusText      = sr.ReadString(),
+                BeatmapChecksum = sr.ReadString(),
+                CurrentMods     = sr.ReadUInt32(),
+                Playmode        = (PlayMode) sr.ReadByte(),
+                BeatmapId       = sr.ReadUInt32()
+            };
+        }
 
         public void WriteToStream(MStreamWriter sw)
         {
@@ -69,6 +72,9 @@ namespace Sora.Packets.Client
         public uint BeatmapId;
 
         public override string ToString()
-            => $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
+        {
+            return
+                $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
+        }
     }
 }

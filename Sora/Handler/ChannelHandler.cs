@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace Sora.Handler
 {
-    using Objects;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Handlers;
-
     internal class ChannelHandler
     {
         [Handler(HandlerTypes.BanchoChannelJoin)]

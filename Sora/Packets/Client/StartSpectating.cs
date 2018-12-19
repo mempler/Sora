@@ -26,20 +26,26 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using System;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class StartSpectating : IPacket
     {
         public int ToSpectateId;
         public PacketId Id => PacketId.ClientStartSpectating;
 
-        public void ReadFromStream(MStreamReader sr) => ToSpectateId = sr.ReadInt32();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            ToSpectateId = sr.ReadInt32();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

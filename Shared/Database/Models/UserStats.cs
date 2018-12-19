@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Shared.Enums;
+
 namespace Shared.Database.Models
 {
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-    using Enums;
-
     public class UserStats
     {
         [Required]
@@ -51,10 +51,21 @@ namespace Shared.Database.Models
         public static UserStats GetUserStats(int userId)
         {
             using (SoraContext db = new SoraContext())
-                return db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+            {
+                UserStats val = db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+                if (val != null) return val;
+
+                db.UserStats.Add(val = new UserStats {Id = userId, CountryId = 0});
+                db.SaveChanges();
+
+                return val;
+            }
         }
 
         // ReSharper disable once UnusedMember.Global
-        public static UserStats GetUserStats(Users user) => GetUserStats(user.Id);
+        public static UserStats GetUserStats(Users user)
+        {
+            return GetUserStats(user.Id);
+        }
     }
 }

@@ -26,16 +26,18 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.IO;
+using Newtonsoft.Json;
+
 namespace Shared.Helpers
 {
-    using System;
-    using System.IO;
-    using Newtonsoft.Json;
-
     public class Config
     {
         public MySql MySql = new MySql
-            {Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = ""};
+            {Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = string.Empty};
+
+        public Osu Osu = new Osu {ApiKey = string.Empty};
 
         public Server Server;
 
@@ -43,7 +45,7 @@ namespace Shared.Helpers
         {
             if (File.Exists("config.json"))
                 return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-            Config cfg = new Config{ Server = new Server{Port = port} };
+            Config cfg = new Config {Server = new Server {Port = port}};
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.L.Info("Config has been created! please edit.");
@@ -56,6 +58,11 @@ namespace Shared.Helpers
     public struct Server
     {
         public short Port;
+    }
+
+    public struct Osu
+    {
+        public string ApiKey;
     }
 
     public struct MySql

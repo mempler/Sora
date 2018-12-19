@@ -26,10 +26,15 @@ SOFTWARE.
 
 #endregion
 
+using System;
+
 namespace Shared.Enums
 {
-    using System;
-
     [Flags]
-    public enum Privileges { Default = 1 << 1, CModSilence = 1 << 2, Admin = Default | CModSilence }
+    public enum Privileges
+    {
+        Default = 1 << 1,
+        CModSilence = 1 << 2,
+        Admin = Default | CModSilence
+    }
 }

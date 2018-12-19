@@ -1,16 +1,17 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Shared.Enums;
+using Shared.Interfaces;
+
 namespace Shared.Database.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-    using Enums;
-    using Interfaces;
-
     public class Scores : IOsuStringable
     {
         [Key]
@@ -22,22 +23,22 @@ namespace Shared.Database.Models
         [DefaultValue(0)]
         public int UserId { get; set; }
 
-        [ForeignKey("UserId")]
+        [NotMapped]
         public Users ScoreOwner { get; set; }
 
         [Required]
         public string FileMD5 { get; set; }
-        
+
         [Required]
         public string ScoreMD5 { get; set; }
-        
+
         [Required]
         [DefaultValue("")]
         public string ReplayMD5 { get; set; }
-        
+
         [Required]
         [DefaultValue(0)]
-        public int TotalScore { get; set; }
+        public ulong TotalScore { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -53,27 +54,27 @@ namespace Shared.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public short Count300 { get; set; }
+        public ulong Count300 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public short Count100 { get; set; }
+        public ulong Count100 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public short Count50 { get; set; }
+        public ulong Count50 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public short CountMiss { get; set; }
+        public ulong CountMiss { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public short CountGeki { get; set; }
+        public ulong CountGeki { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public short CountKatu { get; set; }
+        public ulong CountKatu { get; set; }
 
         [Required]
         public DateTime Date { get; set; }
@@ -90,22 +91,28 @@ namespace Shared.Database.Models
         public int Position { get; set; }
 
 
-        public string ToOsuString() => $"{Id}|" +
-                                       $"{ScoreOwner.Username.Replace("|", "I")}|" +
-                                       $"{TotalScore}|" +
-                                       $"{MaxCombo}|" +
-                                       $"{Count50}|" +
-                                       $"{Count100}|" +
-                                       $"{Count300}|" +
-                                       $"{CountGeki}|" +
-                                       $"{CountMiss}|" +
-                                       $"{CountKatu}|" +
-                                       $"{(CountMiss > 0)}|" +
-                                       $"{(short) Mods}|" +
-                                       $"{UserId}|" +
-                                       $"{Position}|" +
-                                       $"{(int) (Date.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds}|" +
-                                       $"{Convert.ToInt32(ReplayMD5 == string.Empty)}";
+        public string ToOsuString()
+        {
+            if (ScoreOwner == null)
+                ScoreOwner = Users.GetUser(UserId);
+            
+            return $"{Id}|" +
+                   $"{ScoreOwner.Username.Replace("|", "I")}|" +
+                   $"{TotalScore}|" +
+                   $"{MaxCombo}|" +
+                   $"{Count50}|" +
+                   $"{Count100}|" +
+                   $"{Count300}|" +
+                   $"{CountMiss}|" +
+                   $"{CountGeki}|" +
+                   $"{CountKatu}|" +
+                   $"{CountMiss > 0}|" +
+                   $"{(short) Mods}|" +
+                   $"{UserId}|" +
+                   $"{Position}|" +
+                   $"{(int) Date.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds}|" +
+                   $"{Convert.ToInt32(ReplayMD5 != string.Empty)}";
+        }
 
         public static IEnumerable<Scores> GetScores(
             string fileMD5, Users user, PlayMode playMode = PlayMode.Osu,
@@ -113,41 +120,57 @@ namespace Shared.Database.Models
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
+            IEnumerable<Scores> result;
             using (SoraContext db = new SoraContext())
             {
-                CountryIds cid = UserStats.GetUserStats(user.Id).CountryId;
+                CountryIds cid = 0;
+                if (countryOnly)
+                    cid = UserStats.GetUserStats(user.Id).CountryId;
 
-                var query = db.Scores
-                                  .Where(score => score.FileMD5 == fileMD5 && score.PlayMode == playMode)
-                                  .Where(score
-                                      => relaxing
-                                          ? (score.Mods & Mod.Relax) != 0
-                                          : (score.Mods & Mod.Relax) == 0)
-                                  .Where(score
-                                      => touching
-                                          ? (score.Mods & Mod.TouchDevice) != 0
-                                          : (score.Mods & Mod.TouchDevice) == 0)
-                                  .Where(score
-                                      // ReSharper disable once AccessToDisposedClosure
-                                      => !friendsOnly || db.Friends.Where(f => f.UserId == user.Id)
-                                                           .Select(f => f.FriendId).Contains(score.UserId))
-                                  .Where(score
-                                      // ReSharper disable once AccessToDisposedClosure
-                                      => !countryOnly || db.UserStats.Select(c => c.CountryId).Contains(cid))
-                                  .Where(score => !modOnly || score.Mods == mods)
-                                  .Select((s, i) => new {s, i})
-                                  .Where(score => !onlySelf || score.s.UserId == user.Id)
-                                  .Where(score => setPosition(score.s, score.i))
-                                  .Take(50);
-                
-                return query.Select(score => score.s);
+                IQueryable<Scores> query = db.Scores
+                                             .Where(score => score.FileMD5 == fileMD5 && score.PlayMode == playMode)
+                                             .Where(score
+                                                        => relaxing
+                                                            ? (score.Mods & Mod.Relax) != 0
+                                                            : (score.Mods & Mod.Relax) == 0)
+                                             .Where(score
+                                                        => touching
+                                                            ? (score.Mods & Mod.TouchDevice) != 0
+                                                            : (score.Mods & Mod.TouchDevice) == 0)
+                                             .Where(score
+                                                        => !friendsOnly || db.Friends.Where(f => f.UserId == user.Id)
+                                                                             .Select(f => f.FriendId)
+                                                                             .Contains(score.UserId))
+                                             .Where(score
+                                                        => !countryOnly ||
+                                                           db.UserStats.Select(c => c.CountryId).Contains(cid))
+                                             .Where(score => !modOnly || score.Mods == mods)
+                                             //.Select((s, i) => new {s, i})
+                                             .Where(score => !onlySelf || score.UserId == user.Id)
+                                             //.Where(score => setPosition(score.s, score.i))
+                                             .Take(50);
+
+                result = query.ToArray();
             }
+
+            return result;
         }
 
         public static int GetTotalScores(string fileMd5)
         {
             using (SoraContext db = new SoraContext())
+            {
                 return db.Scores.Count(score => score.FileMD5 == fileMd5);
+            }
+        }
+
+        public static void InsertScore(Scores score)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                db.Add(score);
+                db.SaveChanges();
+            }
         }
 
         private static bool setPosition(Scores s, int pos)

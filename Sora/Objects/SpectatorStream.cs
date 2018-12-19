@@ -35,7 +35,7 @@ namespace Sora.Objects
 
         public SpectatorStream(string name, Presence boundPresence) : base(name)
         {
-            SpecChannel = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
+            SpecChannel   = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
             BoundPresence = boundPresence;
         }
     }

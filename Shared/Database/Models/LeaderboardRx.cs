@@ -27,16 +27,16 @@ SOFTWARE.
 #endregion
 
 
-
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Shared.Enums;
 
 namespace Shared.Database.Models
 {
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-
     public class LeaderboardRx
     {
         [Key]
@@ -187,6 +187,166 @@ namespace Shared.Database.Models
             }
         }
 
-        public static LeaderboardRx GetLeaderboard(Users user) => GetLeaderboard(user.Id);
+        public void IncreaseScore(ulong score, bool ranked, PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        if (ranked)
+                            RankedScoreOsu += score;
+                        else
+                            TotalScoreOsu += score;
+                        break;
+                    case PlayMode.Taiko:
+                        if (ranked)
+                            RankedScoreTaiko += score;
+                        else
+                            TotalScoreTaiko += score;
+                        break;
+                    case PlayMode.Ctb:
+                        if (ranked)
+                            RankedScoreCtb += score;
+                        else
+                            TotalScoreCtb += score;
+                        break;
+                    case PlayMode.Mania:
+                        if (ranked)
+                            RankedScoreMania += score;
+                        else
+                            TotalScoreMania += score;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+        public void IncreaseCount300(ulong c, PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        Count300Osu += c;
+                        break;
+                    case PlayMode.Taiko:
+                        Count300Taiko += c;
+                        break;
+                    case PlayMode.Ctb:
+                        Count300Ctb += c;
+                        break;
+                    case PlayMode.Mania:
+                        Count300Mania += c;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+        public void IncreaseCount100(ulong c, PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        Count100Osu += c;
+                        break;
+                    case PlayMode.Taiko:
+                        Count100Taiko += c;
+                        break;
+                    case PlayMode.Ctb:
+                        Count100Ctb += c;
+                        break;
+                    case PlayMode.Mania:
+                        Count100Mania += c;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+        public void IncreaseCount50(ulong c, PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        Count50Osu += c;
+                        break;
+                    case PlayMode.Taiko:
+                        Count50Taiko += c;
+                        break;
+                    case PlayMode.Ctb:
+                        Count50Ctb += c;
+                        break;
+                    case PlayMode.Mania:
+                        Count50Mania += c;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+        public void IncreaseCountMiss(ulong c, PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        CountMissOsu += c;
+                        break;
+                    case PlayMode.Taiko:
+                        CountMissTaiko += c;
+                        break;
+                    case PlayMode.Ctb:
+                        CountMissCtb += c;
+                        break;
+                    case PlayMode.Mania:
+                        CountMissMania += c;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+        public void IncreasePlaycount(PlayMode mode)
+        {
+            using (SoraContext db = new SoraContext())
+            {
+                switch (mode)
+                {
+                    case PlayMode.Osu:
+                        PlayCountOsu++;
+                        break;
+                    case PlayMode.Taiko:
+                        PlayCountTaiko++;
+                        break;
+                    case PlayMode.Ctb:
+                        PlayCountCtb++;
+                        break;
+                    case PlayMode.Mania:
+                        PlayCountMania++;
+                        break;
+                }
+
+                db.LeaderboardRx.Update(this);
+                db.SaveChanges();
+            }
+        }
+
+        public static LeaderboardRx GetLeaderboard(Users user)
+        {
+            return GetLeaderboard(user.Id);
+        }
     }
 }

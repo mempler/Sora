@@ -26,26 +26,32 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Enums;
+using Sora.Packets.Server;
+
 namespace Sora.Objects
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using Enums;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public static class MultiplayerLobby
     {
         private static long _matches;
         public static Dictionary<long, MultiplayerRoom> Rooms = new Dictionary<long, MultiplayerRoom>();
 
-        public static IEnumerable<MultiplayerRoom> GetRooms() => Rooms.Select(x => x.Value);
+        public static IEnumerable<MultiplayerRoom> GetRooms()
+        {
+            return Rooms.Select(x => x.Value);
+        }
 
-        public static MultiplayerRoom GetRoom(long matchId) => Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
+        public static MultiplayerRoom GetRoom(long matchId)
+        {
+            return Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
+        }
 
         public static long Add(MultiplayerRoom room)
         {
@@ -68,9 +74,15 @@ namespace Sora.Objects
         public MultiSlotTeam Team;
         public int UserId;
 
-        public override string ToString() => $"Status: {Status} UserId: {UserId} Team: {Team} Mods: {Mods}";
+        public override string ToString()
+        {
+            return $"Status: {Status} UserId: {UserId} Team: {Team} Mods: {Mods}";
+        }
 
-        public bool IsHost(MultiplayerRoom room) => room.HostId == UserId;
+        public bool IsHost(MultiplayerRoom room)
+        {
+            return room.HostId == UserId;
+        }
     }
 
     public class MultiplayerRoom : ISerializer, ICloneable
@@ -107,25 +119,25 @@ namespace Sora.Objects
                 {
                     // ReSharper disable once ConditionalTernaryEqualBranch
                     Status = i > 6 ? MultiSlotStatus.Locked : MultiSlotStatus.Locked,
-                    Mods = 0,
-                    Team = MultiSlotTeam.NoTeam,
+                    Mods   = 0,
+                    Team   = MultiSlotTeam.NoTeam,
                     UserId = -1
                 };
         }
 
-    #region ISerializer
+        #region ISerializer
 
         public void ReadFromStream(MStreamReader sr)
         {
-            MatchId = sr.ReadInt16();
-            InProgress = sr.ReadBoolean();
-            MatchType = (MatchType) sr.ReadByte();
-            ActiveMods = (Mod) sr.ReadUInt32();
-            Name = sr.ReadString();
-            Password = sr.ReadString();
+            MatchId     = sr.ReadInt16();
+            InProgress  = sr.ReadBoolean();
+            MatchType   = (MatchType) sr.ReadByte();
+            ActiveMods  = (Mod) sr.ReadUInt32();
+            Name        = sr.ReadString();
+            Password    = sr.ReadString();
             BeatmapName = sr.ReadString();
-            BeatmapId = sr.ReadInt32();
-            BeatmapMd5 = sr.ReadString();
+            BeatmapId   = sr.ReadInt32();
+            BeatmapMd5  = sr.ReadString();
 
             for (int i = 0; i < MaxPlayers; i++)
                 Slots[i].Status = (MultiSlotStatus) sr.ReadByte();
@@ -136,10 +148,10 @@ namespace Sora.Objects
             for (int i = 0; i < MaxPlayers; i++)
                 Slots[i].UserId = (Slots[i].Status & (MultiSlotStatus) 124) > 0 ? sr.ReadInt32() : -1;
 
-            HostId = sr.ReadInt32();
-            PlayMode = (PlayMode) sr.ReadByte();
-            ScoringType = (ScoringType) sr.ReadByte();
-            TeamType = (TeamType) sr.ReadByte();
+            HostId       = sr.ReadInt32();
+            PlayMode     = (PlayMode) sr.ReadByte();
+            ScoringType  = (ScoringType) sr.ReadByte();
+            TeamType     = (TeamType) sr.ReadByte();
             SpecialModes = (MatchSpecialModes) sr.ReadByte();
 
             if (SpecialModes == MatchSpecialModes.Freemods)
@@ -187,9 +199,9 @@ namespace Sora.Objects
             sw.Write(Seed);
         }
 
-    #endregion
+        #endregion
 
-    #region Default Stuff
+        #region Default Stuff
 
         public override string ToString()
         {
@@ -215,11 +227,14 @@ namespace Sora.Objects
                    $"Seed: {Seed}";
         }
 
-        public object Clone() => MemberwiseClone();
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
 
-    #endregion
+        #endregion
 
-    #region Multiplayer Stuff
+        #region Multiplayer Stuff
 
         public bool Join(Presence pr, string password)
         {
@@ -228,8 +243,8 @@ namespace Sora.Objects
                 Slots.First(x => x.UserId == -1 && x.Status == MultiSlotStatus.Open ||
                                  x.Status == MultiSlotStatus.Quit);
             if (slot == null) return false;
-            slot.UserId = pr.User.Id;
-            slot.Status = MultiSlotStatus.NotReady;
+            slot.UserId   = pr.User.Id;
+            slot.Status   = MultiSlotStatus.NotReady;
             pr.JoinedRoom = this;
             return true;
         }
@@ -261,17 +276,17 @@ namespace Sora.Objects
             }
         }
 
-        public void Invite(Presence pr)
+        public void Invite(Presence pr, Presence opr)
         {
             // Took me a while to figure out. i tried osu://mp/matchid/Password.Replace(" ", "_");
             string inviteUri = $"osump://{MatchId}/{Password.Replace(" ", "_")}";
-
-            pr.Write(new Invite(new MessageStruct
+    
+            opr.Write(new Invite(new MessageStruct
             {
                 ChannelTarget = pr.User.Username,
-                Message = $"\0Hey, I want to play with you! Join me [{inviteUri} {Name}]",
-                Username = pr.User.Username,
-                SenderId = pr.User.Id
+                Message       = $"\0Hey, I want to play with you! Join me [{inviteUri} {Name}]",
+                Username      = pr.User.Username,
+                SenderId      = opr.User.Id
             }));
         }
 
@@ -285,8 +300,8 @@ namespace Sora.Objects
             MultiplayerSlot slot = Slots[SlotId];
             slot.UserId = userId;
             slot.Status = status;
-            slot.Team = team;
-            slot.Mods = mods;
+            slot.Team   = team;
+            slot.Mods   = mods;
 
             Update();
         }
@@ -298,8 +313,8 @@ namespace Sora.Objects
             MultiplayerSlot firstslot = Slots[SlotId];
             firstslot.UserId = slot.UserId;
             firstslot.Status = slot.Status;
-            firstslot.Team = slot.Team;
-            firstslot.Mods = slot.Mods;
+            firstslot.Team   = slot.Team;
+            firstslot.Mods   = slot.Mods;
 
             Update();
         }
@@ -308,8 +323,8 @@ namespace Sora.Objects
         {
             firstslot.UserId = secondslot.UserId;
             firstslot.Status = secondslot.Status;
-            firstslot.Team = secondslot.Team;
-            firstslot.Mods = secondslot.Mods;
+            firstslot.Team   = secondslot.Team;
+            firstslot.Mods   = secondslot.Mods;
 
             Update();
         }
@@ -318,8 +333,8 @@ namespace Sora.Objects
         {
             slot.UserId = -1;
             slot.Status = MultiSlotStatus.Open;
-            slot.Team = MultiSlotTeam.NoTeam;
-            slot.Mods = Mod.None;
+            slot.Team   = MultiSlotTeam.NoTeam;
+            slot.Mods   = Mod.None;
 
             Update();
         }
@@ -369,18 +384,18 @@ namespace Sora.Objects
 
         public void ChangeSettings(MultiplayerRoom room)
         {
-            MatchType = room.MatchType;
-            ActiveMods = room.ActiveMods;
-            Name = room.Name;
-            BeatmapName = room.BeatmapName;
-            BeatmapId = room.BeatmapId;
-            BeatmapMd5 = room.BeatmapMd5;
-            HostId = room.HostId;
-            PlayMode = room.PlayMode;
-            ScoringType = room.ScoringType;
-            TeamType = room.TeamType;
+            MatchType    = room.MatchType;
+            ActiveMods   = room.ActiveMods;
+            Name         = room.Name;
+            BeatmapName  = room.BeatmapName;
+            BeatmapId    = room.BeatmapId;
+            BeatmapMd5   = room.BeatmapMd5;
+            HostId       = room.HostId;
+            PlayMode     = room.PlayMode;
+            ScoringType  = room.ScoringType;
+            TeamType     = room.TeamType;
             SpecialModes = room.SpecialModes;
-            Seed = room.Seed;
+            Seed         = room.Seed;
 
             Update();
         }
@@ -430,7 +445,10 @@ namespace Sora.Objects
             Update();
         }
 
-        public void Failed(Presence pr) => Failed(pr.User.Id);
+        public void Failed(Presence pr)
+        {
+            Failed(pr.User.Id);
+        }
 
         public void Failed(int userId)
         {
@@ -438,7 +456,10 @@ namespace Sora.Objects
             Broadcast(new MatchPlayerFailed(GetSlotIdByUserId(userId)));
         }
 
-        public void Complete(Presence pr) => Complete(pr.User.Id);
+        public void Complete(Presence pr)
+        {
+            Complete(pr.User.Id);
+        }
 
         public void Complete(int userId)
         {
@@ -458,7 +479,10 @@ namespace Sora.Objects
             Broadcast(new MatchComplete());
         }
 
-        public void Skip(Presence pr) => Skip(pr.User.Id);
+        public void Skip(Presence pr)
+        {
+            Skip(pr.User.Id);
+        }
 
         public void Skip(int userId)
         {
@@ -481,7 +505,10 @@ namespace Sora.Objects
             return mods;
         }
 
-        public MultiplayerSlot GetSlotByUserId(int userId) => Slots.FirstOrDefault(x => x.UserId == userId);
+        public MultiplayerSlot GetSlotByUserId(int userId)
+        {
+            return Slots.FirstOrDefault(x => x.UserId == userId);
+        }
 
         public int GetSlotIdByUserId(int userId)
         {
@@ -494,6 +521,6 @@ namespace Sora.Objects
             return result;
         }
 
-    #endregion
+        #endregion
     }
 }

@@ -26,25 +26,31 @@ SOFTWARE.
 
 #endregion
 
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+
 namespace Shared.Migrations
 {
-    using Microsoft.EntityFrameworkCore.Metadata;
-    using Microsoft.EntityFrameworkCore.Migrations;
-
     public partial class LetsbeFriends : Migration
     {
-        protected override void Up(MigrationBuilder migrationBuilder) => migrationBuilder.CreateTable(
-            "Friends",
-            table => new
-            {
-                Id = table.Column<int>()
-                          .Annotation("MySql:ValueGenerationStrategy",
-                              MySqlValueGenerationStrategy.IdentityColumn),
-                UserId = table.Column<int>(),
-                FriendId = table.Column<int>()
-            },
-            constraints: table => { table.PrimaryKey("PK_Friends", x => x.Id); });
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                "Friends",
+                table => new
+                {
+                    Id = table.Column<int>()
+                              .Annotation("MySql:ValueGenerationStrategy",
+                                          MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId   = table.Column<int>(),
+                    FriendId = table.Column<int>()
+                },
+                constraints: table => { table.PrimaryKey("PK_Friends", x => x.Id); });
+        }
 
-        protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable("Friends");
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable("Friends");
+        }
     }
 }

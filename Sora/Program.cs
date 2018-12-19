@@ -26,20 +26,20 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Diagnostics;
+using System.Reflection;
+using Shared.Database;
+using Shared.Database.Models;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Shared.Plugins;
+using Sora.Objects;
+using Sora.Server;
+
 namespace Sora
 {
-    using System;
-    using System.Diagnostics;
-    using System.Reflection;
-    using Objects;
-    using Server;
-    using Shared.Database;
-    using Shared.Database.Models;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-    using Shared.Plugins;
-
     internal static class Program
     {
         private static HttpServer _server;
@@ -50,9 +50,11 @@ namespace Sora
             {
                 Logger.L.Info("Start Initalization");
                 Stopwatch watch = Stopwatch.StartNew();
-                Config conf = Config.ReadConfig();
+                Config    conf  = Config.ReadConfig();
                 _server = new HttpServer(conf.Server.Port);
-                using (new SoraContext()) { } // Initialize Database. (Migrate database)
+                using (new SoraContext())
+                {
+                } // Initialize Database. (Migrate database)
 
                 AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
                 {
@@ -68,16 +70,17 @@ namespace Sora
                 if (Users.GetUser(100) == null)
                     Users.InsertUser(new Users
                     {
-                        Id = 100,
-                        Username = "Sora",
-                        Email = "bot@gigamons.de",
-                        Password = "",
+                        Id         = 100,
+                        Username   = "Sora",
+                        Email      = "bot@gigamons.de",
+                        Password   = "",
                         Privileges = 0
                     });
 
                 watch.Stop();
                 Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.L.Error(ex);
                 Environment.Exit(1); // an CRITICAL error. close everything.

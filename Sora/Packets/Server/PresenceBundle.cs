@@ -26,23 +26,32 @@ SOFTWARE.
 
 #endregion
 
+using System.Collections.Generic;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Server
 {
-    using System.Collections.Generic;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class PresenceBundle : IPacket
     {
         public List<int> UserIds;
 
-        public PresenceBundle(List<int> userIds) => UserIds = userIds;
+        public PresenceBundle(List<int> userIds)
+        {
+            UserIds = userIds;
+        }
 
         public PacketId Id => PacketId.ServerUserPresenceBundle;
 
-        public void ReadFromStream(MStreamReader sr) => UserIds = sr.ReadInt32List();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            UserIds = sr.ReadInt32List();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(UserIds);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(UserIds);
+        }
     }
 }

@@ -26,27 +26,33 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Server
 {
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class Invite : IPacket
     {
         public MessageStruct Msg;
 
-        public Invite(MessageStruct message) => Msg = message;
+        public Invite(MessageStruct message)
+        {
+            Msg = message;
+        }
 
         public PacketId Id => PacketId.ServerInvite;
 
-        public void ReadFromStream(MStreamReader sr) => Msg = new MessageStruct
+        public void ReadFromStream(MStreamReader sr)
         {
-            Username = sr.ReadString(),
-            Message = sr.ReadString(),
-            ChannelTarget = sr.ReadString(),
-            SenderId = sr.ReadInt32()
-        };
+            Msg = new MessageStruct
+            {
+                Username      = sr.ReadString(),
+                Message       = sr.ReadString(),
+                ChannelTarget = sr.ReadString(),
+                SenderId      = sr.ReadInt32()
+            };
+        }
 
         public void WriteToStream(MStreamWriter sw)
         {

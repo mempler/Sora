@@ -26,26 +26,34 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using Shared.Interfaces;
+
 namespace Shared.Helpers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.Serialization.Formatters;
-    using System.Runtime.Serialization.Formatters.Binary;
-    using System.Text;
-    using Interfaces;
-
     public class MStreamWriter : BinaryWriter
     {
-        public MStreamWriter(Stream s) : base(s, Encoding.UTF8) { }
+        public MStreamWriter(Stream s) : base(s, Encoding.UTF8)
+        {
+        }
 
         public long Length => BaseStream.Length;
 
 
-        public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
+        public static MStreamWriter New()
+        {
+            return new MStreamWriter(new MemoryStream());
+        }
 
-        public void Write(ISerializer seri) => seri.WriteToStream(this);
+        public void Write(ISerializer seri)
+        {
+            seri.WriteToStream(this);
+        }
 
         public void Write(IPacket packet)
         {
@@ -71,7 +79,9 @@ namespace Shared.Helpers
         public void Write(string value, bool nullable)
         {
             if (value == null && nullable)
+            {
                 base.Write((byte) 0);
+            }
             else
             {
                 base.Write((byte) 0x0b);
@@ -100,9 +110,15 @@ namespace Shared.Helpers
             for (int i = 0; i < count; i++) Write(list[i]);
         }
 
-        public void WriteRawBuffer(byte[] buff) => base.Write(buff);
+        public void WriteRawBuffer(byte[] buff)
+        {
+            base.Write(buff);
+        }
 
-        public void WriteRawString(string value) => WriteRawBuffer(Encoding.UTF8.GetBytes(value));
+        public void WriteRawString(string value)
+        {
+            WriteRawBuffer(Encoding.UTF8.GetBytes(value));
+        }
 
         public void WriteObject(object obj)
         {
@@ -157,22 +173,29 @@ namespace Shared.Helpers
                         BinaryFormatter b = new BinaryFormatter
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
+                            TypeFormat     = FormatterTypeStyle.TypesWhenNeeded
                         };
                         b.Serialize(BaseStream, obj);
                         break;
                 }
         }
 
-        public byte[] ToArray() => ((MemoryStream) BaseStream).ToArray();
+        public byte[] ToArray()
+        {
+            return ((MemoryStream) BaseStream).ToArray();
+        }
     }
 
     public class MStreamReader : BinaryReader
     {
-        public MStreamReader(Stream s) : base(s, Encoding.UTF8) { }
+        public MStreamReader(Stream s) : base(s, Encoding.UTF8)
+        {
+        }
 
         public override string ReadString()
-            => (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
+        {
+            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
+        }
 
         public byte[] ReadBytes()
         {

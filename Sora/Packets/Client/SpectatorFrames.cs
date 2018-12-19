@@ -26,23 +26,29 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class SpectatorFrames : IPacket
     {
         public SpectatorFrame Frames;
         public PacketId Id => PacketId.ClientSpectateFrames;
 
-        public void ReadFromStream(MStreamReader sr) => Frames = sr.ReadData<SpectatorFrame>();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            Frames = sr.ReadData<SpectatorFrame>();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ScoreFrame : ISerializer
@@ -71,21 +77,21 @@ namespace Sora.Packets.Client
 
         public void ReadFromStream(MStreamReader sr)
         {
-            Time = sr.ReadInt32();
-            Id = sr.ReadByte();
-            Count300 = sr.ReadUInt16();
-            Count100 = sr.ReadUInt16();
-            Count50 = sr.ReadUInt16();
-            CountGeki = sr.ReadUInt16();
-            CountKatu = sr.ReadUInt16();
-            CountMiss = sr.ReadUInt16();
-            TotalScore = sr.ReadInt32();
-            MaxCombo = sr.ReadUInt16();
+            Time         = sr.ReadInt32();
+            Id           = sr.ReadByte();
+            Count300     = sr.ReadUInt16();
+            Count100     = sr.ReadUInt16();
+            Count50      = sr.ReadUInt16();
+            CountGeki    = sr.ReadUInt16();
+            CountKatu    = sr.ReadUInt16();
+            CountMiss    = sr.ReadUInt16();
+            TotalScore   = sr.ReadInt32();
+            MaxCombo     = sr.ReadUInt16();
             CurrentCombo = sr.ReadUInt16();
-            Perfect = sr.ReadBoolean();
-            CurrentHp = sr.ReadByte();
-            TagByte = sr.ReadByte();
-            ScoreV2 = sr.ReadBoolean();
+            Perfect      = sr.ReadBoolean();
+            CurrentHp    = sr.ReadByte();
+            TagByte      = sr.ReadByte();
+            ScoreV2      = sr.ReadBoolean();
             ComboPortion = ScoreV2 ? sr.ReadDouble() : 0;
             BonusPortion = ScoreV2 ? sr.ReadDouble() : 0;
         }
@@ -112,12 +118,15 @@ namespace Sora.Packets.Client
             sw.Write(BonusPortion);
         }
 
-        public override string ToString() => $"Time: {Time} Id: {Id}\n" +
-                                             $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
-                                             $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
-                                             $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
-                                             $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
-                                             $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
+        public override string ToString()
+        {
+            return $"Time: {Time} Id: {Id}\n" +
+                   $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
+                   $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
+                   $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
+                   $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
+                   $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
+        }
     }
 
     public class SpectatorFrame : ISerializer
@@ -176,10 +185,10 @@ namespace Sora.Packets.Client
         public void ReadFromStream(MStreamReader sr)
         {
             ButtonState = sr.ReadByte();
-            Button = sr.ReadByte();
-            MouseX = sr.ReadSingle();
-            MouseY = sr.ReadSingle();
-            Time = sr.ReadInt32();
+            Button      = sr.ReadByte();
+            MouseX      = sr.ReadSingle();
+            MouseY      = sr.ReadSingle();
+            Time        = sr.ReadInt32();
         }
 
         public void WriteToStream(MStreamWriter sw)
@@ -192,6 +201,8 @@ namespace Sora.Packets.Client
         }
 
         public override string ToString()
-            => $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
+        {
+            return $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
+        }
     }
 }

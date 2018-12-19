@@ -28,5 +28,9 @@ SOFTWARE.
 
 namespace Sora.Enums
 {
-    public enum ErrorStates { Ok, Update }
+    public enum ErrorStates
+    {
+        Ok,
+        Update
+    }
 }

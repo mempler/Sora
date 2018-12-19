@@ -26,21 +26,27 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Enums;
+
 namespace Sora.Packets.Client
 {
-    using Enums;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class Exit : IPacket
     {
         public ErrorStates ErrorState;
         public PacketId Id => PacketId.ClientExit;
 
 
-        public void ReadFromStream(MStreamReader sr) => ErrorState = (ErrorStates) sr.ReadInt32();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            ErrorState = (ErrorStates) sr.ReadInt32();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write((int) ErrorState);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write((int) ErrorState);
+        }
     }
 }

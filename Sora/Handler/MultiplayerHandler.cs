@@ -26,27 +26,27 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Enums;
+using Sora.Objects;
+using Sora.Packets.Client;
+using Sora.Packets.Server;
+using MatchScoreUpdate = Sora.Packets.Server.MatchScoreUpdate;
+
 namespace Sora.Handler
 {
-    using System;
-    using System.Collections.Generic;
-    using Enums;
-    using Objects;
-    using Packets.Client;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using MatchScoreUpdate = Packets.Server.MatchScoreUpdate;
-
     public class MultiplayerHandler
     {
-    #region Lobby
+        #region Lobby
 
         [Handler(HandlerTypes.BanchoLobbyJoin)]
         public void OnLobbyJoin(Presence pr)
         {
-            PacketStream lobbyStream = LPacketStreams.GetStream("lobby");
-            IEnumerable<MultiplayerRoom> rooms = MultiplayerLobby.GetRooms();
+            PacketStream                 lobbyStream = LPacketStreams.GetStream("lobby");
+            IEnumerable<MultiplayerRoom> rooms       = MultiplayerLobby.GetRooms();
             foreach (MultiplayerRoom room in rooms)
                 pr.Write(new MatchNew(room));
 
@@ -54,11 +54,14 @@ namespace Sora.Handler
         }
 
         [Handler(HandlerTypes.BanchoLobbyPart)]
-        public void OnLobbyLeft(Presence pr) => LPacketStreams.GetStream("lobby").Left(pr);
+        public void OnLobbyLeft(Presence pr)
+        {
+            LPacketStreams.GetStream("lobby").Left(pr);
+        }
 
-    #endregion
+        #endregion
 
-    #region Match
+        #region Match
 
         [Handler(HandlerTypes.BanchoMatchCreate)]
         public void OnMatchCreate(Presence pr, MultiplayerRoom room)
@@ -242,7 +245,7 @@ namespace Sora.Handler
             if (pr.JoinedRoom == null) return;
             Presence opr = LPresences.GetPresence(userId);
             if (opr == null) return;
-            pr.JoinedRoom.Invite(opr);
+            pr.JoinedRoom.Invite(pr, opr);
         }
 
         [Handler(HandlerTypes.BanchoMatchStart)]
@@ -261,17 +264,28 @@ namespace Sora.Handler
 
         [Handler(HandlerTypes.BanchoMatchScoreUpdate)]
         public void OnMatchScoreUpdate(Presence pr, ScoreFrame frame)
-            => pr.JoinedRoom?.Broadcast(new MatchScoreUpdate(pr.JoinedRoom.GetSlotIdByUserId(pr.User.Id), frame));
+        {
+            pr.JoinedRoom?.Broadcast(new MatchScoreUpdate(pr.JoinedRoom.GetSlotIdByUserId(pr.User.Id), frame));
+        }
 
         [Handler(HandlerTypes.BanchoMatchFailed)]
-        public void OnMatchFailed(Presence pr) => pr.JoinedRoom?.Failed(pr);
+        public void OnMatchFailed(Presence pr)
+        {
+            pr.JoinedRoom?.Failed(pr);
+        }
 
         [Handler(HandlerTypes.BanchoMatchComplete)]
-        public void OnMatchComplete(Presence pr) => pr.JoinedRoom?.Complete(pr);
+        public void OnMatchComplete(Presence pr)
+        {
+            pr.JoinedRoom?.Complete(pr);
+        }
 
         [Handler(HandlerTypes.BanchoMatchSkipRequest)]
-        public void OnMatchSkipRequest(Presence pr) => pr.JoinedRoom?.Skip(pr);
+        public void OnMatchSkipRequest(Presence pr)
+        {
+            pr.JoinedRoom?.Skip(pr);
+        }
 
-    #endregion
+        #endregion
     }
 }

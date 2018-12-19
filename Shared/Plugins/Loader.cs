@@ -26,14 +26,13 @@ SOFTWARE.
 
 #endregion
 
+using System.IO;
+using System.Reflection;
+using System.Xml.Linq;
+using Shared.Helpers;
+
 namespace Shared.Plugins
 {
-    using System.IO;
-    using System.Reflection;
-    using System.Xml.Linq;
-    using Handlers;
-    using Helpers;
-
     public static class Loader
     {
         public static void LoadPlugins()
@@ -44,13 +43,13 @@ namespace Shared.Plugins
             foreach (string f in Directory.GetFiles("Plugins")) // Press F for File
             {
                 Assembly file = Assembly.LoadFrom(f);
-                Stream fs = file.GetManifestResourceStream($"{file.GetName().Name}.plugin.xml");
+                Stream   fs   = file.GetManifestResourceStream($"{file.GetName().Name}.plugin.xml");
                 if (fs == null) continue;
                 XDocument doc = XDocument.Load(fs);
                 if (doc.Root != null)
                     Logger.L.Info(
                         $"Loaded plugin: {doc.Root.Attribute("Name")?.Value}. Version: {doc.Root.Attribute("Version")?.Value}");
-                Handlers.InitHandlers(file, false);
+                Handlers.Handlers.InitHandlers(file, false);
             }
 
             Logger.L.Info("Finish loading plugins!");

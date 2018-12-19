@@ -26,30 +26,33 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using JetBrains.Annotations;
+using Shared.Database.Models;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Enums;
+using Sora.Packets.Client;
+
 namespace Sora.Objects
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-    using Enums;
-    using JetBrains.Annotations;
-    using Packets.Client;
-    using Shared.Database.Models;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public static class LPresences
     {
         private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
 
         public static IEnumerable<Presence> AllPresences => Presences.Select(x => x.Value);
 
-        public static Presence GetPresence(string token) => Presences.TryGetValue(token, out Presence pr) ? pr : null;
+        public static Presence GetPresence(string token)
+        {
+            return Presences.TryGetValue(token, out Presence pr) ? pr : null;
+        }
 
         public static Presence GetPresence(int userid)
         {
@@ -61,11 +64,17 @@ namespace Sora.Objects
         }
 
         [UsedImplicitly]
-        public static IEnumerable<int> GetUserIds() => Presences.Select(x => x.Value.User.Id);
+        public static IEnumerable<int> GetUserIds()
+        {
+            return Presences.Select(x => x.Value.User.Id);
+        }
 
-        public static IEnumerable<int> GetUserIds(Presence pr) => Presences
-                                                                  .Where(x => x.Value.Token != pr.Token)
-                                                                  .Select(z => z.Value.User.Id);
+        public static IEnumerable<int> GetUserIds(Presence pr)
+        {
+            return Presences
+                   .Where(x => x.Value.Token != pr.Token)
+                   .Select(z => z.Value.User.Id);
+        }
 
         public static void BeginPresence(Presence presence)
         {
@@ -99,24 +108,28 @@ namespace Sora.Objects
             pr.IsLastRequest = true;
         }
 
-        public static void TimeoutCheck() => new Thread(() =>
+        public static void TimeoutCheck()
         {
-            while (true)
+            new Thread(() =>
             {
-                try
+                while (true)
                 {
-                    foreach (KeyValuePair<string, Presence> pr in Presences)
-                        pr.Value.TimeoutCheck();
+                    try
+                    {
+                        foreach (KeyValuePair<string, Presence> pr in Presences)
+                            pr.Value.TimeoutCheck();
 
-                    if (Presences == null) break;
-                } catch
-                {
-                    // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
+                        if (Presences == null) break;
+                    }
+                    catch
+                    {
+                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
+                    }
+
+                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
                 }
-
-                Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
-            }
-        }).Start();
+            }).Start();
+        }
     }
 
     public class Presence : IComparable
@@ -158,7 +171,7 @@ namespace Sora.Objects
         public Presence()
         {
             LastRequest = new Stopwatch();
-            Token = Guid.NewGuid().ToString();
+            Token       = Guid.NewGuid().ToString();
             MemoryStream str = new MemoryStream();
             Stream = new MStreamWriter(str);
         }
@@ -172,17 +185,20 @@ namespace Sora.Objects
 
         public int CompareTo(object obj)
         {
-            if (obj.GetType() != typeof (Presence)) return -1;
+            if (obj.GetType() != typeof(Presence)) return -1;
             if (!(obj is Presence pr)) return -1;
             return pr.Token == Token ? 0 : 1;
         }
 
-        protected bool Equals(Presence pr) => Token == pr.Token;
+        protected bool Equals(Presence pr)
+        {
+            return Token == pr.Token;
+        }
 
         public MemoryStream GetOutput(bool reset = true)
         {
             MemoryStream copy = new MemoryStream();
-            long pos = Stream.BaseStream.Position;
+            long         pos  = Stream.BaseStream.Position;
 
             Stream.BaseStream.Position = 0;
             Stream.BaseStream.CopyTo(copy);
@@ -193,7 +209,9 @@ namespace Sora.Objects
 
             using (Stream)
                 // Dispose after chaning stream.
+            {
                 Stream = new MStreamWriter(new MemoryStream());
+            }
 
             return copy;
         }

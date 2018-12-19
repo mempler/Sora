@@ -26,15 +26,15 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Client;
+using Sora.Packets.Server;
+using SpectatorFrames = Sora.Packets.Server.SpectatorFrames;
+
 namespace Sora.Handler
 {
-    using Objects;
-    using Packets.Client;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using SpectatorFrames = Packets.Server.SpectatorFrames;
-
     public class SpectatorHandler
     {
         [Handler(HandlerTypes.BanchoStartSpectating)]
@@ -83,10 +83,15 @@ namespace Sora.Handler
         }
 
         [Handler(HandlerTypes.BanchoCantSpectate)]
-        public void OnUserCantSpectate(Presence pr) => pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
+        public void OnUserCantSpectate(Presence pr)
+        {
+            pr.Spectator?.Broadcast(new SpectatorCantSpectate(pr.User.Id));
+        }
 
         [Handler(HandlerTypes.BanchoSpectateFrames)]
         public void OnBroadcastingFrames(Presence pr, SpectatorFrame frames)
-            => pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
+        {
+            pr.Spectator?.Broadcast(new SpectatorFrames(frames), pr);
+        }
     }
 }

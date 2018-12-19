@@ -26,19 +26,25 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class ChannelLeave : IPacket
     {
         public string ChannelName;
         public PacketId Id => PacketId.ClientChannelJoin;
 
-        public void ReadFromStream(MStreamReader sr) => ChannelName = sr.ReadString();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            ChannelName = sr.ReadString();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(ChannelName);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(ChannelName);
+        }
     }
 }

@@ -26,21 +26,21 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using MaxMind.GeoIP2.Responses;
+using Shared.Database.Models;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Sora.Enums;
+using Sora.Helpers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace Sora.Handler
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Enums;
-    using Helpers;
-    using MaxMind.GeoIP2.Responses;
-    using Objects;
-    using Packets.Server;
-    using Shared.Database.Models;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-
     internal class LoginHandler
     {
         [Handler(HandlerTypes.BanchoLoginHandler)]
@@ -75,23 +75,26 @@ namespace Sora.Handler
                     CityResponse data = Localisation.GetData(ip);
                     pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
                     if (data.Location.Longitude != null) pr.Lon = (double) data.Location.Longitude;
-                    if (data.Location.Latitude != null) pr.Lat = (double) data.Location.Latitude;
+                    if (data.Location.Latitude != null) pr.Lat  = (double) data.Location.Latitude;
                 }
 
-                pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(pr.User);
-                pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(pr.User);
+                pr.LeaderboardStd   = LeaderboardStd.GetLeaderboard(pr.User);
+                pr.LeaderboardRx    = LeaderboardRx.GetLeaderboard(pr.User);
                 pr.LeaderboardTouch = LeaderboardTouch.GetLeaderboard(pr.User);
 
-                pr.Timezone = loginData.Timezone;
+                pr.Timezone         = loginData.Timezone;
                 pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
+                pr.Status.Playmode = PlayMode.Osu;
+                pr.Status.Status   = Status.Unknown;
+                
                 LPresences.BeginPresence(pr);
 
                 Success(dataWriter, user.Id);
                 dataWriter.Write(new ProtocolNegotiation());
                 dataWriter.Write(new UserPresence(pr));
                 dataWriter.Write(new FriendsList(Friends.GetFriends(pr.User.Id).ToList()));
-                dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));
+                dataWriter.Write(new PresenceBundle(LPresences.GetUserIds(pr).ToList()));                
                 foreach (Presence opr in LPresences.AllPresences)
                 {
                     dataWriter.Write(new UserPresence(opr));
@@ -130,7 +133,8 @@ namespace Sora.Handler
                 stream.Broadcast(new UserPresence(pr));
                 stream.Broadcast(new HandleUpdate(pr));
                 stream.Join(pr);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.L.Error(ex);
                 Exception(dataWriter);
@@ -138,12 +142,18 @@ namespace Sora.Handler
         }
 
         private static void LoginFailed(MStreamWriter dataWriter)
-            => dataWriter.Write(new LoginResponse(LoginResponses.Failed));
+        {
+            dataWriter.Write(new LoginResponse(LoginResponses.Failed));
+        }
 
         private static void Exception(MStreamWriter dataWriter)
-            => dataWriter.Write(new LoginResponse(LoginResponses.Exception));
+        {
+            dataWriter.Write(new LoginResponse(LoginResponses.Exception));
+        }
 
-        private static void Success(MStreamWriter dataWriter, int userid) =>
+        private static void Success(MStreamWriter dataWriter, int userid)
+        {
             dataWriter.Write(new LoginResponse((LoginResponses) userid));
+        }
     }
 }

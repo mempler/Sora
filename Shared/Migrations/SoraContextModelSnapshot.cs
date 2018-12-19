@@ -74,8 +74,6 @@ namespace Shared.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BeatmapSetId");
-
                     b.ToTable("Beatmaps");
                 });
 
@@ -340,17 +338,17 @@ namespace Shared.Migrations
 
                     b.Property<double>("Accuracy");
 
-                    b.Property<short>("Count100");
+                    b.Property<ulong>("Count100");
 
-                    b.Property<short>("Count300");
+                    b.Property<ulong>("Count300");
 
-                    b.Property<short>("Count50");
+                    b.Property<ulong>("Count50");
 
-                    b.Property<short>("CountGeki");
+                    b.Property<ulong>("CountGeki");
 
-                    b.Property<short>("CountKatu");
+                    b.Property<ulong>("CountKatu");
 
-                    b.Property<short>("CountMiss");
+                    b.Property<ulong>("CountMiss");
 
                     b.Property<DateTime>("Date");
 
@@ -371,13 +369,11 @@ namespace Shared.Migrations
                     b.Property<string>("ScoreMD5")
                         .IsRequired();
 
-                    b.Property<int>("TotalScore");
+                    b.Property<ulong>("TotalScore");
 
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Scores");
                 });
@@ -413,22 +409,6 @@ namespace Shared.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserStats");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Beatmaps", b =>
-                {
-                    b.HasOne("Shared.Database.Models.BeatmapSets", "BeatmapSet")
-                        .WithMany()
-                        .HasForeignKey("BeatmapSetId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Scores", b =>
-                {
-                    b.HasOne("Shared.Database.Models.Users", "ScoreOwner")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

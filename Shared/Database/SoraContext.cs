@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Shared.Database.Models;
+using Shared.Helpers;
+
 namespace Shared.Database
 {
-    using System;
-    using Helpers;
-    using Microsoft.EntityFrameworkCore;
-    using Models;
-    using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-
     public sealed class SoraContext : DbContext
     {
         private static readonly bool[] Migrated = {false};
@@ -82,8 +82,13 @@ namespace Shared.Database
             if (cfg.MySql.Hostname == null)
                 Environment.Exit(1);
             optionsBuilder.UseMySql(
-                $"Server={cfg.MySql.Hostname};Database={cfg.MySql.Database};User={cfg.MySql.Username};Password={cfg.MySql.Password};Port={cfg.MySql.Port};",
-                mysqlOptions => { mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb); }
+                $"Server={cfg.MySql.Hostname};Database={cfg.MySql.Database};User={cfg.MySql.Username};Password={cfg.MySql.Password};Port={cfg.MySql.Port};CharSet=utf8mb4;",
+                mysqlOptions =>
+                {
+                    mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb);
+                    mysqlOptions.UnicodeCharSet(CharSet.Utf8mb4);
+                    mysqlOptions.AnsiCharSet(CharSet.Utf8mb4);
+                }
             );
         }
     }

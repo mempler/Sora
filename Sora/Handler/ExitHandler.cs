@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Enums;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace Sora.Handler
 {
-    using Enums;
-    using Objects;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Handlers;
-
     public class ExitHandler
     {
         [Handler(HandlerTypes.BanchoExit)]
@@ -44,7 +44,7 @@ namespace Sora.Handler
 
             mainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
             {
-                UserId = pr.User.Id,
+                UserId     = pr.User.Id,
                 ErrorState = err
             }), pr);
         }

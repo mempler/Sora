@@ -26,21 +26,31 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Server
 {
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class PresenceSingle : IPacket
     {
         public int UserId;
 
-        public PresenceSingle(int userId) => UserId = userId;
+        public PresenceSingle(int userId)
+        {
+            UserId = userId;
+        }
+
         public PacketId Id => PacketId.ServerUserPresenceSingle;
 
-        public void ReadFromStream(MStreamReader sr) => UserId = sr.ReadInt32();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            UserId = sr.ReadInt32();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(UserId);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(UserId);
+        }
     }
 }

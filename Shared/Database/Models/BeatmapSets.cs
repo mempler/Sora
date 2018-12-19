@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+
 namespace Shared.Database.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-
     public class BeatmapSets
     {
         [Key]
@@ -16,7 +16,7 @@ namespace Shared.Database.Models
 
         [NotMapped]
         public List<Beatmaps> Beatmaps { get; set; }
-        
+
         [Required]
         public DateTime LastUpdate { get; set; }
 
@@ -32,16 +32,20 @@ namespace Shared.Database.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public Beatmaps GetBeatmap(string fileMD5) => Beatmaps?.FirstOrDefault(b => b.FileMD5 == fileMD5);
+        public Beatmaps GetBeatmap(string fileMD5)
+        {
+            return Beatmaps?.FirstOrDefault(b => b.FileMD5 == fileMD5);
+        }
 
         public static BeatmapSets GetBeatmapSet(int setId)
         {
-            using (SoraContext db = new SoraContext()) {
+            using (SoraContext db = new SoraContext())
+            {
                 BeatmapSets sts = db.BeatmapSets.FirstOrDefault(s => s.Id == setId);
 
                 if (sts != null)
                     sts.Beatmaps = db.Beatmaps.Where(s => s.BeatmapSetId == sts.Id).ToList();
-                
+
                 return sts;
             }
         }

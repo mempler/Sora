@@ -28,5 +28,8 @@ SOFTWARE.
 
 namespace Sora.Enums
 {
-    public enum MatchType : byte { Default }
+    public enum MatchType : byte
+    {
+        Default
+    }
 }

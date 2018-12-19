@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Database.Models;
+using Shared.Enums;
+using Shared.Handlers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace Sora.Handler
 {
-    using Objects;
-    using Packets.Server;
-    using Shared.Database.Models;
-    using Shared.Enums;
-    using Shared.Handlers;
-
     public class MessageHandler
     {
         [Handler(HandlerTypes.BanchoSendIrcMessage)]

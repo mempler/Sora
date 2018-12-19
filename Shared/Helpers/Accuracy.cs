@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+
 namespace Shared.Helpers
 {
-    using Enums;
-
     public static class Accuracy
     {
         public static double GetAccuracy(

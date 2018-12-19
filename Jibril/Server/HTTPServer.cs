@@ -26,27 +26,27 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using SimpleHttp;
+
 namespace Jibril.Server
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-    using SimpleHttp;
-
-#region Server
+    #region Server
 
     public class HttpServer
     {
+        private readonly short _port;
         private bool _running;
-        private CancellationTokenSource cts = new CancellationTokenSource();
-        private short _port;
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
 
         public HttpServer(short port = 5001)
         {
-            _port = port;
+            _port    = port;
             _running = false;
         }
 
@@ -71,20 +71,60 @@ namespace Jibril.Server
         {
             Route.Add("/web/{handler}", (request, response, args) =>
             {
-                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}. Query is: {request.Url.Query}");
+                Logger.L.Info(
+                    $"Unknown Path {request.Url.AbsolutePath} " +
+                    $"Method is {request.HttpMethod} " +
+                    $"Query is {request.Url.Query} " +
+                    "Args are " + args["handler"]);
+                switch (args["handler"].Split("?")[0])
+                {
+                    case "osu-osz2-getscores.php":
+                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreboardRequest, request, response, args);
+                        break;
+                    case "osu-submit-modular.php":
+                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreSubmittion, request, response, args);
+                        break;
+                    default:
+                        Logger.L.Info(
+                            $"Unknown Path {request.Url.AbsolutePath} " +
+                            $"Method is {request.HttpMethod} " +
+                            $"Query is {request.Url.Query} " +
+                            "Args are " + args["handler"]);
+                        break;
+                }
+
                 response.Close();
             });
-            
+
+            Route.Add("/web/{handler}", (request, response, args) =>
+            {
+                switch (args["handler"].Split("?")[0])
+                {
+                    case "osu-submit-modular.php":
+                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreSubmittion, request, response, args);
+                        break;
+                    default:
+                        Logger.L.Info(
+                            $"Unknown Path {request.Url.AbsolutePath} " +
+                            $"Method is {request.HttpMethod} " +
+                            $"Query is {request.Url.Query} " +
+                            "Args are " + args["handler"]);
+                        break;
+                }
+
+                response.Close();
+            }, "POST");
+
             Route.Add("/{avatar}", (request, response, args) =>
             {
                 if (request.Url.Host.StartsWith("a."))
                     Handlers.ExecuteHandler(HandlerTypes.SharedAvatars, request, response, args);
                 else
                     response.StatusCode = 404;
-                
+
                 response.Close();
             });
-            
+
             Route.Error = (request, response, exception) =>
             {
                 Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
@@ -95,6 +135,5 @@ namespace Jibril.Server
         }
     }
 
-#endregion
+    #endregion
 }
-

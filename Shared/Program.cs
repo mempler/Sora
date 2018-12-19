@@ -27,7 +27,6 @@ SOFTWARE.
 #endregion
 
 
-
 // ReSharper disable All
 
 // Only used for Migration. so just ignore it ^^
@@ -40,7 +39,9 @@ namespace Shared
     {
         private static void Main()
         {
-            using (SoraContext db = new SoraContext()) { }
+            using (SoraContext db = new SoraContext())
+            {
+            }
         }
     }
 }

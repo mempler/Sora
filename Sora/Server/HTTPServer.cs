@@ -26,24 +26,24 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using SimpleHttp;
+
 namespace Sora.Server
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using SimpleHttp;
-
-#region Server
+    #region Server
 
     public class HttpServer
     {
+        private readonly short _port;
         private bool _running;
-        private CancellationTokenSource cts = new CancellationTokenSource();
-        private short _port;
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
 
         public HttpServer(short port = 5001)
         {
-            _port = port;
+            _port    = port;
             _running = false;
         }
 
@@ -69,10 +69,10 @@ namespace Sora.Server
             Route.Add("/", (req, res, args) =>
             {
                 res.Headers["cho-protocol"] = "19";
-                res.Headers["Connection"] = "keep-alive";
-                res.Headers["Keep-Alive"] = "timeout=60, max=100";
+                res.Headers["Connection"]   = "keep-alive";
+                res.Headers["Keep-Alive"]   = "timeout=60, max=100";
                 res.Headers["Content-Type"] = "text/html; charset=UTF-8";
-                res.Headers["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
+                res.Headers["cho-server"]   = "Sora (https://github.com/Mempler/Sora)";
 
                 Client client;
                 if (req.UserAgent == "osu!")
@@ -98,6 +98,5 @@ namespace Sora.Server
         }
     }
 
-#endregion
+    #endregion
 }
-

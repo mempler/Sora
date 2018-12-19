@@ -26,23 +26,23 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.IO;
+using System.Net;
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Sora.Enums;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace Sora.Server
 {
-    using System;
-    using System.IO;
-    using System.Net;
-    using Enums;
-    using Objects;
-    using Packets.Server;
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-
     public abstract class Client
     {
         protected Client(HttpListenerRequest request, HttpListenerResponse response)
         {
-            Request = request;
+            Request  = request;
             Response = response;
         }
 
@@ -56,7 +56,9 @@ namespace Sora.Server
     public class BrowserClient : Client
     {
         public BrowserClient(HttpListenerRequest request, HttpListenerResponse response)
-            : base(request, response) { }
+            : base(request, response)
+        {
+        }
 
         public override void DoWork()
         {
@@ -69,7 +71,9 @@ namespace Sora.Server
     public class OsuClient : Client
     {
         public OsuClient(HttpListenerRequest request, HttpListenerResponse response)
-            : base(request, response) { }
+            : base(request, response)
+        {
+        }
 
         public override void DoWork()
         {
@@ -87,15 +91,16 @@ namespace Sora.Server
                     {
                         if (Request.Headers["osu-token"] == null || Request.Headers["osu-token"] == string.Empty)
                         {
-                            pr = new Presence();
+                            pr                            = new Presence();
                             Response.Headers["cho-token"] = pr.Token;
-                            string ip = Response.Headers["X-Forwarded-For"];
+                            string ip                        = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
 
                             Handlers.ExecuteHandler(HandlerTypes.BanchoLoginHandler, pr, mw, mr, ip);
                             return;
                         }
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Logger.L.Error(ex);
                         mw.Write(new LoginResponse(LoginResponses.Exception));
@@ -121,9 +126,12 @@ namespace Sora.Server
 
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
+                            {
                                 Handlers.ExecuteHandler(HandlerTypes.BanchoPacketHandler, pr, packetId,
-                                    packetDataReader);
-                        } catch (Exception ex)
+                                                        packetDataReader);
+                            }
+                        }
+                        catch (Exception ex)
                         {
                             Logger.L.Error(ex);
                             break;
@@ -135,7 +143,8 @@ namespace Sora.Server
                             pr.GetOutput()
                               .WriteTo(Response.OutputStream);
                         Response.Close();
-                    } catch
+                    }
+                    catch
                     {
                         // Ignored because it may throw an exception.
                     }
@@ -143,7 +152,11 @@ namespace Sora.Server
                     if (pr.IsLastRequest)
                         LPresences.EndPresence(pr, true);
                 }
-            } catch (Exception ex) { Logger.L.Error(ex); }
+            }
+            catch (Exception ex)
+            {
+                Logger.L.Error(ex);
+            }
         }
     }
 }

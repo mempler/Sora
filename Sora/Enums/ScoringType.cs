@@ -30,7 +30,9 @@ namespace Sora.Enums
 {
     public enum ScoringType
     {
-        Score, Accuracy, Combo,
+        Score,
+        Accuracy,
+        Combo,
         ScoreV2
     }
 }

@@ -26,23 +26,29 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Objects;
+
 namespace Sora.Packets.Server
 {
-    using Objects;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class ChannelAvailable : IPacket
     {
         public Channel Channel;
 
-        public ChannelAvailable(Channel channel) => Channel = channel;
+        public ChannelAvailable(Channel channel)
+        {
+            Channel = channel;
+        }
 
         public PacketId Id => PacketId.ServerChannelAvailable;
 
-        public void ReadFromStream(MStreamReader sr) => Channel = new Channel(sr.ReadString(), sr.ReadString())
-            {UserCount = sr.ReadInt32()};
+        public void ReadFromStream(MStreamReader sr)
+        {
+            Channel = new Channel(sr.ReadString(), sr.ReadString())
+                {UserCount = sr.ReadInt32()};
+        }
 
         public void WriteToStream(MStreamWriter sw)
         {

@@ -26,20 +26,26 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using System;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class FriendRemove : IPacket
     {
         public int FriendId;
         public PacketId Id => PacketId.ClientFriendRemove;
 
-        public void ReadFromStream(MStreamReader sr) => FriendId = sr.ReadInt32();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            FriendId = sr.ReadInt32();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

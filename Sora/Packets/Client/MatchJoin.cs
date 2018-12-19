@@ -26,13 +26,13 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+
 namespace Sora.Packets.Client
 {
-    using System;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class MatchJoin : IPacket
     {
         public int MatchId;
@@ -41,10 +41,13 @@ namespace Sora.Packets.Client
 
         public void ReadFromStream(MStreamReader sr)
         {
-            MatchId = sr.ReadInt32();
+            MatchId  = sr.ReadInt32();
             Password = sr.ReadString();
         }
 
-        public void WriteToStream(MStreamWriter sw) => throw new NotImplementedException();
+        public void WriteToStream(MStreamWriter sw)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

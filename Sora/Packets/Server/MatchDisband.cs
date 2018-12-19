@@ -26,23 +26,33 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using Shared.Enums;
+using Shared.Helpers;
+using Shared.Interfaces;
+using Sora.Objects;
+
 namespace Sora.Packets.Server
 {
-    using System;
-    using Objects;
-    using Shared.Enums;
-    using Shared.Helpers;
-    using Shared.Interfaces;
-
     public class MatchDisband : IPacket
     {
         public MultiplayerRoom Room;
 
-        public MatchDisband(MultiplayerRoom room) => Room = room;
+        public MatchDisband(MultiplayerRoom room)
+        {
+            Room = room;
+        }
+
         public PacketId Id => PacketId.ServerMatchDisband;
 
-        public void ReadFromStream(MStreamReader sr) => throw new NotImplementedException();
+        public void ReadFromStream(MStreamReader sr)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write(Room);
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write(Room);
+        }
     }
 }

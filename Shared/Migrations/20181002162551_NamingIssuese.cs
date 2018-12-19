@@ -26,10 +26,10 @@ SOFTWARE.
 
 #endregion
 
+using Microsoft.EntityFrameworkCore.Migrations;
+
 namespace Shared.Migrations
 {
-    using Microsoft.EntityFrameworkCore.Migrations;
-
     public partial class NamingIssuese : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

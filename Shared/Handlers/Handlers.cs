@@ -26,16 +26,16 @@ SOFTWARE.
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using JetBrains.Annotations;
+using Shared.Enums;
+using Shared.Helpers;
+
 namespace Shared.Handlers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Enums;
-    using Helpers;
-    using JetBrains.Annotations;
-
     public static class Handlers
     {
         private static Dictionary<HandlerTypes, List<MethodInfo>> _handlers =
@@ -52,12 +52,12 @@ namespace Shared.Handlers
 
             MethodInfo[] methods = ass.GetTypes()
                                       .SelectMany(t => t.GetMethods())
-                                      .Where(m => m.GetCustomAttributes(typeof (HandlerAttribute), false).Length > 0)
+                                      .Where(m => m.GetCustomAttributes(typeof(HandlerAttribute), false).Length > 0)
                                       .ToArray();
 
             foreach (MethodInfo handler in methods)
             {
-                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof (HandlerAttribute)))[0]
+                HandlerTypes type = ((HandlerAttribute[]) handler.GetCustomAttributes(typeof(HandlerAttribute)))[0]
                     .Type;
                 if (!_handlers.ContainsKey(type))
                     _handlers[type] = new List<MethodInfo>();
@@ -74,7 +74,11 @@ namespace Shared.Handlers
             {
                 if (h.IsStatic)
                 {
-                    try { h.Invoke(null, args); } catch (TargetInvocationException tie)
+                    try
+                    {
+                        h.Invoke(null, args);
+                    }
+                    catch (TargetInvocationException tie)
                     {
                         Logger.L.Error(tie.InnerException);
                     }
@@ -84,7 +88,11 @@ namespace Shared.Handlers
 
                 object handlerClass =
                     Activator.CreateInstance(h.DeclaringType ?? throw new InvalidOperationException());
-                try { h.Invoke(handlerClass, args); } catch (TargetInvocationException tie)
+                try
+                {
+                    h.Invoke(handlerClass, args);
+                }
+                catch (TargetInvocationException tie)
                 {
                     Logger.L.Error(tie.InnerException);
                 }
@@ -98,6 +106,9 @@ namespace Shared.Handlers
     {
         public readonly HandlerTypes Type;
 
-        public HandlerAttribute(HandlerTypes t) => Type = t;
+        public HandlerAttribute(HandlerTypes t)
+        {
+            Type = t;
+        }
     }
 }

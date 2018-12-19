@@ -8,4 +8,7 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\Sora\Sora.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.1.3" />
+  </ItemGroup>
 </Project>

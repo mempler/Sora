@@ -26,11 +26,11 @@ SOFTWARE.
 
 #endregion
 
+using System.IO;
+using Shared.Helpers;
+
 namespace Sora.Helpers
 {
-    using System.IO;
-    using Shared.Helpers;
-
     internal class LoginParser
     {
         public static Login ParseLogin(MStreamReader reader)
@@ -42,10 +42,10 @@ namespace Sora.Helpers
                 l.Password = s.ReadLine();
                 string[] otherData = s.ReadLine()?.Split('|');
                 if (otherData == null || otherData.Length < 5) return null;
-                l.Build = otherData[0];
-                l.Timezone = byte.Parse(otherData[1]);
-                l.DisplayLocation = otherData[2] == "1";
-                l.SecurityHash = otherData[3];
+                l.Build             = otherData[0];
+                l.Timezone          = byte.Parse(otherData[1]);
+                l.DisplayLocation   = otherData[2] == "1";
+                l.SecurityHash      = otherData[3];
                 l.BlockNonFriendDMs = otherData[4] == "1";
             }
 

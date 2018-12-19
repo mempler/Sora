@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using Shared.Enums;
+using Shared.Handlers;
+using Shared.Helpers;
+using Sora.Objects;
+using Sora.Packets.Server;
+
 namespace ExamplePlugin
 {
-    using Shared.Enums;
-    using Shared.Handlers;
-    using Shared.Helpers;
-    using Sora.Objects;
-    using Sora.Packets.Server;
-
     internal class ExampleHandler
     {
         // Let the Handler loader know that this is an LoginHandler
@@ -41,6 +41,8 @@ namespace ExamplePlugin
         public void SomeLoginHandler(
             Presence pr, MStreamWriter dataWriter, MStreamReader dataReader,
             string ip) // a Login handler need those args.
-            => dataWriter.Write(new Announce("Hello World!")); // Write an Hello World message to client.
+        {
+            dataWriter.Write(new Announce("Hello World!"));
+        }
     }
 }

@@ -26,14 +26,14 @@ SOFTWARE.
 
 #endregion
 
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using JetBrains.Annotations;
+
 namespace Shared.Database.Models
 {
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-    using JetBrains.Annotations;
-
     [UsedImplicitly]
     public class Friends
     {
@@ -52,7 +52,9 @@ namespace Shared.Database.Models
         public static IEnumerable<int> GetFriends(int userId)
         {
             using (SoraContext db = new SoraContext())
+            {
                 return db.Friends.Where(t => t.UserId == userId).Select(x => x.FriendId).ToList();
+            }
         }
 
         public static void AddFriend(int userId, int friendId)
@@ -61,7 +63,7 @@ namespace Shared.Database.Models
             {
                 db.Friends.Add(new Friends
                 {
-                    UserId = userId,
+                    UserId   = userId,
                     FriendId = friendId
                 });
                 db.SaveChanges();

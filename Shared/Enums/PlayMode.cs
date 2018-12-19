@@ -30,7 +30,9 @@ namespace Shared.Enums
 {
     public enum PlayMode : byte
     {
-        Osu, Taiko, Ctb,
+        Osu,
+        Taiko,
+        Ctb,
         Mania
     }
 }
