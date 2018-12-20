@@ -9,6 +9,7 @@ using opi.v1;
 using Shared.Helpers;
 using PlayMode = Shared.Enums.PlayMode;
 using RankedStatus = Shared.Enums.RankedStatus;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Shared.Database.Models
 {
@@ -86,7 +87,7 @@ namespace Shared.Database.Models
         public string DifficultyName { get; set; }
 
         [Required]
-        public string FileMD5 { get; set; }
+        public string FileMd5 { get; set; }
 
         [Required]
         [DefaultValue(PlayMode.Osu)]
@@ -138,7 +139,7 @@ namespace Shared.Database.Models
                 RankedStatus     = Fixer.FixRankedStatus(bm.RankedStatus),
                 TotalLength      = bm.TotalLength,
                 BeatmapSetId     = bm.BeatmapSetId,
-                FileMD5          = bm.BeatmapMd5
+                FileMd5          = bm.BeatmapMd5
             };
 
             return b;
@@ -149,7 +150,7 @@ namespace Shared.Database.Models
             using (SoraContext db = new SoraContext())
             {
                 return db.Beatmaps
-                         .FirstOrDefault(bm => bm.FileMD5 == fileMd5 || bm.Id == beatmapId);
+                         .FirstOrDefault(bm => bm.FileMd5 == fileMd5 || bm.Id == beatmapId);
             }
         }
 

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Shared.Enums;
 using Shared.Interfaces;
 using PlayMode = Shared.Enums.PlayMode;
+// ReSharper disable AccessToDisposedClosure
 
 namespace Shared.Database.Models
 {
@@ -29,14 +30,14 @@ namespace Shared.Database.Models
         public Users ScoreOwner { get; set; }
 
         [Required]
-        public string FileMD5 { get; set; }
+        public string FileMd5 { get; set; }
 
         [Required]
-        public string ScoreMD5 { get; set; }
+        public string ScoreMd5 { get; set; }
 
         [Required]
         [DefaultValue("")]
-        public string ReplayMD5 { get; set; }
+        public string ReplayMd5 { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -113,11 +114,11 @@ namespace Shared.Database.Models
                    $"{UserId}|" +
                    $"{Position}|" +
                    $"{(int) Date.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds}|" +
-                   $"{Convert.ToInt32(ReplayMD5 != string.Empty)}";
+                   $"{Convert.ToInt32(ReplayMd5 != string.Empty)}";
         }
 
         public static IEnumerable<Scores> GetScores(
-            string fileMD5, Users user, PlayMode playMode = PlayMode.Osu,
+            string fileMd5, Users user, PlayMode playMode = PlayMode.Osu,
             bool relaxing = false, bool touching = false,
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
@@ -130,7 +131,7 @@ namespace Shared.Database.Models
                     cid = UserStats.GetUserStats(user.Id).CountryId;
 
                 IQueryable<Scores> query = db.Scores
-                                             .Where(score => score.FileMD5 == fileMD5 && score.PlayMode == playMode)
+                                             .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
                                              .Where(score
                                                         => relaxing
                                                             ? (score.Mods & Mod.Relax) != 0
@@ -159,7 +160,7 @@ namespace Shared.Database.Models
                 {
                     // inefficient but it works.
                     int selfPosition = db.Scores
-                                         .Where(score => score.FileMD5 == fileMD5 && score.PlayMode == playMode)
+                                         .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
                                          .Where(score
                                                     => relaxing
                                                         ? (score.Mods & Mod.Relax) != 0
@@ -180,7 +181,7 @@ namespace Shared.Database.Models
         {
             using (SoraContext db = new SoraContext())
             {
-                return db.Scores.Count(score => score.FileMD5 == fileMd5);
+                return db.Scores.Count(score => score.FileMd5 == fileMd5);
             }
         }
 
@@ -197,12 +198,6 @@ namespace Shared.Database.Models
                 db.Add(score);
                 db.SaveChanges();
             }
-        }
-
-        private static bool setPosition(Scores s, int pos)
-        {
-            s.Position = pos;
-            return true;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Jibril.Server
     {
         private readonly short _port;
         private bool _running;
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         public HttpServer(short port = 5001)
         {
@@ -64,7 +64,7 @@ namespace Jibril.Server
                 throw new Exception("Cannot stop if already stopped!");
 
             _running = false;
-            cts.Cancel();
+            _cts.Cancel();
         }
 
         private async Task _RunServer()
@@ -130,7 +130,7 @@ namespace Jibril.Server
                 response.Close();
             };
 
-            await SimpleHttp.HttpServer.ListenAsync(_port, cts.Token, Route.OnHttpRequestAsync);
+            await SimpleHttp.HttpServer.ListenAsync(_port, _cts.Token, Route.OnHttpRequestAsync);
         }
     }
 

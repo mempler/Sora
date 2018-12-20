@@ -29,7 +29,7 @@ namespace Jibril.Handler
             {
                 int replayId = int.Parse(query.Get("c"));
                 Scores score = Scores.GetScore(replayId);
-                using(FileStream s = File.OpenRead("data/replays/" + score.ReplayMD5 + ".rbin"))
+                using(FileStream s = File.OpenRead("data/replays/" + score.ReplayMd5 + ".rbin"))
                     s.CopyTo(response.OutputStream);
             }
             catch

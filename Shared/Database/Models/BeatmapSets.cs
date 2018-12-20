@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Shared.Database.Models
 {
@@ -32,9 +33,9 @@ namespace Shared.Database.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public Beatmaps GetBeatmap(string fileMD5)
+        public Beatmaps GetBeatmap(string fileMd5)
         {
-            return Beatmaps?.FirstOrDefault(b => b.FileMD5 == fileMD5);
+            return Beatmaps?.FirstOrDefault(b => b.FileMd5 == fileMd5);
         }
 
         public static BeatmapSets GetBeatmapSet(int setId)

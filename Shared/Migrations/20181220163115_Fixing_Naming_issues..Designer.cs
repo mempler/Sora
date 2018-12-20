@@ -2,14 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shared.Database;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(SoraContext))]
-    class SoraContextModelSnapshot : ModelSnapshot
+    [Migration("20181220163115_Fixing_Naming_issues.")]
+    partial class FixingNamingIssues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -291,13 +291,13 @@ namespace Sora.Objects
         }
 
         public void SetSlot(
-            int SlotId, int userId, MultiSlotStatus status,
+            int slotId, int userId, MultiSlotStatus status,
             MultiSlotTeam team = MultiSlotTeam.NoTeam,
             Mod mods = Mod.None)
         {
-            if (SlotId > MaxPlayers) throw new ArgumentOutOfRangeException();
+            if (slotId > MaxPlayers) throw new ArgumentOutOfRangeException();
 
-            MultiplayerSlot slot = Slots[SlotId];
+            MultiplayerSlot slot = Slots[slotId];
             slot.UserId = userId;
             slot.Status = status;
             slot.Team   = team;
@@ -306,11 +306,11 @@ namespace Sora.Objects
             Update();
         }
 
-        public void SetSlot(int SlotId, MultiplayerSlot slot)
+        public void SetSlot(int slotId, MultiplayerSlot slot)
         {
-            if (SlotId > MaxPlayers) throw new ArgumentOutOfRangeException();
+            if (slotId > MaxPlayers) throw new ArgumentOutOfRangeException();
 
-            MultiplayerSlot firstslot = Slots[SlotId];
+            MultiplayerSlot firstslot = Slots[slotId];
             firstslot.UserId = slot.UserId;
             firstslot.Status = slot.Status;
             firstslot.Team   = slot.Team;
@@ -369,14 +369,14 @@ namespace Sora.Objects
             Update();
         }
 
-        public void SetMods(Mod mods, MultiplayerSlot Slot)
+        public void SetMods(Mod mods, MultiplayerSlot slot)
         {
-            if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods)
-                Slot.Mods = fixMods(mods);
+            if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods)
+                slot.Mods = FixMods(mods);
             else if
                 (SpecialModes == MatchSpecialModes.Freemods)
-                Slot.Mods = mods;
-            else if (Slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)
+                slot.Mods = mods;
+            else if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)
                 ActiveMods = mods;
 
             Update();
@@ -492,7 +492,7 @@ namespace Sora.Objects
                 Broadcast(new MatchSkip());
         }
 
-        private Mod fixMods(Mod mods)
+        private Mod FixMods(Mod mods)
         {
             ActiveMods = 0;
             if ((mods & Mod.DoubleTime) > 0)

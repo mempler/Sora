@@ -28,15 +28,13 @@ SOFTWARE.
 
 /* Just a playground for me to play around. */
 
-using System;
-
 namespace Playground
 {
     internal static class Program
     {
         private static void Main()
         {
-            string line = Console.ReadLine();
+            //string line = Console.ReadLine();
         }
     }
 }

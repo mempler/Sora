@@ -12,13 +12,13 @@ namespace Shared.Migrations
                 "BeatmapSets",
                 table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>()
                               .Annotation("MySql:ValueGenerationStrategy",
                                           MySqlValueGenerationStrategy.IdentityColumn),
-                    LastUpdate     = table.Column<DateTime>(nullable: false),
-                    FavouriteCount = table.Column<int>(nullable: false),
-                    PlayCount      = table.Column<int>(nullable: false),
-                    PassCount      = table.Column<int>(nullable: false)
+                    LastUpdate     = table.Column<DateTime>(),
+                    FavouriteCount = table.Column<int>(),
+                    PlayCount      = table.Column<int>(),
+                    PassCount      = table.Column<int>()
                 },
                 constraints: table => { table.PrimaryKey("PK_BeatmapSets", x => x.Id); });
 
@@ -26,31 +26,31 @@ namespace Shared.Migrations
                 "Beatmaps",
                 table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>()
                               .Annotation("MySql:ValueGenerationStrategy",
                                           MySqlValueGenerationStrategy.IdentityColumn),
-                    RankedStatus     = table.Column<sbyte>(nullable: false),
-                    RankedDate       = table.Column<DateTime>(nullable: false),
-                    LastUpdate       = table.Column<DateTime>(nullable: false),
-                    Artist           = table.Column<string>(nullable: false),
-                    BeatmapSetId     = table.Column<int>(nullable: false),
-                    Bpm              = table.Column<float>(nullable: false),
-                    BeatmapCreator   = table.Column<string>(nullable: false),
-                    BeatmapCreatorId = table.Column<int>(nullable: false),
-                    Difficulty       = table.Column<double>(nullable: false),
-                    Cs               = table.Column<float>(nullable: false),
-                    Od               = table.Column<float>(nullable: false),
-                    Ar               = table.Column<float>(nullable: false),
-                    Hp               = table.Column<float>(nullable: false),
-                    HitLength        = table.Column<int>(nullable: false),
-                    Title            = table.Column<string>(nullable: false),
-                    TotalLength      = table.Column<int>(nullable: false),
-                    DifficultyName   = table.Column<string>(nullable: false),
-                    FileMD5          = table.Column<string>(nullable: false),
-                    PlayMode         = table.Column<byte>(nullable: false),
-                    Tags             = table.Column<string>(nullable: false),
-                    PlayCount        = table.Column<int>(nullable: false),
-                    PassCount        = table.Column<int>(nullable: false)
+                    RankedStatus     = table.Column<sbyte>(),
+                    RankedDate       = table.Column<DateTime>(),
+                    LastUpdate       = table.Column<DateTime>(),
+                    Artist           = table.Column<string>(),
+                    BeatmapSetId     = table.Column<int>(),
+                    Bpm              = table.Column<float>(),
+                    BeatmapCreator   = table.Column<string>(),
+                    BeatmapCreatorId = table.Column<int>(),
+                    Difficulty       = table.Column<double>(),
+                    Cs               = table.Column<float>(),
+                    Od               = table.Column<float>(),
+                    Ar               = table.Column<float>(),
+                    Hp               = table.Column<float>(),
+                    HitLength        = table.Column<int>(),
+                    Title            = table.Column<string>(),
+                    TotalLength      = table.Column<int>(),
+                    DifficultyName   = table.Column<string>(),
+                    FileMD5          = table.Column<string>(),
+                    PlayMode         = table.Column<byte>(),
+                    Tags             = table.Column<string>(),
+                    PlayCount        = table.Column<int>(),
+                    PassCount        = table.Column<int>()
                 },
                 constraints: table =>
                 {
