@@ -5,7 +5,7 @@ namespace EventManager.Enums
         #region Bancho
 
         BanchoPacketHandler,
-        BanchoLoginHandler,
+        BanchoLoginRequest,
         BanchoSendUserStatus,
         BanchoSendIrcMessage,
         BanchoExit,

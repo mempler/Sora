@@ -1,37 +1,46 @@
-using System.Diagnostics.Tracing;
+using EventManager.Attributes;
 using EventManager.Enums;
+using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
+using Sora.Services;
 
 namespace Sora.Events
 {
+    [EventClass]
     public class OnChannelLeaveEvent
     {
-        [Handler(HandlerTypes.BanchoChannelLeave)]
+        private readonly ChannelService _cs;
+
+        public OnChannelLeaveEvent(ChannelService cs)
+        {
+            _cs = cs;
+        }
+        
         [Event(EventType.BanchoChannelLeave)]
-        public void OnChannelLeave(Presence pr, string channelName)
+        public void OnChannelLeave(BanchoChannelLeaveArgs args)
         {
             Channel channel;
-            switch (channelName)
+            switch (args.ChannelName)
             {
                 case "#spectator":
-                    channel = pr.Spectator?.SpecChannel;
+                    channel = args.pr.Spectator?.SpecChannel;
                     break;
                 case "#multiplayer":
-                    channel = pr.JoinedRoom?.Channel;
+                    channel = args.pr.JoinedRoom?.Channel;
                     break;
                 default:
-                    channel = LChannels.GetChannel(channelName);
+                    channel = _cs.GetChannel(args.ChannelName);
                     break;
             }
 
             if (channel == null)
             {
-                pr.Write(new ChannelRevoked(channelName));
+                args.pr.Write(new ChannelRevoked(args.ChannelName));
                 return;
             }
 
-            channel.LeaveChannel(pr);
+            channel.LeaveChannel(args.pr);
 
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));
         }
