@@ -5,10 +5,10 @@ using System.Net;
 using System.Text;
 using HttpMultipartParser;
 using Jibril.Helpers;
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
+using Shared.Models;
 
 namespace Jibril.Handler
 {

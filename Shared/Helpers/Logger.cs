@@ -26,12 +26,56 @@ SOFTWARE.
 
 #endregion
 
-using NLog;
+using System;
+using System.Linq;
 
 namespace Shared.Helpers
 {
-    public static class Logger
+    public class Logger
     {
-        public static readonly NLog.Logger L = LogManager.GetCurrentClassLogger();
+        public static void Log(params object[] msg) => Debug(msg);
+
+        public static void Debug(params object[] msg)
+        {
+            #if DEBUG
+            const string prefix = "[DEBUG]";
+            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+
+            Console.WriteLine(prefix + m, msg);
+            #endif
+        }
+
+        public static void Info(params object[] msg)
+        {
+            const string prefix = "[INFO]";
+            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+
+            Console.WriteLine(prefix + m, msg);
+        }
+
+        public static void Warn(params object[] msg)
+        {
+            const string prefix = "[WARN]";
+            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+
+            Console.WriteLine(prefix + m, msg);
+        }
+
+        public static void Err(params object[] msg)
+        {
+            const string prefix = "[ERR]";
+            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+
+            Console.WriteLine(prefix + m, msg);
+        }
+
+        public static void Fatal(params object[] msg)
+        {
+            const string prefix = "[Fatal]";
+            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+
+            Console.WriteLine(prefix + m, msg);
+            Environment.Exit(1);
+        }
     }
 }

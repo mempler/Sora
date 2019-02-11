@@ -33,8 +33,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Shared.Enums;
 using Shared.Helpers;
+using Shared.Services;
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
     public class Users
     {
@@ -54,40 +55,23 @@ namespace Shared.Database.Models
         [Required]
         public Privileges Privileges { get; set; } = 0;
 
-        public bool IsPassword(string s)
-        {
-            return BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
-        }
+        public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
 
-        public static int GetUserId(string username)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                Users result = db.Users.FirstOrDefault(t => t.Username == username);
-                return result?.Id ?? -1;
-            }
-        }
+        public static int GetUserId(Database db, string username) =>
+            db.Users.FirstOrDefault(t => t.Username == username)?.Id ?? -1;
 
-        public static Users GetUser(int userId)
-        {
-            if (userId == -1) return null;
-            using (SoraContext db = new SoraContext())
-            {
-                Users result = db.Users.FirstOrDefault(t => t.Id == userId);
-                return result;
-            }
-        }
+        public static Users GetUser(Database db, int userId) => 
+            userId == -1 ? null : db.Users.FirstOrDefault(t => t.Id == userId);
 
-        public static void InsertUser(params Users[] users)
+        public static void InsertUser(Database db, params Users[] users)
         {
-            using (SoraContext db = new SoraContext())
-            {
-                db.Users.AddRange(users);
-                db.SaveChanges();
-            }
+            db.Users.AddRange(users);
+            db.SaveChanges();
         }
 
         public static Users NewUser(
+            Database db,
+            
             string username, string password, string email = "", Privileges privileges = 0,
             bool insert = true)
         {
@@ -102,19 +86,13 @@ namespace Shared.Database.Models
                 Privileges = privileges
             };
             if (insert)
-                InsertUser(u);
+                InsertUser(db, u);
 
             return u;
         }
 
-        public override string ToString()
-        {
-            return $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
-        }
+        public override string ToString() => $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
 
-        public bool HasPrivileges(Privileges privileges)
-        {
-            return (Privileges & privileges) != 0;
-        }
+        public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
     }
 }

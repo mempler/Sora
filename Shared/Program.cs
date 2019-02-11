@@ -31,15 +31,15 @@ SOFTWARE.
 
 // Only used for Migration. so just ignore it ^^
 
+using Shared.Services;
+
 namespace Shared
 {
-    using Database;
-
     internal class Program
     {
         private static void Main()
         {
-            using (SoraContext db = new SoraContext())
+            using (Database db = new Database())
             {
             }
         }

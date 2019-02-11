@@ -4,22 +4,42 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Shared.Database;
+using Shared.Services;
+
+// ReSharper disable All
 
 namespace Shared.Migrations
 {
-    [DbContext(typeof(SoraContext))]
-    [Migration("20181031105549_RemoveForeignkeys")]
-    partial class RemoveForeignkeys
+    [DbContext(typeof(Database))]
+    [Migration("20190211065050_ReinitializeMigrations")]
+    partial class ReinitializeMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Shared.Database.Models.Beatmaps", b =>
+            modelBuilder.Entity("Shared.Models.BeatmapSets", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("FavouriteCount");
+
+                    b.Property<DateTime>("LastUpdate");
+
+                    b.Property<int>("PassCount");
+
+                    b.Property<int>("PlayCount");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BeatmapSets");
+                });
+
+            modelBuilder.Entity("Shared.Models.Beatmaps", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -45,7 +65,7 @@ namespace Shared.Migrations
                     b.Property<string>("DifficultyName")
                         .IsRequired();
 
-                    b.Property<string>("FileMD5")
+                    b.Property<string>("FileMd5")
                         .IsRequired();
 
                     b.Property<int>("HitLength");
@@ -79,25 +99,7 @@ namespace Shared.Migrations
                     b.ToTable("Beatmaps");
                 });
 
-            modelBuilder.Entity("Shared.Database.Models.BeatmapSets", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("FavouriteCount");
-
-                    b.Property<DateTime>("LastUpdate");
-
-                    b.Property<int>("PassCount");
-
-                    b.Property<int>("PlayCount");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BeatmapSets");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Friends", b =>
+            modelBuilder.Entity("Shared.Models.Friends", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -111,7 +113,7 @@ namespace Shared.Migrations
                     b.ToTable("Friends");
                 });
 
-            modelBuilder.Entity("Shared.Database.Models.LeaderboardRx", b =>
+            modelBuilder.Entity("Shared.Models.LeaderboardRx", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -148,13 +150,13 @@ namespace Shared.Migrations
 
                     b.Property<ulong>("CountMissTaiko");
 
-                    b.Property<double>("PeppyPointsCtb");
+                    b.Property<double>("PerformancePerformance");
 
-                    b.Property<double>("PeppyPointsMania");
+                    b.Property<double>("PerformancePointsCtb");
 
-                    b.Property<double>("PeppyPointsOsu");
+                    b.Property<double>("PerformancePointsOsu");
 
-                    b.Property<double>("PeppyPointsTaiko");
+                    b.Property<double>("PerformancePointsTaiko");
 
                     b.Property<ulong>("PlayCountCtb");
 
@@ -185,7 +187,7 @@ namespace Shared.Migrations
                     b.ToTable("LeaderboardRx");
                 });
 
-            modelBuilder.Entity("Shared.Database.Models.LeaderboardStd", b =>
+            modelBuilder.Entity("Shared.Models.LeaderboardStd", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -222,13 +224,13 @@ namespace Shared.Migrations
 
                     b.Property<ulong>("CountMissTaiko");
 
-                    b.Property<double>("PeppyPointsCtb");
+                    b.Property<double>("PerformancePointsCtb");
 
-                    b.Property<double>("PeppyPointsMania");
+                    b.Property<double>("PerformancePointsMania");
 
-                    b.Property<double>("PeppyPointsOsu");
+                    b.Property<double>("PerformancePointsOsu");
 
-                    b.Property<double>("PeppyPointsTaiko");
+                    b.Property<double>("PerformancePointsTaiko");
 
                     b.Property<ulong>("PlayCountCtb");
 
@@ -259,102 +261,28 @@ namespace Shared.Migrations
                     b.ToTable("LeaderboardStd");
                 });
 
-            modelBuilder.Entity("Shared.Database.Models.LeaderboardTouch", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<ulong>("Count100Ctb");
-
-                    b.Property<ulong>("Count100Mania");
-
-                    b.Property<ulong>("Count100Osu");
-
-                    b.Property<ulong>("Count100Taiko");
-
-                    b.Property<ulong>("Count300Ctb");
-
-                    b.Property<ulong>("Count300Mania");
-
-                    b.Property<ulong>("Count300Osu");
-
-                    b.Property<ulong>("Count300Taiko");
-
-                    b.Property<ulong>("Count50Ctb");
-
-                    b.Property<ulong>("Count50Mania");
-
-                    b.Property<ulong>("Count50Osu");
-
-                    b.Property<ulong>("Count50Taiko");
-
-                    b.Property<ulong>("CountMissCtb");
-
-                    b.Property<ulong>("CountMissMania");
-
-                    b.Property<ulong>("CountMissOsu");
-
-                    b.Property<ulong>("CountMissTaiko");
-
-                    b.Property<double>("PeppyPointsCtb");
-
-                    b.Property<double>("PeppyPointsMania");
-
-                    b.Property<double>("PeppyPointsOsu");
-
-                    b.Property<double>("PeppyPointsTaiko");
-
-                    b.Property<ulong>("PlayCountCtb");
-
-                    b.Property<ulong>("PlayCountMania");
-
-                    b.Property<ulong>("PlayCountOsu");
-
-                    b.Property<ulong>("PlayCountTaiko");
-
-                    b.Property<ulong>("RankedScoreCtb");
-
-                    b.Property<ulong>("RankedScoreMania");
-
-                    b.Property<ulong>("RankedScoreOsu");
-
-                    b.Property<ulong>("RankedScoreTaiko");
-
-                    b.Property<ulong>("TotalScoreCtb");
-
-                    b.Property<ulong>("TotalScoreMania");
-
-                    b.Property<ulong>("TotalScoreOsu");
-
-                    b.Property<ulong>("TotalScoreTaiko");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LeaderboardTouch");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Scores", b =>
+            modelBuilder.Entity("Shared.Models.Scores", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<double>("Accuracy");
 
-                    b.Property<short>("Count100");
+                    b.Property<ulong>("Count100");
 
-                    b.Property<short>("Count300");
+                    b.Property<ulong>("Count300");
 
-                    b.Property<short>("Count50");
+                    b.Property<ulong>("Count50");
 
-                    b.Property<short>("CountGeki");
+                    b.Property<ulong>("CountGeki");
 
-                    b.Property<short>("CountKatu");
+                    b.Property<ulong>("CountKatu");
 
-                    b.Property<short>("CountMiss");
+                    b.Property<ulong>("CountMiss");
 
                     b.Property<DateTime>("Date");
 
-                    b.Property<string>("FileMD5")
+                    b.Property<string>("FileMd5")
                         .IsRequired();
 
                     b.Property<short>("MaxCombo");
@@ -365,24 +293,34 @@ namespace Shared.Migrations
 
                     b.Property<byte>("PlayMode");
 
-                    b.Property<string>("ReplayMD5")
+                    b.Property<string>("ReplayMd5")
                         .IsRequired();
 
-                    b.Property<string>("ScoreMD5")
+                    b.Property<string>("ScoreMd5")
                         .IsRequired();
 
-                    b.Property<int>("TotalScore");
+                    b.Property<ulong>("TotalScore");
 
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("Shared.Database.Models.Users", b =>
+            modelBuilder.Entity("Shared.Models.UserStats", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<byte>("CountryId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserStats");
+                });
+
+            modelBuilder.Entity("Shared.Models.Users", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -401,26 +339,6 @@ namespace Shared.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.UserStats", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<byte>("CountryId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserStats");
-                });
-
-            modelBuilder.Entity("Shared.Database.Models.Scores", b =>
-                {
-                    b.HasOne("Shared.Database.Models.Users", "ScoreOwner")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

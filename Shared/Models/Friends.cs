@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 
 /*
 MIT License
@@ -26,46 +26,50 @@ SOFTWARE.
 
 #endregion
 
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Shared.Enums;
+using JetBrains.Annotations;
+using Shared.Services;
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
-    public class UserStats
+    [UsedImplicitly]
+    public class Friends
     {
+        [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public int Id { get; set; }
 
         [Required]
-        [DefaultValue(0)]
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public CountryIds CountryId { get; set; }
+        public int UserId { get; set; }
 
+        [Required]
+        [UsedImplicitly]
+        public int FriendId { get; set; }
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static UserStats GetUserStats(int userId)
+        public static IEnumerable<int> GetFriends(Database db, int userId) =>
+            db
+                .Friends
+                .Where(t => t.UserId == userId)
+                .Select(x => x.FriendId).ToList();
+
+        public static void AddFriend(Database db, int userId, int friendId)
         {
-            using (SoraContext db = new SoraContext())
+            db.Friends.Add(new Friends
             {
-                UserStats val = db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-                if (val != null) return val;
-
-                db.UserStats.Add(val = new UserStats {Id = userId, CountryId = 0});
-                db.SaveChanges();
-
-                return val;
-            }
+                UserId   = userId,
+                FriendId = friendId
+            });
+            db.SaveChanges();
         }
 
-        // ReSharper disable once UnusedMember.Global
-        public static UserStats GetUserStats(Users user)
+        public static void RemoveFriend(Database db, int userId, int friendId)
         {
-            return GetUserStats(user.Id);
+            db.RemoveRange(db.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
+            db.SaveChanges();
         }
     }
 }

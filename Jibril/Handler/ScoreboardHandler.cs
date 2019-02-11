@@ -6,10 +6,10 @@ using System.Text;
 using System.Web;
 using Jibril.Enums;
 using Jibril.Objects;
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
+using Shared.Models;
 
 namespace Jibril.Handler
 {

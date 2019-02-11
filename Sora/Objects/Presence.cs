@@ -33,11 +33,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Interfaces;
+using Shared.Models;
 using Sora.Enums;
 using Sora.Packets.Client;
 

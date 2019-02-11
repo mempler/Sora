@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Helpers;
+using Shared.Models;
 
 namespace Jibril.Helpers
 {

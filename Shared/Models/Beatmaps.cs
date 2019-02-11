@@ -4,14 +4,14 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Jibril.Helpers;
 using opi.v1;
 using Shared.Helpers;
+using Shared.Services;
 using PlayMode = Shared.Enums.PlayMode;
 using RankedStatus = Shared.Enums.RankedStatus;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
     public class Beatmaps
     {
@@ -145,36 +145,29 @@ namespace Shared.Database.Models
             return b;
         }
 
-        public static Beatmaps FetchFromDatabase(string fileMd5, int beatmapId = -1)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                return db.Beatmaps
-                         .FirstOrDefault(bm => bm.FileMd5 == fileMd5 || bm.Id == beatmapId);
-            }
-        }
+        public static Beatmaps FetchFromDatabase(Database db, string fileMd5, int beatmapId = -1) => 
+            db.Beatmaps.FirstOrDefault(
+                bm => bm.FileMd5 == fileMd5 ||
+                      bm.Id ==beatmapId);
 
-        public static void InsertBeatmap(Beatmaps bm)
+        public static void InsertBeatmap(Database db, Beatmaps bm)
         {
-            using (SoraContext db = new SoraContext())
-            {
-                if (db.BeatmapSets.Count(x => x.Id == bm.BeatmapSetId) < 1)
-                    db.BeatmapSets.Add(new BeatmapSets
-                    {
-                        Id = bm.BeatmapSetId,
-                        Beatmaps = new List<Beatmaps>(new [] { bm }),
-                        FavouriteCount = 0,
-                        PassCount = 0,
-                        LastUpdate = DateTime.UtcNow,
-                        PlayCount = 0
-                    });
-                if (db.Beatmaps.Count(x => x.Id == bm.Id) < 1)
-                    db.Beatmaps.Add(bm);
-                else
-                    db.Beatmaps.Update(bm);
+            if (db.BeatmapSets.Count(x => x.Id == bm.BeatmapSetId) < 1)
+                db.BeatmapSets.Add(new BeatmapSets
+                {
+                    Id             = bm.BeatmapSetId,
+                    Beatmaps       = new List<Beatmaps>(new[] {bm}),
+                    FavouriteCount = 0,
+                    PassCount      = 0,
+                    LastUpdate     = DateTime.UtcNow,
+                    PlayCount      = 0
+                });
+            if (db.Beatmaps.Count(x => x.Id == bm.Id) < 1)
+                db.Beatmaps.Add(bm);
+            else
+                db.Beatmaps.Update(bm);
 
-                db.SaveChanges();
-            }
+            db.SaveChanges();
         }
     }
 }

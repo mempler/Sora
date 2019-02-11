@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 
 /*
 MIT License
@@ -26,57 +26,41 @@ SOFTWARE.
 
 #endregion
 
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using JetBrains.Annotations;
+using Shared.Enums;
+using Shared.Services;
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
-    [UsedImplicitly]
-    public class Friends
+    public class UserStats
     {
-        [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public int Id { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        [DefaultValue(0)]
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public CountryIds CountryId { get; set; }
 
-        [Required]
-        [UsedImplicitly]
-        public int FriendId { get; set; }
 
-        public static IEnumerable<int> GetFriends(int userId)
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static UserStats GetUserStats(Database db, int userId)
         {
-            using (SoraContext db = new SoraContext())
-            {
-                return db.Friends.Where(t => t.UserId == userId).Select(x => x.FriendId).ToList();
-            }
+            UserStats val = db.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+            if (val != null) return val;
+
+            db.UserStats.Add(val = new UserStats {Id = userId, CountryId = 0});
+            db.SaveChanges();
+
+            return val;
         }
 
-        public static void AddFriend(int userId, int friendId)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                db.Friends.Add(new Friends
-                {
-                    UserId   = userId,
-                    FriendId = friendId
-                });
-                db.SaveChanges();
-            }
-        }
-
-        public static void RemoveFriend(int userId, int friendId)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                db.RemoveRange(db.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
-                db.SaveChanges();
-            }
-        }
+        // ReSharper disable once UnusedMember.Global
+        public static UserStats GetUserStats(Database db, Users user) => GetUserStats(db, user.Id);
     }
 }

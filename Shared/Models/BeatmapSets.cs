@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Shared.Services;
+
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
     public class BeatmapSets
     {
@@ -33,22 +35,16 @@ namespace Shared.Database.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public Beatmaps GetBeatmap(string fileMd5)
+        public Beatmaps GetBeatmap(string fileMd5) => Beatmaps?.FirstOrDefault(b => b.FileMd5 == fileMd5);
+
+        public static BeatmapSets GetBeatmapSet(Database db, int setId)
         {
-            return Beatmaps?.FirstOrDefault(b => b.FileMd5 == fileMd5);
-        }
+            BeatmapSets sts = db.BeatmapSets.FirstOrDefault(s => s.Id == setId);
 
-        public static BeatmapSets GetBeatmapSet(int setId)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                BeatmapSets sts = db.BeatmapSets.FirstOrDefault(s => s.Id == setId);
+            if (sts != null)
+                sts.Beatmaps = db.Beatmaps.Where(s => s.BeatmapSetId == sts.Id).ToList();
 
-                if (sts != null)
-                    sts.Beatmaps = db.Beatmaps.Where(s => s.BeatmapSetId == sts.Id).ToList();
-
-                return sts;
-            }
+            return sts;
         }
     }
 }

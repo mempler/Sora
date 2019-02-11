@@ -10,10 +10,11 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.Internal;
 using Shared.Enums;
 using Shared.Interfaces;
+using Shared.Services;
 using PlayMode = Shared.Enums.PlayMode;
 // ReSharper disable AccessToDisposedClosure
 
-namespace Shared.Database.Models
+namespace Shared.Models
 {
     public class Scores : IOsuStringable
     {
@@ -94,10 +95,13 @@ namespace Shared.Database.Models
         public int Position { get; set; }
 
 
-        public string ToOsuString()
+        public string ToOsuString(Database db)
         {
+            if (db == null)
+                throw new Exception();
+            
             if (ScoreOwner == null)
-                ScoreOwner = Users.GetUser(UserId);
+                ScoreOwner = Users.GetUser(db, UserId);
             
             return $"{Id}|" +
                    $"{ScoreOwner.Username.Replace("|", "I")}|" +
@@ -118,48 +122,19 @@ namespace Shared.Database.Models
         }
 
         public static IEnumerable<Scores> GetScores(
+            Database db,
+            
             string fileMd5, Users user, PlayMode playMode = PlayMode.Osu,
             bool relaxing = false, bool touching = false,
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
             IEnumerable<Scores> result;
-            using (SoraContext db = new SoraContext())
-            {
-                CountryIds cid = 0;
-                if (countryOnly)
-                    cid = UserStats.GetUserStats(user.Id).CountryId;
+            CountryIds cid = 0;
+            if (countryOnly)
+                cid = UserStats.GetUserStats(db, user.Id).CountryId;
 
-                IQueryable<Scores> query = db.Scores
-                                             .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                                             .Where(score
-                                                        => relaxing
-                                                            ? (score.Mods & Mod.Relax) != 0
-                                                            : (score.Mods & Mod.Relax) == 0)
-                                             .Where(score
-                                                        => touching
-                                                            ? (score.Mods & Mod.TouchDevice) != 0
-                                                            : (score.Mods & Mod.TouchDevice) == 0)
-                                             .Where(score
-                                                        => !friendsOnly || db.Friends.Where(f => f.UserId == user.Id)
-                                                                             .Select(f => f.FriendId)
-                                                                             .Contains(score.UserId))
-                                             .Where(score
-                                                        => !countryOnly ||
-                                                           db.UserStats.Select(c => c.CountryId).Contains(cid))
-                                             .Where(score => !modOnly || score.Mods == mods)
-                                             //.Select((s, i) => new {s, i})
-                                             .Where(score => !onlySelf || score.UserId == user.Id)
-                                             //.Where(score => setPosition(score.s, score.i))
-                                             .Take(50);
-
-               
-                
-                result = query.ToArray();
-                foreach (Scores s in result)
-                {
-                    // inefficient but it works.
-                    int selfPosition = db.Scores
+            IQueryable<Scores> query = db.Scores
                                          .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
                                          .Where(score
                                                     => relaxing
@@ -169,35 +144,51 @@ namespace Shared.Database.Models
                                                     => touching
                                                         ? (score.Mods & Mod.TouchDevice) != 0
                                                         : (score.Mods & Mod.TouchDevice) == 0)
-                                         .IndexOf(s);
-                    s.Position = selfPosition;
-                }
-            }
+                                         .Where(score
+                                                    => !friendsOnly || db.Friends.Where(f => f.UserId == user.Id)
+                                                                         .Select(f => f.FriendId)
+                                                                         .Contains(score.UserId))
+                                         .Where(score
+                                                    => !countryOnly ||
+                                                       db.UserStats.Select(c => c.CountryId).Contains(cid))
+                                         .Where(score => !modOnly || score.Mods == mods)
+                                         //.Select((s, i) => new {s, i})
+                                         .Where(score => !onlySelf || score.UserId == user.Id)
+                                         //.Where(score => setPosition(score.s, score.i))
+                                         .Take(50);
 
+            
+            
+            result = query.ToArray();
+            foreach (Scores s in result)
+            {
+                // inefficient but it works.
+                int selfPosition = db.Scores
+                                     .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                                     .Where(score
+                                                => relaxing
+                                                    ? (score.Mods & Mod.Relax) != 0
+                                                    : (score.Mods & Mod.Relax) == 0)
+                                     .Where(score
+                                                => touching
+                                                    ? (score.Mods & Mod.TouchDevice) != 0
+                                                    : (score.Mods & Mod.TouchDevice) == 0)
+                                     .IndexOf(s);
+                s.Position = selfPosition;
+            }
             return result;
         }
 
-        public static int GetTotalScores(string fileMd5)
-        {
-            using (SoraContext db = new SoraContext())
-            {
-                return db.Scores.Count(score => score.FileMd5 == fileMd5);
-            }
-        }
+        public static int GetTotalScores(Database db, string fileMd5) =>
+            db.Scores.Count(score => score.FileMd5 == fileMd5);
 
-        public static Scores GetScore(int scoreId)
-        {
-            using (SoraContext db = new SoraContext())
-                return db.Scores.First(score => score.Id == scoreId);
-        }
+        public static Scores GetScore(Database db, int scoreId) =>
+            db.Scores.First(score => score.Id == scoreId);
 
-        public static void InsertScore(Scores score)
+        public static void InsertScore(Database db, Scores score)
         {
-            using (SoraContext db = new SoraContext())
-            {
-                db.Add(score);
-                db.SaveChanges();
-            }
+            db.Add(score);
+            db.SaveChanges();
         }
     }
 }

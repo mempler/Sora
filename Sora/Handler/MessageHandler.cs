@@ -26,9 +26,9 @@ SOFTWARE.
 
 #endregion
 
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Handlers;
+using Shared.Models;
 using Sora.Objects;
 using Sora.Packets.Server;
 

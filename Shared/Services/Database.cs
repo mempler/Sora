@@ -29,16 +29,16 @@ SOFTWARE.
 using System;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Shared.Database.Models;
 using Shared.Helpers;
+using Shared.Models;
 
-namespace Shared.Database
+namespace Shared.Services
 {
-    public sealed class SoraContext : DbContext
+    public sealed class Database : DbContext
     {
         private static readonly bool[] Migrated = {false};
 
-        public SoraContext()
+        public Database()
         {
             if (Migrated[0]) return;
             lock (Migrated)
@@ -66,9 +66,6 @@ namespace Shared.Database
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<LeaderboardTouch> LeaderboardTouch { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<Beatmaps> Beatmaps { get; set; }

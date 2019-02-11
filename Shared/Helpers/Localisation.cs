@@ -34,13 +34,11 @@ using ICSharpCode.SharpZipLib.Tar;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Responses;
 using Shared.Enums;
-using Shared.Handlers;
 
 namespace Shared.Helpers
 {
     public static class Localisation
     {
-        [Handler(HandlerTypes.Initializer)]
         public static void Initialize()
         {
             if (Directory.Exists("geoip") && Directory.Exists("geoip/GeoLite2-City") &&
@@ -82,9 +80,6 @@ namespace Shared.Helpers
         }
 
         // ReSharper disable once UnusedMember.Global
-        public static string CountryIdToString(CountryIds x)
-        {
-            return x.ToString();
-        }
+        public static string CountryIdToString(CountryIds x) => x.ToString();
     }
 }
