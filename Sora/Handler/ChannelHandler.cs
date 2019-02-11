@@ -35,37 +35,6 @@ namespace Sora.Handler
 {
     internal class ChannelHandler
     {
-        [Handler(HandlerTypes.BanchoChannelJoin)]
-        public void OnChannelJoin(Presence pr, string channelName)
-        {
-            Channel channel;
-            switch (channelName)
-            {
-                case "#spectator":
-                    channel = pr.Spectator?.SpecChannel;
-                    break;
-                case "#multiplayer":
-                    channel = pr.JoinedRoom?.Channel;
-                    break;
-                default:
-                    channel = LChannels.GetChannel(channelName);
-                    break;
-            }
-
-            if (channel == null)
-            {
-                pr.Write(new ChannelRevoked(channelName));
-                return;
-            }
-
-            channel.LeaveChannel(pr); // leave channel before joining to fix some Issues.
-
-            if (channel.JoinChannel(pr))
-                pr.Write(new ChannelJoinSuccess(channel));
-
-            channel.BoundStream?.Broadcast(new ChannelAvailable(channel));
-        }
-
         [Handler(HandlerTypes.BanchoChannelLeave)]
         public void OnChannelLeave(Presence pr, string channelName)
         {

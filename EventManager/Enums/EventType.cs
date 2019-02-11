@@ -2,8 +2,6 @@ namespace EventManager.Enums
 {
     public enum EventType
     {
-        Initializer,
-
         #region Bancho
 
         BanchoPacketHandler,

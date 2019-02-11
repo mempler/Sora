@@ -28,46 +28,11 @@ SOFTWARE.
 
 using System.Collections.Generic;
 using System.Linq;
-using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Interfaces;
 
 namespace Sora.Objects
 {
-    public static class LPacketStreams
-    {
-        private static readonly Dictionary<string, PacketStream> PacketStreams = new Dictionary<string, PacketStream>();
-        private static bool _initialized;
-
-        [Handler(HandlerTypes.Initializer)]
-        public static void Initialize()
-        {
-            if (_initialized) return;
-            _initialized = true;
-
-            NewStream(new PacketStream("main"));
-            NewStream(new PacketStream("admin")); // Admin stream, only admins will join.
-            NewStream(new PacketStream("lobby"));
-        }
-
-        public static PacketStream GetStream(string name)
-        {
-            PacketStreams.TryGetValue(name, out PacketStream x);
-            return x;
-        }
-
-        public static void NewStream(PacketStream str)
-        {
-            PacketStreams[str.StreamName] = str;
-        }
-
-        public static void RemoveStream(string name)
-        {
-            PacketStreams[name] = null;
-        }
-    }
-
     public class PacketStream
     {
         private readonly Dictionary<string, Presence> _joinedPresences = new Dictionary<string, Presence>();
@@ -110,7 +75,7 @@ namespace Sora.Objects
                     continue;
 
                 if (packet == null)
-                    Logger.L.Error("PACKET IS NULL!");
+                    Logger.Err("PACKET IS NULL!");
 
                 presence.Value?.Write(packet);
             }

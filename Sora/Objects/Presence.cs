@@ -30,110 +30,19 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using JetBrains.Annotations;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Shared.Models;
 using Sora.Enums;
 using Sora.Packets.Client;
+using Sora.Services;
 
 namespace Sora.Objects
 {
-    public static class LPresences
-    {
-        private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
-
-        public static IEnumerable<Presence> AllPresences => Presences.Select(x => x.Value);
-
-        public static Presence GetPresence(string token)
-        {
-            return Presences.TryGetValue(token, out Presence pr) ? pr : null;
-        }
-
-        public static Presence GetPresence(int userid)
-        {
-            foreach (KeyValuePair<string, Presence> presence in Presences)
-                if (presence.Value.User.Id == userid)
-                    return presence.Value;
-
-            return null;
-        }
-
-        [UsedImplicitly]
-        public static IEnumerable<int> GetUserIds()
-        {
-            return Presences.Select(x => x.Value.User.Id);
-        }
-
-        public static IEnumerable<int> GetUserIds(Presence pr)
-        {
-            return Presences
-                   .Where(x => x.Value.Token != pr.Token)
-                   .Select(z => z.Value.User.Id);
-        }
-
-        public static void BeginPresence(Presence presence)
-        {
-            // TODO: Add total playtime.
-            //presence.BeginSeason = DateTime.UtcNow;
-            if (presence == null) return;
-            presence.LastRequest.Start();
-            Presences.Add(presence.Token, presence);
-            LChannels.AddChannel(new Channel(presence.User.Username, "", null, presence));
-        }
-
-        public static void EndPresence(Presence pr, bool forceful)
-        {
-            if (forceful && Presences.ContainsKey(pr.Token))
-            {
-                pr.Stream.Close();
-                pr.LastRequest.Stop();
-                LChannels.RemoveChannel(pr.PrivateChannel);
-
-                foreach (PacketStream str in pr.JoinedStreams)
-                    str.Left(pr);
-
-                Handlers.ExecuteHandler(HandlerTypes.BanchoStopSpectating, pr);
-                Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, pr);
-                Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, pr);
-
-                Presences.Remove(pr.Token);
-                return;
-            }
-
-            pr.IsLastRequest = true;
-        }
-
-        public static void TimeoutCheck()
-        {
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        foreach (KeyValuePair<string, Presence> pr in Presences)
-                            pr.Value.TimeoutCheck();
-
-                        if (Presences == null) break;
-                    }
-                    catch
-                    {
-                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
-                    }
-
-                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
-                }
-            }).Start();
-        }
-    }
-
     public class Presence : IComparable
     {
+        private readonly ChannelService _cs;
         //public bool Disconnected;
 
         // ReSharper disable once CollectionNeverUpdated.Global
@@ -153,7 +62,6 @@ namespace Sora.Objects
 
         //public UserStats Stats;
         public LeaderboardStd LeaderboardStd;
-        public LeaderboardTouch LeaderboardTouch;
         public double Lon;
 
         public bool Relax;
@@ -168,8 +76,9 @@ namespace Sora.Objects
 
         public Users User;
 
-        public Presence()
+        public Presence(ChannelService cs)
         {
+            _cs = cs;
             LastRequest = new Stopwatch();
             Token       = Guid.NewGuid().ToString();
             MemoryStream str = new MemoryStream();
@@ -181,7 +90,7 @@ namespace Sora.Objects
         // ReSharper disable once MemberCanBeMadeStatic.Global
         public uint Rank => 0;
 
-        public Channel PrivateChannel => LChannels.GetChannel(User.Username);
+        public Channel PrivateChannel => _cs.GetChannel(User.Username);
 
         public int CompareTo(object obj)
         {
@@ -216,14 +125,7 @@ namespace Sora.Objects
             return copy;
         }
 
-        public void TimeoutCheck()
-        {
-            if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
-            Handlers.ExecuteHandler(HandlerTypes.BanchoExit, this, ErrorStates.Ok);
-            Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, this);
-            Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, this);
-            LPresences.EndPresence(this, true);
-        }
+        public bool TimeoutCheck() => LastRequest.Elapsed.TotalSeconds > 30;
 
         public void Write(IPacket p)
         {

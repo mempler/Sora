@@ -48,9 +48,7 @@ public class EventManager
         public void RegisterEvents()
         {
             foreach (Assembly asm in _asma)
-            {
                 LoadAssembly(asm);
-            }
         }
         
         public void RunEvent(EventType etype, IEventArgs args = null)
