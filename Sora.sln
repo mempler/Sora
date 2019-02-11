@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jibril Tests", "Jibril Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared Tests", "Shared Tests\Shared Tests.csproj", "{37212CE3-CE46-4C16-980C-7B6DB6C77784}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventManager", "EventManager\EventManager.csproj", "{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{37212CE3-CE46-4C16-980C-7B6DB6C77784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37212CE3-CE46-4C16-980C-7B6DB6C77784}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{37212CE3-CE46-4C16-980C-7B6DB6C77784}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{52F65B00-3FCC-488E-9CEB-A04DFFA46284} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{22554B2E-33F7-4B74-9A41-1FD757B5E2CB} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{37212CE3-CE46-4C16-980C-7B6DB6C77784} = {CDBAE606-50E3-429D-8769-73773D992957}
+		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}

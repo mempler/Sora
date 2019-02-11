@@ -65,7 +65,7 @@ namespace Sora
                 Loader.LoadPlugins();
                 Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
                 Handlers.ExecuteHandler(HandlerTypes.Initializer);
-
+                
                 // Create Sora (bot) if not exists.
                 if (Users.GetUser(100) == null)
                     Users.InsertUser(new Users
