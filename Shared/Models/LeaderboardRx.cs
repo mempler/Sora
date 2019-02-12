@@ -59,10 +59,6 @@ namespace Shared.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong RankedScoreMania { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
         public ulong TotalScoreOsu { get; set; }
 
         [Required]
@@ -72,10 +68,6 @@ namespace Shared.Models
         [Required]
         [DefaultValue(0)]
         public ulong TotalScoreCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong TotalScoreMania { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -91,11 +83,6 @@ namespace Shared.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300Mania { get; set; }
-
-
-        [Required]
-        [DefaultValue(0)]
         public ulong Count100Osu { get; set; }
 
         [Required]
@@ -105,10 +92,6 @@ namespace Shared.Models
         [Required]
         [DefaultValue(0)]
         public ulong Count100Ctb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong Count100Mania { get; set; }
 
 
         [Required]
@@ -122,10 +105,6 @@ namespace Shared.Models
         [Required]
         [DefaultValue(0)]
         public ulong Count50Ctb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong Count50Mania { get; set; }
 
 
         [Required]
@@ -142,10 +121,6 @@ namespace Shared.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMissMania { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
         public ulong PlayCountOsu { get; set; }
 
         [Required]
@@ -158,10 +133,6 @@ namespace Shared.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong PlayCountMania { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
         public double PerformancePointsOsu { get; set; }
 
         [Required]
@@ -171,10 +142,6 @@ namespace Shared.Models
         [Required]
         [DefaultValue(0)]
         public double PerformancePointsCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public double PerformancePerformance { get; set; }
 
         public static LeaderboardRx GetLeaderboard(Database db, int userId)
         {
@@ -207,12 +174,6 @@ namespace Shared.Models
                     else
                         TotalScoreCtb += score;
                     break;
-                case PlayMode.Mania:
-                    if (ranked)
-                        RankedScoreMania += score;
-                    else
-                        TotalScoreMania += score;
-                    break;
             }
 
             db.LeaderboardRx.Update(this);
@@ -230,9 +191,6 @@ namespace Shared.Models
                     break;
                 case PlayMode.Ctb:
                     Count300Ctb += c;
-                    break;
-                case PlayMode.Mania:
-                    Count300Mania += c;
                     break;
             }
 
@@ -252,9 +210,6 @@ namespace Shared.Models
                 case PlayMode.Ctb:
                     Count100Ctb += c;
                     break;
-                case PlayMode.Mania:
-                    Count100Mania += c;
-                    break;
             }
 
             db.LeaderboardRx.Update(this);
@@ -272,9 +227,6 @@ namespace Shared.Models
                     break;
                 case PlayMode.Ctb:
                     Count50Ctb += c;
-                    break;
-                case PlayMode.Mania:
-                    Count50Mania += c;
                     break;
             }
 
@@ -294,9 +246,6 @@ namespace Shared.Models
                 case PlayMode.Ctb:
                     CountMissCtb += c;
                     break;
-                case PlayMode.Mania:
-                    CountMissMania += c;
-                    break;
             }
 
             db.LeaderboardRx.Update(this);
@@ -314,9 +263,6 @@ namespace Shared.Models
                     break;
                 case PlayMode.Ctb:
                     PlayCountCtb++;
-                    break;
-                case PlayMode.Mania:
-                    PlayCountMania++;
                     break;
             }
 
