@@ -13,7 +13,7 @@ namespace EventManager.Enums
         BanchoPong,
         BanchoStartSpectating,
         BanchoStopSpectating,
-        BanchoSpectateFrames,
+        BanchoBroadcastFrames,
         BanchoErrorReport,
         BanchoCantSpectate,
         BanchoSendIrcMessagePrivate,

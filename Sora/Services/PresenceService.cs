@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using EventManager.Enums;
 using JetBrains.Annotations;
+using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Objects;
 
@@ -71,9 +72,10 @@ namespace Sora.Services
                 foreach (PacketStream str in pr.JoinedStreams)
                     str.Left(pr);
                 
-                _ev.RunEvent(EventType.BanchoExit, new BanchoStopSpectatingArgs{ pr = pr});
+                _ev.RunEvent(EventType.BanchoExit, new BanchoExitArgs { pr = pr, err = ErrorStates.Ok });
                 _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs{ pr = pr});
                 _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs{ pr = pr});
+                _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs { pr = pr });
 
                 _presences.Remove(pr.Token);
                 return;
