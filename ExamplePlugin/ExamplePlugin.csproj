@@ -7,9 +7,6 @@
     <None Remove="plugin.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="plugin.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\Sora\Sora.csproj" />
   </ItemGroup>
