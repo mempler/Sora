@@ -223,7 +223,7 @@ namespace Sora.Events
                     break;
                 case PacketId.ClientMatchLock:
                     _evmgr.RunEvent(
-                        EventType.BanchoMatchChangeMods,
+                        EventType.BanchoMatchLock,
                         new BanchoMatchLockArgs()
                             {pr = args.pr, SlotId = args.Data.ReadData<MatchLock>().SlotId});
                     break;

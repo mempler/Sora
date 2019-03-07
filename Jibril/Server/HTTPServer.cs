@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using EventManager.Enums;
 using EventManager.Interfaces;
 using Jibril.EventArgs;
+using Jibril.Helpers;
 using Shared.Helpers;
 using SimpleHttp;
 
@@ -41,7 +42,7 @@ namespace Jibril.Server
         public HttpServer(Config cfg, EventManager.EventManager evmng)
         {
             _evmng = evmng;
-            _port    = cfg.Server.Port;
+            _port    = cfg.Server.Port == 0 ? (short) 13415 : cfg.Server.Port;
             _running = false;
         }
 
@@ -64,54 +65,33 @@ namespace Jibril.Server
 
         private async Task _RunServer()
         {
-            Route.Add("/web/{handler}", (request, response, args) =>
+            Route.Add("/web/osu-osz2-getscores.php", (req, res, args) =>
             {
-                IEventArgs arg = new SharedEventArgs {req = request, res = response, args = args};
-                
-                switch (args["handler"].Split("?")[0])
-                {
-                    case "osu-osz2-getscores.php":
-                        _evmng.RunEvent(EventType.SharedScoreboardRequest, arg);
-                        break;
-                    case "osu-submit-modular.php":
-                        _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
-                        break;
-                    case "osu-getreplay.php":
-                        _evmng.RunEvent(EventType.SharedGetReplay, arg);
-                        break;
-                    
-                    default:
-                        Logger.Info(
-                            $"Unknown Path {request.Url.AbsolutePath} " +
-                            $"Method is {request.HttpMethod} " +
-                            $"Query is {request.Url.Query} " +
-                            "Args are " + args["handler"]);
-                        break;
-                }
+                IEventArgs arg = new SharedEventArgs {req = req, res = res, args = args};
+                _evmng.RunEvent(EventType.SharedScoreboardRequest, arg);
+                res.Close();
+            },"GET");
 
-                response.Close();
-            });
-
-            Route.Add("/web/{handler}", (request, response, args) =>
+            Route.Add("/web/osu-submit-modular.php", (req, res, args) =>
             {
-                IEventArgs arg = new SharedEventArgs {req = request, res = response, args = args};
-                
-                switch (args["handler"].Split("?")[0])
-                {
-                    case "osu-submit-modular.php":
-                        _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
-                        break;
-                    default:
-                        Logger.Info(
-                            $"Unknown Path {request.Url.AbsolutePath} " +
-                            $"Method is {request.HttpMethod} " +
-                            $"Query is {request.Url.Query} " +
-                            "Args are " + args["handler"]);
-                        break;
-                }
+                IEventArgs arg = new SharedEventArgs {req = req, res = res, args = args};
+                _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
+                res.Close();
+            }, "GET");
 
-                response.Close();
+            Route.Add("/web/osu-submit-modular.php", (req, res, args) =>
+            {
+                IEventArgs arg = new SharedEventArgs {req = req, res = res, args = args};
+                _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
+                res.Close();
             }, "POST");
+
+            Route.Add("/web/osu-getreplay.php", (req, res, args) =>
+            {
+                IEventArgs arg = new SharedEventArgs {req = req, res = res, args = args};
+                _evmng.RunEvent(EventType.SharedGetReplay, arg);
+                res.Close();
+            }, "GET");
 
             Route.Add("/{avatar}", (request, response, args) =>
             {
@@ -123,12 +103,12 @@ namespace Jibril.Server
                     response.StatusCode = 404;
 
                 response.Close();
-            });
+            }, "GET");
 
-            Route.Error = (request, response, exception) =>
+            Route.Error = (req, res, ex) =>
             {
-                Logger.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
-                response.Close();
+                Logger.Info($"Unknown Path {req.Url.AbsolutePath} Method is {req.HttpMethod}");
+                res.Close();
             };
 
             await SimpleHttp.HttpServer.ListenAsync(_port, _cts.Token, Route.OnHttpRequestAsync);

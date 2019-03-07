@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using EventManager.Services;
+using Jibril.Helpers;
 using Jibril.Server;
 using Jibril.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,8 @@ namespace Jibril
     {
         private static IServiceProvider BuildProvider() =>
             new ServiceCollection()
-                .AddSingleton(Config.ReadConfig())
+                .AddSingleton(ConfigUtil.ReadConfig<Config>())
+                .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
                 .AddSingleton<Database>()
                 .AddSingleton<PluginService>()
                 .AddSingleton<StartupService>()

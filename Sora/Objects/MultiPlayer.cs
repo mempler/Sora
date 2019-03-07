@@ -356,11 +356,14 @@ namespace Sora.Objects
         {
             if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods)
                 slot.Mods = FixMods(mods);
-            else if
-                (SpecialModes == MatchSpecialModes.Freemods)
+            else if (SpecialModes == MatchSpecialModes.Freemods)
                 slot.Mods = mods;
-            else if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)
+            else if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal) {
+                foreach (MultiplayerSlot s in Slots)
+                    slot.Mods = Mod.None;
+                
                 ActiveMods = mods;
+            }
 
             Update();
         }
@@ -379,7 +382,8 @@ namespace Sora.Objects
             TeamType     = room.TeamType;
             SpecialModes = room.SpecialModes;
             Seed         = room.Seed;
-
+            
+            SetMods(ActiveMods, GetSlotByUserId(HostId));
             Update();
         }
 

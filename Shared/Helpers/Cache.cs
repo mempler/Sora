@@ -25,12 +25,12 @@ namespace Shared.Helpers
 {
     public class Cache
     {
-        public Cache()
+        public Cache(IConfig config)
         {
-            Redis = ConnectionMultiplexer.Connect("localhost");
+            Redis = ConnectionMultiplexer.Connect(config.Redis.Hostname);
         }
         
-        private ConnectionMultiplexer Redis;
+        private readonly ConnectionMultiplexer Redis;
         
         public bool CacheString(RedisKey key, string data, int duration = 300) // 5 Minutes.
         {

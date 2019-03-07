@@ -21,6 +21,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using EventManager.Services;
+using Jibril.Helpers;
 using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
@@ -31,6 +32,7 @@ namespace Jibril.Services
     {
         private readonly Database _db;
         private readonly Config _config;
+        private readonly IConfig _icfg;
         private readonly PluginService _plugs;
         private readonly EventManager.EventManager _ev;
         private readonly Cache _cache;
@@ -38,12 +40,14 @@ namespace Jibril.Services
         public StartupService(
             Database db,
             Config config,
+            IConfig icfg,
             PluginService plugs,
             EventManager.EventManager ev,
             Cache cache)
         {
             _db = db;
             _config = config;
+            _icfg = icfg;
             _plugs = plugs;
             _ev = ev;
             _cache = cache;
@@ -69,6 +73,7 @@ namespace Jibril.Services
             _ev.RegisterService(_plugs);  // Plugin Service
             _ev.RegisterService(_ev);     // EventManager
             _ev.RegisterService(_cache);  // Cache System
+            _ev.RegisterService(_icfg);   // IConfig for Shared
 
             _ev.BuildService();
             _ev.RegisterEvents();
@@ -78,6 +83,7 @@ namespace Jibril.Services
             _ev.RegisterService(_plugs);  // Plugin Service
             _ev.RegisterService(_ev);     // EventManager
             _ev.RegisterService(_cache);  // Cache System
+            _ev.RegisterService(_icfg);   // IConfig for Shared
 
             if (!Directory.Exists("plugins"))
                 Directory.CreateDirectory("plugins");
