@@ -4,6 +4,7 @@ using System.Text;
 using Shared.Enums;
 using Shared.Interfaces;
 using Shared.Models;
+using Shared.Services;
 
 namespace Jibril.Objects
 {
@@ -11,6 +12,7 @@ namespace Jibril.Objects
     {
         private readonly bool _countryOnly;
 
+        private readonly Database _db;
         private readonly string _fileMd5;
         private readonly bool _friendsOnly;
         private readonly bool _modOnly;
@@ -22,11 +24,13 @@ namespace Jibril.Objects
         private Beatmaps _bm;
         private List<Scores> _scores;
 
-        public Scoreboard(string fileMd5, Users user,
+        public Scoreboard(Database db,
+                          string fileMd5, Users user,
                           PlayMode playMode = PlayMode.Osu, bool relaxing = false, bool touching = false,
                           bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
                           Mod mods = Mod.None)
         {
+            _db = db;
             _fileMd5     = fileMd5;
             _user        = user;
             _playMode    = playMode;
@@ -38,7 +42,7 @@ namespace Jibril.Objects
             _mods        = mods;
         }
 
-        public string ToOsuString()
+        public string ToOsuString(Database db)
         {
             StringBuilder x = new StringBuilder();
             SetScores();
@@ -46,7 +50,7 @@ namespace Jibril.Objects
 
             x.Append(ScoreboardHeader());
             foreach (Scores score in _scores)
-                x.Append($"{score?.ToOsuString()}\n");
+                x.Append($"{score?.ToOsuString(db)}\n");
 
             return x.ToString();
         }
@@ -57,7 +61,7 @@ namespace Jibril.Objects
                 return $"{(int) _bm.RankedStatus}|false|" +
                        $"{_bm.Id}|" +
                        $"{_bm.BeatmapSetId}|" +
-                       $"{Scores.GetTotalScores(_fileMd5)}\n" +
+                       $"{Scores.GetTotalScores(_db, _fileMd5)}\n" +
                        $"{0}\n" +
                        $"{_bm.Artist} - {_bm.Title} [{_bm.DifficultyName}]\n" +
                        "10.0\n";
@@ -74,18 +78,18 @@ namespace Jibril.Objects
         {
             _scores = new List<Scores>
             {
-                Scores.GetScores(_fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly, _countryOnly, _modOnly,
+                Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly, _countryOnly, _modOnly,
                                  _mods, true).FirstOrDefault()
             };
-            _scores.AddRange(Scores.GetScores(_fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly,
+            _scores.AddRange(Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly,
                                               _countryOnly, _modOnly, _mods));
         }
 
         private void SetBeatmap()
         {
-            if ((_bm = Beatmaps.FetchFromDatabase(_fileMd5)) != null) return;
+            if ((_bm = Beatmaps.FetchFromDatabase(_db, _fileMd5)) != null) return;
             if ((_bm = Beatmaps.FetchFromApi(_fileMd5)) != null)
-                Beatmaps.InsertBeatmap(_bm);
+                Beatmaps.InsertBeatmap(_db, _bm);
         }
     }
 }

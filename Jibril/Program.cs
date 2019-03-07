@@ -27,52 +27,42 @@ SOFTWARE.
 #endregion
 
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Reflection;
+using EventManager.Services;
 using Jibril.Server;
-using Shared.Database;
-using Shared.Enums;
-using Shared.Handlers;
+using Jibril.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Shared.Helpers;
-using Shared.Plugins;
+using Shared.Services;
 
 namespace Jibril
 {
     internal static class Program
     {
-        private static HttpServer _server;
-
-        private static void Initialize()
-        {
-            try
-            {
-                Logger.L.Info("Start Initalization");
-                Stopwatch watch = Stopwatch.StartNew();
-                Config    conf  = Config.ReadConfig(5002);
-
-                _server = new HttpServer(conf.Server.Port);
-                using (new SoraContext())
-                {
-                } // Initialize Database. (Migrate database)
-
-                Loader.LoadPlugins();
-                Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
-                Handlers.ExecuteHandler(HandlerTypes.Initializer);
-
-                watch.Stop();
-                Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
-            }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-            }
-        }
+        private static IServiceProvider BuildProvider() =>
+            new ServiceCollection()
+                .AddSingleton(Config.ReadConfig())
+                .AddSingleton<Database>()
+                .AddSingleton<PluginService>()
+                .AddSingleton<StartupService>()
+                .AddSingleton<HttpServer>()
+                .AddSingleton<Cache>()
+                .AddSingleton(new EventManager.EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}))
+                .BuildServiceProvider();
 
         [STAThread]
         private static void Main()
         {
-            Initialize();
-            _server.RunAsync().Wait();
+            IServiceProvider provider = BuildProvider();
+
+            provider.GetService<StartupService>()
+                    .Start()
+                    .Wait();
+
+            provider.GetService<HttpServer>()
+                    .RunAsync()
+                    .Wait();
         }
     }
 }

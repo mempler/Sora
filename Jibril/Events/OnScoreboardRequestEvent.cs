@@ -1,25 +1,35 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Net;
 using System.Text;
 using System.Web;
+using EventManager.Attributes;
+using EventManager.Enums;
 using Jibril.Enums;
+using Jibril.EventArgs;
 using Jibril.Objects;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Models;
+using Shared.Services;
 
-namespace Jibril.Handler
+namespace Jibril.Events
 {
-    public class ScoreboardHandler
+    [EventClass]
+    public class OnScoreboardRequestEvent
     {
-        [Handler(HandlerTypes.SharedScoreboardRequest)]
-        public void OnScoreboardRequest(HttpListenerRequest request, HttpListenerResponse response,
-                                        Dictionary<string, string> args)
+        private readonly Database _db;
+        private readonly Cache _cache;
+
+        public OnScoreboardRequestEvent(Database db, Cache cache)
         {
-            NameValueCollection query   = HttpUtility.ParseQueryString(request.Url.Query);
+            _db = db;
+            _cache = cache;
+        }
+        
+        [Event(EventType.SharedScoreboardRequest)]
+        public void OnScoreboardRequest(SharedEventArgs args)
+        {
+            NameValueCollection query   = HttpUtility.ParseQueryString(args.req.Url.Query);
             string              fileMd5 = query.Get("c");
 
             Enum.TryParse(query.Get("m"), out PlayMode playmode);
@@ -27,35 +37,36 @@ namespace Jibril.Handler
             //string scoreboardVersion = request.Headers["vv"];
             Enum.TryParse(query.Get("mods"), out Mod mods);
 
-            Users user = Users.GetUser(Users.GetUserId(query.Get("us")));
+            Users user = Users.GetUser(_db, Users.GetUserId(_db, query.Get("us")));
             if (user == null || !user.IsPassword(query.Get("ha")))
             {
-                response.OutputStream.Write(Encoding.ASCII.GetBytes("error: pass"));
+                args.res.OutputStream.Write(Encoding.ASCII.GetBytes("error: pass"));
                 return;
             }
 
-            string cachehash =
+            string cache_hash =
                 Hex.ToHex(Crypto.GetMd5($"{fileMd5}{playmode}{mods}{scoreboardType}{user.Id}{user.Username}"));
 
-            string cachedData = Cache.GetCachedString($"jibril:Scoreboards:{cachehash}");
-            
+            string cachedData = _cache.GetCachedString($"jibril:Scoreboards:{cache_hash}");
+
             if (!string.IsNullOrEmpty(cachedData))
             {
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(cachedData));
+                args.res.OutputStream.Write(Encoding.UTF8.GetBytes(cachedData));
                 return;
             }
 
-            Scoreboard sboard = new Scoreboard(fileMd5, user, playmode,
+            Scoreboard sboard = new Scoreboard(_db,
+                                               fileMd5, user, playmode,
                                                (mods & Mod.Relax) != 0,
                                                (mods & Mod.TouchDevice) != 0,
                                                scoreboardType == ScoreboardType.Friends,
                                                scoreboardType == ScoreboardType.Country,
                                                scoreboardType == ScoreboardType.Mods,
                                                mods);
-                        
-            Cache.CacheString($"jibril:Scoreboards:{cachehash}", cachedData = sboard.ToOsuString(), 60);
 
-            response.OutputStream.Write(Encoding.Default.GetBytes(cachedData));
+            _cache.CacheString($"jibril:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(_db), 60);
+
+            args.res.OutputStream.Write(Encoding.Default.GetBytes(cachedData));
         }
     }
 }

@@ -33,7 +33,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using opi.v1;
+using Shared.Enums;
 using Shared.Services;
 
 namespace Shared.Models

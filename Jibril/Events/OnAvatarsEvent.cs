@@ -1,56 +1,59 @@
-using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
-using Shared.Enums;
-using Shared.Handlers;
+using EventManager.Attributes;
+using EventManager.Enums;
+using Jibril.EventArgs;
 using Shared.Helpers;
 
-namespace Jibril.Handler
+namespace Jibril.Events
 {
-    public class AvatarHandler
+    [EventClass]
+    public class OnAvatarsEvent
     {
-        [Handler(HandlerTypes.Initializer)]
-        public static void Initialize()
+        private readonly Cache _cache;
+
+        public OnAvatarsEvent(Cache cache)
         {
+            _cache = cache;
+            
             if (!Directory.Exists("data/avatars"))
                 Directory.CreateDirectory("data/avatars");
         }
-
-        [Handler(HandlerTypes.SharedAvatars)]
-        public void OnAvatarRequest(HttpListenerRequest request, HttpListenerResponse response,
-                                    Dictionary<string, string> args)
+        
+        [Event(EventType.SharedAvatars)]
+        public void OnAvatars(SharedEventArgs args)
         {
-            args.TryGetValue("avatar", out string avi);
+            args.args.TryGetValue("avatar", out string avi);
             int.TryParse(avi ?? "0", out int avatarId);
-            
-            byte[] cachedData = Cache.GetCachedData($"jibril:avatars:{avatarId.ToString()}");
+
+            byte[] cachedData = _cache.GetCachedData($"jibril:avatars:{avatarId.ToString()}");
             if (cachedData != null && cachedData.Length > 0)
             {
-                response.OutputStream.Write(cachedData);
+                args.res.OutputStream.Write(cachedData);
                 return;
             }
 
             byte[] data;
-            
+
             if (avatarId == 0 || !File.Exists($"data/avatars/{avatarId.ToString()}"))
             {
                 if (File.Exists("data/avatars/default"))
                     data = File.ReadAllBytes("data/avatars/default");
                 else
                 {
-                    response.OutputStream.Write(Encoding.ASCII.GetBytes(
+                    args.res.OutputStream.Write(Encoding.ASCII.GetBytes(
                                                     "Sorry to tell you, but there is no default avatar!\n" +
                                                     "if you're the owner of this instance please set an default " +
                                                     "by adding a png/jpg file called default"));
                     return;
                 }
-            } else
+            }
+            else
                 data = File.ReadAllBytes($"data/avatars/{avatarId.ToString()}");
 
-            Cache.CacheData($"jibril:avatars:{avatarId.ToString()}", data);
-            
-            response.OutputStream.Write(data);
+            _cache.CacheData($"jibril:avatars:{avatarId.ToString()}", data);
+
+            args.res.OutputStream.Write(data);
         }
     }
 }
