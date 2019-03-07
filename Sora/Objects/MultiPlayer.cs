@@ -56,9 +56,9 @@ namespace Sora.Objects
 
     public class MultiplayerRoom : ISerializer, ICloneable
     {
-        private readonly PacketStreamService _pss;
-        private readonly MultiplayerService _ms;
-        private readonly PresenceService _ps;
+        public PacketStreamService _pss;
+        public MultiplayerService _ms;
+        public PresenceService _ps;
 
         private const int MaxPlayers = 16;
         public Mod ActiveMods;
@@ -90,6 +90,19 @@ namespace Sora.Objects
             _pss = pss;
             _ms = ms;
             _ps = ps;
+            for (int i = 0; i < MaxPlayers; i++)
+                Slots[i] = new MultiplayerSlot
+                {
+                    // ReSharper disable once ConditionalTernaryEqualBranch
+                    Status = i > 6 ? MultiSlotStatus.Locked : MultiSlotStatus.Locked,
+                    Mods   = 0,
+                    Team   = MultiSlotTeam.NoTeam,
+                    UserId = -1
+                };
+        }
+
+        public MultiplayerRoom()
+        {
             for (int i = 0; i < MaxPlayers; i++)
                 Slots[i] = new MultiplayerSlot
                 {

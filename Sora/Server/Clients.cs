@@ -29,17 +29,19 @@ SOFTWARE.
 using System;
 using System.IO;
 using System.Net;
+using EventManager.Enums;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Sora.Enums;
+using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
+using Sora.Services;
 
 namespace Sora.Server
 {
     public abstract class Client
-    {
+    {        
         protected Client(HttpListenerRequest request, HttpListenerResponse response)
         {
             Request  = request;
@@ -70,9 +72,19 @@ namespace Sora.Server
 
     public class OsuClient : Client
     {
-        public OsuClient(HttpListenerRequest request, HttpListenerResponse response)
+        private readonly ChannelService _cs;
+        private readonly EventManager.EventManager _evmng;
+        private readonly PresenceService _ps;
+
+        public OsuClient(HttpListenerRequest request, HttpListenerResponse response,
+                         ChannelService cs,
+                         EventManager.EventManager evmng,
+                         PresenceService ps)
             : base(request, response)
         {
+            _cs = cs;
+            _evmng = evmng;
+            _ps = ps;
         }
 
         public override void DoWork()
@@ -91,23 +103,25 @@ namespace Sora.Server
                     {
                         if (Request.Headers["osu-token"] == null || Request.Headers["osu-token"] == string.Empty)
                         {
-                            pr                            = new Presence();
+                            pr                            = new Presence(_cs);
                             Response.Headers["cho-token"] = pr.Token;
                             string ip                        = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
-
-                            Handlers.ExecuteHandler(HandlerTypes.BanchoLoginHandler, pr, mw, mr, ip);
+                            _evmng.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs()
+                            {
+                                pr = pr, Reader = mr, Writer = mw, IPAddress = ip
+                            });
                             return;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.L.Error(ex);
+                        Logger.Err(ex);
                         mw.Write(new LoginResponse(LoginResponses.Exception));
                         return;
                     }
 
-                    pr = LPresences.GetPresence(Request.Headers["osu-token"]);
+                    pr = _ps.GetPresence(Request.Headers["osu-token"]);
                     if (pr == null)
                     {
                         Response.StatusCode = 403; // Presence is not known, force the client to send login info.
@@ -127,13 +141,15 @@ namespace Sora.Server
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
                             {
-                                Handlers.ExecuteHandler(HandlerTypes.BanchoPacketHandler, pr, packetId,
-                                                        packetDataReader);
+                                _evmng.RunEvent(EventType.BanchoPacket, new BanchoPacketArgs()
+                                {
+                                    pr = pr, PacketId = packetId, Data = packetDataReader
+                                });
                             }
                         }
                         catch (Exception ex)
                         {
-                            Logger.L.Error(ex);
+                            Logger.Err(ex);
                             break;
                         }
 
@@ -150,12 +166,12 @@ namespace Sora.Server
                     }
 
                     if (pr.IsLastRequest)
-                        LPresences.EndPresence(pr, true);
+                        _ps.EndPresence(pr, true);
                 }
             }
             catch (Exception ex)
             {
-                Logger.L.Error(ex);
+                Logger.Err(ex);
             }
         }
     }

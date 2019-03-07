@@ -37,22 +37,12 @@ namespace Sora.Packets.Client
 {
     public class MatchChangePassword : IPacket
     {
-        private readonly PacketStreamService _pss;
-        private readonly MultiplayerService _ms;
-        private readonly PresenceService _ps;
         public MultiplayerRoom Room;
         public PacketId Id => PacketId.ClientMatchChangePassword;
 
-        public MatchChangePassword(PacketStreamService pss, MultiplayerService ms, PresenceService ps)
-        {
-            _pss = pss;
-            _ms = ms;
-            _ps = ps;
-        }
-
         public void ReadFromStream(MStreamReader sr)
         {
-            (Room = new MultiplayerRoom(_pss, _ms, _ps)).ReadFromStream(sr);
+            (Room = new MultiplayerRoom()).ReadFromStream(sr);
         }
 
         public void WriteToStream(MStreamWriter sw)

@@ -4,7 +4,7 @@ namespace EventManager.Enums
     {
         #region Bancho
 
-        BanchoPacketHandler,
+        BanchoPacket,
         BanchoLoginRequest,
         BanchoSendUserStatus,
         BanchoSendIrcMessage,

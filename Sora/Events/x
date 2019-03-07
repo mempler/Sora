@@ -1,0 +1,20 @@
+using EventManager.Attributes;
+using EventManager.Enums;
+
+namespace Sora.Events
+{
+    [EventClass]
+    public class On Event
+    {
+        public On Event()
+        {
+
+        }
+        
+        [Event(EventType.)]
+        public void On()
+        {
+            
+        }
+    }
+}

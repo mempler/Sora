@@ -33,6 +33,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MaxMind.GeoIP2" Version="3.0.0" />
     <PackageReference Include="Simple-HTTP" Version="1.0.6" />
   </ItemGroup>
 </Project>

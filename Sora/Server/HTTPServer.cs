@@ -30,6 +30,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SimpleHttp;
+using Sora.Services;
 
 namespace Sora.Server
 {
@@ -37,12 +38,18 @@ namespace Sora.Server
 
     public class HttpServer
     {
+        private readonly ChannelService _cs;
+        private readonly EventManager.EventManager _evmng;
+        private readonly PresenceService _ps;
         private readonly short _port;
         private bool _running;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public HttpServer(short port = 5001)
+        public HttpServer(ChannelService cs, EventManager.EventManager evmng, PresenceService ps, short port = 5001)
         {
+            _cs = cs;
+            _evmng = evmng;
+            _ps = ps;
             _port    = port;
             _running = false;
         }
@@ -76,7 +83,7 @@ namespace Sora.Server
 
                 Client client;
                 if (req.UserAgent == "osu!")
-                    client = new OsuClient(req, res);
+                    client = new OsuClient(req, res, _cs, _evmng, _ps);
                 else
                     client = new BrowserClient(req, res);
 
@@ -87,7 +94,7 @@ namespace Sora.Server
             {
                 Client client;
                 if (req.UserAgent == "osu!")
-                    client = new OsuClient(req, res);
+                    client = new OsuClient(req, res, _cs, _evmng, _ps);
                 else
                     client = new BrowserClient(req, res);
 

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using EventManager.Services;
+using Shared.Enums;
 using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
@@ -53,11 +54,21 @@ namespace Sora.Services
                     Password   = "",
                     Privileges = 0
                 });
-            
+
             Localisation.Initialize();
 
-            _ev.RegisterEvents();
+            _ev.RegisterService(_config); // Config
+            _ev.RegisterService(_db);     // Database
+            _ev.RegisterService(_plugs);  // Plugin Service
+            _ev.RegisterService(_ev);     // EventManager
+            _ev.RegisterService(_mps);    // Multiplayer Service
+            _ev.RegisterService(_pss);    // PacketStream Service
+            _ev.RegisterService(_cs);     // Channel Service
+            _ev.RegisterService(_ps);     // Presence Service
             
+            _ev.BuildService();
+            _ev.RegisterEvents();
+
             _ev.RegisterService(_config); // Config
             _ev.RegisterService(_db);     // Database
             _ev.RegisterService(_plugs);  // Plugin Service

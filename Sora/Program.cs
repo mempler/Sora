@@ -33,6 +33,7 @@ using EventManager.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Helpers;
 using Shared.Services;
+using Sora.Server;
 using Sora.Services;
 
 namespace Sora
@@ -49,6 +50,7 @@ namespace Sora
                 .AddSingleton<PacketStreamService>()
                 .AddSingleton<ChannelService>()
                 .AddSingleton<StartupService>()
+                .AddSingleton<HttpServer>()
                 .AddSingleton(new EventManager.EventManager(new List<Assembly> { Assembly.GetEntryAssembly() } ))
 
                 .BuildServiceProvider();
@@ -59,6 +61,10 @@ namespace Sora
 
             provider.GetService<StartupService>()
                     .Start()
+                    .Wait();
+
+            provider.GetService<HttpServer>()
+                    .RunAsync()
                     .Wait();
         }
     }
