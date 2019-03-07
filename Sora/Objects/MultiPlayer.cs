@@ -1,5 +1,4 @@
 #region copyright
-
 /*
 MIT License
 
@@ -23,11 +22,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Shared.Enums;
@@ -35,38 +32,10 @@ using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
 using Sora.Packets.Server;
+using Sora.Services;
 
 namespace Sora.Objects
 {
-    public static class MultiplayerLobby
-    {
-        private static long _matches;
-        public static Dictionary<long, MultiplayerRoom> Rooms = new Dictionary<long, MultiplayerRoom>();
-
-        public static IEnumerable<MultiplayerRoom> GetRooms()
-        {
-            return Rooms.Select(x => x.Value);
-        }
-
-        public static MultiplayerRoom GetRoom(long matchId)
-        {
-            return Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
-        }
-
-        public static long Add(MultiplayerRoom room)
-        {
-            room.MatchId = _matches++;
-            Rooms.Add(room.MatchId, room);
-            return room.MatchId;
-        }
-
-        public static void Remove(long matchId)
-        {
-            if (!Rooms.ContainsKey(matchId)) return;
-            Rooms.Remove(matchId);
-        }
-    }
-
     public class MultiplayerSlot
     {
         public Mod Mods;
@@ -87,6 +56,10 @@ namespace Sora.Objects
 
     public class MultiplayerRoom : ISerializer, ICloneable
     {
+        public PacketStreamService _pss;
+        public MultiplayerService _ms;
+        public PresenceService _ps;
+
         private const int MaxPlayers = 16;
         public Mod ActiveMods;
         public int BeatmapId;
@@ -111,6 +84,22 @@ namespace Sora.Objects
         public MatchSpecialModes SpecialModes;
         public TeamType TeamType;
         public int WantSkip;
+
+        public MultiplayerRoom(PacketStreamService pss, MultiplayerService ms, PresenceService ps)
+        {
+            _pss = pss;
+            _ms = ms;
+            _ps = ps;
+            for (int i = 0; i < MaxPlayers; i++)
+                Slots[i] = new MultiplayerSlot
+                {
+                    // ReSharper disable once ConditionalTernaryEqualBranch
+                    Status = i > 6 ? MultiSlotStatus.Locked : MultiSlotStatus.Locked,
+                    Mods   = 0,
+                    Team   = MultiSlotTeam.NoTeam,
+                    UserId = -1
+                };
+        }
 
         public MultiplayerRoom()
         {
@@ -268,7 +257,7 @@ namespace Sora.Objects
         {
             foreach (MultiplayerSlot slot in Slots.Where(x => x.UserId != -1))
             {
-                Presence pr = LPresences.GetPresence(slot.UserId);
+                Presence pr = _ps.GetPresence(slot.UserId);
                 if (pr == null)
                     Leave(slot.UserId);
                 else
@@ -341,15 +330,15 @@ namespace Sora.Objects
 
         public void Update()
         {
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(this));
+            _pss.GetStream("lobby").Broadcast(new MatchUpdate(this));
             Broadcast(new MatchUpdate(this));
         }
 
         public void Dispand()
         {
             Broadcast(new MatchDisband(this));
-            MultiplayerLobby.Remove(MatchId);
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchDisband(this));
+            _ms.Remove(MatchId);
+            _pss.GetStream("lobby").Broadcast(new MatchDisband(this));
         }
 
         public void SetHost(int userId)

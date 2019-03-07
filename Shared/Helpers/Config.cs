@@ -48,7 +48,7 @@ namespace Shared.Helpers
             Config cfg = new Config {Server = new Server {Port = port}};
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
-            Logger.L.Info("Config has been created! please edit.");
+            Logger.Info("Config has been created! please edit.");
             Environment.Exit(0);
 
             return cfg;

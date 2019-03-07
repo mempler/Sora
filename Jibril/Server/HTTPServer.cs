@@ -29,8 +29,9 @@ SOFTWARE.
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Shared.Enums;
-using Shared.Handlers;
+using EventManager.Enums;
+using EventManager.Interfaces;
+using Jibril.EventArgs;
 using Shared.Helpers;
 using SimpleHttp;
 
@@ -40,13 +41,15 @@ namespace Jibril.Server
 
     public class HttpServer
     {
+        private readonly EventManager.EventManager _evmng;
         private readonly short _port;
         private bool _running;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public HttpServer(short port = 5001)
+        public HttpServer(Config cfg, EventManager.EventManager evmng)
         {
-            _port    = port;
+            _evmng = evmng;
+            _port    = cfg.Server.Port;
             _running = false;
         }
 
@@ -71,20 +74,22 @@ namespace Jibril.Server
         {
             Route.Add("/web/{handler}", (request, response, args) =>
             {
+                IEventArgs arg = new SharedEventArgs {req = request, res = response, args = args};
+                
                 switch (args["handler"].Split("?")[0])
                 {
                     case "osu-osz2-getscores.php":
-                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreboardRequest, request, response, args);
+                        _evmng.RunEvent(EventType.SharedScoreboardRequest, arg);
                         break;
                     case "osu-submit-modular.php":
-                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreSubmittion, request, response, args);
+                        _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
                         break;
                     case "osu-getreplay.php":
-                        Handlers.ExecuteHandler(HandlerTypes.SharedGetReplay, request, response, args);
+                        _evmng.RunEvent(EventType.SharedGetReplay, arg);
                         break;
                     
                     default:
-                        Logger.L.Info(
+                        Logger.Info(
                             $"Unknown Path {request.Url.AbsolutePath} " +
                             $"Method is {request.HttpMethod} " +
                             $"Query is {request.Url.Query} " +
@@ -97,13 +102,15 @@ namespace Jibril.Server
 
             Route.Add("/web/{handler}", (request, response, args) =>
             {
+                IEventArgs arg = new SharedEventArgs {req = request, res = response, args = args};
+                
                 switch (args["handler"].Split("?")[0])
                 {
                     case "osu-submit-modular.php":
-                        Handlers.ExecuteHandler(HandlerTypes.SharedScoreSubmittion, request, response, args);
+                        _evmng.RunEvent(EventType.SharedScoreSubmittion, arg);
                         break;
                     default:
-                        Logger.L.Info(
+                        Logger.Info(
                             $"Unknown Path {request.Url.AbsolutePath} " +
                             $"Method is {request.HttpMethod} " +
                             $"Query is {request.Url.Query} " +
@@ -116,8 +123,10 @@ namespace Jibril.Server
 
             Route.Add("/{avatar}", (request, response, args) =>
             {
+                IEventArgs arg = new SharedEventArgs {req = request, res = response, args = args};
+                
                 if (request.Url.Host.StartsWith("a."))
-                    Handlers.ExecuteHandler(HandlerTypes.SharedAvatars, request, response, args);
+                    _evmng.RunEvent(EventType.SharedAvatars, arg);
                 else
                     response.StatusCode = 404;
 
@@ -126,7 +135,7 @@ namespace Jibril.Server
 
             Route.Error = (request, response, exception) =>
             {
-                Logger.L.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
+                Logger.Info($"Unknown Path {request.Url.AbsolutePath} Method is {request.HttpMethod}");
                 response.Close();
             };
 

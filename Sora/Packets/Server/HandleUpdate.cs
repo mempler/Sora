@@ -70,7 +70,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardRx.PlayCountOsu);
                         sw.Write(Presence.LeaderboardRx.TotalScoreOsu);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardRx.PeppyPointsOsu);
+                        sw.Write((ushort) Presence.LeaderboardRx.PerformancePointsOsu);
                         break;
                     case PlayMode.Taiko:
                         sw.Write(Presence.LeaderboardRx.RankedScoreTaiko);
@@ -82,7 +82,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardRx.PlayCountTaiko);
                         sw.Write(Presence.LeaderboardRx.TotalScoreTaiko);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardRx.PeppyPointsTaiko);
+                        sw.Write((ushort) Presence.LeaderboardRx.PerformancePointsTaiko);
                         break;
                     case PlayMode.Ctb:
                         sw.Write(Presence.LeaderboardRx.RankedScoreCtb);
@@ -94,79 +94,19 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardRx.PlayCountCtb);
                         sw.Write(Presence.LeaderboardRx.TotalScoreCtb);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardRx.PeppyPointsCtb);
+                        sw.Write((ushort) Presence.LeaderboardRx.PerformancePointsCtb);
                         break;
                     case PlayMode.Mania:
-                        sw.Write(Presence.LeaderboardRx.RankedScoreMania);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardRx.Count300Mania,
-                                                              Presence.LeaderboardRx.Count100Mania,
-                                                              Presence.LeaderboardRx.Count50Mania,
-                                                              Presence.LeaderboardRx.CountMissMania, 0, 0,
+                        sw.Write(Presence.LeaderboardStd.RankedScoreMania);
+                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardStd.Count300Mania,
+                                                              Presence.LeaderboardStd.Count100Mania,
+                                                              Presence.LeaderboardStd.Count50Mania,
+                                                              Presence.LeaderboardStd.CountMissMania, 0, 0,
                                                               Presence.Status.Playmode));
-                        sw.Write((uint) Presence.LeaderboardRx.PlayCountMania);
-                        sw.Write(Presence.LeaderboardRx.TotalScoreMania);
+                        sw.Write((uint) Presence.LeaderboardStd.PlayCountMania);
+                        sw.Write(Presence.LeaderboardStd.TotalScoreMania);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardRx.PeppyPointsMania);
-                        break;
-                    default:
-                        sw.Write((ulong) 0);
-                        sw.Write((float) 0);
-                        sw.Write((uint) 0);
-                        sw.Write((ulong) 0);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort) 0);
-                        break;
-                }
-            else if (Presence.Touch)
-                switch (Presence.Status.Playmode)
-                {
-                    case PlayMode.Osu:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreOsu);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Osu,
-                                                              Presence.LeaderboardTouch.Count100Osu,
-                                                              Presence.LeaderboardTouch.Count50Osu,
-                                                              Presence.LeaderboardTouch.CountMissOsu, 0, 0,
-                                                              Presence.Status.Playmode));
-                        sw.Write((uint) Presence.LeaderboardTouch.PlayCountOsu);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreOsu);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardTouch.PeppyPointsOsu);
-                        break;
-                    case PlayMode.Taiko:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreTaiko);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Taiko,
-                                                              Presence.LeaderboardTouch.Count100Taiko,
-                                                              Presence.LeaderboardTouch.Count50Taiko,
-                                                              Presence.LeaderboardTouch.CountMissTaiko, 0, 0,
-                                                              Presence.Status.Playmode));
-                        sw.Write((uint) Presence.LeaderboardTouch.PlayCountTaiko);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreTaiko);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardTouch.PeppyPointsTaiko);
-                        break;
-                    case PlayMode.Ctb:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreCtb);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Ctb,
-                                                              Presence.LeaderboardTouch.Count100Ctb,
-                                                              Presence.LeaderboardTouch.Count50Ctb,
-                                                              Presence.LeaderboardTouch.CountMissCtb, 0, 0,
-                                                              Presence.Status.Playmode));
-                        sw.Write((uint) Presence.LeaderboardTouch.PlayCountCtb);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreCtb);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardTouch.PeppyPointsCtb);
-                        break;
-                    case PlayMode.Mania:
-                        sw.Write(Presence.LeaderboardTouch.RankedScoreMania);
-                        sw.Write((float) Accuracy.GetAccuracy(Presence.LeaderboardTouch.Count300Mania,
-                                                              Presence.LeaderboardTouch.Count100Mania,
-                                                              Presence.LeaderboardTouch.Count50Mania,
-                                                              Presence.LeaderboardTouch.CountMissMania, 0, 0,
-                                                              Presence.Status.Playmode));
-                        sw.Write((uint) Presence.LeaderboardTouch.PlayCountMania);
-                        sw.Write(Presence.LeaderboardTouch.TotalScoreMania);
-                        sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardTouch.PeppyPointsMania);
+                        sw.Write((ushort) Presence.LeaderboardStd.PerformancePointsMania);
                         break;
                     default:
                         sw.Write((ulong) 0);
@@ -190,7 +130,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardStd.PlayCountOsu);
                         sw.Write(Presence.LeaderboardStd.TotalScoreOsu);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardStd.PeppyPointsOsu);
+                        sw.Write((ushort) Presence.LeaderboardStd.PerformancePointsOsu);
                         break;
                     case PlayMode.Taiko:
                         sw.Write(Presence.LeaderboardStd.RankedScoreTaiko);
@@ -202,7 +142,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardStd.PlayCountTaiko);
                         sw.Write(Presence.LeaderboardStd.TotalScoreTaiko);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardStd.PeppyPointsTaiko);
+                        sw.Write((ushort) Presence.LeaderboardStd.PerformancePointsTaiko);
                         break;
                     case PlayMode.Ctb:
                         sw.Write(Presence.LeaderboardStd.RankedScoreCtb);
@@ -214,7 +154,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardStd.PlayCountCtb);
                         sw.Write(Presence.LeaderboardStd.TotalScoreCtb);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardStd.PeppyPointsCtb);
+                        sw.Write((ushort) Presence.LeaderboardStd.PerformancePointsCtb);
                         break;
                     case PlayMode.Mania:
                         sw.Write(Presence.LeaderboardStd.RankedScoreMania);
@@ -226,7 +166,7 @@ namespace Sora.Packets.Server
                         sw.Write((uint) Presence.LeaderboardStd.PlayCountMania);
                         sw.Write(Presence.LeaderboardStd.TotalScoreMania);
                         sw.Write(Presence.Rank);
-                        sw.Write((ushort) Presence.LeaderboardStd.PeppyPointsMania);
+                        sw.Write((ushort) Presence.LeaderboardStd.PerformancePointsMania);
                         break;
                     default:
                         sw.Write((ulong) 0);

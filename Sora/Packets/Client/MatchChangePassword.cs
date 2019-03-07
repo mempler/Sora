@@ -31,6 +31,7 @@ using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Objects;
+using Sora.Services;
 
 namespace Sora.Packets.Client
 {

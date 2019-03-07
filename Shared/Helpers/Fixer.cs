@@ -1,6 +1,6 @@
 using Shared.Enums;
 
-namespace Jibril.Helpers
+namespace Shared.Helpers
 {
     public static class Fixer
     {

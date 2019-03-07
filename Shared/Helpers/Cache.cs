@@ -3,28 +3,31 @@ using StackExchange.Redis;
 
 namespace Shared.Helpers
 {
-    public static class Cache
+    public class Cache
     {
-        private static ConnectionMultiplexer Redis => _actualRedis ?? (_actualRedis = ConnectionMultiplexer.Connect("localhost"));
-
-        private static ConnectionMultiplexer _actualRedis;
+        public Cache()
+        {
+            Redis = ConnectionMultiplexer.Connect("localhost");
+        }
         
-        public static bool CacheString(RedisKey key, string data, int duration = 300) // 5 Minutes.
+        private ConnectionMultiplexer Redis;
+        
+        public bool CacheString(RedisKey key, string data, int duration = 300) // 5 Minutes.
         {
             return Redis.GetDatabase().StringSet(key, data, TimeSpan.FromSeconds(duration));
         }
 
-        public static string GetCachedString(RedisKey key)
+        public string GetCachedString(RedisKey key)
         {
             return Redis.GetDatabase().StringGet(key);
         }
 
-        public static bool CacheData(RedisKey key, byte[] data, int duration = 300)
+        public bool CacheData(RedisKey key, byte[] data, int duration = 300)
         {
             return Redis.GetDatabase().StringSet(key, data, TimeSpan.FromSeconds(duration));
         }
 
-        public static byte[] GetCachedData(RedisKey key)
+        public byte[] GetCachedData(RedisKey key)
         {
             return Redis.GetDatabase().StringGet(key);
         }

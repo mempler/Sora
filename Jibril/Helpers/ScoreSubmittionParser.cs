@@ -1,15 +1,16 @@
 using System;
 using System.Text;
-using Shared.Database.Models;
 using Shared.Enums;
 using Shared.Helpers;
+using Shared.Models;
+using Shared.Services;
 
 namespace Jibril.Helpers
 {
     public static class ScoreSubmittionParser
     {
         private const string PrivateKey = "osu!-scoreburgr---------{0}";
-        public static (bool Pass, Scores score) ParseScore(string encscore, string iv, string osuversion)
+        public static (bool Pass, Scores score) ParseScore(Database db, string encscore, string iv, string osuversion)
         {
             string decryptedScore = Crypto.DecryptString(Convert.FromBase64String(encscore),
                                                          Encoding.ASCII.GetBytes(string.Format(PrivateKey, osuversion)),
@@ -18,7 +19,7 @@ namespace Jibril.Helpers
             Scores score = new Scores
             {
                 FileMd5 = x[0],
-                UserId = Users.GetUserId(x[1]),
+                UserId = Users.GetUserId(db, x[1]),
                 Count300 = ulong.Parse(x[3]),
                 Count100 = ulong.Parse(x[4]),
                 Count50 = ulong.Parse(x[5]),
@@ -31,10 +32,11 @@ namespace Jibril.Helpers
                 PlayMode = (PlayMode) byte.Parse(x[15]),
                 Date = DateTime.UtcNow,
             };
+            
             score.Accuracy = Accuracy.GetAccuracy(score.Count300, score.Count100, score.Count50, score.CountGeki,
                                                   score.CountKatu, score.CountMiss, score.PlayMode);
             score.ScoreMd5 = Hex.ToHex(Crypto.GetMd5($"{score.Count300 + score.Count100}{score.FileMd5}{score.CountMiss}{score.CountGeki}{score.CountKatu}{score.Date}{score.Mods}"));
-            score.ScoreOwner = Users.GetUser(score.UserId);
+            score.ScoreOwner = Users.GetUser(db, score.UserId);
             
             return (bool.Parse(x[14]), score);
         }

@@ -27,72 +27,45 @@ SOFTWARE.
 #endregion
 
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Reflection;
-using Shared.Database;
-using Shared.Database.Models;
-using Shared.Enums;
-using Shared.Handlers;
+using EventManager.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Shared.Helpers;
-using Shared.Plugins;
-using Sora.Objects;
+using Shared.Services;
 using Sora.Server;
+using Sora.Services;
 
 namespace Sora
 {
     internal static class Program
     {
-        private static HttpServer _server;
+        public static IServiceProvider BuildProvider() =>
+            new ServiceCollection()
+                .AddSingleton(Config.ReadConfig())
+                .AddSingleton<Database>()
+                .AddSingleton<PluginService>()
+                .AddSingleton<PresenceService>()
+                .AddSingleton<MultiplayerService>()
+                .AddSingleton<PacketStreamService>()
+                .AddSingleton<ChannelService>()
+                .AddSingleton<StartupService>()
+                .AddSingleton<HttpServer>()
+                .AddSingleton(new EventManager.EventManager(new List<Assembly> { Assembly.GetEntryAssembly() } ))
 
-        private static void Initialize()
-        {
-            try
-            {
-                Logger.L.Info("Start Initalization");
-                Stopwatch watch = Stopwatch.StartNew();
-                Config    conf  = Config.ReadConfig();
-                _server = new HttpServer(conf.Server.Port);
-                using (new SoraContext())
-                {
-                } // Initialize Database. (Migrate database)
-
-                AppDomain.CurrentDomain.UnhandledException += delegate(object ex, UnhandledExceptionEventArgs e)
-                {
-                    Logger.L.Error(ex);
-                    Logger.L.Error(e);
-                };
-
-                Loader.LoadPlugins();
-                Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
-                Handlers.ExecuteHandler(HandlerTypes.Initializer);
-
-                // Create Sora (bot) if not exists.
-                if (Users.GetUser(100) == null)
-                    Users.InsertUser(new Users
-                    {
-                        Id         = 100,
-                        Username   = "Sora",
-                        Email      = "bot@gigamons.de",
-                        Password   = "",
-                        Privileges = 0
-                    });
-
-                watch.Stop();
-                Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
-            }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-                Environment.Exit(1); // an CRITICAL error. close everything.
-            }
-        }
-
-        [STAThread]
+                .BuildServiceProvider();
+        
         private static void Main()
         {
-            Initialize();
-            LPresences.TimeoutCheck();
-            _server.RunAsync().Wait();
+            IServiceProvider provider = BuildProvider();
+
+            provider.GetService<StartupService>()
+                    .Start()
+                    .Wait();
+
+            provider.GetService<HttpServer>()
+                    .RunAsync()
+                    .Wait();
         }
     }
 }
