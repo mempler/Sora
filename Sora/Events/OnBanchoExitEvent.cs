@@ -22,7 +22,6 @@ namespace Sora.Events
         [Event(EventType.BanchoExit)]
         public void OnBanchoExit(BanchoExitArgs args)
         {
-            _pcs.EndPresence(args.pr, true);
             PacketStream mainStream = _pss.GetStream("main");
 
             mainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct

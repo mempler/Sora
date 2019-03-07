@@ -65,8 +65,6 @@ namespace Sora.Services
         {
             if (forceful && _presences.ContainsKey(pr.Token))
             {
-                pr.Stream.Close();
-                pr.LastRequest.Stop();
                 _cs.RemoveChannel(pr.PrivateChannel);
 
                 foreach (PacketStream str in pr.JoinedStreams)
@@ -77,6 +75,9 @@ namespace Sora.Services
                 _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs{ pr = pr});
                 _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs { pr = pr });
 
+                pr.Stream.Close();
+                pr.LastRequest.Stop();
+                
                 _presences.Remove(pr.Token);
                 return;
             }

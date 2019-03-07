@@ -117,7 +117,7 @@ namespace Sora.Events
                     Exception(args.Writer);
                     return;
                 }
-
+                
                 stream.Broadcast(new PresenceSingle(args.pr.User.Id));
                 stream.Broadcast(new UserPresence(args.pr));
                 stream.Broadcast(new HandleUpdate(args.pr));
