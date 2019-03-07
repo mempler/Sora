@@ -26,6 +26,7 @@ using EventManager.Attributes;
 using EventManager.Enums;
 using Jibril.Enums;
 using Jibril.EventArgs;
+using Jibril.Helpers;
 using Jibril.Objects;
 using Shared.Enums;
 using Shared.Helpers;
@@ -39,11 +40,13 @@ namespace Jibril.Events
     {
         private readonly Database _db;
         private readonly Cache _cache;
+        private readonly Config _cfg;
 
-        public OnScoreboardRequestEvent(Database db, Cache cache)
+        public OnScoreboardRequestEvent(Database db, Cache cache, Config cfg)
         {
             _db = db;
             _cache = cache;
+            _cfg = cfg;
         }
         
         [Event(EventType.SharedScoreboardRequest)]
@@ -75,7 +78,7 @@ namespace Jibril.Events
                 return;
             }
 
-            Scoreboard sboard = new Scoreboard(_db,
+            Scoreboard sboard = new Scoreboard(_db, _cfg,
                                                fileMd5, user, playmode,
                                                (mods & Mod.Relax) != 0,
                                                (mods & Mod.TouchDevice) != 0,
@@ -83,7 +86,7 @@ namespace Jibril.Events
                                                scoreboardType == ScoreboardType.Country,
                                                scoreboardType == ScoreboardType.Mods,
                                                mods);
-
+            
             _cache.CacheString($"jibril:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(_db), 60);
 
             args.res.OutputStream.Write(Encoding.Default.GetBytes(cachedData));

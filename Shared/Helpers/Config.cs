@@ -24,37 +24,30 @@ using Newtonsoft.Json;
 
 namespace Shared.Helpers
 {
-    public class Config
+    public interface IConfig
     {
-        public MySql MySql = new MySql
-            {Database = "gigamons", Hostname = "127.0.0.1", Username = "root", Port = 3306, Password = string.Empty};
+        MySql MySql { get; set; }
+        Redis Redis { get; set; }
+    }
 
-        public Osu Osu = new Osu {ApiKey = string.Empty};
-
-        public Server Server;
-
-        public static Config ReadConfig(short port = 5001)
+    public static class ConfigUtil
+    {
+        public static T ReadConfig<T>() where T : IConfig, new()
         {
             if (File.Exists("config.json"))
-                return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-            Config cfg = new Config {Server = new Server {Port = port}};
+                return JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
+            T cfg = new T {};
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.Info("Config has been created! please edit.");
             Environment.Exit(0);
-
             return cfg;
         }
     }
 
-    public struct Server
+    public struct Redis
     {
-        public short Port;
-    }
-
-    public struct Osu
-    {
-        public string ApiKey;
+        public string Hostname;
     }
 
     public struct MySql

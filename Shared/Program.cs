@@ -22,15 +22,22 @@
 
 // Only used for Migration. so just ignore it ^^
 
+using Shared.Helpers;
 using Shared.Services;
 
 namespace Shared
 {
     internal class Program
     {
+        private class FakeCFG : IConfig
+        {
+            public Helpers.MySql MySql { get; set; }
+            public Redis Redis { get; set; }
+        }
+        
         private static void Main()
         {
-            using (Database db = new Database())
+            using (Database db = new Database(ConfigUtil.ReadConfig<FakeCFG>()))
             {
             }
         }

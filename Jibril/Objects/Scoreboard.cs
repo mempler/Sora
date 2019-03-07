@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Jibril.Helpers;
 using Shared.Enums;
 using Shared.Interfaces;
 using Shared.Models;
@@ -33,6 +34,7 @@ namespace Jibril.Objects
         private readonly bool _countryOnly;
 
         private readonly Database _db;
+        private readonly Config _cfg;
         private readonly string _fileMd5;
         private readonly bool _friendsOnly;
         private readonly bool _modOnly;
@@ -44,13 +46,14 @@ namespace Jibril.Objects
         private Beatmaps _bm;
         private List<Scores> _scores;
 
-        public Scoreboard(Database db,
+        public Scoreboard(Database db, Config cfg,
                           string fileMd5, Users user,
                           PlayMode playMode = PlayMode.Osu, bool relaxing = false, bool touching = false,
                           bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
                           Mod mods = Mod.None)
         {
             _db = db;
+            _cfg = cfg;
             _fileMd5     = fileMd5;
             _user        = user;
             _playMode    = playMode;
@@ -108,7 +111,7 @@ namespace Jibril.Objects
         private void SetBeatmap()
         {
             if ((_bm = Beatmaps.FetchFromDatabase(_db, _fileMd5)) != null) return;
-            if ((_bm = Beatmaps.FetchFromApi(_fileMd5)) != null)
+            if ((_bm = Beatmaps.FetchFromApi(_cfg.Osu.OsuAPIKey, _fileMd5)) != null)
                 Beatmaps.InsertBeatmap(_db, _bm);
         }
     }

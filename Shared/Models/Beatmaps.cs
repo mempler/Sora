@@ -125,9 +125,8 @@ namespace Shared.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public static Beatmaps FetchFromApi(string fileMd5, int beatmapId = -1)
+        public static Beatmaps FetchFromApi(string osuApiKey, string fileMd5, int beatmapId = -1)
         {
-            string osuApiKey = Config.ReadConfig().Osu.ApiKey;
             if (_api == null)
                 _api = new Api(osuApiKey);
 

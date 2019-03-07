@@ -25,6 +25,7 @@ using Shared.Enums;
 using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
+using Sora.Helpers;
 using Sora.Objects;
 
 namespace Sora.Services
@@ -33,6 +34,7 @@ namespace Sora.Services
     {
         private readonly Database _db;
         private readonly Config _config;
+        private readonly IConfig _icfg;
         private readonly PluginService _plugs;
         private readonly EventManager.EventManager _ev;
         private readonly MultiplayerService _mps;
@@ -43,6 +45,7 @@ namespace Sora.Services
         public StartupService(
             Database db,
             Config config,
+            IConfig icfg,
             PluginService plugs,
             EventManager.EventManager ev,
 
@@ -54,6 +57,7 @@ namespace Sora.Services
         {
             _db = db;
             _config = config;
+            _icfg = icfg;
             _plugs = plugs;
             _ev = ev;
             _mps = mps;
@@ -85,6 +89,7 @@ namespace Sora.Services
             _ev.RegisterService(_pss);    // PacketStream Service
             _ev.RegisterService(_cs);     // Channel Service
             _ev.RegisterService(_ps);     // Presence Service
+            _ev.RegisterService(_icfg);   // Interface Config for Shared
             
             _ev.BuildService();
             _ev.RegisterEvents();
@@ -97,6 +102,7 @@ namespace Sora.Services
             _ev.RegisterService(_pss);    // PacketStream Service
             _ev.RegisterService(_cs);     // Channel Service
             _ev.RegisterService(_ps);     // Presence Service
+            _ev.RegisterService(_icfg); // Interface Config for Shared
                         
             if (!Directory.Exists("plugins"))
                 Directory.CreateDirectory("plugins");

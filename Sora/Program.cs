@@ -25,6 +25,7 @@ using EventManager.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Helpers;
 using Shared.Services;
+using Sora.Helpers;
 using Sora.Server;
 using Sora.Services;
 
@@ -32,9 +33,10 @@ namespace Sora
 {
     internal static class Program
     {
-        public static IServiceProvider BuildProvider() =>
+        private static IServiceProvider BuildProvider() =>
             new ServiceCollection()
-                .AddSingleton(Config.ReadConfig())
+                .AddSingleton(ConfigUtil.ReadConfig<Config>())
+                .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
                 .AddSingleton<Database>()
                 .AddSingleton<PluginService>()
                 .AddSingleton<PresenceService>()

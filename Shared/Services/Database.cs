@@ -28,10 +28,13 @@ namespace Shared.Services
 {
     public sealed class Database : DbContext
     {
+        private readonly IConfig _config;
         private static readonly bool[] Migrated = {false};
 
-        public Database()
+        public Database(IConfig config)
         {
+            _config = config;
+            
             if (Migrated[0]) return;
             lock (Migrated)
             {
@@ -67,11 +70,10 @@ namespace Shared.Services
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Config cfg = Config.ReadConfig();
-            if (cfg.MySql.Hostname == null)
+            if (_config.MySql.Hostname == null)
                 Environment.Exit(1);
             optionsBuilder.UseMySql(
-                $"Server={cfg.MySql.Hostname};Database={cfg.MySql.Database};User={cfg.MySql.Username};Password={cfg.MySql.Password};Port={cfg.MySql.Port};CharSet=utf8mb4;",
+                $"Server={_config.MySql.Hostname};Database={_config.MySql.Database};User={_config.MySql.Username};Password={_config.MySql.Password};Port={_config.MySql.Port};CharSet=utf8mb4;",
                 mysqlOptions =>
                 {
                     mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb);
