@@ -1,78 +1,34 @@
-﻿#region copyright
-
-/*
-MIT License
-
-Copyright (c) 2018 Robin A. P.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-#endregion
-
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using Jibril.Server;
-using Shared.Database;
-using Shared.Enums;
-using Shared.Handlers;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Jibril.Helpers;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Shared.Helpers;
-using Shared.Plugins;
 
 namespace Jibril
 {
-    internal static class Program
+    public class Program
     {
-        private static HttpServer _server;
-
-        private static void Initialize()
+        public static void Main(string[] args)
         {
-            try
-            {
-                Logger.L.Info("Start Initalization");
-                Stopwatch watch = Stopwatch.StartNew();
-                Config    conf  = Config.ReadConfig(5002);
-
-                _server = new HttpServer(conf.Server.Port);
-                using (new SoraContext())
-                {
-                } // Initialize Database. (Migrate database)
-
-                Loader.LoadPlugins();
-                Handlers.InitHandlers(Assembly.GetEntryAssembly(), false);
-                Handlers.ExecuteHandler(HandlerTypes.Initializer);
-
-                watch.Stop();
-                Logger.L.Info($"Initalization Success. it took {watch.Elapsed.Seconds} second(s)");
-            }
-            catch (Exception ex)
-            {
-                Logger.L.Error(ex);
-            }
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        [STAThread]
-        private static void Main()
-        {
-            Initialize();
-            _server.RunAsync().Wait();
-        }
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                   .UseHttpSys(options =>
+                   {
+                       options.MaxConnections                = 100;
+                       options.MaxRequestBodySize            = 30000000;
+                       options.UrlPrefixes.Add("http://+:" + ConfigUtil.ReadConfig<Config>().Server.Port);
+                   })
+                   .UseUrls()
+                   .UseStartup<Startup>();
     }
 }

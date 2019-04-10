@@ -1,33 +1,24 @@
-#region copyright
-
+#region LICENSE
 /*
-MIT License
+    Sora - A Modular Bancho written in C#
+    Copyright (C) 2019 Robin A. P.
 
-Copyright (c) 2018 Robin A. P.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Shared.Enums;
@@ -35,38 +26,10 @@ using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
 using Sora.Packets.Server;
+using Sora.Services;
 
 namespace Sora.Objects
 {
-    public static class MultiplayerLobby
-    {
-        private static long _matches;
-        public static Dictionary<long, MultiplayerRoom> Rooms = new Dictionary<long, MultiplayerRoom>();
-
-        public static IEnumerable<MultiplayerRoom> GetRooms()
-        {
-            return Rooms.Select(x => x.Value);
-        }
-
-        public static MultiplayerRoom GetRoom(long matchId)
-        {
-            return Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
-        }
-
-        public static long Add(MultiplayerRoom room)
-        {
-            room.MatchId = _matches++;
-            Rooms.Add(room.MatchId, room);
-            return room.MatchId;
-        }
-
-        public static void Remove(long matchId)
-        {
-            if (!Rooms.ContainsKey(matchId)) return;
-            Rooms.Remove(matchId);
-        }
-    }
-
     public class MultiplayerSlot
     {
         public Mod Mods;
@@ -87,6 +50,10 @@ namespace Sora.Objects
 
     public class MultiplayerRoom : ISerializer, ICloneable
     {
+        public PacketStreamService _pss;
+        public MultiplayerService _ms;
+        public PresenceService _ps;
+
         private const int MaxPlayers = 16;
         public Mod ActiveMods;
         public int BeatmapId;
@@ -111,6 +78,22 @@ namespace Sora.Objects
         public MatchSpecialModes SpecialModes;
         public TeamType TeamType;
         public int WantSkip;
+
+        public MultiplayerRoom(PacketStreamService pss, MultiplayerService ms, PresenceService ps)
+        {
+            _pss = pss;
+            _ms = ms;
+            _ps = ps;
+            for (int i = 0; i < MaxPlayers; i++)
+                Slots[i] = new MultiplayerSlot
+                {
+                    // ReSharper disable once ConditionalTernaryEqualBranch
+                    Status = i > 6 ? MultiSlotStatus.Locked : MultiSlotStatus.Locked,
+                    Mods   = 0,
+                    Team   = MultiSlotTeam.NoTeam,
+                    UserId = -1
+                };
+        }
 
         public MultiplayerRoom()
         {
@@ -268,7 +251,7 @@ namespace Sora.Objects
         {
             foreach (MultiplayerSlot slot in Slots.Where(x => x.UserId != -1))
             {
-                Presence pr = LPresences.GetPresence(slot.UserId);
+                Presence pr = _ps.GetPresence(slot.UserId);
                 if (pr == null)
                     Leave(slot.UserId);
                 else
@@ -341,15 +324,15 @@ namespace Sora.Objects
 
         public void Update()
         {
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchUpdate(this));
+            _pss.GetStream("lobby").Broadcast(new MatchUpdate(this));
             Broadcast(new MatchUpdate(this));
         }
 
         public void Dispand()
         {
             Broadcast(new MatchDisband(this));
-            MultiplayerLobby.Remove(MatchId);
-            LPacketStreams.GetStream("lobby").Broadcast(new MatchDisband(this));
+            _ms.Remove(MatchId);
+            _pss.GetStream("lobby").Broadcast(new MatchDisband(this));
         }
 
         public void SetHost(int userId)
@@ -373,11 +356,14 @@ namespace Sora.Objects
         {
             if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Freemods)
                 slot.Mods = FixMods(mods);
-            else if
-                (SpecialModes == MatchSpecialModes.Freemods)
+            else if (SpecialModes == MatchSpecialModes.Freemods)
                 slot.Mods = mods;
-            else if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal)
+            else if (slot.IsHost(this) && SpecialModes == MatchSpecialModes.Normal) {
+                foreach (MultiplayerSlot s in Slots)
+                    slot.Mods = Mod.None;
+                
                 ActiveMods = mods;
+            }
 
             Update();
         }
@@ -396,7 +382,8 @@ namespace Sora.Objects
             TeamType     = room.TeamType;
             SpecialModes = room.SpecialModes;
             Seed         = room.Seed;
-
+            
+            SetMods(ActiveMods, GetSlotByUserId(HostId));
             Update();
         }
 

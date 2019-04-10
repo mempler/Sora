@@ -1,45 +1,39 @@
-#region copyright
-
+#region LICENSE
 /*
-MIT License
+    Sora - A Modular Bancho written in C#
+    Copyright (C) 2019 Robin A. P.
 
-Copyright (c) 2018 Robin A. P.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #endregion
 
 using System;
 using System.IO;
 using System.Net;
+using EventManager.Enums;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Sora.Enums;
+using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
+using Sora.Services;
 
 namespace Sora.Server
 {
     public abstract class Client
-    {
+    {        
         protected Client(HttpListenerRequest request, HttpListenerResponse response)
         {
             Request  = request;
@@ -63,20 +57,30 @@ namespace Sora.Server
         public override void DoWork()
         {
             Console.WriteLine("Browser connection");
-            Console.WriteLine(Request.Url);
             Response.Close();
         }
     }
 
     public class OsuClient : Client
     {
-        public OsuClient(HttpListenerRequest request, HttpListenerResponse response)
+        private readonly ChannelService _cs;
+        private readonly EventManager.EventManager _evmng;
+        private readonly PresenceService _ps;
+
+        public OsuClient(HttpListenerRequest request, HttpListenerResponse response,
+                         ChannelService cs,
+                         EventManager.EventManager evmng,
+                         PresenceService ps)
             : base(request, response)
         {
+            _cs = cs;
+            _evmng = evmng;
+            _ps = ps;
         }
 
         public override void DoWork()
         {
+            Console.WriteLine("Client connection");
             try
             {
                 using (MemoryStream rawReadstream = new MemoryStream())
@@ -91,23 +95,25 @@ namespace Sora.Server
                     {
                         if (Request.Headers["osu-token"] == null || Request.Headers["osu-token"] == string.Empty)
                         {
-                            pr                            = new Presence();
+                            pr                            = new Presence(_cs);
                             Response.Headers["cho-token"] = pr.Token;
                             string ip                        = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
-
-                            Handlers.ExecuteHandler(HandlerTypes.BanchoLoginHandler, pr, mw, mr, ip);
+                            _evmng.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs()
+                            {
+                                pr = pr, Reader = mr, Writer = mw, IPAddress = ip
+                            });
                             return;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.L.Error(ex);
+                        Logger.Err(ex);
                         mw.Write(new LoginResponse(LoginResponses.Exception));
                         return;
                     }
 
-                    pr = LPresences.GetPresence(Request.Headers["osu-token"]);
+                    pr = _ps.GetPresence(Request.Headers["osu-token"]);
                     if (pr == null)
                     {
                         Response.StatusCode = 403; // Presence is not known, force the client to send login info.
@@ -127,13 +133,15 @@ namespace Sora.Server
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
                             {
-                                Handlers.ExecuteHandler(HandlerTypes.BanchoPacketHandler, pr, packetId,
-                                                        packetDataReader);
+                                _evmng.RunEvent(EventType.BanchoPacket, new BanchoPacketArgs()
+                                {
+                                    pr = pr, PacketId = packetId, Data = packetDataReader
+                                });
                             }
                         }
                         catch (Exception ex)
                         {
-                            Logger.L.Error(ex);
+                            Logger.Err(ex);
                             break;
                         }
 
@@ -150,12 +158,12 @@ namespace Sora.Server
                     }
 
                     if (pr.IsLastRequest)
-                        LPresences.EndPresence(pr, true);
+                        _ps.EndPresence(pr, true);
                 }
             }
             catch (Exception ex)
             {
-                Logger.L.Error(ex);
+                Logger.Err(ex);
             }
         }
     }

@@ -1,35 +1,28 @@
-﻿#region copyright
-
+﻿#region LICENSE
 /*
-MIT License
+    Sora - A Modular Bancho written in C#
+    Copyright (C) 2019 Robin A. P.
 
-Copyright (c) 2018 Robin A. P.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #endregion
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SimpleHttp;
+using Sora.Services;
 
 namespace Sora.Server
 {
@@ -37,12 +30,18 @@ namespace Sora.Server
 
     public class HttpServer
     {
+        private readonly ChannelService _cs;
+        private readonly EventManager.EventManager _evmng;
+        private readonly PresenceService _ps;
         private readonly short _port;
         private bool _running;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public HttpServer(short port = 5001)
+        public HttpServer(ChannelService cs, EventManager.EventManager evmng, PresenceService ps, short port = 5001)
         {
+            _cs = cs;
+            _evmng = evmng;
+            _ps = ps;
             _port    = port;
             _running = false;
         }
@@ -76,7 +75,7 @@ namespace Sora.Server
 
                 Client client;
                 if (req.UserAgent == "osu!")
-                    client = new OsuClient(req, res);
+                    client = new OsuClient(req, res, _cs, _evmng, _ps);
                 else
                     client = new BrowserClient(req, res);
 
@@ -87,7 +86,7 @@ namespace Sora.Server
             {
                 Client client;
                 if (req.UserAgent == "osu!")
-                    client = new OsuClient(req, res);
+                    client = new OsuClient(req, res, _cs, _evmng, _ps);
                 else
                     client = new BrowserClient(req, res);
 

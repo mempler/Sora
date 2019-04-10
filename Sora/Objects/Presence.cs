@@ -1,139 +1,40 @@
-﻿#region copyright
-
+﻿#region LICENSE
 /*
-MIT License
+    Sora - A Modular Bancho written in C#
+    Copyright (C) 2019 Robin A. P.
 
-Copyright (c) 2018 Robin A. P.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #endregion
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using JetBrains.Annotations;
-using Shared.Database.Models;
 using Shared.Enums;
-using Shared.Handlers;
 using Shared.Helpers;
 using Shared.Interfaces;
+using Shared.Models;
 using Sora.Enums;
 using Sora.Packets.Client;
+using Sora.Services;
 
 namespace Sora.Objects
 {
-    public static class LPresences
-    {
-        private static readonly Dictionary<string, Presence> Presences = new Dictionary<string, Presence>();
-
-        public static IEnumerable<Presence> AllPresences => Presences.Select(x => x.Value);
-
-        public static Presence GetPresence(string token)
-        {
-            return Presences.TryGetValue(token, out Presence pr) ? pr : null;
-        }
-
-        public static Presence GetPresence(int userid)
-        {
-            foreach (KeyValuePair<string, Presence> presence in Presences)
-                if (presence.Value.User.Id == userid)
-                    return presence.Value;
-
-            return null;
-        }
-
-        [UsedImplicitly]
-        public static IEnumerable<int> GetUserIds()
-        {
-            return Presences.Select(x => x.Value.User.Id);
-        }
-
-        public static IEnumerable<int> GetUserIds(Presence pr)
-        {
-            return Presences
-                   .Where(x => x.Value.Token != pr.Token)
-                   .Select(z => z.Value.User.Id);
-        }
-
-        public static void BeginPresence(Presence presence)
-        {
-            // TODO: Add total playtime.
-            //presence.BeginSeason = DateTime.UtcNow;
-            if (presence == null) return;
-            presence.LastRequest.Start();
-            Presences.Add(presence.Token, presence);
-            LChannels.AddChannel(new Channel(presence.User.Username, "", null, presence));
-        }
-
-        public static void EndPresence(Presence pr, bool forceful)
-        {
-            if (forceful && Presences.ContainsKey(pr.Token))
-            {
-                pr.Stream.Close();
-                pr.LastRequest.Stop();
-                LChannels.RemoveChannel(pr.PrivateChannel);
-
-                foreach (PacketStream str in pr.JoinedStreams)
-                    str.Left(pr);
-
-                Handlers.ExecuteHandler(HandlerTypes.BanchoStopSpectating, pr);
-                Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, pr);
-                Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, pr);
-
-                Presences.Remove(pr.Token);
-                return;
-            }
-
-            pr.IsLastRequest = true;
-        }
-
-        public static void TimeoutCheck()
-        {
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        foreach (KeyValuePair<string, Presence> pr in Presences)
-                            pr.Value.TimeoutCheck();
-
-                        if (Presences == null) break;
-                    }
-                    catch
-                    {
-                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
-                    }
-
-                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
-                }
-            }).Start();
-        }
-    }
-
     public class Presence : IComparable
     {
+        private readonly ChannelService _cs;
         //public bool Disconnected;
 
         // ReSharper disable once CollectionNeverUpdated.Global
@@ -153,7 +54,6 @@ namespace Sora.Objects
 
         //public UserStats Stats;
         public LeaderboardStd LeaderboardStd;
-        public LeaderboardTouch LeaderboardTouch;
         public double Lon;
 
         public bool Relax;
@@ -168,8 +68,9 @@ namespace Sora.Objects
 
         public Users User;
 
-        public Presence()
+        public Presence(ChannelService cs)
         {
+            _cs = cs;
             LastRequest = new Stopwatch();
             Token       = Guid.NewGuid().ToString();
             MemoryStream str = new MemoryStream();
@@ -181,7 +82,7 @@ namespace Sora.Objects
         // ReSharper disable once MemberCanBeMadeStatic.Global
         public uint Rank => 0;
 
-        public Channel PrivateChannel => LChannels.GetChannel(User.Username);
+        public Channel PrivateChannel => _cs.GetChannel(User.Username);
 
         public int CompareTo(object obj)
         {
@@ -216,14 +117,7 @@ namespace Sora.Objects
             return copy;
         }
 
-        public void TimeoutCheck()
-        {
-            if (!(LastRequest.Elapsed.TotalSeconds > 30)) return;
-            Handlers.ExecuteHandler(HandlerTypes.BanchoExit, this, ErrorStates.Ok);
-            Handlers.ExecuteHandler(HandlerTypes.BanchoLobbyPart, this);
-            Handlers.ExecuteHandler(HandlerTypes.BanchoMatchPart, this);
-            LPresences.EndPresence(this, true);
-        }
+        public bool TimeoutCheck() => LastRequest.Elapsed.TotalSeconds > 30;
 
         public void Write(IPacket p)
         {

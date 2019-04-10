@@ -28,7 +28,7 @@ build:
 
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" --severity="WARNING" Sora.sln > NUL
-  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+  - cmd: NVika parsereport "inspectcodereport.xml"
   
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/k3rn31p4nic/appveyor-discord-webhook/master/send.ps1 -o send.ps1
