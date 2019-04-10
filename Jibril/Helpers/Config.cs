@@ -17,6 +17,6 @@ namespace Jibril.Helpers
     
     public struct Osu
     {
-        public string OsuAPIKey { get; set; }
+        public string APIKey { get; set; }
     }
 }

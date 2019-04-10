@@ -22,9 +22,9 @@ namespace Jibril.Enums
 {
     public enum ScoreboardType
     {
-        Normal,
-        Mods,
-        Friends,
-        Country
+        Normal = 1,
+        Mods = 2,
+        Friends = 3,
+        Country = 4
     }
 }

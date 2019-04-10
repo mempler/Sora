@@ -145,7 +145,7 @@ namespace Shared.Models
             Database db,
             
             string fileMd5, Users user, PlayMode playMode = PlayMode.Osu,
-            bool relaxing = false, bool touching = false,
+            bool relaxing = false,
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
@@ -154,48 +154,38 @@ namespace Shared.Models
             if (countryOnly)
                 cid = UserStats.GetUserStats(db, user.Id).CountryId;
 
-            IQueryable<Scores> query = db.Scores
+            IQueryable<IGrouping<int, Scores>> query = db.Scores
                                          .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
                                          .Where(score
                                                     => relaxing
                                                         ? (score.Mods & Mod.Relax) != 0
                                                         : (score.Mods & Mod.Relax) == 0)
                                          .Where(score
-                                                    => touching
-                                                        ? (score.Mods & Mod.TouchDevice) != 0
-                                                        : (score.Mods & Mod.TouchDevice) == 0)
-                                         .Where(score
-                                                    => !friendsOnly || db.Friends.Where(f => f.UserId == user.Id)
+                                                    => !friendsOnly || db.Friends
+                                                                         .Where(f => f.UserId == user.Id)
                                                                          .Select(f => f.FriendId)
                                                                          .Contains(score.UserId))
                                          .Where(score
-                                                    => !countryOnly ||
-                                                       db.UserStats.Select(c => c.CountryId).Contains(cid))
+                                                    => !countryOnly || db.UserStats
+                                                                         .Select(c => c.CountryId)
+                                                                         .Contains(cid))
                                          .Where(score => !modOnly || score.Mods == mods)
-                                         //.Select((s, i) => new {s, i})
                                          .Where(score => !onlySelf || score.UserId == user.Id)
-                                         //.Where(score => setPosition(score.s, score.i))
+                                         .OrderByDescending(score => score.TotalScore)
+                                         .GroupBy(s => s.UserId)
                                          .Take(50);
 
+            result = query.ToArray().Select(s => s.Select(xs => xs).First()).ToList();
             
-            
-            result = query.ToArray();
             foreach (Scores s in result)
-            {
-                // inefficient but it works.
-                int selfPosition = db.Scores
-                                     .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                                     .Where(score
-                                                => relaxing
-                                                    ? (score.Mods & Mod.Relax) != 0
-                                                    : (score.Mods & Mod.Relax) == 0)
-                                     .Where(score
-                                                => touching
-                                                    ? (score.Mods & Mod.TouchDevice) != 0
-                                                    : (score.Mods & Mod.TouchDevice) == 0)
-                                     .IndexOf(s);
-                s.Position = selfPosition;
-            }
+                s.Position = db.Scores
+                               .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                               .Where(score
+                                          => relaxing
+                                              ? (score.Mods & Mod.Relax) != 0
+                                              : (score.Mods & Mod.Relax) == 0)
+                               .OrderByDescending(score => score.TotalScore)
+                               .IndexOf(s) + 1;
             return result;
         }
 
@@ -207,6 +197,21 @@ namespace Shared.Models
 
         public static void InsertScore(Database db, Scores score)
         {
+            List<Scores> sc =
+                db.Scores
+                  .Where(s => s.FileMd5 == score.FileMd5 && s.PlayMode == score.PlayMode)
+                  .Where(s => (score.Mods & Mod.Relax) != 0
+                             ? (score.Mods & Mod.Relax) != 0
+                             : (score.Mods & Mod.Relax) == 0)
+                  .Where(s => s.UserId == score.UserId)
+                  .OrderByDescending(s => s.TotalScore)
+                  .ToList();
+
+            bool isBetter = sc.Any(scr => scr.TotalScore < score.TotalScore);
+
+            if (isBetter)
+                db.RemoveRange(sc);
+            
             db.Add(score);
             db.SaveChanges();
         }

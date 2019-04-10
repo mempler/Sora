@@ -79,8 +79,7 @@ namespace EventManager.Enums
         #endregion
 
         #region PrivateAPI
-
-        SharedAvatars,
+        
         SharedScoreboardRequest,
         SharedScoreSubmittion,
         SharedGetReplay,

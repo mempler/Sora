@@ -78,7 +78,7 @@ namespace Sora.Services
                     Password   = "",
                     Privileges = 0
                 });
-
+            
             Localisation.Initialize();
 
             _ev.RegisterService(_config); // Config

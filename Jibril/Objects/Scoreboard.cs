@@ -41,14 +41,13 @@ namespace Jibril.Objects
         private readonly Mod _mods;
         private readonly PlayMode _playMode;
         private readonly bool _relaxing;
-        private readonly bool _touching;
         private readonly Users _user;
         private Beatmaps _bm;
         private List<Scores> _scores;
 
         public Scoreboard(Database db, Config cfg,
                           string fileMd5, Users user,
-                          PlayMode playMode = PlayMode.Osu, bool relaxing = false, bool touching = false,
+                          PlayMode playMode = PlayMode.Osu, bool relaxing = false,
                           bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
                           Mod mods = Mod.None)
         {
@@ -58,7 +57,6 @@ namespace Jibril.Objects
             _user        = user;
             _playMode    = playMode;
             _relaxing    = relaxing;
-            _touching    = touching;
             _friendsOnly = friendsOnly;
             _countryOnly = countryOnly;
             _modOnly     = modOnly;
@@ -85,15 +83,15 @@ namespace Jibril.Objects
                        $"{_bm.Id}|" +
                        $"{_bm.BeatmapSetId}|" +
                        $"{Scores.GetTotalScores(_db, _fileMd5)}\n" +
-                       $"{0}\n" +
+                       "0\n" +
                        $"{_bm.Artist} - {_bm.Title} [{_bm.DifficultyName}]\n" +
                        "10.0\n";
             return $"{(int) RankedStatus.NotSubmited}|false|" +
-                   $"-1|" +
-                   $"-1|" +
-                   $"-1\n" +
-                   $"0\n" +
-                   $"Unknown\n" +
+                   "-1|" +
+                   "-1|" +
+                   "-1\n" +
+                   "0\n" +
+                   "Unknown\n" +
                    "0\n";
         }
 
@@ -101,17 +99,17 @@ namespace Jibril.Objects
         {
             _scores = new List<Scores>
             {
-                Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly, _countryOnly, _modOnly,
+                Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _friendsOnly, _countryOnly, _modOnly,
                                  _mods, true).FirstOrDefault()
             };
-            _scores.AddRange(Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _touching, _friendsOnly,
+            _scores.AddRange(Scores.GetScores(_db, _fileMd5, _user, _playMode, _relaxing, _friendsOnly,
                                               _countryOnly, _modOnly, _mods));
         }
 
         private void SetBeatmap()
         {
             if ((_bm = Beatmaps.FetchFromDatabase(_db, _fileMd5)) != null) return;
-            if ((_bm = Beatmaps.FetchFromApi(_cfg.Osu.OsuAPIKey, _fileMd5)) != null)
+            if ((_bm = Beatmaps.FetchFromApi(_cfg.Osu.APIKey, _fileMd5)) != null)
                 Beatmaps.InsertBeatmap(_db, _bm);
         }
     }

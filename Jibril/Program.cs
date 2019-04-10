@@ -1,62 +1,34 @@
-﻿#region LICENSE
-/*
-    Sora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using EventManager.Services;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Jibril.Helpers;
-using Jibril.Server;
-using Jibril.Services;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Shared.Helpers;
-using Shared.Services;
 
 namespace Jibril
 {
-    internal static class Program
+    public class Program
     {
-        private static IServiceProvider BuildProvider() =>
-            new ServiceCollection()
-                .AddSingleton(ConfigUtil.ReadConfig<Config>())
-                .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
-                .AddSingleton<Database>()
-                .AddSingleton<PluginService>()
-                .AddSingleton<StartupService>()
-                .AddSingleton<HttpServer>()
-                .AddSingleton<Cache>()
-                .AddSingleton(new EventManager.EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}))
-                .BuildServiceProvider();
-
-        [STAThread]
-        private static void Main()
+        public static void Main(string[] args)
         {
-            IServiceProvider provider = BuildProvider();
-
-            provider.GetService<StartupService>()
-                    .Start()
-                    .Wait();
-
-            provider.GetService<HttpServer>()
-                    .RunAsync()
-                    .Wait();
+            CreateWebHostBuilder(args).Build().Run();
         }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                   .UseHttpSys(options =>
+                   {
+                       options.MaxConnections                = 100;
+                       options.MaxRequestBodySize            = 30000000;
+                       options.UrlPrefixes.Add("http://+:" + ConfigUtil.ReadConfig<Config>().Server.Port);
+                   })
+                   .UseUrls()
+                   .UseStartup<Startup>();
     }
 }

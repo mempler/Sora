@@ -30,6 +30,8 @@ namespace Shared.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql($@"ALTER DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+            
             migrationBuilder.CreateTable(
                 name: "Beatmaps",
                 columns: table => new

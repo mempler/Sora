@@ -35,6 +35,7 @@ namespace Jibril.Helpers
             string decryptedScore = Crypto.DecryptString(Convert.FromBase64String(encscore),
                                                          Encoding.ASCII.GetBytes(string.Format(PrivateKey, osuversion)),
                                                          Convert.FromBase64String(iv));
+           
             string[] x = decryptedScore.Split(":");
             Scores score = new Scores
             {
@@ -48,9 +49,10 @@ namespace Jibril.Helpers
                 CountMiss = ulong.Parse(x[8]),
                 TotalScore = ulong.Parse(x[9]),
                 MaxCombo = short.Parse(x[10]),
+                
                 Mods = (Mod) short.Parse(x[13]),
                 PlayMode = (PlayMode) byte.Parse(x[15]),
-                Date = DateTime.UtcNow,
+                Date = DateTime.UtcNow
             };
             
             score.Accuracy = Accuracy.GetAccuracy(score.Count300, score.Count100, score.Count50, score.CountGeki,

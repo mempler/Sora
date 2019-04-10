@@ -57,7 +57,6 @@ namespace Sora.Server
         public override void DoWork()
         {
             Console.WriteLine("Browser connection");
-            Console.WriteLine(Request.Url);
             Response.Close();
         }
     }
@@ -81,6 +80,7 @@ namespace Sora.Server
 
         public override void DoWork()
         {
+            Console.WriteLine("Client connection");
             try
             {
                 using (MemoryStream rawReadstream = new MemoryStream())

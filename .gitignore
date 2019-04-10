@@ -269,3 +269,4 @@ geoip/*
 */geoip/*
 geoip/
 geoip
+data/
