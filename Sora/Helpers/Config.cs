@@ -12,5 +12,6 @@ namespace Sora.Helpers
     public struct Server
     {
         public short Port;
+        public bool FreeDirect;
     }
 }

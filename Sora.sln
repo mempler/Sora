@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jibril", "Jibril\Jibril.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Switcher", "Switcher", "{CC9DA8FC-25DB-4581-A5F6-CD18C671BCE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JibrilConnector", "JibrilConnector\JibrilConnector.csproj", "{B00BE43C-1237-4D79-A65E-EBB799EB4268}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{D78D7300-1E2A-4F6E-8EA6-70FA19EB4A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D78D7300-1E2A-4F6E-8EA6-70FA19EB4A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D78D7300-1E2A-4F6E-8EA6-70FA19EB4A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B00BE43C-1237-4D79-A65E-EBB799EB4268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00BE43C-1237-4D79-A65E-EBB799EB4268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B00BE43C-1237-4D79-A65E-EBB799EB4268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B00BE43C-1237-4D79-A65E-EBB799EB4268}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{322C8CA6-482C-481C-A7C3-A9C6AE44FDA4} = {DD57D7DE-6402-4EE4-B23F-C5B4145561F8}
 		{F6DCDDE8-35D1-4EFC-AFE0-F01FD496A5F1} = {DD57D7DE-6402-4EE4-B23F-C5B4145561F8}
 		{D78D7300-1E2A-4F6E-8EA6-70FA19EB4A2A} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
+		{B00BE43C-1237-4D79-A65E-EBB799EB4268} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}

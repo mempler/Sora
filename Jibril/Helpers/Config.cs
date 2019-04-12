@@ -13,6 +13,7 @@ namespace Jibril.Helpers
     public struct Server
     {
         public short Port;
+        public string Cheesegull;
     }
     
     public struct Osu

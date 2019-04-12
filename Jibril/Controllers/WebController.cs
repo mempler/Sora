@@ -75,9 +75,7 @@ namespace Jibril.Controllers
 
         [HttpPost("osu-submit-modular-selector.php")]
         public IActionResult PostSubmitModular(
-            [FromServices] Database db,
-            [FromServices] Cache cache,
-            [FromServices] Config conf
+            [FromServices] Database db
             )
         {
             string score = Request.Form["score"];
@@ -173,7 +171,6 @@ namespace Jibril.Controllers
         [HttpGet("osu-getreplay.php")]
         public IActionResult GetReplay(
             [FromServices] Database db,
-            [FromServices] Cache cache,
             
             [FromQuery(Name = "c")] int replayId,
             [FromQuery(Name = "m")] PlayMode mode,
@@ -195,6 +192,48 @@ namespace Jibril.Controllers
             return File(System.IO.File.OpenRead("data/replays/" + s.ReplayMd5), "binary/octet-stream", s.ReplayMd5);
         }
 
+        #endregion
+
+        #region GET /web/osu-search.php
+
+        [HttpGet("osu-search.php")]
+        public IActionResult GetSearchDIRECT(
+            [FromServices] Database db,
+            [FromServices] Cache cache,
+            [FromServices] Config cfg,
+
+            [FromQuery(Name = "m")] int playMode,
+            [FromQuery(Name = "r")] int rankedStatus,
+            [FromQuery(Name = "p")] int page,
+            [FromQuery(Name = "q")] string query,
+            
+            [FromQuery(Name = "u")] string userName,
+            [FromQuery(Name = "h")] string pass
+        )
+        {
+            Users user = Users.GetUser(db, Users.GetUserId(db, userName));
+            if (user == null)
+                return Ok("err: pass");
+
+            if (!user.IsPassword(pass))
+                return Ok("err: pass");
+
+            string cache_hash = Hex.ToHex(Crypto.GetMd5($"m{playMode}r{rankedStatus}p{page}q{query}"));
+
+            string cachedData = cache.GetCachedString($"jibril:DirectSearches:{cache_hash}");
+
+            if (!string.IsNullOrEmpty(cachedData))
+                return Ok(cachedData);
+
+            Cheesegull cg = new Cheesegull(cfg);
+            cg.Search(query, rankedStatus, playMode, page);
+
+            Response.ContentType = "text/plain";
+
+            cache.CacheString($"jibril:DirectSearches:{cache_hash}", cachedData = cg.ToDirect(), 600);
+            
+            return Ok(cachedData);
+        }
         #endregion
     }
 }

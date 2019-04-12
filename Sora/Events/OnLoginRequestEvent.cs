@@ -41,13 +41,15 @@ namespace Sora.Events
     public class OnLoginRequestEvent
     {
         private readonly Database _db;
+        private readonly Config _cfg;
         private readonly PresenceService _pcs;
         private readonly PacketStreamService _ps;
         private readonly ChannelService _cs;
 
-        public OnLoginRequestEvent(Database db, PresenceService pcs, PacketStreamService ps, ChannelService cs)
+        public OnLoginRequestEvent(Database db, Config cfg, PresenceService pcs, PacketStreamService ps, ChannelService cs)
         {
             _db = db;
+            _cfg = cfg;
             _pcs = pcs;
             _ps = ps;
             _cs = cs;
@@ -109,6 +111,9 @@ namespace Sora.Events
                     args.Writer.Write(new UserPresence(opr));
                     args.Writer.Write(new HandleUpdate(opr));
                 }
+
+                if (_cfg.Server.FreeDirect)
+                    args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
 
                 args.Writer.Write(new HandleUpdate(args.pr));
 
