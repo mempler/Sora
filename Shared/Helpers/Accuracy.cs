@@ -30,19 +30,20 @@ namespace Shared.Helpers
         {
             if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
                 return 0;
+            
             switch (playMode)
             {
                 case PlayMode.Osu:
-                    return count50 * 50 + count100 * 100 +
-                           count300 * 300 / ((double) countMiss + count50 + count300 + count100 * 300);
+                    return (count50 * 50 + count100 * 100 + count300 * 300) / ((countMiss + count50 + count300 +
+                                                                                count100) * (double) 300);
                 case PlayMode.Taiko:
-                    return count50 * 50 + count300 * 100 / ((double) countMiss + count100 + count300 * 100);
+                    return (count50 * 50 + count300 * 100) / ((double) (countMiss + count100 + count300) * 100);
                 case PlayMode.Ctb:
-                    return count300 + count100 + count50 / (double) count300 + count100 + count50 + count300 +
+                    return (count300 + count100 + count50) / (double) count300 + count100 + count50 + count300 +
                            countKatu;
                 case PlayMode.Mania:
-                    return count50 * 50 + count100 * 100 + countKatu * 200 + count300 * 300 + countGeki * 300 /
-                           ((double) countMiss + count50 + count100 + count300 + countGeki + countKatu * 300);
+                    return (count50 * 50 + count100 * 100 + countKatu * 200 + count300 * 300 + countGeki * 300) /
+                           ((double) (countMiss + count50 + count100 + count300 + countGeki + countKatu) * 300);
                 default:
                     return 0;
             }
