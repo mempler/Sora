@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Jibril.Enums;
 using Jibril.Helpers;
@@ -71,7 +72,7 @@ namespace Jibril.Controllers
         }
         #endregion
 
-        #region GET /web/osu-submit-modular-selector.php
+        #region POST /web/osu-submit-modular-selector.php
 
         [HttpPost("osu-submit-modular-selector.php")]
         public IActionResult PostSubmitModular(
@@ -226,12 +227,69 @@ namespace Jibril.Controllers
                 return Ok(cachedData);
 
             Cheesegull cg = new Cheesegull(cfg);
-            cg.Search(query, rankedStatus, playMode, page);
+            try
+            {
+                cg.Search(query, rankedStatus, playMode, page);
+            }
+            catch
+            {
+                // Ignored
+            }
 
             Response.ContentType = "text/plain";
 
             cache.CacheString($"jibril:DirectSearches:{cache_hash}", cachedData = cg.ToDirect(), 600);
             
+            return Ok(cachedData);
+        }
+
+        #endregion
+
+        #region GET /web/osu-search-set.php
+        [HttpGet("osu-search-set.php")]
+        public IActionResult GetDirectNP(
+            [FromServices] Database db,
+            [FromServices] Cache cache,
+            [FromServices] Config cfg,
+
+            [FromQuery(Name = "s")] int setId,
+            [FromQuery(Name = "b")] int beatmapId,
+
+            [FromQuery(Name = "u")] string userName,
+            [FromQuery(Name = "h")] string pass
+        )
+        {
+            Users user = Users.GetUser(db, Users.GetUserId(db, userName));
+            if (user == null)
+                return Ok("err: pass");
+
+            if (!user.IsPassword(pass))
+                return Ok("err: pass");
+
+            string cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}"));
+
+            string cachedData = cache.GetCachedString($"jibril:DirectNP:{cache_hash}");
+
+            if (!string.IsNullOrEmpty(cachedData))
+                return Ok(cachedData);
+
+            Cheesegull cg = new Cheesegull(cfg);
+            try
+            {
+                if (setId != 0)
+                    cg.SetBMSet(setId);
+                else
+                    cg.SetBM(beatmapId);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            Response.ContentType = "text/plain";
+
+            cache.CacheString($"jibril:DirectNP:{cache_hash}", cachedData = cg.ToNP(), 600);
+
             return Ok(cachedData);
         }
         #endregion

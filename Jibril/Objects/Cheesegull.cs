@@ -115,7 +115,7 @@ namespace Jibril.Objects
 	        _query = query;
         }
 
-        public CheesegullBeatmapSet GetSet(int SetId)
+        public void SetBMSet(int SetId)
         {
 	        string request_url = _cfg.Server.Cheesegull + "/api/s/" + SetId;
 
@@ -129,8 +129,22 @@ namespace Jibril.Objects
 		        string result = reader.ReadToEnd();
 		        _sets = new List<CheesegullBeatmapSet>(new []{JsonConvert .DeserializeObject<CheesegullBeatmapSet>(result) });
 	        }
+        }
 
-	        return _sets[0];
+        public void SetBM(int BeatmapId)
+        {
+	        string request_url = _cfg.Server.Cheesegull + "/api/b/" + BeatmapId;
+
+	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
+	        request.AutomaticDecompression = DecompressionMethods.GZip;
+
+	        using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+	        using (Stream stream = response.GetResponseStream())
+	        using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
+	        {
+		        string result = reader.ReadToEnd();
+		        SetBMSet(JsonConvert.DeserializeObject<CheesegullBeatmap>(result).ParentSetID);
+	        }
         }
         
         public string ToDirect()
@@ -193,9 +207,26 @@ namespace Jibril.Objects
 	        return RetStr;
         }
 
-        public string ToNP(int SetId, int BeatmapId)
+        public string ToNP()
         {
+	        if (_sets.Count <= 0)
+		        return "0";
+
+	        CheesegullBeatmapSet set = _sets[0];
 	        
+	        return $"{set.SetID}.osz|" +
+	               $"{set.Artist}|" +
+	               $"{set.Title}|" +
+	               $"{set.Creator}|" +
+	               $"{set.RankedStatus}|" +
+	               $"10.00|" +
+	               $"{set.LastUpdate}|" +
+	               $"{set.SetID}|" +
+	               $"{set.SetID}|" +
+	               $"{Convert.ToInt32(set.HasVideo)}|" +
+	               $"0|" +
+	               $"1234|" +
+	               $"{Convert.ToInt32(set.HasVideo) * 4321}\r\n";
         }
     }
 }
