@@ -20,6 +20,8 @@
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -255,6 +257,32 @@ namespace Shared.Models
                 case PlayMode.Ctb:
                     PlayCountCtb++;
                     break;
+            }
+
+            db.LeaderboardRx.Update(this);
+            db.SaveChanges();
+        }
+
+        public void UpdatePP(Database db, PlayMode mode)
+        {
+            double TotalPP = db.Scores.Where(s => (s.Mods & Mod.Relax) == 0).OrderByDescending(s => s.PeppyPoints)
+                               .Take(100).ToList().Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i)).Sum();
+
+            switch (mode)
+            {
+                case PlayMode.Osu:
+                    PerformancePointsOsu = TotalPP;
+                    break;
+                case PlayMode.Taiko:
+                    PerformancePointsTaiko = TotalPP;
+                    break;
+                case PlayMode.Ctb:
+                    PerformancePointsCtb = TotalPP;
+                    break;
+                case PlayMode.Mania:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
             }
 
             db.LeaderboardRx.Update(this);

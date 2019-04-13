@@ -12,7 +12,7 @@ using Shared.Services;
 
 namespace Jibril.Objects
 {
-	struct CheesegullBeatmapSet
+	public struct CheesegullBeatmapSet
 	{
 		public int SetID;
 		public List<CheesegullBeatmap> ChildrenBeatmaps;
@@ -31,7 +31,7 @@ namespace Jibril.Objects
 		public int Favourites;
 	}
 
-	struct CheesegullBeatmap
+	public struct CheesegullBeatmap
 	{
 		public int BeatmapID;
 		public int ParentSetID;
@@ -127,13 +127,32 @@ namespace Jibril.Objects
 	        using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
 	        {
 		        string result = reader.ReadToEnd();
-		        _sets = new List<CheesegullBeatmapSet>(new []{JsonConvert .DeserializeObject<CheesegullBeatmapSet>(result) });
+		        _sets = new List<CheesegullBeatmapSet>(new[]
+		        {
+			        JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)
+		        });
 	        }
         }
 
         public void SetBM(int BeatmapId)
         {
 	        string request_url = _cfg.Server.Cheesegull + "/api/b/" + BeatmapId;
+
+	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
+	        request.AutomaticDecompression = DecompressionMethods.GZip;
+
+	        using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+	        using (Stream stream = response.GetResponseStream())
+	        using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
+	        {
+		        string result = reader.ReadToEnd();
+		        SetBMSet(JsonConvert.DeserializeObject<CheesegullBeatmap>(result).ParentSetID);
+	        }
+        }
+
+        public void SetBM(string Hash)
+        {
+	        string request_url = _cfg.Server.Cheesegull + "/api/hash/" + Hash;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -228,5 +247,7 @@ namespace Jibril.Objects
 	               $"1234|" +
 	               $"{Convert.ToInt32(set.HasVideo) * 4321}\r\n";
         }
+
+        public List<CheesegullBeatmapSet> GetSets() => _sets;
     }
 }

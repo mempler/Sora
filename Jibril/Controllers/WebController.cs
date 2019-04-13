@@ -5,6 +5,7 @@ using Jibril.Helpers;
 using Jibril.Objects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PeppyPoints;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Models;
@@ -76,7 +77,8 @@ namespace Jibril.Controllers
 
         [HttpPost("osu-submit-modular-selector.php")]
         public IActionResult PostSubmitModular(
-            [FromServices] Database db
+            [FromServices] Database db,
+            [FromServices] Config cfg
             )
         {
             string score = Request.Form["score"];
@@ -119,6 +121,20 @@ namespace Jibril.Controllers
                 return Ok("Thanks for your hard work!");
             }
 
+             switch (s.score.PlayMode)
+             {
+                 case PlayMode.Osu:
+                     oppai op = new oppai(BeatmapDownloader.GetBeatmap(s.score.FileMd5, cfg));
+                     op.SetAcc((int) s.score.Count300, (int) s.score.Count50, (int) s.score.CountMiss);
+                     op.SetCombo(s.score.MaxCombo);
+                     op.SetMods(s.score.Mods);                    
+                     op.Calculate();
+                     
+                     s.score.PeppyPoints = op.GetPP();
+                     Console.WriteLine(s.score.PeppyPoints);
+                     break;
+             }
+
             if (isRelaxing)
             {
                 LeaderboardRx rx = LeaderboardRx.GetLeaderboard(db, s.score.ScoreOwner);
@@ -128,6 +144,8 @@ namespace Jibril.Controllers
                 rx.IncreaseCount50(db, s.score.Count50, s.score.PlayMode);
                 rx.IncreaseScore(db, s.score.TotalScore, true, s.score.PlayMode);
                 rx.IncreaseScore(db, s.score.TotalScore, false, s.score.PlayMode);
+
+                rx.UpdatePP(db, s.score.PlayMode);
             }
             else
             {
@@ -138,6 +156,8 @@ namespace Jibril.Controllers
                 std.IncreaseCount50(db, s.score.Count50, s.score.PlayMode);
                 std.IncreaseScore(db, s.score.TotalScore, true, s.score.PlayMode);
                 std.IncreaseScore(db, s.score.TotalScore, false, s.score.PlayMode);
+
+                std.UpdatePP(db, s.score.PlayMode);
             }
 
             IFormFile ReplayFile = Request.Form.Files.GetFile("score");

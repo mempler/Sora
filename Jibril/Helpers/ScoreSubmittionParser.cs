@@ -55,8 +55,8 @@ namespace Jibril.Helpers
                 Date = DateTime.UtcNow
             };
             
-            score.Accuracy = Accuracy.GetAccuracy(score.Count300, score.Count100, score.Count50, score.CountGeki,
-                                                  score.CountKatu, score.CountMiss, score.PlayMode);
+            score.Accuracy = Accuracy.GetAccuracy(score.Count300, score.Count100, score.Count50, score.CountMiss,
+                                                  score.CountGeki, score.CountKatu, score.PlayMode);
             score.ScoreMd5 = Hex.ToHex(Crypto.GetMd5($"{score.Count300 + score.Count100}{score.FileMd5}{score.CountMiss}{score.CountGeki}{score.CountKatu}{score.Date}{score.Mods}"));
             score.ScoreOwner = Users.GetUser(db, score.UserId);
             
