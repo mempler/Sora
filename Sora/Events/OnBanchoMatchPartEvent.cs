@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Objects;
 
@@ -27,7 +28,14 @@ namespace Sora.Events
 {
     [EventClass]
     public class OnBanchoMatchPartEvent
-    {    
+    {
+        private readonly EventManager.EventManager _ev;
+
+        public OnBanchoMatchPartEvent(EventManager.EventManager ev)
+        {
+            _ev = ev;
+        }
+
         [Event(EventType.BanchoMatchPart)]
         public void OnBanchoMatchPart(BanchoMatchPartArgs args)
         {
@@ -38,12 +46,22 @@ namespace Sora.Events
             if (room.HostId == args.pr.User.Id)
                 room.SetRandomHost();
 
+            _ev.RunEvent(EventType.BanchoChannelLeave, new BanchoChannelLeaveArgs
+            {
+                pr = args.pr,
+                ChannelName = "#multiplayer"
+            });
+            
             if (room.HostId != -1)
             {
                 room.Update();
                 return;
             }
-
+            
+            Logger.Info("Detected Empty %#f1fc5a%Multiplayer Room %#FFFFFF%called",
+                        "%#F94848%" + room.Name,
+                        "%#B342F4%(", room.MatchId, "%#B342F4%)%#FFFFFF% Cleaning up...");
+            
             room.Dispand();
         }
     }

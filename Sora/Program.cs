@@ -53,6 +53,8 @@ namespace Sora
         private static void Main()
         {
             Logger.Info(@"%#FFFFFF%Sora V1.0.0
+
+%#800000%=============================== %#F94848%License %#800000%=================================
 %#F94848%Sora - A Modular Bancho written in C#
 Copyright (C) 2019 Robin A. P.
 
@@ -67,7 +69,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.");
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+%#800000%==========================================================================
+
+");
             
             IServiceProvider provider = BuildProvider();
 

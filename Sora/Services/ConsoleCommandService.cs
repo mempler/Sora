@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,8 @@ namespace Sora.Services
         private Thread _consoleThread;
         private readonly object _mut;
         private bool _shouldStop;
+
+        public List<ConsoleCommand> Commands => _commands;
 
         public ConsoleCommandService(Database db)
         {
@@ -95,7 +98,7 @@ namespace Sora.Services
                         System.Console.Clear();
                     }
                     return true;
-                }, true);
+                });
             
             RegisterCommand("adduser",
                 "Add a User to our Database",
@@ -129,11 +132,11 @@ namespace Sora.Services
                                 "%#F94848%" + u.Username,
                                 "%#B342F4%(", Users.GetUserId(db, u.Username), "%#B342F4%)");
                     return true;
-                }, true);
+                });
             #endregion
         }      
         
-        public void RegisterCommand(string Command, string Description, List<Argument> args, ConsoleCommand.ConsoleCommandExecution cb, bool ConsoleOnly = false)
+        public void RegisterCommand(string Command, string Description, List<Argument> args, ConsoleCommand.ConsoleCommandExecution cb)
         {
             lock(_mut)
             _commands.Add(new ConsoleCommand
@@ -141,9 +144,14 @@ namespace Sora.Services
                 Command = Command,
                 Description = Description,
                 Args = args,
-                ConsoleOnly = ConsoleOnly,
                 Callback = cb
             });
+        }
+
+        public IEnumerable<ConsoleCommand> GetCommands(string Command)
+        {
+            lock (_mut)
+            return _commands.Where(z => z.Command == Command.Split(" ")[0]);
         }
 
         public void Start()
@@ -166,9 +174,8 @@ namespace Sora.Services
                         switch (k.Key)
                         {
                             case ConsoleKey.Enter:
+                                IEnumerable<ConsoleCommand> cmds = GetCommands(x);
                                 string x1 = x;
-                                IEnumerable<ConsoleCommand> cmds = _commands.Where(z => z.Command == x1.Split(" ")[0]);
-
                                 new Thread(() =>
                                 {
                                     IEnumerable<ConsoleCommand> consoleCommands = cmds as ConsoleCommand[] ?? cmds.ToArray();

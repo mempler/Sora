@@ -68,6 +68,8 @@ namespace Sora.Objects
 
         public Users User;
 
+        public bool BotPresence;
+
         public Presence(ChannelService cs)
         {
             _cs = cs;
@@ -121,6 +123,7 @@ namespace Sora.Objects
 
         public void Write(IPacket p)
         {
+            if (BotPresence) return;
             if (!Stream.BaseStream.CanWrite) return;
             if (p != null) Stream?.Write(p);
         }

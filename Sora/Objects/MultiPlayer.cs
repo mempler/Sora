@@ -21,10 +21,12 @@
 using System;
 using System.Linq;
 using System.Text;
+using EventManager.Enums;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
+using Sora.EventArgs;
 using Sora.Packets.Server;
 using Sora.Services;
 
@@ -60,7 +62,7 @@ namespace Sora.Objects
         public string BeatmapMd5;
         public string BeatmapName;
 
-        public Channel Channel = new Channel("#multiplayer");
+        public Channel Channel = new Channel("#multiplayer", "Even more osu! default channels!");
         public int FailedPeople;
         public int HostId;
         public bool InProgress;

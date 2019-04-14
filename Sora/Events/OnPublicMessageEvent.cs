@@ -48,7 +48,7 @@ namespace Sora.Events
                     chan = args.pr.Spectator?.SpecChannel;
                     break;
                 case "#multiplayer":
-                    chan = null; // No multiplayer yet.
+                    chan = args.pr.JoinedRoom.Channel;
                     break;
                 default:
                     chan = _cs.GetChannel(args.Message.ChannelTarget);
@@ -63,7 +63,7 @@ namespace Sora.Events
 
             Logger.Info("%#F94848%" + args.pr.User.Username,
                         "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
-                        "%#f1fc5a%" + args.Message.ChannelTarget,
+                        "%#f1fc5a%" + chan.ChannelName,
                         "%#FFFFFF%=>", args.Message.Message);
 
             chan.WriteMessage(args.pr, args.Message.Message);

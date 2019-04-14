@@ -31,10 +31,12 @@ namespace Sora.Events
     public class OnBanchoMatchCreateEvent
     {
         private readonly MultiplayerService _ms;
-
-        public OnBanchoMatchCreateEvent(MultiplayerService ms)
+        private readonly EventManager.EventManager _ev;
+        
+        public OnBanchoMatchCreateEvent(MultiplayerService ms, EventManager.EventManager ev)
         {
             _ms = ms;
+            _ev = ev;
         }
 
         
@@ -55,6 +57,12 @@ namespace Sora.Events
                 args.pr.Write(new MatchJoinFail());
             
             args.room.Update();
+
+            _ev.RunEvent(EventType.BanchoChannelJoin, new BanchoChannelJoinArgs
+            {
+                pr          = args.pr,
+                ChannelName = "#multiplayer"
+            });
         }
     }
 }

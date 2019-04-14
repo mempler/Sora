@@ -128,6 +128,10 @@ namespace Sora.Services
                 }
             }).Start();
         }
-       
+
+        public PacketStream GetStream(string main)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

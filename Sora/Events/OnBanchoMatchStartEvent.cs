@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 
 namespace Sora.Events
@@ -31,6 +32,11 @@ namespace Sora.Events
         public void OnBanchoMatchStart(BanchoMatchStartArgs args)
         {
             if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id) return;
+
+            Logger.Info("%#FFFFFF% a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
+                        args.pr.JoinedRoom.Name,
+                        "%#B342F4%(", args.pr.JoinedRoom.MatchId, "%#B342F4%) %#FFFFFF%has started their Match!");
+            
             args.pr.JoinedRoom.Start();
         }
     }

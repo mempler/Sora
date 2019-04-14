@@ -41,6 +41,8 @@ namespace Sora.Services
         private readonly PacketStreamService _pss;
         private readonly ChannelService _cs;
         private readonly PresenceService _ps;
+        private readonly ConsoleCommandService _ccs;
+        private readonly Bot.Sora _s;
 
         public StartupService(
             Database db,
@@ -52,7 +54,9 @@ namespace Sora.Services
             MultiplayerService mps,
             PacketStreamService pss,
             ChannelService cs,
-            PresenceService ps
+            PresenceService ps,
+            ConsoleCommandService ccs,
+            Bot.Sora s
             )
         {
             _db = db;
@@ -64,6 +68,8 @@ namespace Sora.Services
             _pss = pss;
             _cs = cs;
             _ps = ps;
+            _ccs = ccs;
+            _s = s;
         }
 
         public Task Start()
@@ -90,6 +96,8 @@ namespace Sora.Services
             _ev.RegisterService(_cs);     // Channel Service
             _ev.RegisterService(_ps);     // Presence Service
             _ev.RegisterService(_icfg);   // Interface Config for Shared
+            _ev.RegisterService(_ccs);    // Console Command Service
+            _ev.RegisterService(_s); // Bot Sora
             
             _ev.BuildService();
             _ev.RegisterEvents();
@@ -102,7 +110,9 @@ namespace Sora.Services
             _ev.RegisterService(_pss);    // PacketStream Service
             _ev.RegisterService(_cs);     // Channel Service
             _ev.RegisterService(_ps);     // Presence Service
-            _ev.RegisterService(_icfg); // Interface Config for Shared
+            _ev.RegisterService(_icfg);   // Interface Config for Shared
+            _ev.RegisterService(_ccs);    // Console Command Service
+            _ev.RegisterService(_s);      // Bot Sora
                         
             if (!Directory.Exists("plugins"))
                 Directory.CreateDirectory("plugins");

@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Packets.Client;
 
@@ -33,6 +34,22 @@ namespace Sora.Events
         {
             if (args.pr.JoinedRoom == null) return;
             if (args.pr.JoinedRoom.HostId != args.pr.User.Id) return;
+
+            if (args.pr.JoinedRoom.Name != args.room.Name)
+                Logger.Info("%#F94848%" + args.pr.User.Username,
+                            "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                            "%#FFFFFF% renamed a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
+                            args.pr.JoinedRoom.Name,
+                            "%#B342F4%(", args.room.MatchId, "%#B342F4%)",
+                            "%#FFFFFF%and is now called %#F94848%" +
+                            args.room.Name,
+                            "%#B342F4%(", args.room.MatchId, "%#B342F4%)"
+                );
+            
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#FFFFFF%changed the Settings of a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.room.Name,
+                        "%#B342F4%(", args.room.MatchId, "%#B342F4%)");
 
             args.pr.JoinedRoom.ChangeSettings(args.room);
         }
