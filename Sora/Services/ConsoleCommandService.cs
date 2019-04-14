@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Shared.Enums;
 using Shared.Helpers;
+using Shared.Models;
+using Shared.Services;
 using Console = Colorful.Console;
 
 namespace Sora.Services
@@ -32,7 +35,7 @@ namespace Sora.Services
         private readonly object _mut;
         private bool _shouldStop;
 
-        public ConsoleCommandService()
+        public ConsoleCommandService(Database db)
         {
             _commands = new List<ConsoleCommand>();
             _mut = new object();
@@ -61,10 +64,10 @@ namespace Sora.Services
                         aList += a.ArgName;
                         if (a.Optional)
                             aList += "?";
-                        aList += " ";
+                        aList += ", ";
                     }
 
-                    aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ');
+                    aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
                     if (cmd.Args.Count > 0)
                         aList += ">";
 
@@ -83,16 +86,50 @@ namespace Sora.Services
             });
 
             RegisterCommand("clear",
-                            "Clear Console",
-                            new List<Argument>(),
-                            args =>
-                            {
-                                lock (Logger.Locker)
-                                {
-                                    System.Console.Clear();
-                                }
-                                return true;
-                            }, true);
+                "Clear Console",
+                new List<Argument>(),
+                args =>
+                {
+                    lock (Logger.Locker)
+                    {
+                        System.Console.Clear();
+                    }
+                    return true;
+                }, true);
+            
+            RegisterCommand("adduser",
+                "Add a User to our Database",
+                new List<Argument>
+                {
+                    new Argument
+                    {
+                        ArgName = "Username",
+                        Optional = false
+                    },
+                    new Argument
+                    {
+                        ArgName  = "Password",
+                        Optional = false
+                    },
+                    new Argument
+                    {
+                        ArgName  = "E-Mail",
+                        Optional = false
+                    },
+                    new Argument
+                    {
+                        ArgName  = "Privileges",
+                        Optional = true
+                    }
+                },
+                args =>
+                {
+                    Users u = Users.NewUser(db, args[0], args[1], args[2], (Privileges) (args.Length > 3 ? Convert.ToInt32(args[3]) : 0));
+                    Logger.Info("Created User",
+                                "%#F94848%" + u.Username,
+                                "%#B342F4%(", Users.GetUserId(db, u.Username), "%#B342F4%)");
+                    return true;
+                }, true);
             #endregion
         }      
         
@@ -117,7 +154,6 @@ namespace Sora.Services
             _consoleThread = new Thread(() =>
             {
                 string x = string.Empty;
-                int cur;
                 
                 while (!_shouldStop)
                 {
@@ -141,6 +177,26 @@ namespace Sora.Services
                                     foreach (ConsoleCommand m in consoleCommands)
                                     {
                                         List<string> l = x1.Split(" ").ToList();
+                                        l.RemoveAt(0);
+                                        if (l.Count < m.Args.Count - m.Args.Sum(op => Convert.ToInt32(op.Optional)))
+                                        {
+                                            string aList = "\t<";
+
+                                            foreach (Argument a in m.Args)
+                                            {
+                                                aList += a.ArgName;
+                                                if (a.Optional)
+                                                    aList += "?";
+                                                aList += ", ";
+                                            }
+
+                                            aList = aList.TrimEnd(m.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
+                                            if (m.Args.Count > 0)
+                                                aList += ">";
+                                            
+                                            Logger.Err("Insufficient amount of Arguments!\nUsage: " +m.Command + aList);
+                                            break;
+                                        }
                                         if (m.Callback(l.ToArray()))
                                             break;
                                     }
