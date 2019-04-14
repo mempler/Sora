@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
@@ -44,6 +45,10 @@ namespace Sora.Events
         {
             PacketStream mainStream = _pss.GetStream("main");
 
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#FFFFFF%has Disconnected!");
+            
             mainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
             {
                 UserId     = args.pr.User.Id,

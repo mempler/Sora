@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
@@ -59,6 +60,11 @@ namespace Sora.Events
                 args.pr.Write(new ChannelRevoked(args.Message.ChannelTarget));
                 return;
             }
+
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#f1fc5a%" + args.Message.ChannelTarget,
+                        "%#FFFFFF%=>", args.Message.Message);
 
             chan.WriteMessage(args.pr, args.Message.Message);
         }

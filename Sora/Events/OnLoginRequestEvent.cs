@@ -147,6 +147,8 @@ namespace Sora.Events
                 stream.Broadcast(new UserPresence(args.pr));
                 stream.Broadcast(new HandleUpdate(args.pr));
                 stream.Join(args.pr);
+                
+                Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
             }
             catch (Exception ex)
             {

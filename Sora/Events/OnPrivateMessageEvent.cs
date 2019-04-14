@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
 using Sora.EventArgs;
@@ -42,7 +43,7 @@ namespace Sora.Events
         }
 
         [Event(EventType.BanchoSendIrcMessage)]
-        public void OnPublicMessage(BanchoSendIRCMessageArgs args)
+        public void OnPrivateMessage(BanchoSendIRCMessageArgs args)
         {
             Presence opr = _ps.GetPresence(Users.GetUserId(_db, args.Message.ChannelTarget));
             if (opr == null) return;
@@ -53,6 +54,12 @@ namespace Sora.Events
                 args.pr.Write(new ChannelRevoked(args.Message.ChannelTarget));
                 return;
             }
+
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#FFFFFF%=>",
+                        "%#F94848%" + opr.User.Username,
+                        "%#B342F4%(", opr.User.Id, "%#B342F4%)");
 
             chan.WriteMessage(args.pr, args.Message.Message);
         }

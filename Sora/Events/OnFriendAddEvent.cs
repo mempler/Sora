@@ -19,6 +19,7 @@
 #endregion
 
 using EventManager.Attributes;
+using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
 using Sora.EventArgs;
@@ -37,6 +38,14 @@ namespace Sora.Events
         
         public void OnFriendAdd(BanchoFriendAddArgs args)
         {
+            Users u = Users.GetUser(_db, args.FriendId);
+            if (u != null)
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#FFFFFF%added",
+                        "%#F94848%" + u.Username,
+                        "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as Friend!");
+            
             Friends.AddFriend(_db, args.pr.User.Id, args.FriendId);
         }
     }

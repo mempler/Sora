@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Jibril.Enums;
 using Jibril.Helpers;
 using Jibril.Objects;
@@ -135,6 +137,42 @@ namespace Jibril.Controllers
                      break;
              }
 
+            IFormFile ReplayFile = Request.Form.Files.GetFile("score");
+
+            if (!Directory.Exists("data/replays"))
+                Directory.CreateDirectory("data/replays");
+
+            using (MemoryStream m = new MemoryStream())
+            {
+                ReplayFile.CopyTo(m);
+
+                s.score.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(m)) ?? string.Empty;
+                if (!string.IsNullOrEmpty(s.score.ReplayMd5))
+                  using (FileStream replayFile = System.IO.File.Create($"data/replays/{s.score.ReplayMd5}"))
+                  {
+                      m.Position = 0;
+                      m.WriteTo(replayFile);
+                      m.Close();
+                      replayFile.Close();
+                  }
+            }
+
+            Scores oldScore = Scores.GetScores(db,
+                                               s.score.FileMd5,
+                                               s.score.ScoreOwner,
+                                               s.score.PlayMode,
+                                               isRelaxing,
+                                               false,
+                                               false,
+                                               false,
+                                               s.score.Mods,
+                                        true).FirstOrDefault();
+            
+            LeaderboardRx oldRx = LeaderboardRx.GetLeaderboard(db, s.score.ScoreOwner);
+            LeaderboardStd oldStd = LeaderboardStd.GetLeaderboard(db, s.score.ScoreOwner);
+
+            Scores.InsertScore(db, s.score);
+
             if (isRelaxing)
             {
                 LeaderboardRx rx = LeaderboardRx.GetLeaderboard(db, s.score.ScoreOwner);
@@ -160,29 +198,97 @@ namespace Jibril.Controllers
                 std.UpdatePP(db, s.score.PlayMode);
             }
 
-            IFormFile ReplayFile = Request.Form.Files.GetFile("score");
 
-            if (!Directory.Exists("data/replays"))
-                Directory.CreateDirectory("data/replays");
-
-            using (MemoryStream m = new MemoryStream())
+            Scores NewScore = Scores.GetScores(db,
+                                               s.score.FileMd5,
+                                               s.score.ScoreOwner,
+                                               s.score.PlayMode,
+                                               isRelaxing,
+                                               false,
+                                               false,
+                                               false,
+                                               s.score.Mods,
+                                               true).FirstOrDefault();
+            
+            Cheesegull cg = new Cheesegull(cfg);
+            try
             {
-                ReplayFile.CopyTo(m);
-
-                s.score.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(m)) ?? string.Empty;
-                if (!string.IsNullOrEmpty(s.score.ReplayMd5))
-                  using (FileStream replayFile = System.IO.File.Create($"data/replays/{s.score.ReplayMd5}"))
-                  {
-                      m.Position = 0;
-                      m.WriteTo(replayFile);
-                      m.Close();
-                      replayFile.Close();
-                  }
+                cg.SetBM(s.score.FileMd5);
+            }
+            catch
+            {
+                // ignored
             }
 
-            Scores.InsertScore(db, s.score);
-            // TODO: Finish Score Submittion
-            return Ok("ok");
+            CheesegullBeatmap bm;
+            List<CheesegullBeatmapSet> sets = cg.GetSets();
+            if (sets == null)
+            {
+                bm = new CheesegullBeatmap();
+            }
+            else
+            {
+                bm = sets[0].ChildrenBeatmaps.First(x => x.FileMD5 == s.score.FileMd5);
+            }
+            
+            Chart bmChart = new Chart(
+                "beatmap",
+                "Beatmap Ranking",
+                $"https://osu.ppy.sh/b/{bm.BeatmapID}",
+                oldScore?.Position ?? 0,
+                NewScore?.Position ?? 0,
+                oldScore?.MaxCombo ?? 0,
+                NewScore?.MaxCombo ?? 0,
+                oldScore?.Accuracy ?? 0,
+                NewScore?.Accuracy ?? 0,
+                oldScore?.TotalScore ?? 0,
+                NewScore?.TotalScore ?? 0,
+                oldScore?.PeppyPoints ?? 0,
+                NewScore?.PeppyPoints ?? 0,
+                NewScore?.Id ?? 0
+                );
+
+            /*
+            Chart overallChart = new Chart(
+                "overall",
+                "Overall Ranking",
+                $"https://osu.ppy.sh/u/{s.score.ScoreOwner.Id}",
+                isRelaxing ? oldRx.P
+                NewScore?.Position ?? 0,
+                oldScore?.MaxCombo ?? 0,
+                NewScore?.MaxCombo ?? 0,
+                oldScore?.Accuracy ?? 0,
+                NewScore?.Accuracy ?? 0,
+                oldScore?.TotalScore ?? 0,
+                NewScore?.TotalScore ?? 0,
+                oldScore?.PeppyPoints ?? 0,
+                NewScore?.PeppyPoints ?? 0,
+                NewScore?.Id ?? 0
+            );
+            */
+            
+            /*
+            beatmapId:315|beatmapSetId:141|beatmapPlaycount:1|beatmapPasscount:1|approvedDate:
+
+            chartId:overall|
+            chartUrl:https://akatsuki.pw/u/1001|
+            chartName:Overall Ranking|
+            rankBefore:0|
+            rankAfter:1|
+            rankedScoreBefore:554957857|
+            rankedScoreAfter:555075201|
+            totalScoreBefore:2473528962|
+            totalScoreAfter:2473646306|
+            maxComboBefore:2219|
+            maxComboAfter:2219|
+            accuracyBefore:96.985397338867|
+            accuracyAfter:96.985397338867|
+            ppBefore:7347|
+            ppAfter:7347|
+            achievements-new:|
+            onlineScoreId:500335289   
+            */
+            return Ok();
         }
         
         #endregion

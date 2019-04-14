@@ -19,55 +19,76 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Colorful;
+using Console = Colorful.Console;
 
 namespace Shared.Helpers
 {
-    public class Logger
-    {
+    public static class Logger
+    {        
         public static void Log(params object[] msg) => Debug(msg);
+        
+        public static object Locker = new object();
+
+        private static void PrintColorized(string Prefix, Color PrefixColor, bool exit, IEnumerable<object> msg)
+        {
+            new Thread(() =>
+            {
+                Color color = PrefixColor;
+
+                lock (Locker)
+                {
+                    string m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);
+                    Console.WriteFormatted(Prefix, color);
+
+                    color = Color.White;
+                    foreach (string x in Regex.Split(m, @"\%(.*?)\%"))
+                    {
+                        if (!x.StartsWith('#') || !IsHex(x.TrimStart('#')) || x.Length != 7)
+                        {
+                            Console.WriteFormatted(x, color);
+                            continue;
+                        }
+
+                        color = Color.FromArgb(int.Parse(x.Replace("#", "").ToUpper().Trim(), NumberStyles.HexNumber));
+                    }
+
+                    Console.WriteLine();
+                }
+
+                if (exit)
+                    Environment.Exit(1);
+            }).Start();
+        }
 
         public static void Debug(params object[] msg)
-        {
             #if DEBUG
-            const string prefix = "[DEBUG]";
-            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
-
-            Console.WriteLine(prefix + m, msg);
+            => PrintColorized("[DEBUG]", Color.FromArgb(0xCECECE), false, msg);
+            #else
+            { }
             #endif
-        }
+            
 
         public static void Info(params object[] msg)
-        {
-            const string prefix = "[INFO]";
-            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
-
-            Console.WriteLine(prefix + m, msg);
-        }
+            => PrintColorized("[INFO]", Color.FromArgb(0x37B6FF), false, msg);
 
         public static void Warn(params object[] msg)
-        {
-            const string prefix = "[WARN]";
-            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
-
-            Console.WriteLine(prefix + m, msg);
-        }
+            => PrintColorized("[WARNING]", Color.FromArgb(0xFFDA38), false, msg);
 
         public static void Err(params object[] msg)
-        {
-            const string prefix = "[ERR]";
-            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
-
-            Console.WriteLine(prefix + m, msg);
-        }
+            => PrintColorized("[ERROR]", Color.FromArgb(0xFF4C4C), false, msg);
 
         public static void Fatal(params object[] msg)
-        {
-            const string prefix = "[Fatal]";
-            string m      = msg.Aggregate(string.Empty, (current, x) => current + (" " + x));
+            => PrintColorized("[FATAL]", Color.FromArgb(0x910000), true, msg);
 
-            Console.WriteLine(prefix + m, msg);
-            Environment.Exit(1);
-        }
+        private static bool IsHex(IEnumerable<char> chars) =>
+            chars.Select(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')
+                 .All(isHex => isHex);
     }
 }

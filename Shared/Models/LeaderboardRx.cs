@@ -289,6 +289,11 @@ namespace Shared.Models
             db.SaveChanges();
         }
 
+        public int GetPosition(Database db, Users user, PlayMode mode)
+        {
+            return 0;
+        }
+
         public static LeaderboardRx GetLeaderboard(Database db, Users user) => GetLeaderboard(db, user.Id);
     }
 }

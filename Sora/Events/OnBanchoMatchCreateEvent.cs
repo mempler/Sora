@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Packets.Server;
 using Sora.Services;
@@ -39,15 +40,20 @@ namespace Sora.Events
         
         [Event(EventType.BanchoMatchCreate)]
         public void OnBanchoMatchCreate(BanchoMatchCreateArgs args)
-        {
+        {            
             args.room.Password = args.room.Password.Replace(" ", "_");
             _ms.Add(args.room);
+
+            Logger.Info("%#F94848%" + args.pr.User.Username,
+                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#FFFFFF%has created a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.room.Name,
+                        "%#B342F4%(", args.room.MatchId, "%#B342F4%)");
 
             if (args.room.Join(args.pr, args.room.Password))
                 args.pr.Write(new MatchJoinSuccess(args.room));
             else
                 args.pr.Write(new MatchJoinFail());
-
+            
             args.room.Update();
         }
     }

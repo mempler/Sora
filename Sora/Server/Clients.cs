@@ -56,7 +56,6 @@ namespace Sora.Server
 
         public override void DoWork()
         {
-            Console.WriteLine("Browser connection");
             Response.Close();
         }
     }
@@ -80,7 +79,6 @@ namespace Sora.Server
 
         public override void DoWork()
         {
-            Console.WriteLine("Client connection");
             try
             {
                 using (MemoryStream rawReadstream = new MemoryStream())
@@ -99,7 +97,7 @@ namespace Sora.Server
                             Response.Headers["cho-token"] = pr.Token;
                             string ip                        = Response.Headers["X-Forwarded-For"];
                             if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
-                            _evmng.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs()
+                            _evmng.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs
                             {
                                 pr = pr, Reader = mr, Writer = mw, IPAddress = ip
                             });
@@ -116,6 +114,7 @@ namespace Sora.Server
                     pr = _ps.GetPresence(Request.Headers["osu-token"]);
                     if (pr == null)
                     {
+                        Logger.Warn("Presence of token%#F94848%", Request.Headers["osu-token"], "%#FFFFFF%hasn't been found!");
                         Response.StatusCode = 403; // Presence is not known, force the client to send login info.
                         return;
                     }
