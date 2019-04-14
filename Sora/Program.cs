@@ -24,6 +24,7 @@ using System.Reflection;
 using EventManager.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Helpers;
+using Shared.Models;
 using Shared.Services;
 using Sora.Helpers;
 using Sora.Server;
@@ -35,17 +36,17 @@ namespace Sora
     {
         private static IServiceProvider BuildProvider() =>
             new ServiceCollection()
+                .AddSingleton<IConfig>(ConfigUtil.ReadConfig<Config>())
                 .AddSingleton(ConfigUtil.ReadConfig<Config>())
-                .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
                 .AddSingleton<Database>()
                 .AddSingleton<PluginService>()
                 .AddSingleton<PresenceService>()
                 .AddSingleton<MultiplayerService>()
                 .AddSingleton<PacketStreamService>()
+                .AddSingleton<ConsoleCommandService>()
                 .AddSingleton<ChannelService>()
                 .AddSingleton<StartupService>()
                 .AddSingleton<HttpServer>()
-                .AddSingleton<ConsoleCommandService>()
                 .AddSingleton<Bot.Sora>()
                 .AddSingleton(new EventManager.EventManager(new List<Assembly> { Assembly.GetEntryAssembly() } ))
 
@@ -76,20 +77,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ");
             
             IServiceProvider provider = BuildProvider();
-
-            provider.GetService<ConsoleCommandService>()
-                    .Start();
-
-            provider.GetService<Bot.Sora>()
-                    .RunAsync()
-                    .Wait();
+            
+            // Create Sora (bot) if not exists.
+            if (Users.GetUser(provider.GetService<Database>(), 100) == null)
+                Users.InsertUser(provider.GetService<Database>(), new Users
+                {
+                    Id         = 100,
+                    Username   = "Sora",
+                    Email      = "bot@gigamons.de",
+                    Password   = "",
+                    Privileges = 0
+                });
             
             provider.GetService<StartupService>()
                     .Start()
                     .Wait();
 
+            provider.GetService<ConsoleCommandService>()
+                    .Start();
 
-            provider.GetService<PresenceService>().TimeoutCheck();
+            provider.GetService<PresenceService>()
+                    .TimeoutCheck();
    
 
             provider.GetService<HttpServer>()

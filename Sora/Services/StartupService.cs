@@ -72,22 +72,12 @@ namespace Sora.Services
             _s = s;
         }
 
-        public Task Start()
-        {
-            // Create Sora (bot) if not exists.
-            if (Users.GetUser(_db, 100) == null)
-                Users.InsertUser(_db, new Users
-                {
-                    Id         = 100,
-                    Username   = "Sora",
-                    Email      = "bot@gigamons.de",
-                    Password   = "",
-                    Privileges = 0
-                });
-            
+        public async Task Start()
+        {            
             Localisation.Initialize();
 
             _ev.RegisterService(_config); // Config
+            _ev.RegisterService(_icfg);   // Config
             _ev.RegisterService(_db);     // Database
             _ev.RegisterService(_plugs);  // Plugin Service
             _ev.RegisterService(_ev);     // EventManager
@@ -103,7 +93,8 @@ namespace Sora.Services
             _ev.RegisterEvents();
 
             _ev.RegisterService(_config); // Config
-            _ev.RegisterService(_db);     // Database
+            _ev.RegisterService(_icfg);   // Config
+            _ev.RegisterService(_db); // Database
             _ev.RegisterService(_plugs);  // Plugin Service
             _ev.RegisterService(_ev);     // EventManager
             _ev.RegisterService(_mps);    // Multiplayer Service
@@ -121,8 +112,8 @@ namespace Sora.Services
                 _plugs.LoadPlugin("plugins/" + plug);
 
             _ev.BuildService();
-            
-            return Task.CompletedTask;
+
+            await _s.RunAsync();
         }
     }
 }
