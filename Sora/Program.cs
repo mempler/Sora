@@ -46,6 +46,7 @@ namespace Sora
                 .AddSingleton<StartupService>()
                 .AddSingleton<HttpServer>()
                 .AddSingleton<ConsoleCommandService>()
+                .AddSingleton<Bot.Sora>()
                 .AddSingleton(new EventManager.EventManager(new List<Assembly> { Assembly.GetEntryAssembly() } ))
 
                 .BuildServiceProvider();
@@ -76,12 +77,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             
             IServiceProvider provider = BuildProvider();
 
+            provider.GetService<ConsoleCommandService>()
+                    .Start();
+
+            provider.GetService<Bot.Sora>()
+                    .RunAsync()
+                    .Wait();
+            
             provider.GetService<StartupService>()
                     .Start()
                     .Wait();
-
-            provider.GetService<ConsoleCommandService>()
-                    .Start();
 
             provider.GetService<HttpServer>()
                     .RunAsync()

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using EventManager.Attributes;
 using EventManager.Enums;
 using Shared.Enums;
+using Shared.Helpers;
 using Shared.Models;
 using Shared.Services;
 using Sora.Enums;
@@ -33,6 +35,7 @@ namespace Sora.Bot
     {
         private List<SoraCommand> _commands = new List<SoraCommand>();
         private EventManager.EventManager _ev;
+        private PacketStreamService _pss;
         private MultiplayerService _ms;
         private PresenceService _ps;
         private ChannelService _cs;
@@ -41,17 +44,18 @@ namespace Sora.Bot
               
         private Presence _botPresence;
 
-        public Sora(Database db, MultiplayerService ms, PresenceService ps, ChannelService cs, EventManager.EventManager ev)
+        public Sora(Database db, MultiplayerService ms, PresenceService ps, ChannelService cs, EventManager.EventManager ev, PacketStreamService pss)
         {
             _db = db;
             _ms = ms;
             _ps = ps;
             _cs = cs;
             _ev = ev;
-            
+            _pss = pss;
+
             _botPresence = new Presence(cs);
 
-            _botPresence.User = Users.GetUser(_db, 101);
+            _botPresence.User = Users.GetUser(_db, 100);
             _botPresence.Status = new UserStatus
             {
                 Status = Status.Watching,
@@ -61,18 +65,30 @@ namespace Sora.Bot
                 StatusText = "Over you!",
                 CurrentMods = 0
             };
-            _botPresence.LeaderboardRx = LeaderboardRx.GetLeaderboard(_db, 101);
-            _botPresence.LeaderboardStd = LeaderboardStd.GetLeaderboard(_db, 101);
+            _botPresence.LeaderboardRx = LeaderboardRx.GetLeaderboard(_db, 100);
+            _botPresence.LeaderboardStd = LeaderboardStd.GetLeaderboard(_db, 100);
 
             _botPresence.Timezone         = 0;
             _botPresence.BlockNonFriendDm = false;
 
             _botPresence.Lon  = 0d;
             _botPresence.Lat  = 0d;
-            
-            _ps.BeginPresence(_botPresence);
+
+            PacketStream stream = _pss.GetStream("main");
+            if (stream == null) return;
+
+            stream.Broadcast(new PresenceSingle(_botPresence.User.Id));
+            stream.Broadcast(new UserPresence(_botPresence));
+            stream.Broadcast(new HandleUpdate(_botPresence));
         }
 
+        public Task RunAsync()
+        {
+            Logger.Info("Hey, I'm Sora! I'm a bot and i say Hello World!");
+            _ps.BeginPresence(_botPresence);
+            return Task.CompletedTask;
+        }
+        
         public void SoraCommand(string Command, string Description, List<Argument> args,
                                 SoraCommand.SoraCommandExecution cb)
         {
