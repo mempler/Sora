@@ -22,13 +22,11 @@ namespace Jibril
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                   .UseHttpSys(options =>
+                   .UseKestrel(options =>
                    {
-                       options.MaxConnections                = 100;
-                       options.MaxRequestBodySize            = 30000000;
-                       options.UrlPrefixes.Add("http://+:" + ConfigUtil.ReadConfig<Config>().Server.Port);
+                       options.Limits.MaxRequestBodySize = 52428800; //50MB
                    })
-                   .UseUrls()
+                   .UseUrls("http://+:" + ConfigUtil.ReadConfig<Config>().Server.Port)
                    .UseStartup<Startup>();
     }
 }
