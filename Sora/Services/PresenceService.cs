@@ -113,9 +113,10 @@ namespace Sora.Services
                 {
                     try
                     {
-                        foreach (KeyValuePair<string, Presence> pr in _presences)
-                            if (pr.Value.TimeoutCheck())
-                                EndPresence(pr.Value, true);
+                        foreach ((string _, Presence value) in _presences)
+                            if (!value.BotPresence)
+                            if (value.TimeoutCheck())
+                                EndPresence(value, true);
 
                         if (_presences == null) break;
                     }

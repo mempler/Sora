@@ -104,13 +104,6 @@ namespace Sora.Events
                 Success(args.Writer, user.Id);
                 args.Writer.Write(new ProtocolNegotiation());
                 args.Writer.Write(new UserPresence(args.pr));
-                args.Writer.Write(new FriendsList(Friends.GetFriends(_db, args.pr.User.Id).ToList()));
-                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));                
-                foreach (Presence opr in _pcs.AllPresences)
-                {
-                    args.Writer.Write(new UserPresence(opr));
-                    args.Writer.Write(new HandleUpdate(opr));
-                }
 
                 if (_cfg.Server.FreeDirect)
                     args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
@@ -141,6 +134,14 @@ namespace Sora.Events
                 {
                     Exception(args.Writer);
                     return;
+                }
+
+                args.Writer.Write(new FriendsList(Friends.GetFriends(_db, args.pr.User.Id).ToList()));
+                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
+                foreach (Presence opr in _pcs.AllPresences)
+                {
+                    args.Writer.Write(new UserPresence(opr));
+                    args.Writer.Write(new HandleUpdate(opr));
                 }
                 
                 stream.Broadcast(new PresenceSingle(args.pr.User.Id));

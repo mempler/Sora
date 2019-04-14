@@ -88,6 +88,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     .Start()
                     .Wait();
 
+
+            provider.GetService<PresenceService>().TimeoutCheck();
+   
+
             provider.GetService<HttpServer>()
                     .RunAsync()
                     .Wait();

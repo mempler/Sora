@@ -53,26 +53,26 @@ namespace Sora.Bot
             _ev = ev;
             _pss = pss;
 
-            _botPresence = new Presence(cs);
-
-            _botPresence.User = Users.GetUser(_db, 100);
-            _botPresence.Status = new UserStatus
+            _botPresence = new Presence(cs)
             {
-                Status = Status.Watching,
-                Playmode = PlayMode.Osu,
-                BeatmapChecksum = "",
-                BeatmapId = 0,
-                StatusText = "Over you!",
-                CurrentMods = 0
+                User = Users.GetUser(_db, 100),
+                Status = new UserStatus
+                {
+                    Status          = Status.Watching,
+                    Playmode        = PlayMode.Osu,
+                    BeatmapChecksum = "nothing",
+                    BeatmapId       = 0,
+                    StatusText      = "over you!",
+                    CurrentMods     = (uint) Mod.TouchDevice
+                },
+                LeaderboardRx    = LeaderboardRx.GetLeaderboard(_db, 100),
+                LeaderboardStd   = LeaderboardStd.GetLeaderboard(_db, 100),
+                Timezone         = 0,
+                BlockNonFriendDm = false,
+                Lon              = 0d,
+                Lat              = 0d,
+                BotPresence      = true
             };
-            _botPresence.LeaderboardRx = LeaderboardRx.GetLeaderboard(_db, 100);
-            _botPresence.LeaderboardStd = LeaderboardStd.GetLeaderboard(_db, 100);
-
-            _botPresence.Timezone         = 0;
-            _botPresence.BlockNonFriendDm = false;
-
-            _botPresence.Lon  = 0d;
-            _botPresence.Lat  = 0d;
 
             PacketStream stream = _pss.GetStream("main");
             if (stream == null) return;
