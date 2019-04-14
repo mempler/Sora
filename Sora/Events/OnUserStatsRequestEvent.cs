@@ -46,6 +46,7 @@ namespace Sora.Events
                 if (id == args.pr.User.Id)
                 {
                     args.pr.Write(new UserPresence(args.pr));
+                    args.pr.Write(new HandleUpdate(args.pr));
                     continue;
                 }
 
@@ -61,6 +62,7 @@ namespace Sora.Events
                 }
 
                 args.pr.Write(new UserPresence(opr));
+                args.pr.Write(new HandleUpdate(opr));
             }
         }
     }

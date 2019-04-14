@@ -40,7 +40,7 @@ namespace Sora.Bot
         private PresenceService _ps;
         private ChannelService _cs;
         private Database _db;
-        private object _mut;
+        private object _mut = new object();
               
         private Presence _botPresence;
 

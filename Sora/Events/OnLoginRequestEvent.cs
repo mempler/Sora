@@ -98,18 +98,26 @@ namespace Sora.Events
                 args.pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
                 args.pr.Status.Playmode = PlayMode.Osu;
-                args.pr.Status.Status   = Status.Unknown;
+                args.pr.Status.Status   = Status.Idle;
                 
                 _pcs.BeginPresence(args.pr);
 
                 Success(args.Writer, user.Id);
                 args.Writer.Write(new ProtocolNegotiation());
                 args.Writer.Write(new UserPresence(args.pr));
-
+                args.Writer.Write(new HandleUpdate(args.pr));
                 if (_cfg.Server.FreeDirect)
                     args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
 
-                args.Writer.Write(new HandleUpdate(args.pr));
+                args.Writer.Write(new FriendsList(Friends.GetFriends(_db, args.pr.User.Id).ToList()));
+                foreach (Presence opr in _pcs.AllPresences)
+                {
+                    args.Writer.Write(new PresenceSingle(opr.User.Id));
+                    args.Writer.Write(new HandleUpdate(opr));
+                    args.Writer.Write(new UserPresence(opr));
+                }
+
+                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
 
                 foreach (Channel chanAuto in _cs.ChannelsAutoJoin)
                 {
@@ -136,20 +144,12 @@ namespace Sora.Events
                     Exception(args.Writer);
                     return;
                 }
-
-                args.Writer.Write(new FriendsList(Friends.GetFriends(_db, args.pr.User.Id).ToList()));
-                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
-                foreach (Presence opr in _pcs.AllPresences)
-                {
-                    args.Writer.Write(new UserPresence(opr));
-                    args.Writer.Write(new HandleUpdate(opr));
-                }
                 
                 stream.Broadcast(new PresenceSingle(args.pr.User.Id));
                 stream.Broadcast(new UserPresence(args.pr));
                 stream.Broadcast(new HandleUpdate(args.pr));
                 stream.Join(args.pr);
-                
+
                 Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
             }
             catch (Exception ex)
