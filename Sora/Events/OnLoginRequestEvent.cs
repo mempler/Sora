@@ -34,6 +34,7 @@ using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
+using Console = Colorful.Console;
 
 namespace Sora.Events
 {

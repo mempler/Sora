@@ -42,13 +42,13 @@ namespace Sora.Events
             _ps = ps;
         }
 
-        [Event(EventType.BanchoSendIrcMessage)]
+        [Event(EventType.BanchoSendIrcMessagePrivate)]
         public void OnPrivateMessage(BanchoSendIRCMessageArgs args)
         {
             Presence opr = _ps.GetPresence(Users.GetUserId(_db, args.Message.ChannelTarget));
             if (opr == null) return;
             Channel chan = opr.PrivateChannel;
-
+   
             if (chan == null)
             {
                 args.pr.Write(new ChannelRevoked(args.Message.ChannelTarget));
@@ -57,6 +57,7 @@ namespace Sora.Events
 
             Logger.Info("%#F94848%" + args.pr.User.Username,
                         "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                        "%#f1fc5a%(Private Message)",
                         "%#FFFFFF%=>",
                         "%#F94848%" + opr.User.Username,
                         "%#B342F4%(", opr.User.Id, "%#B342F4%)");

@@ -64,7 +64,6 @@ namespace Sora.Objects
 
         public MStreamWriter Stream;
         public byte Timezone;
-        public bool Touch;
 
         public Users User;
 
