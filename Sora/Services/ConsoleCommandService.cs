@@ -1,17 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Shared.Helpers;
 using Console = Colorful.Console;
 
 namespace Sora.Services
 {
+    public struct Argument
+    {
+        public string ArgName;
+        public bool Optional;
+    }
+    
     public struct ConsoleCommand
     {
         public delegate bool ConsoleCommandExecution(string[] args);
         
         public string Command;
+        public string Description;
+        public List<Argument> Args;
+        public bool ConsoleOnly;
         public ConsoleCommandExecution Callback;
     }
     
@@ -26,14 +36,75 @@ namespace Sora.Services
         {
             _commands = new List<ConsoleCommand>();
             _mut = new object();
+            
+            #region DefaultCommands
+            RegisterCommand("help", 
+                            "Get a list of ALL Commands!", 
+                            new List<Argument>
+                            {
+                                new Argument
+                                {
+                                    ArgName = "command",
+                                    Optional = true
+                                }
+                            }, 
+            args =>
+            {
+                string l = "\n====== Command List ======\n";
+                
+                foreach (ConsoleCommand cmd in _commands)
+                {
+                    string aList = "\t<";
+                    
+                    foreach (Argument a in cmd.Args)
+                    {
+                        aList += a.ArgName;
+                        if (a.Optional)
+                            aList += "?";
+                        aList += " ";
+                    }
+
+                    aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ');
+                    if (cmd.Args.Count > 0)
+                        aList += ">";
+
+                    l += "\n%#1c9624%/*\n";
+                    l += cmd.Description;
+                    l += "\n*/%#FFFFFF%\n";
+                    l += "\n" +  cmd.Command + aList;
+                    l += "\n";
+                }
+
+                l += "\n==========================";
+                
+                Logger.Info(l);
+
+                return true;
+            });
+
+            RegisterCommand("clear",
+                            "Clear Console",
+                            new List<Argument>(),
+                            args =>
+                            {
+                                lock (Logger.Locker)
+                                {
+                                    System.Console.Clear();
+                                }
+                                return true;
+                            }, true);
+            #endregion
         }      
         
-        public void RegisterCommand(string Command, ConsoleCommand.ConsoleCommandExecution cb)
+        public void RegisterCommand(string Command, string Description, List<Argument> args, ConsoleCommand.ConsoleCommandExecution cb, bool ConsoleOnly = false)
         {
             lock(_mut)
             _commands.Add(new ConsoleCommand
             {
                 Command = Command,
+                Description = Description,
+                Args = args,
+                ConsoleOnly = ConsoleOnly,
                 Callback = cb
             });
         }
