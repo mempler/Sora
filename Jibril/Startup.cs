@@ -61,6 +61,9 @@ namespace Jibril
                     Privileges = 0
                 });
 
+            // Create Default Achievements!
+            AchievementProcessor.CreateDefaultAchievements(db);
+
             Localisation.Initialize();
             
             if (env.IsDevelopment())

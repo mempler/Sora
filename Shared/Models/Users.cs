@@ -47,6 +47,9 @@ namespace Shared.Models
         [Required]
         public Privileges Privileges { get; set; } = 0;
 
+        [Required]
+        public ulong Achievements { get; set; } = 0;
+
         public bool IsPassword(string s) => BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
 
         public static int GetUserId(Database db, string username) =>
@@ -86,5 +89,14 @@ namespace Shared.Models
         public override string ToString() => $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
 
         public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
+
+        public void ObtainAchievement(Database db, Achievements ach)
+        {
+            Achievements |= ach.BitId;
+            db.Users.Update(this);
+            db.SaveChanges();
+        }
+
+        public bool AlreadyOptainedAchievement(Achievements ach) => (Achievements & ach.BitId) != 0;
     }
 }

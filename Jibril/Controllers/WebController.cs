@@ -342,8 +342,8 @@ namespace Jibril.Controllers
                 NewScore?.PeppyPoints ?? 0,
                 NewScore?.Id ?? 0
             );
-            
-            
+
+            cg.SetBMSet(bm.ParentSetID);
             
             Chart overallChart = new Chart(
                 "overall",
@@ -360,7 +360,7 @@ namespace Jibril.Controllers
                 oldPP,
                 newPP,
                 NewScore?.Id ?? 0,
-                Achievements.GetAchievement(db, "stupid-idea").ToOsuString(null)
+                AchievementProcessor.ProcessAchievements(db, s.score.ScoreOwner, s.score, bm, cg.GetSets()[0], oldStd, newStd)
             );
 
             return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 

@@ -20,7 +20,7 @@ namespace Shared.Models
         public int Id { get; set; }
 
         [Required]
-        public int BitId { get; set; }
+        public ulong BitId { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -56,5 +56,30 @@ namespace Shared.Models
         public string ToOsuString(Database db) => $"{Name}+{DisplayName}+{Description}".Replace('\n', '\t');
 
         public static Achievements GetAchievement(Database db, string name) => db.Achievements.FirstOrDefault(x => x.Name == name);
+
+        public static Achievements NewAchievement(
+            Database db,
+            string name,
+            string displayName,
+            string desc,
+            string iconUri,
+            bool insert = true)
+        {
+            Achievements a = new Achievements
+            {
+                Name = name,
+                DisplayName = displayName,
+                Description = desc,
+                IconURI = iconUri,
+                BitId = 1ul << db.Achievements.Count()
+            };
+
+            if (!insert) return a;
+            
+            db.Achievements.Add(a);
+            db.SaveChanges();
+
+            return a;
+        }
     }
 }
