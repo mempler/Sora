@@ -270,3 +270,4 @@ geoip/*
 geoip/
 geoip
 data/
+Plugins/

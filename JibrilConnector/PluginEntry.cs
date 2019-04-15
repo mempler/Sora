@@ -57,21 +57,29 @@ namespace JibrilConnector
                 {
                     string Key = z.Value.ToString().Split(",")[0];
                     string Value = z.Value.ToString().Split(",")[1];
-                    
+                                        
                     Logger.Debug($"Incomming Request: {Key} Value {Value}");
                     switch (Key)
                     {
                         case "SubmitScore":
                         {
                             Presence pr = _ps.GetPresence(Convert.ToInt32(Value.Split("|")[0]));
-                            if (Value.Split("|")[1] == "True")
-                                pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(_db, pr.User);
-                            else
-                                pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(_db, pr.User);
+                            if (pr == null) break;
+
+                            Database _ddb = new Database();
+                            
+                            pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(_ddb, pr.User);
+                            pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(_ddb, pr.User);
                             
                             pr.Relax = Value.Split("|")[1] == "True";
+                            if (pr.Relax)
+                                pr.Rank = pr.LeaderboardRx.GetPosition(_ddb, pr.Status.Playmode);
+                            else
+                                pr.Rank = pr.LeaderboardStd.GetPosition(_ddb, pr.Status.Playmode);
                             
                             pr.Write(new HandleUpdate(pr));
+                            
+                            _ddb.Dispose();
                         } break;
 
                         case "IsRelaxing":
