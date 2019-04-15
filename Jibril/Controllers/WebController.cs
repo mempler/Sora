@@ -15,15 +15,15 @@ using Shared.Services;
 
 namespace Jibril.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class WebController : Controller
     {
         #region GET /web/
         [HttpGet]
         public IActionResult Index()
         {
-            return Forbid("ERR: you sneaky little mouse :3");
+            return Ok("ERR: you sneaky little mouse :3");
         }
         #endregion
         
