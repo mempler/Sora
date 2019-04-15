@@ -318,6 +318,28 @@ namespace Shared.Models
             db.SaveChanges();
         }
 
+        // I could do that better but this looks nice :3
+        public uint GetPosition(Database db, PlayMode mode)
+        {
+            int pos = 0;
+            switch (mode)
+            {
+                case PlayMode.Osu:
+                    pos = db.LeaderboardStd.Count(x => x.PerformancePointsOsu > PerformancePointsOsu);
+                    break;
+                case PlayMode.Taiko:
+                    pos = db.LeaderboardStd.Count(x => x.PerformancePointsTaiko > PerformancePointsTaiko);
+                    break;
+                case PlayMode.Ctb:
+                    pos = db.LeaderboardStd.Count(x => x.PerformancePointsCtb > PerformancePointsCtb);
+                    break;
+                case PlayMode.Mania:
+                    pos = db.LeaderboardStd.Count(x => x.PerformancePointsMania > PerformancePointsMania);
+                    break;
+            }
+            return (uint) pos + 1;
+        }
+
         public void UpdatePP(Database db, PlayMode mode)
         {
             double TotalPP = db.Scores.Where(s => (s.Mods & Mod.Relax) == 0).OrderByDescending(s => s.PeppyPoints)

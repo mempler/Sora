@@ -97,10 +97,16 @@ namespace Sora.Events
                 args.pr.Timezone         = loginData.Timezone;
                 args.pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
+                args.pr.Status.BeatmapId = 0;
+                args.pr.Status.StatusText = "";
+                args.pr.Status.CurrentMods = 0;
+                args.pr.Status.BeatmapChecksum = "";
                 args.pr.Status.Playmode = PlayMode.Osu;
                 args.pr.Status.Status   = Status.Idle;
                 
                 _pcs.BeginPresence(args.pr);
+
+                args.pr.Rank = args.pr.LeaderboardStd.GetPosition(_db, PlayMode.Osu);
 
                 Success(args.Writer, user.Id);
                 args.Writer.Write(new ProtocolNegotiation());
@@ -110,14 +116,13 @@ namespace Sora.Events
                     args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
 
                 args.Writer.Write(new FriendsList(Friends.GetFriends(_db, args.pr.User.Id).ToList()));
+                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
                 foreach (Presence opr in _pcs.AllPresences)
                 {
                     args.Writer.Write(new PresenceSingle(opr.User.Id));
-                    args.Writer.Write(new HandleUpdate(opr));
                     args.Writer.Write(new UserPresence(opr));
+                    args.Writer.Write(new HandleUpdate(opr));
                 }
-
-                args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
 
                 foreach (Channel chanAuto in _cs.ChannelsAutoJoin)
                 {
@@ -150,6 +155,9 @@ namespace Sora.Events
                 stream.Broadcast(new HandleUpdate(args.pr));
                 stream.Join(args.pr);
 
+                args.Writer.Write(new UserPresence(args.pr));
+                args.Writer.Write(new HandleUpdate(args.pr));
+                
                 Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
             }
             catch (Exception ex)

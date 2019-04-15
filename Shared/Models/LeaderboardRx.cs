@@ -289,9 +289,22 @@ namespace Shared.Models
             db.SaveChanges();
         }
 
-        public int GetPosition(Database db, Users user, PlayMode mode)
+        public uint GetPosition(Database db, PlayMode mode)
         {
-            return 0;
+            int pos = 0;
+            switch (mode)
+            {
+                case PlayMode.Osu:
+                    pos = db.LeaderboardRx.Count(x => x.PerformancePointsOsu > PerformancePointsOsu);
+                    break;
+                case PlayMode.Taiko:
+                    pos = db.LeaderboardRx.Count(x => x.PerformancePointsTaiko > PerformancePointsTaiko);
+                    break;
+                case PlayMode.Ctb:
+                    pos = db.LeaderboardRx.Count(x => x.PerformancePointsCtb > PerformancePointsCtb);
+                    break;
+            }
+            return (uint) pos;
         }
 
         public static LeaderboardRx GetLeaderboard(Database db, Users user) => GetLeaderboard(db, user.Id);

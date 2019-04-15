@@ -81,7 +81,7 @@ namespace Sora.Objects
         public string Token { get; }
 
         // ReSharper disable once MemberCanBeMadeStatic.Global
-        public uint Rank => 0;
+        public uint Rank = 0;
 
         public Channel PrivateChannel => _cs.GetChannel(User.Username);
 

@@ -33,7 +33,8 @@ namespace Sora.Events
         {
             if (args.pr.Spectator == null || args.pr.Spectator?.BoundPresence == args.pr) return;
             
-            args.pr.Spectator?.Broadcast(new UserPresence(args.pr));
+            //args.pr.Spectator?.Broadcast(new UserPresence(args.pr));
+            args.pr.Write(new HandleUpdate(args.pr));
             args.pr.Spectator?.Broadcast(new HandleUpdate(args.pr));
         }
     }

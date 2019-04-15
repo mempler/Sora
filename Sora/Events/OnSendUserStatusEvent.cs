@@ -21,6 +21,7 @@
 using EventManager.Attributes;
 using EventManager.Enums;
 using Shared.Enums;
+using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
@@ -42,11 +43,11 @@ namespace Sora.Events
         public void OnSendUserStatus(BanchoSendUserStatusArgs args)
         {
             args.pr.Status = args.status;
-            PacketStream main = _pss.GetStream("main");
-
             args.pr.Relax = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
+            Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
             
-            main.Broadcast(new UserPresence(args.pr));
+            PacketStream main = _pss.GetStream("main");
+            //main.Broadcast(new UserPresence(args.pr));
             main.Broadcast(new HandleUpdate(args.pr));
         }
     }

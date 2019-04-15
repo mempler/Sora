@@ -43,12 +43,7 @@ namespace Sora.Events
         {
             foreach (int id in args.userIds)
             {
-                if (id == args.pr.User.Id)
-                {
-                    args.pr.Write(new UserPresence(args.pr));
-                    args.pr.Write(new HandleUpdate(args.pr));
-                    continue;
-                }
+                if (id == args.pr.User.Id) continue;
 
                 Presence opr = _ps.GetPresence(id);
                 if (opr == null)
@@ -61,7 +56,7 @@ namespace Sora.Events
                     continue;
                 }
 
-                args.pr.Write(new UserPresence(opr));
+                //args.pr.Write(new UserPresence(opr));
                 args.pr.Write(new HandleUpdate(opr));
             }
         }
