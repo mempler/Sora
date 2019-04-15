@@ -168,9 +168,9 @@ namespace Jibril.Controllers
                                                s.score.Mods,
                                         true).FirstOrDefault();
             
-            LeaderboardRx oldRx = LeaderboardRx.GetLeaderboard(db, s.score.ScoreOwner);
             LeaderboardStd oldStd = LeaderboardStd.GetLeaderboard(db, s.score.ScoreOwner);
-
+            uint oldStdPos = oldStd.GetPosition(db, s.score.PlayMode);
+            
             Scores.InsertScore(db, s.score);
 
             if (isRelaxing)
@@ -197,6 +197,9 @@ namespace Jibril.Controllers
 
                 std.UpdatePP(db, s.score.PlayMode);
             }
+            
+            LeaderboardStd newStd    = LeaderboardStd.GetLeaderboard(db, s.score.ScoreOwner);
+            uint           newStdPos = newStd.GetPosition(db, s.score.PlayMode);
 
 
             Scores NewScore = Scores.GetScores(db,
@@ -231,6 +234,98 @@ namespace Jibril.Controllers
                 bm = sets[0].ChildrenBeatmaps.First(x => x.FileMD5 == s.score.FileMd5);
             }
             
+            double oldAcc;
+            double newAcc;
+
+            ulong oldRankedScore;
+            ulong newRankedScore;
+
+            double oldPP;
+            double newPP;
+            
+            switch (s.score.PlayMode)
+            {
+                case PlayMode.Osu:
+                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Osu,
+                                                  oldStd.Count100Osu,
+                                                  oldStd.Count50Osu,
+                                                  oldStd.Count300Osu, 0, 0,
+                                                  PlayMode.Osu);
+
+                    newAcc = Accuracy.GetAccuracy(newStd.Count300Osu,
+                                                  newStd.Count100Osu,
+                                                  newStd.Count50Osu,
+                                                  newStd.Count300Osu, 0, 0,
+                                                  PlayMode.Osu);
+
+                    oldRankedScore = oldStd.RankedScoreOsu;
+                    newRankedScore = newStd.RankedScoreOsu;
+                    
+                    oldPP = oldStd.PerformancePointsOsu;
+                    newPP = newStd.PerformancePointsOsu;
+                    break;
+                case PlayMode.Taiko:
+                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Taiko,
+                                                  oldStd.Count100Taiko,
+                                                  oldStd.Count50Taiko,
+                                                  oldStd.Count300Taiko, 0, 0,
+                                                  PlayMode.Taiko);
+
+                    newAcc = Accuracy.GetAccuracy(newStd.Count300Taiko,
+                                                  newStd.Count100Taiko,
+                                                  newStd.Count50Taiko,
+                                                  newStd.Count300Taiko, 0, 0,
+                                                  PlayMode.Taiko);
+
+                    oldRankedScore = oldStd.RankedScoreTaiko;
+                    newRankedScore = newStd.RankedScoreTaiko;
+
+                    oldPP = oldStd.PerformancePointsTaiko;
+                    newPP = newStd.PerformancePointsTaiko;
+                    break;
+                case PlayMode.Ctb:
+                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Ctb,
+                                                  oldStd.Count100Ctb,
+                                                  oldStd.Count50Ctb,
+                                                  oldStd.Count300Ctb, 0, 0,
+                                                  PlayMode.Ctb);
+
+                    newAcc = Accuracy.GetAccuracy(newStd.Count300Ctb,
+                                                  newStd.Count100Ctb,
+                                                  newStd.Count50Ctb,
+                                                  newStd.Count300Ctb, 0, 0,
+                                                  PlayMode.Ctb);
+
+                    oldRankedScore = oldStd.RankedScoreCtb;
+                    newRankedScore = newStd.RankedScoreCtb;
+
+                    oldPP = oldStd.PerformancePointsCtb;
+                    newPP = newStd.PerformancePointsCtb;
+                    break;
+                case PlayMode.Mania:
+                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Mania,
+                                                  oldStd.Count100Mania,
+                                                  oldStd.Count50Mania,
+                                                  oldStd.Count300Mania, 0, 0,
+                                                  PlayMode.Mania);
+
+                    newAcc = Accuracy.GetAccuracy(newStd.Count300Mania,
+                                                  newStd.Count100Mania,
+                                                  newStd.Count50Mania,
+                                                  newStd.Count300Mania, 0, 0,
+                                                  PlayMode.Mania);
+                    
+                    oldRankedScore = oldStd.RankedScoreMania;
+                    newRankedScore = newStd.RankedScoreMania;
+
+                    oldPP = oldStd.PerformancePointsMania;
+                    newPP = newStd.PerformancePointsMania;
+                    break;
+                default:
+                    return Ok("");
+            }
+
+
             Chart bmChart = new Chart(
                 "beatmap",
                 "Beatmap Ranking",
@@ -239,56 +334,37 @@ namespace Jibril.Controllers
                 NewScore?.Position ?? 0,
                 oldScore?.MaxCombo ?? 0,
                 NewScore?.MaxCombo ?? 0,
-                oldScore?.Accuracy ?? 0,
-                NewScore?.Accuracy ?? 0,
-                oldScore?.TotalScore ?? 0,
-                NewScore?.TotalScore ?? 0,
-                oldScore?.PeppyPoints ?? 0,
-                NewScore?.PeppyPoints ?? 0,
-                NewScore?.Id ?? 0
-                );
-
-            /*
-            Chart overallChart = new Chart(
-                "overall",
-                "Overall Ranking",
-                $"https://osu.ppy.sh/u/{s.score.ScoreOwner.Id}",
-                isRelaxing ? oldRx.P
-                NewScore?.Position ?? 0,
-                oldScore?.MaxCombo ?? 0,
-                NewScore?.MaxCombo ?? 0,
-                oldScore?.Accuracy ?? 0,
-                NewScore?.Accuracy ?? 0,
+                oldScore?.Accuracy * 100 ?? 0,
+                NewScore?.Accuracy * 100 ?? 0,
                 oldScore?.TotalScore ?? 0,
                 NewScore?.TotalScore ?? 0,
                 oldScore?.PeppyPoints ?? 0,
                 NewScore?.PeppyPoints ?? 0,
                 NewScore?.Id ?? 0
             );
-            */
             
-            /*
-            beatmapId:315|beatmapSetId:141|beatmapPlaycount:1|beatmapPasscount:1|approvedDate:
+            
+            
+            Chart overallChart = new Chart(
+                "overall",
+                "Overall Ranking",
+                $"https://osu.ppy.sh/u/{s.score.ScoreOwner.Id}",
+                (int) oldStdPos,
+                (int) newStdPos,
+                0,
+                0,
+                oldAcc * 100,
+                newAcc * 100,
+                oldRankedScore,
+                newRankedScore,
+                oldPP,
+                newPP,
+                NewScore?.Id ?? 0,
+                ""
+            );
 
-            chartId:overall|
-            chartUrl:https://akatsuki.pw/u/1001|
-            chartName:Overall Ranking|
-            rankBefore:0|
-            rankAfter:1|
-            rankedScoreBefore:554957857|
-            rankedScoreAfter:555075201|
-            totalScoreBefore:2473528962|
-            totalScoreAfter:2473646306|
-            maxComboBefore:2219|
-            maxComboAfter:2219|
-            accuracyBefore:96.985397338867|
-            accuracyAfter:96.985397338867|
-            ppBefore:7347|
-            ppAfter:7347|
-            achievements-new:|
-            onlineScoreId:500335289   
-            */
-            return Ok();
+            return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 
+                      bmChart.ToOsuString(null) + "\n" + overallChart.ToOsuString(null));
         }
         
         #endregion

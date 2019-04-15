@@ -66,7 +66,7 @@ namespace Sora.Packets.Server
                                                               ? Presence.LeaderboardRx.Count50Osu
                                                               : Presence.LeaderboardStd.Count50Osu,
                                                           Presence.Relax
-                                                              ? Presence.LeaderboardRx.Count300Osu
+                                                              ? Presence.LeaderboardRx.CountMissOsu
                                                               : Presence.LeaderboardStd.CountMissOsu, 0, 0,
                                                           Presence.Status.Playmode));
                     sw.Write((uint) (Presence.Relax
@@ -94,7 +94,7 @@ namespace Sora.Packets.Server
                                                               ? Presence.LeaderboardRx.Count50Taiko
                                                               : Presence.LeaderboardStd.Count50Taiko,
                                                           Presence.Relax
-                                                              ? Presence.LeaderboardRx.Count300Taiko
+                                                              ? Presence.LeaderboardRx.CountMissTaiko
                                                               : Presence.LeaderboardStd.CountMissTaiko, 0, 0,
                                                           Presence.Status.Playmode));
                     sw.Write((uint) (Presence.Relax
@@ -122,7 +122,7 @@ namespace Sora.Packets.Server
                                                               ? Presence.LeaderboardRx.Count50Ctb
                                                               : Presence.LeaderboardStd.Count50Ctb,
                                                           Presence.Relax
-                                                              ? Presence.LeaderboardRx.Count300Ctb
+                                                              ? Presence.LeaderboardRx.CountMissCtb
                                                               : Presence.LeaderboardStd.CountMissCtb, 0, 0,
                                                           Presence.Status.Playmode));
                     sw.Write((uint) (Presence.Relax

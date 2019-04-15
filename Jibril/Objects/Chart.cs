@@ -22,6 +22,7 @@ namespace Jibril.Objects
         private readonly double _ppBefore;
         private readonly double _ppAfter;
         private readonly int _onlineScoreId;
+        private readonly string _achievementsNew;
 
         public Chart(string chartId,
                      string chartName,
@@ -36,7 +37,8 @@ namespace Jibril.Objects
                      ulong totalScoreAfter,
                      double ppBefore,
                      double ppAfter,
-                     int onlineScoreId
+                     int onlineScoreId,
+                     string achievements_new = null
         )
         {
             _chartId = chartId;
@@ -53,6 +55,7 @@ namespace Jibril.Objects
             _ppBefore = ppBefore;
             _ppAfter = ppAfter;
             _onlineScoreId = onlineScoreId;
+            _achievementsNew = achievements_new;
         }
         
         public string ToOsuString(Database db)
@@ -73,6 +76,7 @@ namespace Jibril.Objects
                 $"|totalScoreAfter:{_totalScoreAfter}" +
                 $"|ppBefore:{_ppBefore}" +
                 $"|ppAfter:{_ppAfter}" +
+                (_achievementsNew == null ? ""  : "|achievements-new:" + _achievementsNew) +
                 $"|onlineScoreId:{_onlineScoreId}";
         }
     }
