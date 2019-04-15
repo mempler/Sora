@@ -21,6 +21,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Shared.Helpers;
 using SimpleHttp;
 using Sora.Services;
 
@@ -93,6 +94,7 @@ namespace Sora.Server
                 client.DoWork();
             });
 
+            Logger.Info("Finish Server boot. Server should listen at port%#3cfc59%", _port);
             await SimpleHttp.HttpServer.ListenAsync(_port, _cts.Token, Route.OnHttpRequestAsync);
         }
     }

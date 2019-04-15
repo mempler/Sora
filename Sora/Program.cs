@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using EventManager.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +79,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             
             IServiceProvider provider = BuildProvider();
             
+            Stopwatch w = new Stopwatch();
+            Logger.Info("Generating %#F94848%Database%#FFFFFF%! this could take a while.");
+            w.Start();
             // Create Sora (bot) if not exists.
             if (Users.GetUser(provider.GetService<Database>(), 100) == null)
                 Users.InsertUser(provider.GetService<Database>(), new Users
@@ -88,6 +92,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     Password   = "",
                     Privileges = 0
                 });
+            w.Stop();
+            Logger.Info("Done, it took%#3cfc59%", w.ElapsedMilliseconds + "ms");
             
             provider.GetService<StartupService>()
                     .Start()
