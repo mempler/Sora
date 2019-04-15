@@ -69,7 +69,7 @@ namespace Jibril.Controllers
                                                type == ScoreboardType.Mods,
                                                mods);
 
-            cache.CacheString($"jibril:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(db), 1);         
+            cache.CacheString($"jibril:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(db), 30);         
             
             return Ok(cachedData);
         }
@@ -360,7 +360,7 @@ namespace Jibril.Controllers
                 oldPP,
                 newPP,
                 NewScore?.Id ?? 0,
-                ""
+                Achievements.GetAchievement(db, "stupid-idea").ToOsuString(null)
             );
 
             return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 

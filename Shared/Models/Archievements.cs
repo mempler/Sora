@@ -3,13 +3,16 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
+using System.Linq;
 using System.Net;
 using ImageMagick;
 using Newtonsoft.Json;
+using Shared.Interfaces;
+using Shared.Services;
 
 namespace Shared.Models
 {
-    public class Achievements
+    public class Achievements : IOsuStringable
     {
         [Key]
         [Required]
@@ -46,8 +49,12 @@ namespace Shared.Models
                 else
                     image.Resize(193, 210);
                 
-                return image.ToByteArray(MagickFormat.Jpg);
+                return image.ToByteArray(MagickFormat.Png);
             }
         }
+
+        public string ToOsuString(Database db) => $"{Name}+{DisplayName}+{Description}".Replace('\n', '\t');
+
+        public static Achievements GetAchievement(Database db, string name) => db.Achievements.FirstOrDefault(x => x.Name == name);
     }
 }
