@@ -36,7 +36,7 @@ namespace Shared.Helpers
         {
             if (File.Exists("config.json"))
                 return JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
-            T cfg = new T {};
+            T cfg = new T();
 
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.Info("Config has been created! please edit.");

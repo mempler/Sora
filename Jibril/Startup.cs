@@ -31,6 +31,7 @@ namespace Jibril
                 .AddSingleton(ConfigUtil.ReadConfig<Config>())
                 .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
                 .AddSingleton<Database>()
+                .AddSingleton<JibrilConnector>()
                 .AddSingleton<Cache>();
                 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

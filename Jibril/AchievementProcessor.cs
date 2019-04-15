@@ -13,7 +13,7 @@ namespace Jibril
         {
             List<Achievements> alist = db.Achievements.ToList();
             
-            if (alist.FirstOrDefault(x => x.Name != "oog") == null)
+            if (alist.FirstOrDefault(x => x.Name == "oog") == null)
             Achievements.NewAchievement(db,
                                         "oog",
                                         "Oooooooooooooooog!",

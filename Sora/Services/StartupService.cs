@@ -87,31 +87,18 @@ namespace Sora.Services
             _ev.RegisterService(_ps);     // Presence Service
             _ev.RegisterService(_icfg);   // Interface Config for Shared
             _ev.RegisterService(_ccs);    // Console Command Service
-            _ev.RegisterService(_s); // Bot Sora
+            _ev.RegisterService(_s);      // Bot Sora
+            _ev.BuildService();
+
+            if (!Directory.Exists("plugins"))
+                Directory.CreateDirectory("plugins");
+
+            Logger.Info("Loading Plugins...");
+            foreach (string plug in Directory.GetFiles("plugins"))
+                _plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + plug);
             
             _ev.BuildService();
             _ev.RegisterEvents();
-
-            _ev.RegisterService(_config); // Config
-            _ev.RegisterService(_icfg);   // Config
-            _ev.RegisterService(_db); // Database
-            _ev.RegisterService(_plugs);  // Plugin Service
-            _ev.RegisterService(_ev);     // EventManager
-            _ev.RegisterService(_mps);    // Multiplayer Service
-            _ev.RegisterService(_pss);    // PacketStream Service
-            _ev.RegisterService(_cs);     // Channel Service
-            _ev.RegisterService(_ps);     // Presence Service
-            _ev.RegisterService(_icfg);   // Interface Config for Shared
-            _ev.RegisterService(_ccs);    // Console Command Service
-            _ev.RegisterService(_s);      // Bot Sora
-                        
-            if (!Directory.Exists("plugins"))
-                Directory.CreateDirectory("plugins");
-            
-            foreach (string plug in Directory.GetFiles("plugins"))
-                _plugs.LoadPlugin("plugins/" + plug);
-
-            _ev.BuildService();
 
             await _s.RunAsync();
         }

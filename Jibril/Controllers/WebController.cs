@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using Jibril.Enums;
 using Jibril.Helpers;
 using Jibril.Objects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PeppyPoints;
 using Shared.Enums;
 using Shared.Helpers;
@@ -30,6 +32,7 @@ namespace Jibril.Controllers
         #region GET /web/osu-osz2-getscores.php
         [HttpGet("osu-osz2-getscores.php")]
         public IActionResult GetScoreResult(
+            [FromServices] JibrilConnector jc,
             [FromServices] Database db,
             [FromServices] Cache cache,
             [FromServices] Config conf,
@@ -69,6 +72,12 @@ namespace Jibril.Controllers
                                                type == ScoreboardType.Mods,
                                                mods);
 
+            jc.TriggerEvent(JibrilConnectorEvents.IsRelaxing, new IsRelaxingArgs
+            {
+                UserId = user.Id,
+                Relaxing = (mods & Mod.Relax) != 0
+            });
+            
             cache.CacheString($"jibril:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(db), 30);         
             
             return Ok(cachedData);
@@ -80,7 +89,8 @@ namespace Jibril.Controllers
         [HttpPost("osu-submit-modular-selector.php")]
         public IActionResult PostSubmitModular(
             [FromServices] Database db,
-            [FromServices] Config cfg
+            [FromServices] Config cfg,
+            [FromServices] JibrilConnector jc
             )
         {
             string score = Request.Form["score"];
@@ -119,6 +129,12 @@ namespace Jibril.Controllers
                     std.IncreasePlaycount(db, s.score.PlayMode);
                     std.IncreaseScore(db, s.score.TotalScore, false, s.score.PlayMode);
                 }
+
+                jc.TriggerEvent(JibrilConnectorEvents.SubmitScore, new SubmitScore
+                {
+                    UserId   = s.score.ScoreOwner.Id,
+                    Relaxing = isRelaxing
+                });
                 
                 return Ok("Thanks for your hard work!");
             }
@@ -197,6 +213,12 @@ namespace Jibril.Controllers
 
                 std.UpdatePP(db, s.score.PlayMode);
             }
+
+            jc.TriggerEvent(JibrilConnectorEvents.SubmitScore, new SubmitScore
+            {
+                UserId = s.score.ScoreOwner.Id,
+                Relaxing = isRelaxing
+            });
             
             LeaderboardStd newStd    = LeaderboardStd.GetLeaderboard(db, s.score.ScoreOwner);
             uint           newStdPos = newStd.GetPosition(db, s.score.PlayMode);
@@ -493,6 +515,34 @@ namespace Jibril.Controllers
             cache.CacheString($"jibril:DirectNP:{cache_hash}", cachedData = cg.ToNP(), 600);
 
             return Ok(cachedData);
+        }
+        #endregion
+        
+        #region GET /web/check-updates.php
+
+        [HttpGet("check-updates.php")]
+        public IActionResult CheckUpdates(
+            [FromServices] Cache cache,
+            
+            [FromQuery] string action,
+            [FromQuery(Name = "stream")] string qstream,
+            [FromQuery]ulong time)
+        {
+            string answer;
+            if ((answer = cache.GetCachedString("jibril:updater:" + action + qstream)) != null)
+                return Ok(answer);
+            
+            HttpWebRequest request = (HttpWebRequest) WebRequest.Create($"http://osu.ppy.sh/web/check-updates.php?action={action}&stream={qstream}&time={time}");
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+            
+            using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
+            {
+                string result = reader.ReadToEnd();
+                cache.CacheString("jibril:updater:" + action + qstream, result, 36000);
+                return Ok(result);
+            }
         }
         #endregion
     }

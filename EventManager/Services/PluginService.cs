@@ -81,12 +81,14 @@ namespace EventManager.Services
                 return null;
             }
 
-            foreach (ConstructorInfo cInfo in iplug.GetConstructors())
-                cInfo.Invoke(cInfo.GetParameters()
-                                  .Select(prms => _ev.Provider.GetService(prms.ParameterType))
-                                  .ToArray());
+            object[] tArgs = (from cInfo in iplug.GetConstructors()
+                              from pInfo in cInfo.GetParameters()
+                              select _ev.Provider.GetService(pInfo.ParameterType)).ToArray();
+
+            if (tArgs.Any(x => x == null))
+                throw new Exception("Could not find Dependency, are you sure you registered the Dependency?");
             
-            IPlugin retVal = Activator.CreateInstance(iplug) as IPlugin;
+            IPlugin retVal = Activator.CreateInstance(iplug, tArgs) as IPlugin;
 
             _entryPoints.Add(asm, retVal);
 
