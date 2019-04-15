@@ -37,7 +37,7 @@ namespace Sora.Packets.Client
                 Status          = (Status) sr.ReadByte(),
                 StatusText      = sr.ReadString(),
                 BeatmapChecksum = sr.ReadString(),
-                CurrentMods     = sr.ReadUInt32(),
+                CurrentMods     = (Mod) sr.ReadUInt32(),
                 Playmode        = (PlayMode) sr.ReadByte(),
                 BeatmapId       = sr.ReadUInt32()
             };
@@ -48,7 +48,7 @@ namespace Sora.Packets.Client
             sw.Write((byte) Status.Status);
             sw.Write(Status.StatusText);
             sw.Write(Status.BeatmapChecksum);
-            sw.Write(Status.CurrentMods);
+            sw.Write((uint) Status.CurrentMods);
             sw.Write((byte) Status.Playmode);
             sw.Write(Status.BeatmapId);
         }
@@ -59,7 +59,7 @@ namespace Sora.Packets.Client
         public Status Status;
         public string StatusText;
         public string BeatmapChecksum;
-        public uint CurrentMods;
+        public Mod CurrentMods;
         public PlayMode Playmode;
         public uint BeatmapId;
 

@@ -63,7 +63,7 @@ namespace Sora.Bot
                     BeatmapChecksum = "nothing",
                     BeatmapId       = 0,
                     StatusText      = "over you!",
-                    CurrentMods     = (uint) Mod.TouchDevice
+                    CurrentMods     = Mod.TouchDevice
                 },
                 LeaderboardRx    = LeaderboardRx.GetLeaderboard(_db, 100),
                 LeaderboardStd   = LeaderboardStd.GetLeaderboard(_db, 100),

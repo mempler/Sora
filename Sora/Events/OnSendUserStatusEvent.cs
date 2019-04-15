@@ -20,6 +20,7 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
+using Shared.Enums;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
@@ -42,6 +43,9 @@ namespace Sora.Events
         {
             args.pr.Status = args.status;
             PacketStream main = _pss.GetStream("main");
+
+            args.pr.Relax = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
+            
             main.Broadcast(new UserPresence(args.pr));
             main.Broadcast(new HandleUpdate(args.pr));
         }
