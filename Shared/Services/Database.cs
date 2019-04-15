@@ -28,13 +28,24 @@ namespace Shared.Services
 {
     public sealed class Database : DbContext
     {
+        private class FakeCFG : IConfig
+        {
+            public Helpers.MySql MySql { get; set; }
+            public Redis Redis { get; set; }
+        }
+        
         private readonly IConfig _config;
         private static readonly bool[] Migrated = {false};
 
-        public Database(IConfig config)
+        public Database()
+            : this(null) { }
+
+        public Database(IConfig config = null)
         {
             _config = config;
-            
+            if (config == null)
+                _config = ConfigUtil.ReadConfig<FakeCFG>();
+
             if (Migrated[0]) return;
             lock (Migrated)
             {
@@ -43,9 +54,13 @@ namespace Shared.Services
                 Migrated[0] = true;
             }
         }
+       
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<Users> Users { get; set; }
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public DbSet<Achievements> Achievements { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<UserStats> UserStats { get; set; }

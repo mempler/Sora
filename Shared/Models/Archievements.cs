@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Shared.Models
 {
-    public class Archievements
+    public class Achievements
     {
         [Key]
         [Required]

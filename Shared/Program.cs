@@ -22,6 +22,11 @@
 
 // Only used for Migration. so just ignore it ^^
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Org.BouncyCastle.Math.EC;
 using Shared.Helpers;
 using Shared.Services;
 
@@ -29,17 +34,15 @@ namespace Shared
 {
     internal class Program
     {
-        private class FakeCFG : IConfig
-        {
-            public Helpers.MySql MySql { get; set; }
-            public Redis Redis { get; set; }
-        }
+        private static IServiceProvider BuildProvider() =>
+            new ServiceCollection()
+                .AddSingleton<Database>()
+                .BuildServiceProvider();
         
         private static void Main()
         {
-            using (Database db = new Database(ConfigUtil.ReadConfig<FakeCFG>()))
-            {
-            }
+            IServiceProvider provider = BuildProvider();
+            provider.GetService<Database>();
         }
     }
 }
