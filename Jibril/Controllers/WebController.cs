@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -544,6 +546,30 @@ namespace Jibril.Controllers
                 return Ok(result);
             }
         }
+        #endregion
+        
+        #region POST /web/osu-screenshot.php
+
+        [HttpPost("osu-screenshot.php")]
+        public IActionResult UploadScreenshot(
+            [FromServices] Config cfg
+            )
+        {
+            if (!Directory.Exists("data/screenshots"))
+                Directory.CreateDirectory("data/screenshots");
+            
+            IFormFile screenshot = Request.Form.Files.GetFile("ss");
+            string Randi = Crypto.RandomString(16);
+            using(Stream stream = screenshot.OpenReadStream())
+            using (FileStream fs = System.IO.File.OpenWrite($"data/screenshots/{Randi}"))
+            {
+                Image.FromStream(stream)
+                      .Save(fs, ImageFormat.Jpeg);
+            }
+
+            return Ok($"http://{cfg.Server.Hostname}/ss/{Randi}");
+        }
+        
         #endregion
     }
 }
