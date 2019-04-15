@@ -108,12 +108,9 @@ namespace Sora.Objects
             LastRequest.Restart();
 
             if (!reset) return copy;
-
-            using (Stream)
-                // Dispose after chaning stream.
-            {
-                Stream = new MStreamWriter(new MemoryStream());
-            }
+            
+            Stream.Dispose();
+            Stream = new MStreamWriter(new MemoryStream());
 
             return copy;
         }

@@ -117,11 +117,11 @@ namespace Sora.Server
                         Logger.Warn("Presence of token%#F94848%", Request.Headers["osu-token"], "%#FFFFFF%hasn't been found!");
                         Response.StatusCode = 403; // Presence is not known, force the client to send login info.
                         return;
-                    }
-
+                    }                    
                     while (true)
                         try
                         {
+                            pr.LastRequest.Restart();
                             if (Request.ContentLength64 - rawReadstream.Position < 7)
                                 break; // Dont handle any invalid packets! (less then bytelength of 7)
 
@@ -132,7 +132,7 @@ namespace Sora.Server
                             using (MemoryStream packetDataStream = new MemoryStream(packetData))
                             using (MStreamReader packetDataReader = new MStreamReader(packetDataStream))
                             {
-                                _evmng.RunEvent(EventType.BanchoPacket, new BanchoPacketArgs()
+                                _evmng.RunEvent(EventType.BanchoPacket, new BanchoPacketArgs
                                 {
                                     pr = pr, PacketId = packetId, Data = packetDataReader
                                 });
