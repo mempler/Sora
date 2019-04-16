@@ -39,7 +39,7 @@ namespace Sora
             new ServiceCollection()
                 .AddSingleton<IConfig>(ConfigUtil.ReadConfig<Config>())
                 .AddSingleton(ConfigUtil.ReadConfig<Config>())
-                .AddSingleton<Database>()
+                .AddDbContext<Database>()
                 .AddSingleton<PluginService>()
                 .AddSingleton<PresenceService>()
                 .AddSingleton<MultiplayerService>()

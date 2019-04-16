@@ -36,7 +36,12 @@ namespace Shared.Helpers
         public static T ReadConfig<T>() where T : IConfig, new()
         {
             if (File.Exists("config.json"))
-                return JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
+            {
+                T r = JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(r, Formatting.Indented)); // to Update Config
+                return r;
+            }
+            
             T cfg = new T();
 
             cfg.MySql = new CMySql

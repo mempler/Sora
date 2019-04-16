@@ -118,7 +118,7 @@ namespace Jibril.Controllers
 
             bool isRelaxing = (s.score.Mods & Mod.Relax) != 0;
             
-             if (!s.pass)
+            if (!s.pass || !RankedMods.IsRanked(s.score.Mods))
             {
                 if (isRelaxing)
                 {

@@ -30,10 +30,11 @@ namespace Jibril
             services
                 .AddSingleton(ConfigUtil.ReadConfig<Config>())
                 .AddSingleton((IConfig) ConfigUtil.ReadConfig<Config>())
-                .AddSingleton<Database>()
                 .AddSingleton<JibrilConnector>()
                 .AddSingleton<Cache>();
-                
+
+            services.AddDbContext<Database>();
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<FormOptions>(x =>
             {
