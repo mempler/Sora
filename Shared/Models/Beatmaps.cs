@@ -24,8 +24,8 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using opi.v1;
 using Shared.Helpers;
+using Shared.Objects;
 using Shared.Services;
 using PlayMode = Shared.Enums.PlayMode;
 using RankedStatus = Shared.Enums.RankedStatus;
@@ -35,8 +35,6 @@ namespace Shared.Models
 {
     public class Beatmaps
     {
-        private static Api _api;
-
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -125,42 +123,48 @@ namespace Shared.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public static Beatmaps FetchFromApi(string osuApiKey, string fileMd5, int beatmapId = -1)
+        public static Beatmaps FetchFromApi(IConfig cfg, string fileMd5, int beatmapId = -1)
         {
-            if (_api == null)
-                _api = new Api(osuApiKey);
+            Cheesegull cg = new Cheesegull(cfg);
+            if (!string.IsNullOrEmpty(fileMd5))
+                cg.SetBM(fileMd5);
+            else if (beatmapId != -1)
+                cg.SetBM(beatmapId);
 
-            Beatmap bm = _api.GetBeatmap(beatmapId, opi.v1.PlayMode.All, true, fileMd5);
-            if (bm == null)
+            List<CheesegullBeatmapSet> bmSet = cg.GetSets();
+            if (bmSet.Count == 0)
                 return null;
-            
+
+            CheesegullBeatmap bm = bmSet[0].ChildrenBeatmaps.FirstOrDefault(x => x.FileMD5 == fileMd5 || x.BeatmapID == beatmapId);
+            if (string.IsNullOrEmpty(bm.FileMD5))
+                return null;
+
             Beatmaps b = new Beatmaps
             {
-                Ar               = bm.Ar,
-                Artist           = bm.Artist,
-                Bpm              = bm.Bpm,
-                Cs               = bm.Cs,
-                Difficulty       = bm.Difficulty,
-                Hp               = bm.Hp,
-                Id               = bm.BeatmapId,
-                Od               = bm.Od,
-                Tags             = bm.Tags,
-                Title            = bm.Title,
-                BeatmapCreator   = bm.Creator,
+                Ar               = bm.AR,
+                Artist           = bmSet[0].Artist,
+                Bpm              = bm.BPM,
+                Cs               = bm.CS,
+                Difficulty       = bm.DifficultyRating,
+                Hp               = bm.HP,
+                Id               = bm.BeatmapID,
+                Od               = bm.OD,
+                Tags             = bmSet[0].Tags,
+                Title            = bmSet[0].Title,
+                BeatmapCreator   = bmSet[0].Creator,
                 BeatmapCreatorId = -1, // -1 because we do not own this beatmap.
-                DifficultyName   = bm.DifficultyName,
+                DifficultyName   = bm.DiffName,
                 HitLength        = bm.HitLength,
                 LastUpdate       = DateTime.Now,
                 PassCount        = 0,
                 PlayCount        = 0,
-                PlayMode         = (PlayMode) bm.PlayMode,
-                RankedDate       = bm.RankedDate ?? DateTime.Now,
-                RankedStatus     = Fixer.FixRankedStatus(bm.RankedStatus),
+                PlayMode         = bm.Mode,
+                RankedDate       = Convert.ToDateTime(bmSet[0].ApprovedDate),
+                RankedStatus     = Fixer.FixRankedStatus((Cheesegull.RankedStatus) bmSet[0].RankedStatus),
                 TotalLength      = bm.TotalLength,
-                BeatmapSetId     = bm.BeatmapSetId,
-                FileMd5          = bm.BeatmapMd5
+                BeatmapSetId     = bm.ParentSetID,
+                FileMd5          = bm.FileMD5
             };
-
             return b;
         }
 

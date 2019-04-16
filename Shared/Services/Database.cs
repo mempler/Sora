@@ -30,8 +30,9 @@ namespace Shared.Services
     {
         private class FakeCFG : IConfig
         {
-            public Helpers.MySql MySql { get; set; }
-            public Redis Redis { get; set; }
+            public CMySql MySql { get; set; }
+            public CRedis Redis { get; set; }
+            public CCheesegull Cheesegull { get; set; }
         }
         
         private readonly IConfig _config;

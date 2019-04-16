@@ -18,29 +18,30 @@
 */
 #endregion
 
-using Shared.Enums;
+using Shared.Objects;
+using RankedStatus = Shared.Enums.RankedStatus;
 
 namespace Shared.Helpers
 {
     public static class Fixer
     {
-        public static RankedStatus FixRankedStatus(opi.v1.RankedStatus rankedStatus)
+        public static RankedStatus FixRankedStatus(Cheesegull.RankedStatus rankedStatus)
         {
             switch (rankedStatus)
             {
-                case opi.v1.RankedStatus.Graveyard:
+                case Cheesegull.RankedStatus.Graveyard:
                     return RankedStatus.LatestPending;
-                case opi.v1.RankedStatus.Wip:
+                case Cheesegull.RankedStatus.Wip:
                     return RankedStatus.LatestPending;
-                case opi.v1.RankedStatus.Pending:
+                case Cheesegull.RankedStatus.Pending:
                     return RankedStatus.LatestPending;
-                case opi.v1.RankedStatus.Ranked:
+                case Cheesegull.RankedStatus.Ranked:
                     return RankedStatus.Ranked;
-                case opi.v1.RankedStatus.Approved:
+                case Cheesegull.RankedStatus.Approved:
                     return RankedStatus.Approved;
-                case opi.v1.RankedStatus.Qualified:
+                case Cheesegull.RankedStatus.Qualified:
                     return RankedStatus.Qualified;
-                case opi.v1.RankedStatus.Loved:
+                case Cheesegull.RankedStatus.Loved:
                     return RankedStatus.Loved;
                 default:
                     return RankedStatus.Unknown;

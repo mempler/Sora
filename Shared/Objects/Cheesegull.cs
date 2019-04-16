@@ -1,22 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using Jibril.Helpers;
 using Newtonsoft.Json;
 using Shared.Enums;
-using Shared.Interfaces;
-using Shared.Models;
-using Shared.Services;
+using Shared.Helpers;
 
-namespace Jibril.Objects
+namespace Shared.Objects
 {
 	public struct CheesegullBeatmapSet
 	{
 		public int SetID;
 		public List<CheesegullBeatmap> ChildrenBeatmaps;
-		public int RankedStatus;
+		public RankedStatus RankedStatus;
 		public string ApprovedDate;
 		public string LastUpdate;
 		public string LastChecked;
@@ -50,10 +46,21 @@ namespace Jibril.Objects
 		public int MaxCombo;
 		public double DifficultyRating;
 	}
-	
+
     public class Cheesegull
     {
-	    private readonly Config _cfg;
+	    public enum RankedStatus
+	    {
+		    Graveyard = -2,
+		    Wip = -1,
+		    Pending = 0,
+		    Ranked = 1,
+		    Approved = 2,
+		    Qualified = 3,
+		    Loved = 4,
+	    }
+	    
+	    private readonly IConfig _cfg;
 	    private List<CheesegullBeatmapSet> _sets;
 	    private string _query;
 
@@ -80,7 +87,7 @@ namespace Jibril.Objects
             }
         }
 
-        public Cheesegull(Config cfg)
+        public Cheesegull(IConfig cfg)
         {
 	        _cfg = cfg;
         }
@@ -99,7 +106,7 @@ namespace Jibril.Objects
 	        else pm = playMode.ToString();
 	        
 	        query = $"?mode=${pm}&amount={100}&offset={page*100}&status={rankedStatus}&query={query}";
-	        string request_url = _cfg.Server.Cheesegull + "/api/search" + query;
+	        string request_url = _cfg.Cheesegull.Hostname + "/api/search" + query;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -117,7 +124,7 @@ namespace Jibril.Objects
 
         public void SetBMSet(int SetId)
         {
-	        string request_url = _cfg.Server.Cheesegull + "/api/s/" + SetId;
+	        string request_url = _cfg.Cheesegull.Hostname + "/api/s/" + SetId;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -136,7 +143,7 @@ namespace Jibril.Objects
 
         public void SetBM(int BeatmapId)
         {
-	        string request_url = _cfg.Server.Cheesegull + "/api/b/" + BeatmapId;
+	        string request_url = _cfg.Cheesegull.Hostname + "/api/b/" + BeatmapId;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -152,7 +159,7 @@ namespace Jibril.Objects
 
         public void SetBM(string Hash)
         {
-	        string request_url = _cfg.Server.Cheesegull + "/api/hash/" + Hash;
+	        string request_url = _cfg.Cheesegull.Hostname + "/api/hash/" + Hash;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;

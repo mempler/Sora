@@ -109,7 +109,7 @@ namespace Jibril.Objects
         private void SetBeatmap()
         {
             if ((_bm = Beatmaps.FetchFromDatabase(_db, _fileMd5)) != null) return;
-            if ((_bm = Beatmaps.FetchFromApi(_cfg.Osu.APIKey, _fileMd5)) != null)
+            if ((_bm = Beatmaps.FetchFromApi(_cfg, _fileMd5)) != null)
                 Beatmaps.InsertBeatmap(_db, _bm);
         }
     }

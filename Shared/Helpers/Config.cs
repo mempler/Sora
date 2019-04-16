@@ -26,8 +26,9 @@ namespace Shared.Helpers
 {
     public interface IConfig
     {
-        MySql MySql { get; set; }
-        Redis Redis { get; set; }
+        CMySql MySql { get; set; }
+        CRedis Redis { get; set; }
+        CCheesegull Cheesegull { get; set; }
     }
 
     public static class ConfigUtil
@@ -38,6 +39,25 @@ namespace Shared.Helpers
                 return JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
             T cfg = new T();
 
+            cfg.MySql = new CMySql
+            {
+                Hostname = "localhost",
+                Username = "root",
+                Password = string.Empty,
+                Port = 3306,
+                Database = "Sora"
+            };
+            
+            cfg.Redis = new CRedis
+            {
+                Hostname = "localhost"
+            };
+
+            cfg.Cheesegull = new CCheesegull
+            {
+                Hostname = "https://cg.mempler.de"
+            };
+
             File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.Info("Config has been created! please edit.");
             Environment.Exit(0);
@@ -45,12 +65,17 @@ namespace Shared.Helpers
         }
     }
 
-    public struct Redis
+    public struct CRedis
     {
         public string Hostname;
     }
 
-    public struct MySql
+    public struct CCheesegull
+    {
+        public string Hostname;
+    }
+
+    public struct CMySql
     {
         public string Username;
         public string Password;
