@@ -8,7 +8,8 @@ namespace Jibril
     public enum JibrilConnectorEvents
     {
         SubmitScore,
-        IsRelaxing
+        IsRelaxing,
+        SendMessage
     }
 
     public interface JibrilConnectorEventArgs : IEventArgs
@@ -35,6 +36,18 @@ namespace Jibril
         public string Sanitize()
         {
             return $"{UserId}|{Relaxing}";
+        }
+    }
+
+    public class SendMessageArgs : JibrilConnectorEventArgs
+    {
+        public int UserId;
+        public string Channel;
+        public string Message;
+
+        public string Sanitize()
+        {
+            return $"{UserId}|{Channel}|{Message}";
         }
     }
     

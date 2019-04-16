@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading;
 using EventManager;
 using Shared.Helpers;
@@ -17,15 +16,19 @@ namespace JibrilConnector
     {
         private readonly PresenceService _ps;
         private readonly Database _db;
+        private readonly ChannelService _cs;
+        private readonly PacketStreamService _pss;
         private ConnectionMultiplexer Redis;
         private Thread UpdateLoopThread;
 
         private bool Stop;
 
-        public PluginEntry(PresenceService ps, Database db)
+        public PluginEntry(PresenceService ps, Database db, ChannelService cs, PacketStreamService pss)
         {
             _ps = ps;
             _db = db;
+            _cs = cs;
+            _pss = pss;
         }
         
         public override void OnEnable()
@@ -64,7 +67,8 @@ namespace JibrilConnector
                         case "SubmitScore":
                         {
                             Presence pr = _ps.GetPresence(Convert.ToInt32(Value.Split("|")[0]));
-                            if (pr == null) break;
+                            if (pr == null)
+                                break;
 
                             Database _ddb = new Database();
                             
@@ -85,6 +89,28 @@ namespace JibrilConnector
                         case "IsRelaxing":
                         {
                             Presence pr = _ps.GetPresence(Convert.ToInt32(Value.Split("|")[0]));
+                            if (pr == null)
+                                break;
+                            
+                            pr.Relax = Value.Split("|")[1] == "True";
+                            pr.Write(new HandleUpdate(pr));
+                        } break;
+
+                        case "SendMessage":
+                        {
+                            Presence pr = _ps.GetPresence(Convert.ToInt32(Value.Split("|")[0]));
+                            if (pr == null)
+                                break;
+                            
+                            string Channel = Value.Split("|")[1];
+                            string Message = Value.Split("|")[2];
+
+                            Channel c;
+                            if ((c = _cs.GetChannel(Channel)) == null)
+                                break;
+                            
+                            c.WriteMessage(pr, Message, true);
+                            
                             pr.Relax = Value.Split("|")[1] == "True";
                             pr.Write(new HandleUpdate(pr));
                         } break;

@@ -107,9 +107,10 @@ namespace Sora.Objects
             }
         }
 
-        public void WriteMessage(Presence pr, string message)
+        public void WriteMessage(Presence pr, string message, bool skipReadonly = false)
         {
-            if (ReadOnly) return;
+            if (!skipReadonly)
+                if (ReadOnly) return;
             if (BoundStream == null && BoundPresence != null)
             {
                 BoundPresence.Write(

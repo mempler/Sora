@@ -250,14 +250,7 @@ namespace Jibril.Controllers
 
             CheesegullBeatmap bm;
             List<CheesegullBeatmapSet> sets = cg.GetSets();
-            if (sets == null)
-            {
-                bm = new CheesegullBeatmap();
-            }
-            else
-            {
-                bm = sets[0].ChildrenBeatmaps.First(x => x.FileMD5 == s.score.FileMd5);
-            }
+            bm = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == s.score.FileMd5) ?? new CheesegullBeatmap();
             
             double oldAcc;
             double newAcc;
@@ -350,7 +343,15 @@ namespace Jibril.Controllers
                     return Ok("");
             }
 
-
+            
+            if (NewScore?.Position == 1)
+                jc.TriggerEvent(JibrilConnectorEvents.SendMessage, new SendMessageArgs
+                {
+                    Channel = "#announce",
+                    Message = $"[http://{cfg.Server.Hostname}/{s.score.ScoreOwner.Id} {s.score.ScoreOwner.Username}] has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {sets?[0].Title} [{bm.DiffName}]]] Good job!",
+                    UserId = 100
+                });
+            
             Chart bmChart = new Chart(
                 "beatmap",
                 "Beatmap Ranking",
