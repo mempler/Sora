@@ -18,9 +18,11 @@ install:
   - cmd: git submodule update --init --recursive
   - cmd: choco install resharper-clt -y
   - cmd: choco install nvika -y
+  - cmd: choco install nodejs -y
   
 before_build:
   - cmd: nuget restore -verbosity quiet
+  - cmd: npm install Sora/Jibril/ClientApp
 
 build:
   parallel: true
@@ -29,10 +31,11 @@ build:
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:* --caches-home="inspectcode" --severity="WARNING" Sora.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml"
-  
+
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/k3rn31p4nic/appveyor-discord-webhook/master/send.ps1 -o send.ps1
   - ps: ./send.ps1 success $env:WEBHOOK_URL
+
 on_failure:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/k3rn31p4nic/appveyor-discord-webhook/master/send.ps1 -o send.ps1
   - ps: ./send.ps1 failure $env:WEBHOOK_URL
