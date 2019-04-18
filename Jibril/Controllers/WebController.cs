@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PeppyPoints;
+using Shared;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Models;

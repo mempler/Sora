@@ -12,9 +12,7 @@ namespace Jibril
     {
         public static void CreateDefaultAchievements(Database db)
         {
-            List<Achievements> alist = db.Achievements.ToList();
-            
-            if (alist.FirstOrDefault(x => x.Name == "oog") == null)
+            if (db.Achievements.FirstOrDefault(x => x.Name == "oog") == null)
             Achievements.NewAchievement(db,
                                         "oog",
                                         "Oooooooooooooooog!",

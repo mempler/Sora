@@ -265,6 +265,35 @@ namespace Shared.Migrations
                     b.ToTable("LeaderboardStd");
                 });
 
+            modelBuilder.Entity("Shared.Models.OAuthClients", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AllowedScopes")
+                        .IsRequired();
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<string>("GrandType")
+                        .IsRequired();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<int>("OwnerId");
+
+                    b.Property<string>("Secret")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("OAuthClients");
+                });
+
             modelBuilder.Entity("Shared.Models.Scores", b =>
                 {
                     b.Property<int>("Id")
@@ -345,6 +374,14 @@ namespace Shared.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Shared.Models.OAuthClients", b =>
+                {
+                    b.HasOne("Shared.Models.Users", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

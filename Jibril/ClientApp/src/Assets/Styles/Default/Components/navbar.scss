@@ -1,0 +1,280 @@
+#navbar {
+  position: relative;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  background: url('../../Images/Interface/navbar_pink.png');
+  background-color: pink;
+  height: 85px;
+  /*box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.75);*/
+  box-shadow: inset 0px -2px 3px -3px rgba(0, 0, 0, 0.75);
+  z-index: 500;
+  cursor: default;
+}
+
+#navContents {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 3000;
+  top: 0px;
+}
+
+#logo {
+  position: absolute;
+  top: 8px;
+  left: 0px;
+  color: white;
+  font-size: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+  cursor: pointer;
+  width: 140px;
+  height: 60px;
+}
+
+#searchbox {
+  text-align: right;
+  padding-right: 270px;
+  height: 65px;
+}
+
+#searchbox input {
+  margin-top: 13px; font-family: 'Exo', sans-serif;
+  border: none;
+  width: 310px;
+  font-size: 30px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+  background-color: rgba(0,0,0,0.25);
+  border-radius: 5px;
+  padding: 8px;
+  color: white;
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.25);
+}
+
+#searchbox input:hover {
+  background-color: rgba(0,0,0,0.35);
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.35);
+}
+
+#searchbox input:focus {
+  background-color: rgba(0,0,0,0.55);
+}
+
+/* Chrome 62 displays this the way I expected it to I think ¯\_(ツ)_/¯ */
+#searchbox input::placeholder {
+  color: rgba(255,255,255,0.25);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  position: relative;
+  top: -5px;
+  font-size: 15px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* We're gonna tell firefox to make the placeholder text a little brighter because .25 seems dim compared to chrome */
+#searchbox input::-moz-placeholder {
+  color: rgba(255,255,255,0.45);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* IE11 is retarded and doesn't even care about the ::placeholder psudoelement. Go home internet explorer you're old and drunk.
+Also this is not tested in Edge because I don't have it so it might completely break everything. ¯\_(ツ)_/¯
+TBH I'm okay with dropping IE support completely if ::placeholder works in edge and if this somehow screws up edge otherwise.
+I do not want to get into any conditional stylesheets or other trash like that. Let IE die in peace. What I've done here is cancer. */
+#searchbox input:-ms-input-placeholder {  
+  color: rgba(255,255,255,0.25);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  height: 35px;
+  font-style: italic;
+  text-align: center;
+}
+
+#leftNav {
+  position: absolute;
+  top: -30px;
+  left: 0px;
+  color: white;
+  width: 310px;
+  text-shadow: 1px 0px 1px rgba(0, 0, 0, 1);
+  font-size: 15px;
+}
+
+#leftnavlinks {
+  position: absolute;
+  display: inline-block;
+  width: 350px;
+  left: 45px;
+  top: 56px;
+  text-align: center;
+}
+
+#rightNav {
+  position: absolute;
+  top: -30px;
+  right: 0px;
+  color: white;
+  width: 310px;
+  text-shadow: 1px 0px 1px rgba(0, 0, 0, 1);
+}
+
+#rightnavlinks {
+  position: absolute;
+  display: inline-block;
+  width: 250px;
+  right: 5px;
+  top: 37px;
+  text-align: right;
+}
+
+#profile {
+  background-color: rgb(122, 10, 81);
+  padding: 8px;
+  padding-right: 60px;
+  height: 46px;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 1);
+  text-align: center;
+  border-radius: 3px;
+}
+
+#username {
+  font-size: 11px;
+  display: inline-block;
+  width: 50%;
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  text-align: left;
+}
+
+#sessionControls {
+  position: absolute;
+  bottom: 5px;
+  font-size: 11px;
+}
+
+#welcome {
+  font-size: 10px;
+  display: inline-block;
+  text-align: right;
+  position: absolute;
+  right: 70px;
+  top: 4px;
+}
+
+#stats {
+  font-size: 9px;
+  display: inline-block;
+  text-align: right;
+  position: absolute;
+  right: 70px;
+  top: 4px;
+}
+
+#navAvatar {
+  display: inline-block;
+  position: absolute;
+  top: 35px;
+  right: 8px;
+  z-index: 2000;
+}
+
+/* Firefox specific style for nav avatar. Add a pixel! ¯\_(ツ)_/¯ */
+@-moz-document url-prefix() { #navAvatar { top: 31px; } }
+
+#navAvatar img {
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  padding: 3px;
+  margin-top: 5px;
+  border-radius: 5px;
+  background-color: rgb(97, 3, 64);
+}
+
+#advanced {
+  position: relative;
+  background-color: rgb(51, 51, 51);
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.75);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1030px;
+  margin-top: 12px;
+  padding: 0px;
+  z-index: 1000;
+  height: 35px;
+}
+
+#advancedNested {
+  color: white;
+  white-space: nowrap;
+}
+
+#advancedNested .download {
+  display: inline-block;
+  background-color: rgb(30, 30, 30);
+  margin-top: 5px;
+  margin-left: 13px;
+  padding: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 12px;
+  border-radius: 3px;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.75);
+}
+
+#advancedNested .download:hover {
+  background-color: rgb(0, 0, 0);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.75);
+}
+
+#advancedNested .nav {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 204px;
+  color: white;
+  font-size: 12px;
+  cursor: default;
+}
+
+#advancedNested .nav a {
+  text-decoration: none;
+}
+
+#advancedNested .nav span {
+  margin-right: 6px;
+  margin-left: 6px;
+}
+
+#advancedNested .rightSide {
+  display:  inline-block;
+  position: absolute;
+  top: 3px;
+  right: 15px;
+  color: white;
+  font-size: 12px;
+}
+
+#advancedNested .rightSide .right {
+  color: white;
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  right: 0px;
+  background-color: rgb(30, 30, 30);
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.75);
+  padding: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#advancedNested .rightSide .right:hover {
+  background-color: rgb(0, 0, 0);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.75);
+}
+
+#advancedNested .rightSide .right .fa-envelope {
+  margin-right: 5px;
+}

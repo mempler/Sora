@@ -1,0 +1,32 @@
+welcome_guest: Witaj, Gość!
+help: Pomoc
+leaderboard: Tabela wyników
+beatmaps: Beatmapy
+accept: Akceptuj
+deny: Odrzuć
+dl_switcher: Pobierz Server Switcher
+search: Szukaj w tabeli wyników i beatmapach...
+messages: Wiadomości
+logout: Wyloguj się
+signup: Zarejestruj się
+settings: Ustawienia
+signup_prepare: Przygotuj się...
+signup_description: Jesteś prawie gotowy, żeby zacząć grać na najbardziej niesamowitym
+  serwerze osu! na świecie...
+signup_fun: Zarejestruj się tutaj i zacznij wybuchową przygodę...
+signup_step_number: Etap
+signup_step_o: Jest to proces trójetapowy...
+signup_step_one: Zarejestruj się z twoją wybraną Nazwą Użytkownika i Hasłem oraz zweryfikuj
+  E-Mail tutaj...
+signup_step_two: Pobierz nasz server switcher i włącz przełącznik (zrestartuj osu!
+  jeżeli miałeś je uruchomione podczas przełączania serwerów.)
+signup_step_three: Zaloguj się w twoim kliencie osu! informacjami, które tutaj podałeś
+  tutaj i baw się dobrze!
+signup_username: Nazwa Użytkownika
+signup_email: E-Mail
+signup_password: Hasło
+signup_confirm: Powtórz Hasło
+signup_create_account: Utwórz konto!
+signup_verification_email_send: Wysłano E-Mail Weryfikacyjny.
+signup_dont_close: Prosimy nie zamykać tego okna podczas kiedy weryfikujesz swojego
+  E-Mail'a!

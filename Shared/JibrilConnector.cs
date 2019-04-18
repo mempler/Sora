@@ -1,9 +1,8 @@
 using System;
-using EventManager.Interfaces;
 using Shared.Helpers;
 using StackExchange.Redis;
 
-namespace Jibril
+namespace Shared
 {
     public enum JibrilConnectorEvents
     {
@@ -12,7 +11,7 @@ namespace Jibril
         SendMessage
     }
 
-    public interface JibrilConnectorEventArgs : IEventArgs
+    public interface JibrilConnectorEventArgs
     {
         string Sanitize();
     }
