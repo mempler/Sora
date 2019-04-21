@@ -21,12 +21,10 @@
 using System;
 using System.Linq;
 using System.Text;
-using EventManager.Enums;
 using Shared.Enums;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Sora.Enums;
-using Sora.EventArgs;
 using Sora.Packets.Server;
 using Sora.Services;
 

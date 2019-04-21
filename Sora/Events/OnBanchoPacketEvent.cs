@@ -25,7 +25,6 @@ using Shared.Helpers;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Client;
-using Sora.Packets.Server;
 using Sora.Services;
 using Invite = Sora.Packets.Client.Invite;
 using MatchScoreUpdate = Sora.Packets.Client.MatchScoreUpdate;

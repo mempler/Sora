@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using Jibril.Objects;
-using Newtonsoft.Json;
 using Shared.Objects;
 
 namespace Jibril.Helpers

@@ -20,10 +20,8 @@
 
 using EventManager.Attributes;
 using EventManager.Enums;
-using Shared.Helpers;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
 using Sora.Packets.Server;
 
 namespace ExamplePlugin

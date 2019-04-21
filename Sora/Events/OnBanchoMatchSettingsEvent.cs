@@ -22,7 +22,6 @@ using EventManager.Attributes;
 using EventManager.Enums;
 using Shared.Helpers;
 using Sora.EventArgs;
-using Sora.Packets.Client;
 
 namespace Sora.Events
 {

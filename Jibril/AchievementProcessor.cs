@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
-using Jibril.Objects;
 using Shared.Models;
 using Shared.Objects;
 using Shared.Services;

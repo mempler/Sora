@@ -21,12 +21,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using EventManager.Services;
-using Shared.Enums;
 using Shared.Helpers;
-using Shared.Models;
 using Shared.Services;
 using Sora.Helpers;
-using Sora.Objects;
 
 namespace Sora.Services
 {

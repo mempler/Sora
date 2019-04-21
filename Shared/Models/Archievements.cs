@@ -1,12 +1,9 @@
-using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Net;
 using ImageMagick;
-using Newtonsoft.Json;
 using Shared.Interfaces;
 using Shared.Services;
 

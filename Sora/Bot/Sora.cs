@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using EventManager.Attributes;
 using EventManager.Enums;
@@ -11,7 +9,6 @@ using Shared.Models;
 using Shared.Services;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Events;
 using Sora.Objects;
 using Sora.Packets.Client;
 using Sora.Packets.Server;
