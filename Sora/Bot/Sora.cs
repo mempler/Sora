@@ -42,7 +42,7 @@ namespace Sora.Bot
         private SoraDbContextFactory _factory;
         private object _mut = new object();
               
-        private readonly Presence _botPresence;
+        private Presence _botPresence { get; set; }
 
         public Sora(SoraDbContextFactory factory, MultiplayerService ms, PresenceService ps, ChannelService cs, EventManager ev, PacketStreamService pss)
         {
@@ -52,10 +52,15 @@ namespace Sora.Bot
             _cs = cs;
             _ev = ev;
             _pss = pss;
+        }
 
-            _botPresence = new Presence(cs)
+        public Task RunAsync()
+        {
+            Logger.Info("Hey, I'm Sora! I'm a bot and i say Hello World!");
+            
+            _botPresence = new Presence(_cs)
             {
-                User = Users.GetUser(factory, 100),
+                User = Users.GetUser(_factory, 100),
                 Status = new UserStatus
                 {
                     Status          = Status.Watching,
@@ -65,8 +70,8 @@ namespace Sora.Bot
                     StatusText      = "over you!",
                     CurrentMods     = Mod.TouchDevice
                 },
-                LeaderboardRx    = LeaderboardRx.GetLeaderboard(factory, 100),
-                LeaderboardStd   = LeaderboardStd.GetLeaderboard(factory, 100),
+                LeaderboardRx    = LeaderboardRx.GetLeaderboard(_factory, 100),
+                LeaderboardStd   = LeaderboardStd.GetLeaderboard(_factory, 100),
                 Timezone         = 0,
                 BlockNonFriendDm = false,
                 Lon              = 0d,
@@ -75,16 +80,13 @@ namespace Sora.Bot
             };
 
             PacketStream stream = _pss.GetStream("main");
-            if (stream == null) return;
+            if (stream != null)
+            {
+                stream.Broadcast(new PresenceSingle(_botPresence.User.Id));
+                stream.Broadcast(new UserPresence(_botPresence));
+                stream.Broadcast(new HandleUpdate(_botPresence));
+            }
 
-            stream.Broadcast(new PresenceSingle(_botPresence.User.Id));
-            stream.Broadcast(new UserPresence(_botPresence));
-            stream.Broadcast(new HandleUpdate(_botPresence));
-        }
-
-        public Task RunAsync()
-        {
-            Logger.Info("Hey, I'm Sora! I'm a bot and i say Hello World!");
             _ps.BeginPresence(_botPresence);
             return Task.CompletedTask;
         }

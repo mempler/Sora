@@ -49,4 +49,8 @@
     <PackageReference Include="SharpZipLib" Version="1.1.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Bot\Commands" />
+  </ItemGroup>
 </Project>
