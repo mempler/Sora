@@ -18,8 +18,8 @@
 */
 #endregion
 
-using EventManager;
-using Shared.Helpers;
+using Sora;
+using Sora.Helpers;
 
 namespace ExamplePlugin
 {

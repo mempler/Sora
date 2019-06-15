@@ -1,18 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EventManager.Attributes;
-using EventManager.Enums;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Models;
-using Shared.Services;
+using Sora.Attributes;
+using Sora.Database;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Client;
 using Sora.Packets.Server;
 using Sora.Services;
+using LeaderboardRx = Sora.Database.Models.LeaderboardRx;
+using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
+using Logger = Sora.Helpers.Logger;
+using Mod = Sora.Enums.Mod;
+using PlayMode = Sora.Enums.PlayMode;
+using Privileges = Sora.Enums.Privileges;
+using Users = Sora.Database.Models.Users;
 
 namespace Sora.Bot
 {
@@ -31,19 +34,19 @@ namespace Sora.Bot
     public class Sora
     {
         private List<SoraCommand> _commands = new List<SoraCommand>();
-        private EventManager.EventManager _ev;
+        private EventManager _ev;
         private PacketStreamService _pss;
         private MultiplayerService _ms;
         private PresenceService _ps;
         private ChannelService _cs;
-        private Database _db;
+        private SoraDbContextFactory _factory;
         private object _mut = new object();
               
-        private Presence _botPresence;
+        private readonly Presence _botPresence;
 
-        public Sora(Database db, MultiplayerService ms, PresenceService ps, ChannelService cs, EventManager.EventManager ev, PacketStreamService pss)
+        public Sora(SoraDbContextFactory factory, MultiplayerService ms, PresenceService ps, ChannelService cs, EventManager ev, PacketStreamService pss)
         {
-            _db = db;
+            _factory = factory;
             _ms = ms;
             _ps = ps;
             _cs = cs;
@@ -52,7 +55,7 @@ namespace Sora.Bot
 
             _botPresence = new Presence(cs)
             {
-                User = Users.GetUser(_db, 100),
+                User = Users.GetUser(factory, 100),
                 Status = new UserStatus
                 {
                     Status          = Status.Watching,
@@ -62,8 +65,8 @@ namespace Sora.Bot
                     StatusText      = "over you!",
                     CurrentMods     = Mod.TouchDevice
                 },
-                LeaderboardRx    = LeaderboardRx.GetLeaderboard(_db, 100),
-                LeaderboardStd   = LeaderboardStd.GetLeaderboard(_db, 100),
+                LeaderboardRx    = LeaderboardRx.GetLeaderboard(factory, 100),
+                LeaderboardStd   = LeaderboardStd.GetLeaderboard(factory, 100),
                 Timezone         = 0,
                 BlockNonFriendDm = false,
                 Lon              = 0d,
@@ -103,6 +106,37 @@ namespace Sora.Bot
         {
             lock (_mut)
                 return _commands.Where(z => z.Command == Command.Split(" ")[0]);
+        }
+
+        public async void SendMessage(string msg, string channelTarget, bool isPrivate)
+        {
+            if (_cs.GetChannel(channelTarget) == null)
+                return;
+
+            if (!isPrivate)
+                await _ev.RunEvent(EventType.BanchoSendIrcMessage, new BanchoSendIRCMessageArgs
+                {
+                    Message = new MessageStruct
+                    {
+                        Message       = msg,
+                        Username      = _botPresence.User.Username,
+                        ChannelTarget = channelTarget,
+                        SenderId      = _botPresence.User.Id
+                    },
+                    pr = _botPresence
+                });
+            else
+                await _ev.RunEvent(EventType.BanchoSendIrcMessagePrivate, new BanchoSendIRCMessageArgs
+                {
+                    Message = new MessageStruct
+                    {
+                        Message       = msg,
+                        Username      = _botPresence.User.Username,
+                        ChannelTarget = channelTarget,
+                        SenderId      = _botPresence.User.Id
+                    },
+                    pr = _botPresence
+                });
         }
 
         [Event(EventType.BanchoSendIrcMessage)]

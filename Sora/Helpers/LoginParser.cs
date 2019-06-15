@@ -19,7 +19,6 @@
 #endregion
 
 using System.IO;
-using Shared.Helpers;
 
 namespace Sora.Helpers
 {

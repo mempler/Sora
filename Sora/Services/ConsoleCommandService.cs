@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Models;
-using Shared.Services;
+using Sora.Database;
 using Console = Colorful.Console;
+using Logger = Sora.Helpers.Logger;
+using Privileges = Sora.Enums.Privileges;
+using Users = Sora.Database.Models.Users;
 
 namespace Sora.Services
 {
@@ -36,7 +36,7 @@ namespace Sora.Services
 
         public List<ConsoleCommand> Commands => _commands;
 
-        public ConsoleCommandService(Database db)
+        public ConsoleCommandService(SoraDbContextFactory factory)
         {
             _commands = new List<ConsoleCommand>();
             _mut = new object();
@@ -125,10 +125,10 @@ namespace Sora.Services
                 },
                 args =>
                 {
-                    Users u = Users.NewUser(db, args[0], args[1], args[2], (Privileges) (args.Length > 3 ? Convert.ToInt32(args[3]) : 0));
+                    Users u = Users.NewUser(factory, args[0], args[1], args[2], (Privileges) (args.Length > 3 ? Convert.ToInt32(args[3]) : 0));
                     Logger.Info("Created User",
                                 "%#F94848%" + u.Username,
-                                "%#B342F4%(", Users.GetUserId(db, u.Username), "%#B342F4%)");
+                                "%#B342F4%(", Users.GetUserId(factory, u.Username), "%#B342F4%)");
                     return true;
                 });
             #endregion

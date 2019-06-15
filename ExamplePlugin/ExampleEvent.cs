@@ -18,8 +18,7 @@
 */
 #endregion
 
-using EventManager.Attributes;
-using EventManager.Enums;
+using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Packets.Server;

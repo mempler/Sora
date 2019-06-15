@@ -18,11 +18,11 @@
 */
 #endregion
 
+/*
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Shared.Helpers;
-using SimpleHttp;
 using Sora.Services;
 
 namespace Sora.Server
@@ -101,3 +101,5 @@ namespace Sora.Server
 
     #endregion
 }
+
+*/

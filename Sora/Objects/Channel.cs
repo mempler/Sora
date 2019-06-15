@@ -20,8 +20,8 @@
 
 using System.Collections.Generic;
 using System.Threading;
-using Shared.Enums;
 using Sora.Packets.Server;
+using Privileges = Sora.Enums.Privileges;
 
 namespace Sora.Objects
 {
@@ -109,7 +109,7 @@ namespace Sora.Objects
 
         public void WriteMessage(Presence pr, string message, bool skipReadonly = false)
         {
-            if (!skipReadonly)
+            if (!skipReadonly && pr.User.Id != 100)
                 if (ReadOnly) return;
             if (BoundStream == null && BoundPresence != null)
             {

@@ -21,9 +21,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
+using IPacket = Sora.Interfaces.IPacket;
+using ISerializer = Sora.Interfaces.ISerializer;
+using MStreamReader = Sora.Helpers.MStreamReader;
+using MStreamWriter = Sora.Helpers.MStreamWriter;
+using PacketId = Sora.Enums.PacketId;
 
 namespace Sora.Packets.Client
 {

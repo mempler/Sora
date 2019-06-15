@@ -20,8 +20,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Shared.Helpers;
-using Shared.Interfaces;
+using IPacket = Sora.Interfaces.IPacket;
+using Logger = Sora.Helpers.Logger;
 
 namespace Sora.Objects
 {

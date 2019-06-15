@@ -21,12 +21,16 @@
 using System;
 using System.Linq;
 using System.Text;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
 using Sora.Enums;
 using Sora.Packets.Server;
 using Sora.Services;
+using Crypto = Sora.Helpers.Crypto;
+using IPacket = Sora.Interfaces.IPacket;
+using ISerializer = Sora.Interfaces.ISerializer;
+using Mod = Sora.Enums.Mod;
+using MStreamReader = Sora.Helpers.MStreamReader;
+using MStreamWriter = Sora.Helpers.MStreamWriter;
+using PlayMode = Sora.Enums.PlayMode;
 
 namespace Sora.Objects
 {

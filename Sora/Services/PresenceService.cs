@@ -21,7 +21,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using EventManager.Enums;
 using JetBrains.Annotations;
 using Sora.Enums;
 using Sora.EventArgs;
@@ -32,14 +31,21 @@ namespace Sora.Services
     public class PresenceService
     {
         private readonly ChannelService _cs;
-        private readonly EventManager.EventManager _ev;
+        private readonly EventManager _ev;
         
         private readonly Dictionary<string, Presence> _presences = new Dictionary<string, Presence>();
         public object Locker = new object();
 
-        public IEnumerable<Presence> AllPresences => _presences.Select(x => x.Value);
+        public IEnumerable<Presence> AllPresences
+        {
+            get
+            {
+                lock (Locker)
+                    return _presences.Select(x => x.Value);
+            }
+        }
 
-        public PresenceService(ChannelService cs, EventManager.EventManager ev)
+        public PresenceService(ChannelService cs, EventManager ev)
         {
             _cs = cs;
             _ev = ev;
@@ -48,15 +54,15 @@ namespace Sora.Services
         public Presence GetPresence(string token)
         {
             lock (Locker)
-            return _presences.TryGetValue(token, out Presence pr) ? pr : null;
+                return _presences.TryGetValue(token, out Presence pr) ? pr : null;
         }
 
         public Presence GetPresence(int userid)
         {
             lock (Locker)
-            foreach (KeyValuePair<string, Presence> presence in _presences)
-                if (presence.Value.User.Id == userid)
-                    return presence.Value;
+                foreach (KeyValuePair<string, Presence> presence in _presences)
+                    if (presence.Value.User.Id == userid)
+                        return presence.Value;
 
             return null;
         }
@@ -65,13 +71,13 @@ namespace Sora.Services
         public IEnumerable<int> GetUserIds()
         {
             lock (Locker)
-            return _presences.Select(x => x.Value.User.Id);
+                return _presences.Select(x => x.Value.User.Id);
         }
 
         public IEnumerable<int> GetUserIds(Presence pr)
         {
             lock (Locker)
-            return _presences
+                return _presences
                    .Where(x => x.Value.Token != pr.Token)
                    .Select(z => z.Value.User.Id);
         }
@@ -98,13 +104,14 @@ namespace Sora.Services
 
                     foreach (PacketStream str in pr.JoinedStreams)
                         str.Left(pr);
-                
-                    _ev.RunEvent(EventType.BanchoExit, new BanchoExitArgs { pr                     = pr, err = ErrorStates.Ok });
-                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs{ pr            = pr});
-                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs{ pr            = pr});
-                    _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs { pr = pr });
 
-                    pr.Stream.Close();
+                    #pragma warning disable 4014
+                    _ev.RunEvent(EventType.BanchoExit, new BanchoExitArgs {pr = pr, err = ErrorStates.Ok});
+                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs{ pr = pr});
+                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs{ pr = pr});
+                    _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs { pr = pr });
+                    #pragma warning restore 4014
+                    
                     pr.LastRequest.Stop();
                 
                     _presences.Remove(pr.Token);

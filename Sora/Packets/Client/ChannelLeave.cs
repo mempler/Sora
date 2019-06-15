@@ -18,9 +18,10 @@
 */
 #endregion
 
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
+using IPacket = Sora.Interfaces.IPacket;
+using MStreamReader = Sora.Helpers.MStreamReader;
+using MStreamWriter = Sora.Helpers.MStreamWriter;
+using PacketId = Sora.Enums.PacketId;
 
 namespace Sora.Packets.Client
 {

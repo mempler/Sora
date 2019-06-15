@@ -22,12 +22,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Shared.Enums;
-using Shared.Helpers;
-using Shared.Interfaces;
-using Shared.Models;
 using Sora.Packets.Client;
 using Sora.Services;
+using CountryIds = Sora.Enums.CountryIds;
+using IPacket = Sora.Interfaces.IPacket;
+using LeaderboardRx = Sora.Database.Models.LeaderboardRx;
+using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
+using MStreamWriter = Sora.Helpers.MStreamWriter;
+using Users = Sora.Database.Models.Users;
 
 namespace Sora.Objects
 {
@@ -61,7 +63,9 @@ namespace Sora.Objects
         public UserStatus
             Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.
 
-        public MStreamWriter Stream;
+        public object locker;
+        //public MStreamWriter Stream;
+        public List<IPacket> packetList;
         public byte Timezone;
 
         public Users User;
@@ -71,10 +75,12 @@ namespace Sora.Objects
         public Presence(ChannelService cs)
         {
             _cs = cs;
+
+            locker      = new object();
             LastRequest = new Stopwatch();
             Token       = Guid.NewGuid().ToString();
-            MemoryStream str = new MemoryStream();
-            Stream = new MStreamWriter(str);
+            //Stream      = new MStreamWriter(new MemoryStream());
+            packetList = new List<IPacket>();
         }
 
         public string Token { get; }
@@ -96,22 +102,26 @@ namespace Sora.Objects
             return Token == pr.Token;
         }
 
-        public MemoryStream GetOutput(bool reset = true)
+        public MemoryStream GetOutput()
         {
-            MemoryStream copy = new MemoryStream();
-            long         pos  = Stream.BaseStream.Position;
-
-            Stream.BaseStream.Position = 0;
-            Stream.BaseStream.CopyTo(copy);
-            Stream.BaseStream.Position = pos;
             LastRequest.Restart();
 
-            if (!reset) return copy;
+            IPacket[] copy;
+            lock (locker)
+            {
+                copy = new IPacket[packetList.Count];
+                packetList.CopyTo(copy);
+                packetList.Clear();
+            }
             
-            Stream.Dispose();
-            Stream = new MStreamWriter(new MemoryStream());
+            MStreamWriter res = MStreamWriter.New();
 
-            return copy;
+            foreach (IPacket p in copy)
+                res.Write(p);
+            
+            res.BaseStream.Position = 0;
+            
+            return (MemoryStream) res.BaseStream;
         }
 
         public bool TimeoutCheck() => LastRequest.Elapsed.TotalSeconds > 30;
@@ -119,8 +129,10 @@ namespace Sora.Objects
         public void Write(IPacket p)
         {
             if (BotPresence) return;
-            if (!Stream.BaseStream.CanWrite) return;
-            if (p != null) Stream?.Write(p);
+            if (p == null) return;
+            
+            lock(packetList)
+                packetList.Add(p);
         }
     }
 }
