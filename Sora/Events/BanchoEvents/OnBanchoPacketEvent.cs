@@ -85,7 +85,8 @@ namespace Sora.Events.BanchoEvents
                     break;
                 case PacketId.ClientReceiveUpdates:
                     await _evmgr.RunEvent(
-                        EventType.BanchoReceiveUpdates);
+                        EventType.BanchoReceiveUpdates,
+                        new BanchoEmptyEventArgs{ pr = args.pr });
                     break;
                 #endregion
                 

@@ -5,13 +5,16 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Enums;
+using Sora.EventArgs;
 using Sora.Helpers;
 using Sora.Objects;
+using Sora.Services;
 
 namespace Sora.Controllers
 {
@@ -20,16 +23,25 @@ namespace Sora.Controllers
     public class WebController : Controller
     {
         private readonly SoraDbContextFactory _factory;
+        private readonly EventManager _ev;
         private readonly Cache _cache;
         private readonly Config _config;
         private readonly Bot.Sora _sora;
+        private readonly PresenceService _ps;
 
-        public WebController(SoraDbContextFactory factory, Cache cache, Config config, Bot.Sora sora)
+        public WebController(SoraDbContextFactory factory,
+                             EventManager ev,
+                             Cache cache,
+                             Config config,
+                             Bot.Sora sora,
+                             PresenceService ps)
         {
             _factory = factory;
+            _ev = ev;
             _cache = cache;
             _config = config;
             _sora = sora;
+            _ps = ps;
         }
         
         #region GET /web/
@@ -86,7 +98,7 @@ namespace Sora.Controllers
         #region POST /web/osu-submit-modular-selector.php
 
         [HttpPost("osu-submit-modular-selector.php")]
-        public IActionResult PostSubmitModular()
+        public async Task<IActionResult> PostSubmitModular()
         {
             string score = Request.Form["score"];
             string iv = Request.Form["iv"];
@@ -177,6 +189,7 @@ namespace Sora.Controllers
             
             Scores.InsertScore(_factory, scores);
 
+            Presence pr = _ps.GetPresence(scores.ScoreOwner.Id);
             if (isRelaxing)
             {
                 LeaderboardRx rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
@@ -188,6 +201,13 @@ namespace Sora.Controllers
                 rx.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
 
                 rx.UpdatePP(_factory, scores.PlayMode);
+                
+                pr.LeaderboardRx = rx;
+                await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
+                {
+                    userIds = new List<int> {scores.ScoreOwner.Id},
+                    pr      = pr
+                });
             }
             else
             {
@@ -313,7 +333,6 @@ namespace Sora.Controllers
                 default:
                     return Ok("");
             }
-
             
             if (NewScore?.Position == 1)
                 _sora.SendMessage(
@@ -359,6 +378,13 @@ namespace Sora.Controllers
                 NewScore?.Id ?? 0,
                 AchievementProcessor.ProcessAchievements(_factory, scores.ScoreOwner, scores, bm, cg.GetSets()[0], oldStd, newStd)
             );
+            
+            pr.LeaderboardStd = newStd;
+            await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
+            {
+                userIds = new List<int>{scores.ScoreOwner.Id},
+                pr = pr
+            });
 
             return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 
                       bmChart.ToOsuString() + "\n" + overallChart.ToOsuString());
