@@ -27,6 +27,8 @@ services:
       - db
       - redis
     restart: on-failure
+    environment:
+      - COS_READONLY=true
     expose:
       - 4312
 

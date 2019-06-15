@@ -110,7 +110,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
             ev.SetProvider(provider);
 
-            ccs.Start();
+            if (Environment.GetEnvironmentVariable("COS_READONLY") == null)
+                ccs.Start();
             s.RunAsync();
 
             if (!Directory.Exists("plugins"))

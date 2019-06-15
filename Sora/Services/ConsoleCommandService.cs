@@ -137,7 +137,7 @@ namespace Sora.Services
         public void RegisterCommand(string Command, string Description, List<Argument> args, ConsoleCommand.ConsoleCommandExecution cb)
         {
             lock(_mut)
-            _commands.Add(new ConsoleCommand
+                _commands.Add(new ConsoleCommand
             {
                 Command = Command,
                 Description = Description,
@@ -149,7 +149,7 @@ namespace Sora.Services
         public IEnumerable<ConsoleCommand> GetCommands(string Command)
         {
             lock (_mut)
-            return _commands.Where(z => z.Command == Command.Split(" ")[0]);
+                return _commands.Where(z => z.Command == Command.Split(" ")[0]);
         }
 
         public void Start()
