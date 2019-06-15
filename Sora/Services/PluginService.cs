@@ -93,8 +93,20 @@ namespace Sora.Services
             _entryPoints.Add(asm, retVal);
 
             return retVal;
-        } 
+        }
 
-        public bool UnloadPlugin(string filename) => throw new PlatformNotSupportedException("Not supported in this version (.net core 3.0 has support for dynamic unloading)");
+        public bool UnloadPlugins()
+        {
+            try
+            {
+                _context.Unload();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Err(ex);
+                return false;
+            }
+        }
     }
 }
