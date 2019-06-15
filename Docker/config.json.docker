@@ -1,0 +1,20 @@
+{
+    "MySql": {
+        "Username": "root",
+        "Password": "supersecretpasswordthatnobodywilleverknowsincenobodycanconencttothisdatabasepog",
+        "Hostname": "db",
+        "Port": 3306,
+        "Database": "Sora"
+    },
+    "Redis": {
+        "Hostname": "redis"
+    },
+    "Cheesegull": {
+        "Hostname": "https://pisstau.be"
+    },
+    "Server": {
+        "Hostname": "localhost",
+        "Port": 4312,
+        "FreeDirect": true
+    }
+}

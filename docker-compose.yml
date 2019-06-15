@@ -1,0 +1,53 @@
+version: "3.5"
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./Docker/NGINX/Config/:/etc/nginx/conf.d
+      - ./Docker/NGINX/Certs/:/srv
+    links:
+      - sora
+    depends_on:
+      - sora
+    ports:
+      - 80:80
+      - 443:443
+    restart: on-failure
+
+  sora:
+    image: sora
+    build: ./
+    volumes:
+      - ./data/sora_data/:/app/dat
+      - ./plugins/:/app/plugins
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    restart: on-failure
+    expose:
+      - 4312
+
+  redis:
+    image: redis
+    volumes:
+      - ./data/redis_data/:/data
+    restart: on-failure
+    expose:
+      - 6379
+
+  db:
+    container_name: db
+    image: mysql:5.7.23
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./data/mysql_data/:/var/lib/mysql
+      - ./Docker/MYSQL/:/etc/mysql/conf.d
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=supersecretpasswordthatnobodywilleverknowsincenobodycanconencttothisdatabasepog
+      - MYSQL_ROOT_HOST=%
+    expose:
+      - 3306
