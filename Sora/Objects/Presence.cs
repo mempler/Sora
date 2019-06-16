@@ -125,7 +125,7 @@ namespace Sora.Objects
             return (MemoryStream) res.BaseStream;
         }
 
-        public bool TimeoutCheck() => LastRequest.Elapsed.TotalSeconds > 30;
+        public bool TimeoutCheck() => LastRequest.Elapsed.Seconds > 60;
 
         public void Write(IPacket p)
         {

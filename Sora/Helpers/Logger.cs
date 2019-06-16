@@ -40,7 +40,7 @@ namespace Sora.Helpers
     }
     
     public static class Logger
-    {        
+    {
         public static void Log(params object[] msg) => Debug(msg);
 
         private static void PrintColorized(string Prefix, Color PrefixColor, bool exit, IEnumerable<object> msg)

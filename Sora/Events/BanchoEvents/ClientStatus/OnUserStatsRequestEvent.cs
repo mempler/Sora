@@ -42,6 +42,9 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         {
             foreach (int id in args.userIds)
             {
+                if (id == args.pr.User.Id)
+                    continue;
+                
                 Presence opr = _ps.GetPresence(id);
                 if (opr == null)
                 {
@@ -52,8 +55,7 @@ namespace Sora.Events.BanchoEvents.ClientStatus
                     }));
                     continue;
                 }
-
-                //args.pr.Write(new UserPresence(opr));
+                
                 args.pr.Write(new HandleUpdate(opr));
             }
         }

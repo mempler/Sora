@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sora.Database;
@@ -24,9 +25,9 @@ namespace Sora
 
         public Startup(IHostingEnvironment env)
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath);
-
+            IConfigurationBuilder builder = new ConfigurationBuilder();
+                //.SetBasePath(env.ContentRootPath);
+            
             config = builder.Build();
         }
 
@@ -46,6 +47,12 @@ namespace Sora
                     .AddSingleton<ChannelService>()
                     .AddSingleton<Bot.Sora>()
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
+
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit         = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue;
+            });
         }
 
         public void Configure(IApplicationBuilder app,
