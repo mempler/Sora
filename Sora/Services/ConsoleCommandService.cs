@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Sora.Database;
+using Sora.Helpers;
 using Console = Colorful.Console;
 using Logger = Sora.Helpers.Logger;
 using Privileges = Sora.Enums.Privileges;
@@ -13,7 +14,6 @@ namespace Sora.Services
     public struct Argument
     {
         public string ArgName;
-        public bool Optional;
     }
     
     public struct ConsoleCommand
@@ -24,6 +24,7 @@ namespace Sora.Services
         public string Description;
         public List<Argument> Args;
         public bool ConsoleOnly;
+        public int ExpectedArgs;
         public ConsoleCommandExecution Callback;
     }
     
@@ -48,10 +49,10 @@ namespace Sora.Services
                             {
                                 new Argument
                                 {
-                                    ArgName = "command",
-                                    Optional = true
+                                    ArgName = "command"
                                 }
-                            }, 
+                            },
+                            0,
             args =>
             {
                 string l = "\n====== Command List ======\n";
@@ -59,13 +60,15 @@ namespace Sora.Services
                 foreach (ConsoleCommand cmd in _commands)
                 {
                     string aList = "\t<";
-                    
+
+                    int i = 0;
                     foreach (Argument a in cmd.Args)
                     {
                         aList += a.ArgName;
-                        if (a.Optional)
+                        if (i >= cmd.ExpectedArgs)
                             aList += "?";
                         aList += ", ";
+                        i++;
                     }
 
                     aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
@@ -74,7 +77,7 @@ namespace Sora.Services
 
                     l += "\n%#1c9624%/*\n";
                     l += cmd.Description;
-                    l += "\n*/%#FFFFFF%\n";
+                    l += $"\n*/{L_COL.WHITE}\n";
                     l += "\n" +  cmd.Command + aList;
                     l += "\n";
                 }
@@ -89,12 +92,10 @@ namespace Sora.Services
             RegisterCommand("clear",
                 "Clear Console",
                 new List<Argument>(),
+                0,
                 args =>
                 {
-                    lock (Logger.Locker)
-                    {
-                        System.Console.Clear();
-                    }
+                    System.Console.Clear();
                     return true;
                 });
             
@@ -104,25 +105,22 @@ namespace Sora.Services
                 {
                     new Argument
                     {
-                        ArgName = "Username",
-                        Optional = false
+                        ArgName = "Username"
                     },
                     new Argument
                     {
-                        ArgName  = "Password",
-                        Optional = false
+                        ArgName  = "Password"
                     },
                     new Argument
                     {
-                        ArgName  = "E-Mail",
-                        Optional = false
+                        ArgName  = "E-Mail"
                     },
                     new Argument
                     {
-                        ArgName  = "Privileges",
-                        Optional = true
+                        ArgName  = "Privileges"
                     }
                 },
+                3,
                 args =>
                 {
                     Users u = Users.NewUser(factory, args[0], args[1], args[2], (Privileges) (args.Length > 3 ? Convert.ToInt32(args[3]) : 0));
@@ -134,7 +132,7 @@ namespace Sora.Services
             #endregion
         }      
         
-        public void RegisterCommand(string Command, string Description, List<Argument> args, ConsoleCommand.ConsoleCommandExecution cb)
+        public void RegisterCommand(string Command, string Description, List<Argument> args, int expectedArgs, ConsoleCommand.ConsoleCommandExecution cb)
         {
             lock(_mut)
                 _commands.Add(new ConsoleCommand
@@ -142,6 +140,7 @@ namespace Sora.Services
                 Command = Command,
                 Description = Description,
                 Args = args,
+                ExpectedArgs = expectedArgs,
                 Callback = cb
             });
         }
@@ -164,9 +163,7 @@ namespace Sora.Services
                 while (!_shouldStop)
                 {
                     ConsoleKeyInfo k = Console.ReadKey();
-                    lock (Logger.Locker)
-                    {
-                        Console.SetCursorPosition(0, Console.CursorTop);
+Console.SetCursorPosition(0, Console.CursorTop);
                         System.Console.Write(x);
                         
                         switch (k.Key)
@@ -183,16 +180,18 @@ namespace Sora.Services
                                     {
                                         List<string> l = x1.Split(" ").ToList();
                                         l.RemoveAt(0);
-                                        if (l.Count < m.Args.Count - m.Args.Sum(op => Convert.ToInt32(op.Optional)))
+                                        if (l.Count < m.ExpectedArgs)
                                         {
                                             string aList = "\t<";
 
+                                            int i = 0;
                                             foreach (Argument a in m.Args)
                                             {
                                                 aList += a.ArgName;
-                                                if (a.Optional)
+                                                if (i >= m.ExpectedArgs)
                                                     aList += "?";
                                                 aList += ", ";
+                                                i++;
                                             }
 
                                             aList = aList.TrimEnd(m.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
@@ -226,7 +225,6 @@ namespace Sora.Services
 
                         Console.Write(new string(' ', Console.WindowWidth));
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    }
                 }
             });
 

@@ -42,38 +42,30 @@ namespace Sora.Helpers
     public static class Logger
     {        
         public static void Log(params object[] msg) => Debug(msg);
-        
-        public static object Locker = new object();
 
         private static void PrintColorized(string Prefix, Color PrefixColor, bool exit, IEnumerable<object> msg)
         {
-            new Thread(() =>
+            Color color = PrefixColor;
+
+            string m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);
+            Console.WriteFormatted(Prefix, color);
+
+            color = Color.White;
+            foreach (string x in Regex.Split(m, @"\%(.*?)\%"))
             {
-                Color color = PrefixColor;
-
-                lock (Locker)
+                if (!x.StartsWith('#') || !IsHex(x.TrimStart('#')) || x.Length != 7)
                 {
-                    string m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);
-                    Console.WriteFormatted(Prefix, color);
-
-                    color = Color.White;
-                    foreach (string x in Regex.Split(m, @"\%(.*?)\%"))
-                    {
-                        if (!x.StartsWith('#') || !IsHex(x.TrimStart('#')) || x.Length != 7)
-                        {
-                            Console.WriteFormatted(x, color);
-                            continue;
-                        }
-
-                        color = Color.FromArgb(int.Parse(x.Replace("#", "").ToUpper().Trim(), NumberStyles.HexNumber));
-                    }
-
-                    Console.WriteLine();
+                    Console.WriteFormatted(x, color);
+                    continue;
                 }
 
-                if (exit)
-                    Environment.Exit(1);
-            }).Start();
+                color = Color.FromArgb(int.Parse(x.Replace("#", "").ToUpper().Trim(), NumberStyles.HexNumber));
+            }
+
+            Console.WriteLine();
+
+            if (exit)
+                Environment.Exit(1);
         }
 
         public static void Debug(params object[] msg)

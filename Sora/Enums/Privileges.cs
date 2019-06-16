@@ -27,6 +27,14 @@ namespace Sora.Enums
     {
         Default = 1 << 1,
         CModSilence = 1 << 2,
-        Admin = Default | CModSilence
+        ARestrict   = 1 << 3,
+        
+        ColorORANGE  = 1 << 4,
+        ColorRED     = 1 << 5,
+        ColorBLUE    = 1 << 6,
+        
+        CMod = Default | CModSilence | ColorRED,
+        Admin =  CMod | ARestrict,
+        Developer = Admin | ColorBLUE
     }
 }

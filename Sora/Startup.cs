@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sora.Database;
+using Sora.Enums;
 using Sora.Helpers;
 using Sora.Services;
 using Logger = Sora.Helpers.Logger;
@@ -100,7 +101,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     Username   = "Sora",
                     Email      = "bot@gigamons.de",
                     Password   = "",
-                    Privileges = 0
+                    Privileges = Privileges.Admin
                 });
             w.Stop();
             Logger.Info("Done, it took%#3cfc59%", w.ElapsedMilliseconds + "ms");

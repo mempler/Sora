@@ -24,6 +24,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Helpers;
 using Sora.Objects;
 
 namespace Sora.Services
@@ -88,6 +89,22 @@ namespace Sora.Services
                 // TODO: Add total playtime.
                 //presence.BeginSeason = DateTime.UtcNow;
                 if (presence == null) return;
+                
+                presence.ClientPermissions |= LoginPermissions.User;
+                if (presence.User.HasPrivileges(Privileges.ColorORANGE))
+                    presence.ClientPermissions |= LoginPermissions.Supporter;
+                if (presence.User.HasPrivileges(Privileges.ColorRED))
+                {
+                    if (presence.User.HasPrivileges(Privileges.ColorORANGE))
+                        presence.ClientPermissions -= LoginPermissions.Supporter;
+                    presence.ClientPermissions |= LoginPermissions.BAT;
+                }
+                if (presence.User.HasPrivileges(Privileges.ColorBLUE)) {
+                    if (presence.User.HasPrivileges(Privileges.ColorRED))
+                        presence.ClientPermissions -= LoginPermissions.BAT;
+                    presence.ClientPermissions |= LoginPermissions.Developer;
+                }
+                
                 presence.LastRequest.Start();
                 _presences.Add(presence.Token, presence);
                 _cs.AddChannel(new Channel(presence.User.Username, "", null, presence));

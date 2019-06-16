@@ -31,7 +31,7 @@ using Sora.Utilities;
 
 namespace Sora
 {
-public class EventManager
+    public class EventManager
     {
         private readonly IEnumerable<Assembly> _asma;
 

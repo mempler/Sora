@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Sora.Enums;
 using Sora.Packets.Client;
 using Sora.Services;
 using CountryIds = Sora.Enums.CountryIds;
@@ -43,7 +44,7 @@ namespace Sora.Objects
         public readonly Stopwatch LastRequest;
 
         public bool BlockNonFriendDm;
-        public int ClientPermissions;
+        public LoginPermissions ClientPermissions;
 
         public CountryIds CountryId;
 

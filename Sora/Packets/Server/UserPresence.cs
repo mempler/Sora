@@ -52,7 +52,7 @@ namespace Sora.Packets.Server
             sw.Write(Presence.User.Username, false);
             sw.Write(Presence.Timezone);
             sw.Write((byte) Presence.CountryId);
-            sw.Write(Presence.ClientPermissions);
+            sw.Write((int) Presence.ClientPermissions);
             sw.Write(Presence.Lat);
             sw.Write(Presence.Lon);
             sw.Write(Presence.Rank);

@@ -115,8 +115,12 @@ namespace Sora.Events.BanchoEvents.Friends
                 args.Writer.Write(new ProtocolNegotiation());
                 args.Writer.Write(new UserPresence(args.pr));
                 args.Writer.Write(new HandleUpdate(args.pr));
-                if (_cfg.Server.FreeDirect)
-                    args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
+                if ((args.pr.ClientPermissions & LoginPermissions.Supporter) == 0) {
+                    if (_cfg.Server.FreeDirect)
+                        args.Writer.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
+                }
+                else
+                    args.Writer.Write(new LoginPermission(args.pr.ClientPermissions));
 
                 args.Writer.Write(new FriendsList(Database.Models.Friends.GetFriends(_factory, args.pr.User.Id).ToList()));
                 args.Writer.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
@@ -140,11 +144,11 @@ namespace Sora.Events.BanchoEvents.Friends
                         args.Writer.Write(new ChannelRevoked(chanAuto));
                 }
 
-                foreach (KeyValuePair<string, Channel> chan in _cs.Channels)
-                    if (chan.Value.AdminOnly && args.pr.User.HasPrivileges(Privileges.Admin))
-                        args.Writer.Write(new ChannelAvailable(chan.Value));
-                    else if (!chan.Value.AdminOnly)
-                        args.Writer.Write(new ChannelAvailable(chan.Value));
+                foreach ((string _, Channel value) in _cs.Channels)
+                    if (value.AdminOnly && args.pr.User.HasPrivileges(Privileges.Admin))
+                        args.Writer.Write(new ChannelAvailable(value));
+                    else if (!value.AdminOnly)
+                        args.Writer.Write(new ChannelAvailable(value));
 
                 PacketStream stream = _ps.GetStream("main");
                 if (stream == null)
