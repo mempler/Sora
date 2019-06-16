@@ -51,7 +51,11 @@ namespace Sora
             services.Configure<FormOptions>(x =>
             {
                 x.ValueLengthLimit         = int.MaxValue;
+                
                 x.MultipartBodyLengthLimit = int.MaxValue;
+                x.MultipartBoundaryLengthLimit = int.MaxValue;
+                x.MultipartHeadersCountLimit = int.MaxValue;
+                x.MultipartHeadersCountLimit = int.MaxValue;
             });
         }
 
