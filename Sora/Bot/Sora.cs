@@ -195,8 +195,7 @@ namespace Sora.Bot
             
             if (args.Message.Message.StartsWith("!"))
             {
-                Channel c;
-                if ((c = _cs.GetChannel(args.Message.ChannelTarget)) == null)
+                if (_cs.GetChannel(args.Message.ChannelTarget) == null)
                     return;
 
                 IEnumerable<SoraCommand> cmds = GetCommands(args.Message.Message.TrimStart('!'));
