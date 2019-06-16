@@ -24,7 +24,6 @@ using Sora.EventArgs;
 using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
-using Logger = Sora.Helpers.Logger;
 using Mod = Sora.Enums.Mod;
 
 namespace Sora.Events.BanchoEvents.ClientStatus
@@ -44,7 +43,7 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         {
             args.pr.Status = args.status;
             args.pr.Relax = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
-            Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
+            //Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
             
             PacketStream main = _pss.GetStream("main");
             //main.Broadcast(new UserPresence(args.pr));

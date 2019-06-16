@@ -75,7 +75,7 @@ namespace Sora.Controllers
                         {
                             pr = pr, Reader = mr, Writer = mw, IPAddress = ip
                         });
-                        
+
                         mw.Flush();
                         
                         return await RetOut(mw.BaseStream);

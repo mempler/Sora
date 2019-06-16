@@ -55,21 +55,21 @@ namespace Sora.Objects
 
         public void Broadcast(IPacket packet, params Presence[] ignorePresences)
         {
-            foreach (KeyValuePair<string, Presence> presence in _joinedPresences)
+            foreach ((string key, Presence value) in _joinedPresences)
             {
-                if (presence.Value == null)
+                if (value == null)
                 {
-                    Left(presence.Key);
+                    Left(key);
                     continue;
                 }
 
-                if (ignorePresences.Contains(presence.Value))
+                if (ignorePresences.Contains(value))
                     continue;
 
                 if (packet == null)
                     Logger.Err("PACKET IS NULL!");
 
-                presence.Value?.Write(packet);
+                value.Write(packet);
             }
         }
     }

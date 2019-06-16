@@ -36,14 +36,12 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         {
             _ps = ps;
         }
-        
+
         [Event(EventType.BanchoUserStatsRequest)]
         public void OnUserStatsRequest(BanchoUserStatsRequestArgs args)
         {
             foreach (int id in args.userIds)
             {
-                if (id == args.pr.User.Id) continue;
-
                 Presence opr = _ps.GetPresence(id);
                 if (opr == null)
                 {

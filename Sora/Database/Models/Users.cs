@@ -50,13 +50,19 @@ namespace Sora.Database.Models
         public ulong Achievements { get; set; } = 0;
 
         public bool IsPassword(string s)
-            => BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
+        {
+            return BCrypt.validate_password(s, Password);
+            //return BCrypt.Net.BCrypt.Verify(Encoding.UTF8.GetString(Hex.FromHex(s)), Password);
+        }
 
         public static int GetUserId(SoraDbContextFactory factory, string username) =>
             factory.Get().Users.FirstOrDefault(t => t.Username == username)?.Id ?? -1;
 
         public static Users GetUser(SoraDbContextFactory factory, int userId) => 
             userId == -1 ? null : factory.Get().Users.FirstOrDefault(t => t.Id == userId);
+
+        public static Users GetUser(SoraDbContextFactory factory, string username) =>
+            username == null ? null : factory.Get().Users.FirstOrDefault(t => t.Username == username);
 
         public static void InsertUser(SoraDbContextFactory factory, params Users[] users)
         {
@@ -74,7 +80,9 @@ namespace Sora.Database.Models
             )
         {
             byte[] md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
-            string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
+            //string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
+            string bcryptPass = BCrypt.generate_hash(Hex.ToHex(md5Pass), 8);
+            Logger.Info(bcryptPass);
             
             Users u = new Users
             {
