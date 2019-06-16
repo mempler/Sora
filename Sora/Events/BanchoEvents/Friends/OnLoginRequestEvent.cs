@@ -20,8 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using MaxMind.GeoIP2.Responses;
 using Sora.Attributes;
@@ -60,34 +58,10 @@ namespace Sora.Events.BanchoEvents.Friends
             _ps = ps;
             _cs = cs;
         }
-
-        private static List<double> sw_m = new List<double>();
-        private static Stopwatch sw = new Stopwatch();
-        private static object Locker = new object();
-        private static StreamWriter fs;
         
         [Event(EventType.BanchoLoginRequest)]
         public void OnLoginRequest(BanchoLoginRequestArgs args)
         {
-            if (fs == null)
-                fs = File.AppendText("out.data");
-            if (sw_m.Count > 20)
-            {
-                lock (Locker)
-                {
-                    Logger.Info();
-                    lock (Logger.Locker)
-                        foreach (double a in sw_m)
-                            fs.Write($"{a}\n");
-                    fs.Flush();
-                    fs.Close();
-                    Logger.Fatal("Done!");
-                }
-
-                return;
-            }
-
-            sw.Start();
             try
             {
                 Login loginData = LoginParser.ParseLogin(args.Reader);
@@ -187,19 +161,13 @@ namespace Sora.Events.BanchoEvents.Friends
                 args.Writer.Write(new UserPresence(args.pr));
                 args.Writer.Write(new HandleUpdate(args.pr));
                 
-                //Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
+                Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
             }
             catch (Exception ex)
             {
-                //Logger.Err(ex);
+                Logger.Err(ex);
                 Exception(args.Writer);
             }
-
-
-            sw.Stop();
-            sw_m.Add(sw.Elapsed.TotalMilliseconds);
-            Logger.Info("CUR:", sw.Elapsed.TotalMilliseconds);
-            sw.Reset();
         }
 
         private void LoginFailed(MStreamWriter dataWriter)
