@@ -356,8 +356,11 @@ namespace Sora.Database.Models
             double TotalPP = db.Context.Scores
                                .Where(s => (s.Mods & Mod.Relax) == 0)
                                .Where(s => s.PlayMode == mode)
+                               .Where(s => s.UserId == Id)
                                .OrderByDescending(s => s.PeppyPoints)
-                               .Take(100).ToList().Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i)).Sum();
+                               .Take(100).ToList()
+                               .Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i))
+                               .Sum();
 
             switch (mode)
             {

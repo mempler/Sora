@@ -166,11 +166,13 @@ namespace Sora.Objects
 	        using Stream          stream   = response.GetResponseStream();
 	        using StreamReader    reader   = new StreamReader(stream ?? throw new Exception("Request Failed!"));
 	        string                result   = reader.ReadToEnd();
-	        
-	        _sets = new List<CheesegullBeatmapSet>(new[]
-	        {
-		        JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)
-	        });
+	        if (result != "null")
+		        _sets = new List<CheesegullBeatmapSet>(new[]
+		        {
+			        JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)
+		        });
+	        else
+		        _sets = new List<CheesegullBeatmapSet>();
         }
         
         public string ToDirect()
