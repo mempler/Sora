@@ -232,6 +232,7 @@ namespace Sora.Objects
             if (slot == null) return false;
             slot.UserId   = pr.User.Id;
             slot.Status   = MultiSlotStatus.NotReady;
+            Channel.JoinChannel(pr);
             pr.JoinedRoom = this;
             return true;
         }
@@ -241,6 +242,7 @@ namespace Sora.Objects
             MultiplayerSlot slot = Slots.First(x => x.UserId == pr.User.Id);
             if (slot == null) return;
             ClearSlot(slot);
+            Channel.LeaveChannel(pr);
             pr.JoinedRoom = null;
         }
 
