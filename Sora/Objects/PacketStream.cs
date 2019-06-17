@@ -40,12 +40,14 @@ namespace Sora.Objects
 
         public void Join(Presence pr)
         {
-            _joinedPresences.Add(pr.Token, pr);
+            if (!_joinedPresences.ContainsKey(pr.Token))
+                _joinedPresences.Add(pr.Token, pr);
         }
 
         public void Left(Presence pr)
         {
-            _joinedPresences.Remove(pr.Token);
+            if (_joinedPresences.ContainsKey(pr.Token))
+                _joinedPresences.Remove(pr.Token);
         }
 
         public void Left(string token)

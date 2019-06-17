@@ -50,7 +50,7 @@ namespace Sora.Objects
 
         //public DateTime BeginSeason;
         public bool IsLastRequest;
-        public MultiplayerRoom JoinedRoom;
+        public MultiplayerRoom? JoinedRoom;
         public double Lat;
         public LeaderboardRx LeaderboardRx;
 
@@ -59,7 +59,7 @@ namespace Sora.Objects
         public double Lon;
 
         public bool Relax;
-        public SpectatorStream Spectator;
+        public SpectatorStream? Spectator;
 
         public UserStatus
             Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.

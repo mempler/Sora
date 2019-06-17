@@ -34,7 +34,7 @@ namespace Sora.Helpers
             string decryptedScore = Crypto.DecryptString(Convert.FromBase64String(encscore),
                                                          Encoding.ASCII.GetBytes(string.Format(PrivateKey, osuversion)),
                                                          Convert.FromBase64String(iv));
-           
+            
             string[] x = decryptedScore.Split(":");
             Scores score = new Scores
             {
@@ -49,7 +49,7 @@ namespace Sora.Helpers
                 TotalScore = ulong.Parse(x[9]),
                 MaxCombo = short.Parse(x[10]),
                 
-                Mods = (Mod) short.Parse(x[13]),
+                Mods = (Mod) uint.Parse(x[13]),
                 PlayMode = (PlayMode) byte.Parse(x[15]),
                 Date = DateTime.UtcNow
             };

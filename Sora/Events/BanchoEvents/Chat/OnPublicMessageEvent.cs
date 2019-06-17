@@ -49,7 +49,7 @@ namespace Sora.Events.BanchoEvents.Chat
                     chan = args.pr.Spectator?.SpecChannel;
                     break;
                 case "#multiplayer":
-                    chan = args.pr.JoinedRoom.Channel;
+                    chan = args.pr.JoinedRoom?.Channel;
                     break;
                 default:
                     chan = _cs.GetChannel(args.Message.ChannelTarget);

@@ -508,14 +508,14 @@ namespace Sora.Controllers
             [FromQuery(Name = "h")] string pass
         )
         {
-            Users user = Users.GetUser(_factory, Users.GetUserId(_factory, userName));
+            Users user = Users.GetUser(_factory, userName);
             if (user == null)
                 return Ok("err: pass");
 
             if (!user.IsPassword(pass))
                 return Ok("err: pass");
 
-            string cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}"));
+            string cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}|b{beatmapId}"));
 
             string cachedData = _cache.GetCachedString($"sora:DirectNP:{cache_hash}");
 
