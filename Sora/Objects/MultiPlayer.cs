@@ -104,6 +104,8 @@ namespace Sora.Objects
 
         public MultiplayerRoom()
         {
+            stream  = new PacketStream("multiplayer");
+            Channel = new Channel("#multiplayer", "Even more osu! default channels!", stream);
             for (int i = 0; i < MaxPlayers; i++)
                 Slots[i] = new MultiplayerSlot
                 {
