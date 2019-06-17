@@ -1,4 +1,4 @@
-﻿#region LICENSE
+#region LICENSE
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -81,7 +81,7 @@ namespace Sora.Database.Models
         {
             byte[] md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
             //string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
-            string bcryptPass = BCrypt.generate_hash(Hex.ToHex(md5Pass), 8);
+            string bcryptPass = BCrypt.generate_hash(Hex.ToHex(md5Pass));
             Logger.Info(bcryptPass);
             
             Users u = new Users
