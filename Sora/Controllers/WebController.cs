@@ -187,8 +187,12 @@ namespace Sora.Controllers
 
             BeatmapDownloader.GetBeatmap(scores.FileMd5, _config);
 
+            if (isRelaxing)
+                scores.Mods -= Mod.Relax;
             scores.PeppyPoints =  _pointsProcessor.Compute(scores);
-
+            if (isRelaxing)
+                scores.Mods |= Mod.Relax;
+            
             Scores oldScore = Scores.GetScores(_factory,
                                                scores.FileMd5,
                                                scores.ScoreOwner,
