@@ -37,6 +37,7 @@ namespace Sora.Helpers
         public const string PURPLE = "%#B342F4%";
         public const string RED = "%#F94848%";
         public const string DARK_RED = "%#800000%";
+        public const string BLUE = "%#1E88E5%";
     }
     
     public static class Logger

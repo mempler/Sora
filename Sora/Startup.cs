@@ -46,16 +46,19 @@ namespace Sora
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<ChannelService>()
                     .AddSingleton<Bot.Sora>()
+                    .AddSingleton<PerformancePointsProcessor>()
+                    
+                    
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
 
             services.Configure<FormOptions>(x =>
             {
-                x.ValueLengthLimit         = int.MaxValue;
-                
-                x.MultipartBodyLengthLimit = int.MaxValue;
+                x.ValueLengthLimit             = int.MaxValue;
+                x.MultipartBodyLengthLimit     = int.MaxValue;
+                x.MemoryBufferThreshold        = int.MaxValue;
+                x.BufferBodyLengthLimit        = int.MaxValue;
                 x.MultipartBoundaryLengthLimit = int.MaxValue;
-                x.MultipartHeadersCountLimit = int.MaxValue;
-                x.MultipartHeadersCountLimit = int.MaxValue;
+                x.MultipartHeadersLengthLimit  = int.MaxValue;
             });
         }
 

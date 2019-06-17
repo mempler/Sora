@@ -187,8 +187,11 @@ namespace Sora.Database.Models
         public static int GetTotalScores(SoraDbContextFactory factory, string fileMd5) =>
             factory.Get().Scores.Count(score => score.FileMd5 == fileMd5);
 
-        public static Scores GetScore(SoraDbContextFactory factory, int scoreId) =>
-            factory.Get().Scores.First(score => score.Id == scoreId);
+        public static Scores GetScore(SoraDbContextFactory factory, int scoreId) {
+            Scores s = factory.Get().Scores.First(score => score.Id == scoreId);
+            s.ScoreOwner = Users.GetUser(factory, s.UserId);
+            return s;
+        }
 
         public static void InsertScore(SoraDbContextFactory factory, Scores score)
         {

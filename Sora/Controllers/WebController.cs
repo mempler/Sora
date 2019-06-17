@@ -27,6 +27,7 @@ namespace Sora.Controllers
         private readonly Cache _cache;
         private readonly Config _config;
         private readonly Bot.Sora _sora;
+        private readonly PerformancePointsProcessor _pointsProcessor;
         private readonly PresenceService _ps;
 
         public WebController(SoraDbContextFactory factory,
@@ -34,6 +35,7 @@ namespace Sora.Controllers
                              Cache cache,
                              Config config,
                              Bot.Sora sora,
+                             PerformancePointsProcessor pointsProcessor,
                              PresenceService ps)
         {
             _factory = factory;
@@ -41,6 +43,7 @@ namespace Sora.Controllers
             _cache = cache;
             _config = config;
             _sora = sora;
+            _pointsProcessor = pointsProcessor;
             _ps = ps;
         }
         
@@ -120,6 +123,7 @@ namespace Sora.Controllers
                 return Ok("error: pass");
 
             bool isRelaxing = (scores.Mods & Mod.Relax) != 0;
+            Presence pr = _ps.GetPresence(scores.ScoreOwner.Id);
             
             if (!b || !RankedMods.IsRanked(scores.Mods))
             {
@@ -136,9 +140,16 @@ namespace Sora.Controllers
                     std.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
                 }
 
+                await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
+                {
+                    userIds = new List<int> {scores.ScoreOwner.Id},
+                    pr      = pr
+                });
+
                 return Ok("Thanks for your hard work!");
             }
 
+            /*
             switch (scores.PlayMode)
             {
                 case PlayMode.Osu:
@@ -152,26 +163,31 @@ namespace Sora.Controllers
                     Logger.Info("Peppy Points:", scores.PeppyPoints);
                     break;
             }
+            */
 
             IFormFile ReplayFile = Request.Form.Files.GetFile("score");
 
             if (!Directory.Exists("data/replays"))
                 Directory.CreateDirectory("data/replays");
 
-            using (MemoryStream m = new MemoryStream())
+            await using (MemoryStream m = new MemoryStream())
             {
                 ReplayFile.CopyTo(m);
-
+                m.Position = 0;
                 scores.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(m)) ?? string.Empty;
-                if (!string.IsNullOrEmpty(scores.ReplayMd5))
-                  using (FileStream replayFile = System.IO.File.Create($"data/replays/{scores.ReplayMd5}"))
-                  {
-                      m.Position = 0;
-                      m.WriteTo(replayFile);
-                      m.Close();
-                      replayFile.Close();
-                  }
+                if (!string.IsNullOrEmpty(scores.ReplayMd5)) 
+                    await using (FileStream replayFile = System.IO.File.Create($"data/replays/{scores.ReplayMd5}"))
+                    {
+                        m.Position = 0;
+                        m.WriteTo(replayFile);
+                        m.Close();
+                        replayFile.Close();
+                    }
             }
+
+            BeatmapDownloader.GetBeatmap(scores.FileMd5, _config);
+
+            scores.PeppyPoints =  _pointsProcessor.Compute(scores);
 
             Scores oldScore = Scores.GetScores(_factory,
                                                scores.FileMd5,
@@ -184,12 +200,21 @@ namespace Sora.Controllers
                                                scores.Mods,
                                         true).FirstOrDefault();
             
-            LeaderboardStd oldStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-            uint oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
-            
-            Scores.InsertScore(_factory, scores);
+            LeaderboardStd oldStd    = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
+            uint           oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
 
-            Presence pr = _ps.GetPresence(scores.ScoreOwner.Id);
+            if (oldScore != null && oldScore.TotalScore <= scores.TotalScore)
+            {
+                using DatabaseWriteUsage db = _factory.GetForWrite();
+                db.Context.Scores.Remove(oldScore);
+                System.IO.File.Delete($"data/replays/{oldScore.ReplayMd5}");
+
+                Scores.InsertScore(_factory, scores);
+            } else if (oldScore == null)
+                Scores.InsertScore(_factory, scores);
+            else
+                System.IO.File.Delete($"data/replays/{scores.ReplayMd5}");
+
             if (isRelaxing)
             {
                 LeaderboardRx rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
@@ -241,7 +266,7 @@ namespace Sora.Controllers
             cg.SetBM(scores.FileMd5);
 
             List<CheesegullBeatmapSet> sets = cg.GetSets();
-            CheesegullBeatmap bm = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == scores.FileMd5) ?? new CheesegullBeatmap();
+            CheesegullBeatmap          bm   = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == scores.FileMd5) ?? new CheesegullBeatmap();
             
             double oldAcc;
             double newAcc;
@@ -334,13 +359,22 @@ namespace Sora.Controllers
                     return Ok("");
             }
             
-            if (NewScore?.Position == 1)
+            if (NewScore?.Position == 1 && (oldScore == null || oldScore.TotalScore < NewScore.TotalScore))
                 _sora.SendMessage(
                     $"[http://{_config.Server.Hostname}/{scores.ScoreOwner.Id} {scores.ScoreOwner.Username}] " +
-                    $"has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {sets?[0].Title} [{bm.DiffName}]]" +
-                    "Good job!",
+                    $"has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {sets?[0].Title} [{bm.DiffName}]] " +
+                    $"using {ModUtil.ToString(NewScore.Mods)} " +
+                    $"Good job! +{NewScore.PeppyPoints:F}PP",
                     "#announce",
                     false);
+            
+            Logger.Info(
+                $"{L_COL.RED}{scores?.ScoreOwner.Username}",
+                        $"{L_COL.PURPLE}( {scores?.ScoreOwner.Id} ){L_COL.WHITE}",
+                        $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PeppyPoints:F}PP",
+                        $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{NewScore?.Accuracy * 100:F}",
+                        $"{L_COL.WHITE}on {L_COL.YELLOW}{sets?[0].Title} [{bm.DiffName}]",
+                        $"{L_COL.WHITE}using {L_COL.BLUE}{ModUtil.ToString(NewScore?.Mods ?? Mod.None)}");
 
             Chart bmChart = new Chart(
                 "beatmap",
@@ -363,7 +397,7 @@ namespace Sora.Controllers
             
             Chart overallChart = new Chart(
                 "overall",
-                "Overall Ranking",
+                "Global Ranking",
                 $"https://osu.ppy.sh/u/{scores.ScoreOwner.Id}",
                 (int) oldStdPos,
                 (int) newStdPos,
@@ -383,7 +417,7 @@ namespace Sora.Controllers
             await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
             {
                 userIds = new List<int>{scores.ScoreOwner.Id},
-                pr = pr
+                pr      = pr
             });
 
             return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 
@@ -525,8 +559,8 @@ namespace Sora.Controllers
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
             using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-            using Stream stream = response.GetResponseStream();
-            using StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
+            using Stream          stream   = response.GetResponseStream();
+            using StreamReader    reader   = new StreamReader(stream ?? throw new Exception("Request Failed!"));
             
             string result = reader.ReadToEnd();
             _cache.CacheString("sora:updater:" + action + qstream, result, 36000);
@@ -543,7 +577,7 @@ namespace Sora.Controllers
                 Directory.CreateDirectory("data/screenshots");
             
             IFormFile screenshot = Request.Form.Files.GetFile("ss");
-            string Randi = Crypto.RandomString(16);
+            string    Randi      = Crypto.RandomString(16);
             using(Stream stream = screenshot.OpenReadStream())
             using (FileStream fs = System.IO.File.OpenWrite($"data/screenshots/{Randi}"))
             {
