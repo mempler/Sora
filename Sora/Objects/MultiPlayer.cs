@@ -57,6 +57,7 @@ namespace Sora.Objects
         public PacketStreamService _pss;
         public MultiplayerService _ms;
         public PresenceService _ps;
+        public PacketStream stream;
 
         private const int MaxPlayers = 16;
         public Mod ActiveMods;
@@ -64,7 +65,7 @@ namespace Sora.Objects
         public string BeatmapMd5;
         public string BeatmapName;
 
-        public Channel Channel = new Channel("#multiplayer", "Even more osu! default channels!");
+        public Channel Channel;
         public int FailedPeople;
         public int HostId;
         public bool InProgress;
@@ -88,6 +89,8 @@ namespace Sora.Objects
             _pss = pss;
             _ms = ms;
             _ps = ps;
+            stream = new PacketStream("multiplayer");
+            Channel = new Channel("#multiplayer", "Even more osu! default channels!", stream);
             for (int i = 0; i < MaxPlayers; i++)
                 Slots[i] = new MultiplayerSlot
                 {
@@ -233,6 +236,7 @@ namespace Sora.Objects
             slot.UserId   = pr.User.Id;
             slot.Status   = MultiSlotStatus.NotReady;
             Channel.JoinChannel(pr);
+            stream.Join(pr);
             pr.JoinedRoom = this;
             return true;
         }
@@ -243,6 +247,7 @@ namespace Sora.Objects
             if (slot == null) return;
             ClearSlot(slot);
             Channel.LeaveChannel(pr);
+            stream.Left(pr);
             pr.JoinedRoom = null;
         }
 
