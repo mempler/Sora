@@ -71,10 +71,7 @@ namespace Sora.Events.BanchoEvents.Friends
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
             public string Username;
 
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 60)]
-            public string Password;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
             public string Email;
             
             public int Privil;
@@ -161,7 +158,6 @@ namespace Sora.Events.BanchoEvents.Friends
                     cachedUser = new CachableUser
                     {
                         Id           = user.Id,
-                        Password     = user.Password,
                         Username     = user.Username,
                         Achievements = user.Achievements,
                         Email        = user.Email,
@@ -190,7 +186,6 @@ namespace Sora.Events.BanchoEvents.Friends
                     user = new Users
                     {
                         Username = cachedUser.Username,
-                        Password = cachedUser.Password,
                         Email = cachedUser.Email,
                         Achievements = cachedUser.Achievements,
                         Id = cachedUser.Id,
