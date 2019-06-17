@@ -19,6 +19,7 @@
 #endregion
 
 using System.IO;
+using Markdig.Syntax;
 
 namespace Sora.Helpers
 {
@@ -53,5 +54,15 @@ namespace Sora.Helpers
         public string SecurityHash;
         public byte Timezone;
         public string Username;
+
+        public override int GetHashCode()
+        {
+            return (BlockNonFriendDMs ? 1 : 0) +
+                   (DisplayLocation ? 1 : 0) +
+                   Password.GetHashCode() *
+                   SecurityHash.GetHashCode() *
+                   Username.GetHashCode() /
+                   Timezone;
+        }
     }
 }
