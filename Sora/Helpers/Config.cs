@@ -29,12 +29,12 @@ namespace Sora.Helpers
 
     public static class ConfigUtil
     {
-        public static T ReadConfig<T>() where T : IConfig, new()
+        public static T ReadConfig<T>(string cfgName = "config.json") where T : IConfig, new()
         {
-            if (File.Exists("config.json"))
+            if (File.Exists(cfgName))
             {
-                T r = JsonConvert.DeserializeObject<T>(File.ReadAllText("config.json"));
-                File.WriteAllText("config.json",
+                T r = JsonConvert.DeserializeObject<T>(File.ReadAllText(cfgName));
+                File.WriteAllText(cfgName,
                                   JsonConvert.SerializeObject(r, Formatting.Indented)); // to Update Config
                 return r;
             }
@@ -66,7 +66,7 @@ namespace Sora.Helpers
                 FreeDirect = true
             };
 
-            File.WriteAllText("config.json", JsonConvert.SerializeObject(cfg, Formatting.Indented));
+            File.WriteAllText(cfgName, JsonConvert.SerializeObject(cfg, Formatting.Indented));
             Logger.Info("Config has been created! please edit.");
             Environment.Exit(0);
             return cfg;

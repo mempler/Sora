@@ -32,6 +32,7 @@ using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
 using MStreamWriter = Sora.Helpers.MStreamWriter;
 using Users = Sora.Database.Models.Users;
 
+#nullable enable
 namespace Sora.Objects
 {
     public class Presence : IComparable
@@ -82,6 +83,9 @@ namespace Sora.Objects
             Token       = Guid.NewGuid().ToString();
             //Stream      = new MStreamWriter(new MemoryStream());
             packetList = new List<IPacket>();
+            LeaderboardRx = null;
+            LeaderboardStd = null;
+            User = null;
         }
 
         public string Token { get; }

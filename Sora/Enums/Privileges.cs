@@ -33,7 +33,8 @@ namespace Sora.Enums
         ColorRED     = 1 << 5,
         ColorBLUE    = 1 << 6,
         
-        CMod = Default | CModSilence | ColorRED,
+        Donator = Default | ColorORANGE,
+        CMod = Donator | CModSilence | ColorRED,
         Admin =  CMod | ARestrict,
         Developer = Admin | ColorBLUE
     }

@@ -264,7 +264,7 @@ __pycache__/
 *.pyc
 
 # Config
-config.json
+*config.json
 geoip/*
 */geoip/*
 geoip/

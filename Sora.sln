@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Osu", "os
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Taiko", "osu\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj", "{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ripple.MergeTool", "Ripple.MergeTool\Ripple.MergeTool.csproj", "{DD6035CF-DA80-4013-ACBC-9148115F1445}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD6035CF-DA80-4013-ACBC-9148115F1445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD6035CF-DA80-4013-ACBC-9148115F1445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD6035CF-DA80-4013-ACBC-9148115F1445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD6035CF-DA80-4013-ACBC-9148115F1445}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{64A68ED8-0D96-4A83-A346-1F8C7556F9C4} = {E3EEDA5F-8548-45F9-AD06-EA3BF2DBD8FC}
 		{2254EB98-F072-4201-B940-D44623C35C9E} = {E3EEDA5F-8548-45F9-AD06-EA3BF2DBD8FC}
 		{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277} = {E3EEDA5F-8548-45F9-AD06-EA3BF2DBD8FC}
+		{DD6035CF-DA80-4013-ACBC-9148115F1445} = {5BF7D1D4-97CE-4D5C-BB4C-F8E2F31CBE57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}
