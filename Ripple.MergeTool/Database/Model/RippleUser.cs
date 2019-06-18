@@ -5,7 +5,7 @@ using Ripple.MergeTool.Enums;
 namespace Ripple.MergeTool.Database.Model
 {
     [Table("users")]
-    public class RippleUsers
+    public class RippleUser
     {
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

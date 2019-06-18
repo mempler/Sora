@@ -8,11 +8,30 @@ namespace Ripple.MergeTool.Database
 {
     public class RippleDbContext : DbContext
     {
-        public DbSet<RippleUsers> Users { get; set; }
+        public struct CRipple
+        {
+            public string LetsBeatmapPath;
+            public string LetsReplaysPath;
+            public string LetsScreenshotPath;
+        }
+        public class RippleConfig : IConfig
+        {
+            public string SoraDataDirectory { get; set; }
+            
+            public CRipple CRipple { get; set; }
+            public CMySql MySql { get; set; }
+            public CRedis Redis { get; set; }
+            public CCheesegull Cheesegull { get; set; }
+            public CServer Server { get; set; }
+        }
+        
+        public DbSet<RippleBeatmap> Beatmaps { get; set; }
+        public DbSet<RippleUser> Users { get; set; }
+        public DbSet<RippleScore> Scores { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Config config = ConfigUtil.ReadConfig<Config>("ripple.config.json");
+            RippleConfig config = ConfigUtil.ReadConfig<RippleConfig>("ripple.config.json");
             
             if (config.MySql.Hostname == null)
                 Logger.Fatal("MySQL Hostname cannot be null!");

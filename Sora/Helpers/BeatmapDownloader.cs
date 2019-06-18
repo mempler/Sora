@@ -9,7 +9,7 @@ namespace Sora.Helpers
 {
     public static class BeatmapDownloader
     {
-        public static string GetBeatmap(string hash, Config cfg)
+        public static string GetBeatmap(string hash, IConfig cfg)
         {
             if (!Directory.Exists("data/beatmaps"))
                 Directory.CreateDirectory("data/beatmaps");

@@ -152,6 +152,13 @@ namespace Sora.Objects
 	        using Stream stream = response.GetResponseStream();
 	        using StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
 	        string result = reader.ReadToEnd();
+
+	        if (result == "null")
+	        {
+		        _sets = new List<CheesegullBeatmapSet>();
+		        return;
+	        }
+	        
 	        SetBMSet(JsonConvert.DeserializeObject<CheesegullBeatmap>(result).ParentSetID);
         }
 

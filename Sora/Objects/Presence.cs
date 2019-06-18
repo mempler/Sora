@@ -83,9 +83,6 @@ namespace Sora.Objects
             Token       = Guid.NewGuid().ToString();
             //Stream      = new MStreamWriter(new MemoryStream());
             packetList = new List<IPacket>();
-            LeaderboardRx = null;
-            LeaderboardStd = null;
-            User = null;
         }
 
         public string Token { get; }
