@@ -1,24 +1,24 @@
 using Ripple.MergeTool.Enums;
-using Sora.Enums;
+using Sora;
 
 namespace Ripple.MergeTool.Tools
 {
     public static class PrivilegeMerger
     {
-        public static Privileges Merge(RipplePrivileges priv)
+        public static Permission Merge(RipplePrivileges priv)
         {
-            Privileges retVal = 0;
+            Permission retVal = new Permission();
 
             if ((priv & RipplePrivileges.USER_NORMAL) != 0)
-                retVal |= Privileges.Default;
+                retVal += Permission.DEFAULT;
             if ((priv & RipplePrivileges.ADMIN_SILENCE_USERS) != 0)
-                retVal |= Privileges.CModSilence;
+                retVal += Permission.CHAT_MOD_SILENCE;
             if ((priv & RipplePrivileges.ADMIN_MANAGE_USERS) != 0)
-                retVal |= Privileges.ARestrict;
+                retVal += Permission.ADMIN_RESTRICT;
             if ((priv & RipplePrivileges.USER_DONOR) != 0)
-                retVal |= Privileges.Donator;
+                retVal += Permission.GROUP_DONATOR;
             if ((priv & RipplePrivileges.ADMIN_CHAT_MOD) != 0)
-                retVal |= Privileges.CMod;
+                retVal += Permission.GROUP_CHAT_MOD;
 
             return retVal;
         }

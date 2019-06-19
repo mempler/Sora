@@ -58,7 +58,7 @@ namespace Ripple.MergeTool
                     {
                         Username   = user.username,
                         Password   = user.password_md5,
-                        Privileges = PrivilegeMerger.Merge(user.privileges),
+                        Permissions = PrivilegeMerger.Merge(user.privileges),
                         Email      = user.email
                     });
                 }
