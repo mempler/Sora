@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Sora.Enums;
+using Sora.Objects;
 using Sora.Services;
 
 namespace Sora.Bot.Commands
@@ -27,7 +28,7 @@ namespace Sora.Bot.Commands
         public int ExpectedArgs => 3;
 
         public Privileges RequiredPrivileges => Privileges.ARestrict;
-        public bool Execute(string[] args)
+        public bool Execute(Presence executor, string[] args)
         {
             throw new System.NotImplementedException();
         }

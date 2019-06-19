@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Sora.Enums;
+using Sora.Objects;
 using Sora.Services;
 
 namespace Sora.Bot
@@ -12,6 +13,6 @@ namespace Sora.Bot
         int ExpectedArgs { get; }
         Privileges RequiredPrivileges { get; }
         
-        bool Execute(string[] args);
+        bool Execute(Presence executer, string[] args);
     }
 }

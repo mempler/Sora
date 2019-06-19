@@ -24,7 +24,7 @@ namespace Sora.Bot
 {
     public struct SoraCommand
     {
-        public delegate bool SoraCommandExecution(string[] args);
+        public delegate bool SoraCommandExecution(Presence executor, string[] args);
 
         public string Command;
         public string Description;
@@ -69,6 +69,7 @@ namespace Sora.Bot
             #region DEFAULT COMMANDS
 
             RegisterCommandClass<RestrictCommand>();
+            RegisterCommandClass<DebugCommand>();
 
             #endregion
         }
@@ -223,11 +224,11 @@ namespace Sora.Bot
                         if (cmd.Args.Count > 0)
                             aList += ">";
 
-                        SendMessage($"Insufficient amount of Arguments!\nUsage:\n     {cmd.Command} {aList}", args.Message.ChannelTarget, false);
+                        SendMessage($"Insufficient amount of Arguments!\nUsage:\n     !{cmd.Command} {aList}", args.Message.ChannelTarget, false);
                         break;
                     }
 
-                    if (cmd.Callback(l.ToArray()))
+                    if (cmd.Callback(args.pr, l.ToArray()))
                         break;
                 }
             }

@@ -223,7 +223,7 @@ namespace Sora.Events.BanchoEvents
                     xy._ps  = _ps;
 
                     await _evmgr.RunEvent(
-                        EventType.BanchoMatchChangeSettings,
+                        EventType.BanchoMatchChangePassword,
                         new BanchoMatchChangePasswordArgs {pr = args.pr, room = xy});
                     break;
                 case PacketId.ClientMatchChangeTeam:

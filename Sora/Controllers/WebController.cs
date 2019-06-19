@@ -589,7 +589,7 @@ namespace Sora.Controllers
                       .Save(fs, ImageFormat.Jpeg);
             }
 
-            return Ok($"http://{_config.Server.Hostname}/ss/{Randi}");
+            return Ok($"http://{_config.Server.ScreenshotHostname}/ss/{Randi}");
         }
         
         #endregion

@@ -85,6 +85,8 @@ namespace Sora.Helpers
     {
         public string Hostname;
         public short Port;
+
+        public string ScreenshotHostname;
         public bool FreeDirect;
     }
 }

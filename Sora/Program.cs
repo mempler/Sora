@@ -28,6 +28,7 @@ namespace Sora
                 {
                     Hostname   = "0.0.0.0",
                     Port       = 4312,
+                    ScreenshotHostname = "gigamons.de",
                     FreeDirect = true
                 },
                 Cheesegull = new CCheesegull
