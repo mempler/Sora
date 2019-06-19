@@ -132,7 +132,7 @@ namespace Sora.Controllers
                     // Ignored because it may throw an exception.
                 }
 
-                if (pr.IsLastRequest)
+                if (pr.Get<bool>("IS_LAST_REQUEST"))
                     _ps.EndPresence(pr, true);
             }
             catch (Exception ex)

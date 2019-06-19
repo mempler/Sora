@@ -42,7 +42,7 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         public void OnSendUserStatus(BanchoSendUserStatusArgs args)
         {
             args.pr.Status = args.status;
-            args.pr.Relax = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
+            args.pr["IS_RELAXING"] = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
             //Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
             
             PacketStream main = _pss.GetStream("main");

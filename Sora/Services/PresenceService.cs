@@ -136,7 +136,7 @@ namespace Sora.Services
                 }
             }
 
-            pr.IsLastRequest = true;
+            pr["IS_LAST_REQUEST"] = true;
         }
 
         public void TimeoutCheck()

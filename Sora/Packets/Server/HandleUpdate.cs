@@ -56,86 +56,86 @@ namespace Sora.Packets.Server
             switch (Presence.Status.Playmode)
             {
                 case PlayMode.Osu:
-                    sw.Write(Presence.Relax ?
+                    sw.Write(Presence.Get<bool>("IS_RELAXING") ?
                                  Presence.LeaderboardRx.RankedScoreOsu :
                                  Presence.LeaderboardStd.RankedScoreOsu);
-                    sw.Write((float) Accuracy.GetAccuracy(Presence.Relax
+                    sw.Write((float) Accuracy.GetAccuracy(Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count300Osu
                                                               : Presence.LeaderboardStd.Count300Osu,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count100Osu
                                                               : Presence.LeaderboardStd.Count100Osu,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count50Osu
                                                               : Presence.LeaderboardStd.Count50Osu,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.CountMissOsu
                                                               : Presence.LeaderboardStd.CountMissOsu, 0, 0,
                                                           Presence.Status.Playmode));
-                    sw.Write((uint) (Presence.Relax
+                    sw.Write((uint) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PlayCountOsu
                                  : Presence.LeaderboardStd.PlayCountOsu));
-                    sw.Write(Presence.Relax
+                    sw.Write(Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.TotalScoreOsu
                                  : Presence.LeaderboardStd.TotalScoreOsu);
                     sw.Write(Presence.Rank);
-                    sw.Write((ushort) (Presence.Relax
+                    sw.Write((ushort) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PerformancePointsOsu
                                  : Presence.LeaderboardStd.PerformancePointsOsu));
                     break;
                 case PlayMode.Taiko:
-                    sw.Write(Presence.Relax ?
+                    sw.Write(Presence.Get<bool>("IS_RELAXING") ?
                                  Presence.LeaderboardRx.RankedScoreTaiko :
                                  Presence.LeaderboardStd.RankedScoreTaiko);
-                    sw.Write((float) Accuracy.GetAccuracy(Presence.Relax
+                    sw.Write((float) Accuracy.GetAccuracy(Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count300Taiko
                                                               : Presence.LeaderboardStd.Count300Taiko,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count100Taiko
                                                               : Presence.LeaderboardStd.Count100Taiko,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count50Taiko
                                                               : Presence.LeaderboardStd.Count50Taiko,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.CountMissTaiko
                                                               : Presence.LeaderboardStd.CountMissTaiko, 0, 0,
                                                           Presence.Status.Playmode));
-                    sw.Write((uint) (Presence.Relax
+                    sw.Write((uint) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PlayCountTaiko
                                  : Presence.LeaderboardStd.PlayCountTaiko));
-                    sw.Write(Presence.Relax
+                    sw.Write(Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.TotalScoreTaiko
                                  : Presence.LeaderboardStd.TotalScoreTaiko);
                     sw.Write(Presence.Rank);
-                    sw.Write((ushort) (Presence.Relax
+                    sw.Write((ushort) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PerformancePointsTaiko
                                  : Presence.LeaderboardStd.PerformancePointsTaiko));
                     break;
                 case PlayMode.Ctb:
-                    sw.Write(Presence.Relax ?
+                    sw.Write(Presence.Get<bool>("IS_RELAXING") ?
                                  Presence.LeaderboardRx.RankedScoreCtb :
                                  Presence.LeaderboardStd.RankedScoreCtb);
-                    sw.Write((float) Accuracy.GetAccuracy(Presence.Relax
+                    sw.Write((float) Accuracy.GetAccuracy(Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count300Ctb
                                                               : Presence.LeaderboardStd.Count300Ctb,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count100Ctb
                                                               : Presence.LeaderboardStd.Count100Ctb,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.Count50Ctb
                                                               : Presence.LeaderboardStd.Count50Ctb,
-                                                          Presence.Relax
+                                                          Presence.Get<bool>("IS_RELAXING")
                                                               ? Presence.LeaderboardRx.CountMissCtb
                                                               : Presence.LeaderboardStd.CountMissCtb, 0, 0,
                                                           Presence.Status.Playmode));
-                    sw.Write((uint) (Presence.Relax
+                    sw.Write((uint) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PlayCountCtb
                                  : Presence.LeaderboardStd.PlayCountCtb));
-                    sw.Write(Presence.Relax
+                    sw.Write(Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.TotalScoreCtb
                                  : Presence.LeaderboardStd.TotalScoreCtb);
                     sw.Write(Presence.Rank);
-                    sw.Write((ushort) (Presence.Relax
+                    sw.Write((ushort) (Presence.Get<bool>("IS_RELAXING")
                                  ? Presence.LeaderboardRx.PerformancePointsCtb
                                  : Presence.LeaderboardStd.PerformancePointsCtb));
                     break;

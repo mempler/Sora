@@ -33,7 +33,6 @@ using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
 using MStreamWriter = Sora.Helpers.MStreamWriter;
 using Users = Sora.Database.Models.Users;
 
-#nullable enable
 namespace Sora.Objects
 {
     public class Presence : IComparable
@@ -49,21 +48,19 @@ namespace Sora.Objects
 
         public bool BlockNonFriendDm;
         public LoginPermissions ClientPermissions;
-
         public CountryIds CountryId;
 
         //public DateTime BeginSeason;
-        public bool IsLastRequest;
-        public MultiplayerRoom? JoinedRoom;
-        public double Lat;
+        public MultiplayerRoom JoinedRoom;
         public LeaderboardRx LeaderboardRx;
 
         //public UserStats Stats;
         public LeaderboardStd LeaderboardStd;
-        public double Lon;
 
-        public bool Relax;
-        public SpectatorStream? Spectator;
+        public SpectatorStream Spectator;
+
+        public double Lat;
+        public double Lon;
 
         public UserStatus
             Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.
@@ -86,6 +83,10 @@ namespace Sora.Objects
             Token       = Guid.NewGuid().ToString();
             //Stream      = new MStreamWriter(new MemoryStream());
             packetList = new List<IPacket>();
+
+            LeaderboardStd = null;
+            LeaderboardRx  = null;
+            User           = null;
         }
 
         public string Token { get; set; }
@@ -145,7 +146,7 @@ namespace Sora.Objects
             Write(new Announce(Message));
         }
 
-        public object? this[object key]
+        public object this[object key]
         {
             get => !_customValues.TryGetValue(key, out object val) ? default : val;
             set => _customValues[key] = value;

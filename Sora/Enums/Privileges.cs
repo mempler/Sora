@@ -26,16 +26,19 @@ namespace Sora.Enums
     public enum Privileges
     {
         Default = 1 << 1,
-        CModSilence = 1 << 2,
-        ARestrict   = 1 << 3,
         
-        ColorORANGE  = 1 << 4,
-        ColorRED     = 1 << 5,
-        ColorBLUE    = 1 << 6,
+        CModSilence = 1 << 2,
+        
+        ARestrict   = 1 << 3,
+        AKick       = 1 << 4,
+        
+        ColorORANGE  = 1 << 5,
+        ColorRED     = 1 << 6,
+        ColorBLUE    = 1 << 7,
         
         Donator = Default | ColorORANGE,
         CMod = Donator | CModSilence | ColorRED,
-        Admin =  CMod | ARestrict,
+        Admin =  CMod | ARestrict | AKick,
         Developer = Admin | ColorBLUE
     }
 }
