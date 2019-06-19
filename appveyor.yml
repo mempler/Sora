@@ -3,12 +3,13 @@ pull_requests:
   do_not_increment_build_number: true
 
 clone_depth: 1
-image: Visual Studio 2017
+image: Visual Studio 2019 Preview
 configuration: Debug
+platform: x64
 
 environment:
-    WEBHOOK_URL:
-        secure: 5iyntOmaNX1ztZQHITwehOjGHrTQW9SzqnqigVtYWGs5hbJk6nhzxfw8G+TZiTboZ4Ma04xW7pDcjBjMHEui2FMjuf8raJPFTzR/sE6Xd+Q4CicdfBOdl2cbRmF8XFYtagf4n/K7U1QPVw/0QNetAGbuxZd2r8y4j44IV3FQuHE=
+  WEBHOOK_URL:
+    secure: 5iyntOmaNX1ztZQHITwehOjGHrTQW9SzqnqigVtYWGs5hbJk6nhzxfw8G+TZiTboZ4Ma04xW7pDcjBjMHEui2FMjuf8raJPFTzR/sE6Xd+Q4CicdfBOdl2cbRmF8XFYtagf4n/K7U1QPVw/0QNetAGbuxZd2r8y4j44IV3FQuHE=
 
 cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
@@ -18,11 +19,9 @@ install:
   - cmd: git submodule update --init --recursive
   - cmd: choco install resharper-clt -y
   - cmd: choco install nvika -y
-  - cmd: choco install nodejs -y
-  
+
 before_build:
   - cmd: nuget restore -verbosity quiet
-  - cmd: npm install Sora/Jibril/ClientApp
 
 build:
   parallel: true
