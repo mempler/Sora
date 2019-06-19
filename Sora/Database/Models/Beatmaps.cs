@@ -123,11 +123,13 @@ namespace Sora.Database.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public static Beatmaps FetchFromApi(IConfig cfg, string fileMd5, int beatmapId = -1)
+        public static Beatmaps FetchFromApi(ICheesegullConfig cfg, string fileMd5, int beatmapId = -1)
         {
             Cheesegull cg = new Cheesegull(cfg);
+            
             if (!string.IsNullOrEmpty(fileMd5))
                 cg.SetBM(fileMd5);
+            
             else if (beatmapId != -1)
                 cg.SetBM(beatmapId);
 

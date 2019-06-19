@@ -79,7 +79,7 @@ namespace Sora.Controllers
                 Hex.ToHex(Crypto.GetMd5(
                               $"{fileMD5}{playMode}{mods}{type}{user.Id}{user.Username}"));
 
-            string cachedData = _cache.GetCachedString($"sora:Scoreboards:{cache_hash}");
+            string cachedData = _cache.Get<string>($"sora:Scoreboards:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
@@ -92,7 +92,7 @@ namespace Sora.Controllers
                                                type == ScoreboardType.Mods,
                                                mods);
 
-            _cache.CacheString($"sora:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(), 30);         
+            _cache.Set($"sora:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(), TimeSpan.FromSeconds(30));         
             
             return Ok(cachedData);
         }
@@ -478,7 +478,7 @@ namespace Sora.Controllers
 
             string cache_hash = Hex.ToHex(Crypto.GetMd5($"m{playMode}r{rankedStatus}p{page}q{query}"));
 
-            string cachedData = _cache.GetCachedString($"sora:DirectSearches:{cache_hash}");
+            string cachedData = _cache.Get<string>($"sora:DirectSearches:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
@@ -495,7 +495,7 @@ namespace Sora.Controllers
 
             Response.ContentType = "text/plain";
 
-            _cache.CacheString($"sora:DirectSearches:{cache_hash}", cachedData = cg.ToDirect(), 600);
+            _cache.Set($"sora:DirectSearches:{cache_hash}", cachedData = cg.ToDirect(), TimeSpan.FromMinutes(10));
             
             return Ok(cachedData);
         }
@@ -521,7 +521,7 @@ namespace Sora.Controllers
 
             string cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}|b{beatmapId}"));
 
-            string cachedData = _cache.GetCachedString($"sora:DirectNP:{cache_hash}");
+            string cachedData = _cache.Get<string>($"sora:DirectNP:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
@@ -541,7 +541,7 @@ namespace Sora.Controllers
 
             Response.ContentType = "text/plain";
 
-            _cache.CacheString($"sora:DirectNP:{cache_hash}", cachedData = cg.ToNP(), 600);
+            _cache.Set($"sora:DirectNP:{cache_hash}", cachedData = cg.ToNP(), TimeSpan.FromMinutes(10));
 
             return Ok(cachedData);
         }
@@ -556,7 +556,7 @@ namespace Sora.Controllers
             [FromQuery]ulong time)
         {
             string answer;
-            if ((answer = _cache.GetCachedString("sora:updater:" + action + qstream)) != null)
+            if ((answer = _cache.Get<string>("sora:updater:" + action + qstream)) != null)
                 return Ok(answer);
             
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create($"http://osu.ppy.sh/web/check-updates.php?action={action}&stream={qstream}&time={time}");
@@ -567,7 +567,7 @@ namespace Sora.Controllers
             using StreamReader    reader   = new StreamReader(stream ?? throw new Exception("Request Failed!"));
             
             string result = reader.ReadToEnd();
-            _cache.CacheString("sora:updater:" + action + qstream, result, 36000);
+            _cache.Set("sora:updater:" + action + qstream, result, TimeSpan.FromDays(1));
             return Ok(result);
         }
         #endregion

@@ -1,15 +1,84 @@
 using System;
 using System.IO;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace Sora.Helpers
 {
-    public class Config : IConfig
+    public class Config : IMySQLConfig, IServerConfig, ICheesegullConfig
     {
-        public CMySql MySql { get; set; }
-        public CRedis Redis { get; set; }
-        public CCheesegull Cheesegull { get; set; }
         public CServer Server { get; set; }
+        public CCheesegull Cheesegull { get; set; }
+        public CMySql MySql { get; set; }
+    }
+
+    public interface IMySQLConfig : IConfig
+    {
+        CMySql MySql { get; set; } 
+    }
+
+    public interface IServerConfig : IConfig
+    {
+        CServer Server { get; set; }
+    }
+
+    public interface ICheesegullConfig : IConfig
+    {
+        CCheesegull Cheesegull { get; set; }
+    }
+
+    public interface IConfig
+    {
+    }
+
+    public class ConfigUtil
+    {
+        private readonly IMemoryCache _cache;
+
+        public ConfigUtil(IMemoryCache cache)
+        {
+            _cache = cache;
+        }
+        
+        public T ReadConfig<T>(string cfgName = "config.json", T defaultConfig = default) where T : IConfig, new()
+        {
+            T c;
+            if ((c = _cache.Get<T>(cfgName)) != null)
+                return c;
+            
+            if (File.Exists(cfgName))
+            {
+                _cache.Set(cfgName, c = JsonConvert.DeserializeObject<T>(File.ReadAllText(cfgName)),
+                           TimeSpan.FromDays(365));
+                return c;
+            }
+            
+            c = defaultConfig;
+            
+            if (c == null)
+                c = new T();
+
+            File.WriteAllText(cfgName, JsonConvert.SerializeObject(c, Formatting.Indented));
+            Logger.Info($"Config {cfgName} has been created! please edit.");
+            Environment.Exit(0);
+            
+            return c;
+        }
+    }
+
+    public struct CCheesegull
+    {
+        public string URI;
+    }
+
+    public struct CMySql
+    {
+        public string Hostname;
+        public short Port;
+        
+        public string Username;
+        public string Password;
+        public string Database;
     }
 
     public struct CServer
@@ -17,78 +86,5 @@ namespace Sora.Helpers
         public string Hostname;
         public short Port;
         public bool FreeDirect;
-    }
-
-    public interface IConfig
-    {
-        CMySql MySql { get; set; }
-        CRedis Redis { get; set; }
-        CCheesegull Cheesegull { get; set; }
-        CServer Server { get; set; }
-    }
-
-    public static class ConfigUtil
-    {
-        public static T ReadConfig<T>(string cfgName = "config.json") where T : IConfig, new()
-        {
-            if (File.Exists(cfgName))
-            {
-                T r = JsonConvert.DeserializeObject<T>(File.ReadAllText(cfgName));
-                File.WriteAllText(cfgName,
-                                  JsonConvert.SerializeObject(r, Formatting.Indented)); // to Update Config
-                return r;
-            }
-
-            T cfg = new T();
-
-            cfg.MySql = new CMySql
-            {
-                Hostname = "localhost",
-                Username = "root",
-                Password = string.Empty,
-                Port     = 3306,
-                Database = "Sora"
-            };
-
-            cfg.Redis = new CRedis
-            {
-                Hostname = "localhost"
-            };
-
-            cfg.Cheesegull = new CCheesegull
-            {
-                Hostname = "https://pisstau.be"
-            };
-            cfg.Server = new CServer
-            {
-                Hostname = "localhost",
-                Port = 4312,
-                FreeDirect = true
-            };
-
-            File.WriteAllText(cfgName, JsonConvert.SerializeObject(cfg, Formatting.Indented));
-            Logger.Info("Config has been created! please edit.");
-            Environment.Exit(0);
-            return cfg;
-        }
-    }
-
-    public struct CRedis
-    {
-        public string Hostname;
-    }
-
-    public struct CCheesegull
-    {
-        public string Hostname;
-    }
-
-    public struct CMySql
-    {
-        public string Username;
-        public string Password;
-        public string Hostname;
-        public short Port;
-        public string Database;
     }
 }

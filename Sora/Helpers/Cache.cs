@@ -19,72 +19,32 @@
 #endregion
 
 using System;
-using System.Runtime.InteropServices;
-using StackExchange.Redis;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Sora.Helpers
 {
     public class Cache
     {
-        public Cache(IConfig config)
+        private readonly IMemoryCache _memoryCache;
+
+        public Cache(IMemoryCache memoryCache)
         {
-            Redis = ConnectionMultiplexer.Connect(config.Redis.Hostname);
-            if (!Redis.IsConnected)
-                throw new Exception("Failed to Connect to Redis!");
-        }
-        
-        private readonly ConnectionMultiplexer Redis;
-        
-        public bool CacheString(RedisKey key, string data, int duration = 300) // 5 Minutes.
-        {
-            return Redis.GetDatabase().StringSet(key, data, TimeSpan.FromSeconds(duration));
+            _memoryCache = memoryCache;
         }
 
-        public string GetCachedString(RedisKey key)
+        public void Set<T>(object key, T value, TimeSpan duration)
         {
-            return Redis.GetDatabase().StringGet(key);
-        }
-        
-        public void CacheStruct<T>(RedisKey key, ref T data, int duration = 1800) where T : struct
-        {
-            int    size   = Marshal.SizeOf(data);
-            IntPtr arrPtr = Marshal.AllocHGlobal(size);
-            
-            Marshal.StructureToPtr(data, arrPtr, true);
-            byte[] arr = new byte[size];
-            Marshal.Copy(arrPtr, arr, 0, size);
-            Marshal.FreeHGlobal(arrPtr);
+            MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(duration);
 
-            CacheData(key, arr);
+            _memoryCache.Set(key, value, cacheEntryOptions);
         }
 
-        public T GetCachedStruct<T>(RedisKey key) where T : struct
+        public T Get<T>(object key) where T : class
         {
-            byte[] arr = GetCachedData(key);
-            if (arr == null)
-                return default;
-            
-            T structure = new T();
-
-            int    size = Marshal.SizeOf<T>();
-            IntPtr ptr  = Marshal.AllocHGlobal(size);
-
-            Marshal.Copy(arr, 0, ptr, size);
-
-            structure = (T) Marshal.PtrToStructure(ptr, structure.GetType());
-            Marshal.FreeHGlobal(ptr);
-
-            return structure;
-        }
-
-        public bool CacheData(RedisKey key, byte[] data, int duration = 300)
-        {
-            return Redis.GetDatabase().StringSet(key, data, TimeSpan.FromSeconds(duration));
-        }
-
-        public byte[] GetCachedData(RedisKey key)
-        {
-            return Redis.GetDatabase().StringGet(key);
+            if (!_memoryCache.TryGetValue(key, out object obj))
+                return null;
+            return (T) obj;
         }
     }
 }

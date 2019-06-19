@@ -20,6 +20,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Sora.Database.Models;
 using Sora.Helpers;
@@ -28,17 +29,32 @@ namespace Sora.Database
 {
     public sealed class SoraDbContext : DbContext
     {
-        private readonly IConfig _config;
+        private class MySQLConfig : IMySQLConfig
+        {
+            public CMySql MySql { get; set; }
+        }
+        
+        private static MemoryCache _memoryCache;
+        
+        private readonly IMySQLConfig _config;
         private static readonly bool[] Migrated = {false};
 
         public SoraDbContext()
             : this(null) { }
 
-        public SoraDbContext(IConfig config = null)
+        public SoraDbContext(ConfigUtil cfgUtil = null, IMySQLConfig config = null)
         {
+            if (cfgUtil == null) {
+                if (_memoryCache == null)
+                    _memoryCache = new MemoryCache(new MemoryCacheOptions
+                    {
+                        ExpirationScanFrequency = TimeSpan.FromDays(365)
+                    });
+                cfgUtil = new ConfigUtil(_memoryCache);
+            }
             _config = config;
             if (config == null)
-                _config = ConfigUtil.ReadConfig<Config>();
+                _config = cfgUtil.ReadConfig<MySQLConfig>();
 
             if (Migrated[0]) return;
             lock (Migrated)

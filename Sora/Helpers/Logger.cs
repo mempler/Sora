@@ -24,7 +24,6 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Console = Colorful.Console;
 
 namespace Sora.Helpers

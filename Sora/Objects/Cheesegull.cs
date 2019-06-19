@@ -60,7 +60,7 @@ namespace Sora.Objects
 		    Loved = 4,
 	    }
 	    
-	    private readonly IConfig _cfg;
+	    private readonly ICheesegullConfig _cfg;
 	    private List<CheesegullBeatmapSet> _sets;
 	    private string _query;
 
@@ -87,7 +87,7 @@ namespace Sora.Objects
             }
         }
 
-        public Cheesegull(IConfig cfg)
+        public Cheesegull(ICheesegullConfig cfg)
         {
 	        _cfg = cfg;
         }
@@ -106,7 +106,7 @@ namespace Sora.Objects
 	        else pm = $"mode={playMode.ToString()}&";
 	        
 	        query = $"?{pm}amount={100}&offset={page*100}&status={rankedStatus}&query={query}";
-	        string request_url = _cfg.Cheesegull.Hostname + "/api/search" + query;
+	        string request_url = _cfg.Cheesegull.URI + "/api/search" + query;
 	        
 	        Logger.Debug($"{L_COL.YELLOW}Cheesegull {L_COL.WHITE}REQUEST_URI: {request_url}");
 
@@ -126,7 +126,7 @@ namespace Sora.Objects
 
         public void SetBMSet(int SetId)
         {
-	        string request_url = _cfg.Cheesegull.Hostname + "/api/s/" + SetId;
+	        string request_url = _cfg.Cheesegull.URI + "/api/s/" + SetId;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -143,7 +143,7 @@ namespace Sora.Objects
 
         public void SetBM(int BeatmapId)
         {
-	        string request_url = _cfg.Cheesegull.Hostname + "/api/b/" + BeatmapId;
+	        string request_url = _cfg.Cheesegull.URI + "/api/b/" + BeatmapId;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;
@@ -164,7 +164,7 @@ namespace Sora.Objects
 
         public void SetBM(string Hash)
         {
-	        string request_url = _cfg.Cheesegull.Hostname + "/api/hash/" + Hash;
+	        string request_url = _cfg.Cheesegull.URI + "/api/hash/" + Hash;
 
 	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
 	        request.AutomaticDecompression = DecompressionMethods.GZip;

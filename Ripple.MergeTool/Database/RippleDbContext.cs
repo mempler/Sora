@@ -1,5 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Ripple.MergeTool.Database.Model;
 using Sora.Helpers;
@@ -8,21 +9,27 @@ namespace Ripple.MergeTool.Database
 {
     public class RippleDbContext : DbContext
     {
+        private class MySQLConfig : IMySQLConfig
+        {
+            public CMySql MySql { get; set; }
+        }
+        
+        private static MemoryCache _memoryCache;
+        
         public struct CRipple
         {
             public string LetsBeatmapPath;
             public string LetsReplaysPath;
             public string LetsScreenshotPath;
         }
-        public class RippleConfig : IConfig
+        
+        public class RippleConfig : IMySQLConfig, ICheesegullConfig
         {
             public string SoraDataDirectory { get; set; }
             
             public CRipple CRipple { get; set; }
             public CMySql MySql { get; set; }
-            public CRedis Redis { get; set; }
             public CCheesegull Cheesegull { get; set; }
-            public CServer Server { get; set; }
         }
         
         public DbSet<RippleBeatmap> Beatmaps { get; set; }
@@ -31,7 +38,14 @@ namespace Ripple.MergeTool.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            RippleConfig config = ConfigUtil.ReadConfig<RippleConfig>("ripple.config.json");
+            if (_memoryCache == null)
+                _memoryCache = new MemoryCache(new MemoryCacheOptions
+                {
+                    ExpirationScanFrequency = TimeSpan.FromDays(365)
+                });
+            ConfigUtil cfgUtil = new ConfigUtil(_memoryCache);
+
+            MySQLConfig config = cfgUtil.ReadConfig<MySQLConfig>();
             
             if (config.MySql.Hostname == null)
                 Logger.Fatal("MySQL Hostname cannot be null!");

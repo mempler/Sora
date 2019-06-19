@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sora.Database;
@@ -34,21 +35,36 @@ namespace Sora
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore();
+            services.AddMemoryCache();
 
-            services.AddSingleton<IConfig>(ConfigUtil.ReadConfig<Config>())
-                    .AddSingleton(ConfigUtil.ReadConfig<Config>())
+            MemoryCache c = new MemoryCache(new MemoryCacheOptions
+            {
+                ExpirationScanFrequency = TimeSpan.FromDays(365)
+            });
+            ConfigUtil cfgUtil = new ConfigUtil(c);
+
+            Config scfg = cfgUtil.ReadConfig<Config>();
+                
+            services.AddSingleton(scfg)
+                    .AddSingleton<IConfig>(scfg)
+                    .AddSingleton<IMySQLConfig>(scfg)
+                    .AddSingleton<ICheesegullConfig>(scfg)
+                    .AddSingleton<IServerConfig>(scfg)
+                    
+                    .AddSingleton<ConfigUtil>()
                     .AddSingleton<SoraDbContextFactory>()
+                    
                     .AddSingleton<PluginService>()
                     .AddSingleton<PresenceService>()
                     .AddSingleton<MultiplayerService>()
                     .AddSingleton<PacketStreamService>()
+                    
                     .AddSingleton<Cache>()
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<ChannelService>()
                     .AddSingleton<Bot.Sora>()
                     .AddSingleton<PerformancePointsProcessor>()
-                    
-                    
+
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
 
             services.Configure<FormOptions>(x =>
@@ -141,6 +157,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
             if (!Directory.Exists("data"))
                 Directory.CreateDirectory("data");
+
+            app.UseDeveloperExceptionPage();
 
             app.UseMvc(routes =>
             {

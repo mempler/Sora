@@ -8,32 +8,20 @@ namespace Jibril.Controllers
     [Route("/ss/{screenshot}")]
     public class ScreenshotController : Controller
     {
-        private readonly Cache _cache;
-
-        public ScreenshotController(Cache cache)
-        {
-            _cache = cache;
-        }
-        
         [HttpGet]
         public IActionResult Index(string screenshot)
         {
+            Logger.Info($"data/screenshots/{screenshot}");
             if (!Directory.Exists("data/screenshots"))
                 Directory.CreateDirectory("data/screenshots");
-            
-            byte[] x = _cache.GetCachedData("sora:screenshots:" + screenshot);
-            
-            if (x != null)
-            {
-                return File(x, "image/jpg");
-            }
 
-            if (!System.IO.File.Exists("data/screenshots/" + screenshot))
-                return NotFound($"Could not find Screenshot with the ID of {screenshot}");
+            // No config reading for you :3
+            screenshot = screenshot.Replace("..", string.Empty);
+
+            if (!System.IO.File.Exists($"data/screenshots/{screenshot}"))
+                return NotFound($"Could not find ScreenShot with the Id of {screenshot}");
             
-            byte[] file = System.IO.File.ReadAllBytes("data/screenshots/" + screenshot);
-            _cache.CacheData("sora:screenshots:" + screenshot, file, 3600);
-            return File(file, "image/jpg");
+            return File(System.IO.File.OpenRead($"data/screenshots/{screenshot}"), "image/jpg");
         }
     }
 }

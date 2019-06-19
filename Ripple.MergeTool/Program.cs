@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Caching.Memory;
 using Ripple.MergeTool.Database;
 using Ripple.MergeTool.Database.Model;
 using Ripple.MergeTool.Tools;
@@ -14,11 +15,22 @@ namespace Ripple.MergeTool
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static MemoryCache _memoryCache;
+        
+        private static void Main()
         {
             Logger.Info("Ripple Merger v0.0.1a");
 
-            RippleDbContext.RippleConfig cfg = ConfigUtil.ReadConfig<RippleDbContext.RippleConfig>("ripple.config.json");
+            if (_memoryCache == null)
+                _memoryCache = new MemoryCache(new MemoryCacheOptions
+                {
+                    ExpirationScanFrequency = TimeSpan.FromDays(365)
+                });
+            ConfigUtil cfgUtil = new ConfigUtil(_memoryCache);
+
+            RippleDbContext.RippleConfig cfg =
+                cfgUtil.ReadConfig<RippleDbContext.RippleConfig>();
+
             SoraDbContextFactory factory = new SoraDbContextFactory();
             RippleDbContext rippleCtx = new RippleDbContext();
             

@@ -85,7 +85,7 @@ namespace Sora.Objects
             packetList = new List<IPacket>();
         }
 
-        public string Token { get; }
+        public string Token { get; set; }
 
         // ReSharper disable once MemberCanBeMadeStatic.Global
         public uint Rank = 0;

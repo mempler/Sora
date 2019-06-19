@@ -9,12 +9,13 @@ namespace Sora.Helpers
 {
     public static class BeatmapDownloader
     {
-        public static string GetBeatmap(string hash, IConfig cfg)
+        public static string GetBeatmap(string hash, ICheesegullConfig cfg)
         {
             if (!Directory.Exists("data/beatmaps"))
                 Directory.CreateDirectory("data/beatmaps");
 
-            if (File.Exists($"data/beatmaps/{hash}")) return $"data/beatmaps/{hash}";
+            if (File.Exists($"data/beatmaps/{hash}"))
+                return $"data/beatmaps/{hash}";
             
             Cheesegull cg = new Cheesegull(cfg);
             cg.SetBM(hash);
@@ -33,7 +34,10 @@ namespace Sora.Helpers
             using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
             {
                 string result = reader.ReadToEnd();
-                if (result.Length < 1) return string.Empty;
+                
+                if (result.Length < 1)
+                    return string.Empty;
+                
                 File.WriteAllText($"data/beatmaps/{hash}", result);
             }
 

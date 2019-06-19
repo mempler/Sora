@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Sora.Database;
 using Sora.Database.Models;
@@ -25,7 +26,7 @@ namespace Sora.Controllers
         public IActionResult Index(string achievement)
         {
             byte[] res;
-            if ((res = _cache.GetCachedData("jibril:achievements:"+achievement)) != null)
+            if ((res = _cache.Get<byte[]>($"jibril:achievements:{achievement}")) != null)
                 return File(res, "image/png");
             
             res = Achievements
@@ -35,7 +36,7 @@ namespace Sora.Controllers
             if (res == null)
                 return NotFound();
             
-            _cache.CacheData("sora:achievements:" + achievement, res, 3600);
+            _cache.Set("sora:achievements:" + achievement, res, TimeSpan.FromHours(1));
             return File(res, "image/png");
         }
     }
