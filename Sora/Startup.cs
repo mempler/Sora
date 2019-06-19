@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,9 @@ namespace Sora
             ConfigUtil cfgUtil = new ConfigUtil(c);
 
             Config scfg = cfgUtil.ReadConfig<Config>();
+
+            SoraDbContextFactory f = new SoraDbContextFactory();
+            f.Get().Migrate();
                 
             services.AddSingleton(scfg)
                     .AddSingleton<IConfig>(scfg)
@@ -119,7 +123,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 %#800000%==========================================================================
 
 ");
-
             Stopwatch w = new Stopwatch();
             Logger.Info("Generating %#F94848%Database%#FFFFFF%! this could take a while.");
             w.Start();
@@ -131,7 +134,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     Username   = "Sora",
                     Email      = "bot@gigamons.de",
                     Password   = "",
-                    Privileges = Privileges.Admin
+                    Permissions = Permission.From(Permission.GROUP_ADMIN)
                 });
             w.Stop();
             Logger.Info("Done, it took%#3cfc59%", w.ElapsedMilliseconds + "ms");

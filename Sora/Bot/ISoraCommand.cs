@@ -11,7 +11,7 @@ namespace Sora.Bot
         string Description { get; }
         List<Argument> Args { get; }
         int ExpectedArgs { get; }
-        Privileges RequiredPrivileges { get; }
+        Permission RequiredPermission { get; }
         
         bool Execute(Presence executer, string[] args);
     }

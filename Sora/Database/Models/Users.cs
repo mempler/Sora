@@ -18,12 +18,12 @@
 */
 #endregion
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Sora.Enums;
 using Sora.Helpers;
 
 namespace Sora.Database.Models
@@ -42,9 +42,17 @@ namespace Sora.Database.Models
 
         [Required]
         public string Email { get; set; }
-
+        
+        [NotMapped]
+        public Permission Permissions { get; set; } = new Permission();
+        
         [Required]
-        public Privileges Privileges { get; set; } = 0;
+        [MaxLength]
+        [DefaultValue("none")]
+        public string AcquiredPermissions {
+            get => Permissions?.ToString() ?? string.Empty;
+            set => Permissions?.Add(value.Split(", "));
+        }
 
         [Required]
         public ulong Achievements { get; set; } = 0;
@@ -74,7 +82,7 @@ namespace Sora.Database.Models
         public static Users NewUser(
             SoraDbContextFactory factory,
             
-            string username, string password, string email = "", Privileges privileges = 0,
+            string username, string password, string email = "", Permission permissions = null,
             
             bool insert = true
             )
@@ -89,7 +97,7 @@ namespace Sora.Database.Models
                 Username   = username,
                 Password   = bcryptPass,
                 Email      = email,
-                Privileges = privileges
+                Permissions = permissions ?? new Permission()
             };
             
             if (insert)
@@ -99,9 +107,7 @@ namespace Sora.Database.Models
         }
 
         public override string ToString()
-            => $"ID: {Id}, Email: {Email}, Privileges: {Privileges}";
-
-        public bool HasPrivileges(Privileges privileges) => (Privileges & privileges) != 0;
+            => $"ID: {Id}, Email: {Email}, Privileges: {Permissions}";
 
         public void ObtainAchievement(SoraDbContextFactory factory, Achievements ach)
         {

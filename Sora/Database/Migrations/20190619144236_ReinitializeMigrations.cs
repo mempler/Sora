@@ -1,28 +1,6 @@
-﻿#region LICENSE
-/*
-    Sora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-#endregion
-
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-
-// ReSharper disable All
 
 namespace Sora.Database.Migrations
 {
@@ -32,6 +10,23 @@ namespace Sora.Database.Migrations
         {
             migrationBuilder.Sql($@"ALTER DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
             
+            migrationBuilder.CreateTable(
+                name: "Achievements",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BitId = table.Column<ulong>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    DisplayName = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: false),
+                    IconURI = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Achievements", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Beatmaps",
                 columns: table => new
@@ -105,35 +100,27 @@ namespace Sora.Database.Migrations
                     RankedScoreOsu = table.Column<ulong>(nullable: false),
                     RankedScoreTaiko = table.Column<ulong>(nullable: false),
                     RankedScoreCtb = table.Column<ulong>(nullable: false),
-                    RankedScoreMania = table.Column<ulong>(nullable: false),
                     TotalScoreOsu = table.Column<ulong>(nullable: false),
                     TotalScoreTaiko = table.Column<ulong>(nullable: false),
                     TotalScoreCtb = table.Column<ulong>(nullable: false),
-                    TotalScoreMania = table.Column<ulong>(nullable: false),
                     Count300Osu = table.Column<ulong>(nullable: false),
                     Count300Taiko = table.Column<ulong>(nullable: false),
                     Count300Ctb = table.Column<ulong>(nullable: false),
-                    Count300Mania = table.Column<ulong>(nullable: false),
                     Count100Osu = table.Column<ulong>(nullable: false),
                     Count100Taiko = table.Column<ulong>(nullable: false),
                     Count100Ctb = table.Column<ulong>(nullable: false),
-                    Count100Mania = table.Column<ulong>(nullable: false),
                     Count50Osu = table.Column<ulong>(nullable: false),
                     Count50Taiko = table.Column<ulong>(nullable: false),
                     Count50Ctb = table.Column<ulong>(nullable: false),
-                    Count50Mania = table.Column<ulong>(nullable: false),
                     CountMissOsu = table.Column<ulong>(nullable: false),
                     CountMissTaiko = table.Column<ulong>(nullable: false),
                     CountMissCtb = table.Column<ulong>(nullable: false),
-                    CountMissMania = table.Column<ulong>(nullable: false),
                     PlayCountOsu = table.Column<ulong>(nullable: false),
                     PlayCountTaiko = table.Column<ulong>(nullable: false),
                     PlayCountCtb = table.Column<ulong>(nullable: false),
-                    PlayCountMania = table.Column<ulong>(nullable: false),
                     PerformancePointsOsu = table.Column<double>(nullable: false),
                     PerformancePointsTaiko = table.Column<double>(nullable: false),
-                    PerformancePointsCtb = table.Column<double>(nullable: false),
-                    PerformancePerformance = table.Column<double>(nullable: false)
+                    PerformancePointsCtb = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,7 +209,8 @@ namespace Sora.Database.Migrations
                     Username = table.Column<string>(nullable: false),
                     Password = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
-                    Privileges = table.Column<int>(nullable: false)
+                    AcquiredPermissions = table.Column<string>(nullable: false),
+                    Achievements = table.Column<ulong>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -245,6 +233,9 @@ namespace Sora.Database.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Achievements");
+
             migrationBuilder.DropTable(
                 name: "Beatmaps");
 

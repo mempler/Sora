@@ -37,7 +37,6 @@ namespace Sora.Database
         private static MemoryCache _memoryCache;
         
         private readonly IMySQLConfig _config;
-        private static readonly bool[] Migrated = {false};
 
         public SoraDbContext()
             : this(null) { }
@@ -55,14 +54,6 @@ namespace Sora.Database
             _config = config;
             if (config == null)
                 _config = cfgUtil.ReadConfig<MySQLConfig>();
-
-            if (Migrated[0]) return;
-            lock (Migrated)
-            {
-                if (Migrated[0]) return;
-                Database.Migrate();
-                Migrated[0] = true;
-            }
         }
        
 
@@ -93,6 +84,9 @@ namespace Sora.Database
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<BeatmapSets> BeatmapSets { get; set; }
 
+
+        public void Migrate() => Database.Migrate();
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (_config.MySql.Hostname == null)

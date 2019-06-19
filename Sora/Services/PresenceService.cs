@@ -24,7 +24,6 @@ using System.Threading;
 using JetBrains.Annotations;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Helpers;
 using Sora.Objects;
 
 namespace Sora.Services
@@ -91,16 +90,16 @@ namespace Sora.Services
                 if (presence == null) return;
                 
                 presence.ClientPermissions |= LoginPermissions.User;
-                if (presence.User.HasPrivileges(Privileges.ColorORANGE))
+                if (presence.User.Permissions == Permission.COLOR_ORANGE)
                     presence.ClientPermissions |= LoginPermissions.Supporter;
-                if (presence.User.HasPrivileges(Privileges.ColorRED))
+                if (presence.User.Permissions == Permission.COLOR_RED)
                 {
-                    if (presence.User.HasPrivileges(Privileges.ColorORANGE))
+                    if (presence.User.Permissions == Permission.COLOR_ORANGE)
                         presence.ClientPermissions -= LoginPermissions.Supporter;
                     presence.ClientPermissions |= LoginPermissions.BAT;
                 }
-                if (presence.User.HasPrivileges(Privileges.ColorBLUE)) {
-                    if (presence.User.HasPrivileges(Privileges.ColorRED))
+                if (presence.User.Permissions == Permission.COLOR_BLUE) {
+                    if (presence.User.Permissions == Permission.COLOR_RED)
                         presence.ClientPermissions -= LoginPermissions.BAT;
                     presence.ClientPermissions |= LoginPermissions.Developer;
                 }

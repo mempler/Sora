@@ -19,13 +19,10 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Markdig.Helpers;
 using MaxMind.GeoIP2.Responses;
-using Microsoft.Extensions.Caching.Memory;
 using Sora.Attributes;
 using Sora.Database;
 using Sora.Enums;
@@ -40,7 +37,6 @@ using Localisation = Sora.Helpers.Localisation;
 using Logger = Sora.Helpers.Logger;
 using MStreamWriter = Sora.Helpers.MStreamWriter;
 using PlayMode = Sora.Enums.PlayMode;
-using Privileges = Sora.Enums.Privileges;
 using Users = Sora.Database.Models.Users;
 
 namespace Sora.Events.BanchoEvents.Friends
@@ -227,7 +223,7 @@ namespace Sora.Events.BanchoEvents.Friends
 
                 foreach (Channel chanAuto in _cs.ChannelsAutoJoin)
                 {
-                    if (chanAuto.AdminOnly && args.pr.User.HasPrivileges(Privileges.Admin))
+                    if (chanAuto.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)
                         args.pr.Write(new ChannelAvailableAutojoin(chanAuto));
                     else if (!chanAuto.AdminOnly)
                         args.pr.Write(new ChannelAvailableAutojoin(chanAuto));
@@ -239,7 +235,7 @@ namespace Sora.Events.BanchoEvents.Friends
                 }
 
                 foreach ((string _, Channel value) in _cs.Channels)
-                    if (value.AdminOnly && args.pr.User.HasPrivileges(Privileges.Admin))
+                    if (value.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)
                         args.pr.Write(new ChannelAvailable(value));
                     else if (!value.AdminOnly)
                         args.pr.Write(new ChannelAvailable(value));

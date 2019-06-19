@@ -21,7 +21,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Sora.Packets.Server;
-using Privileges = Sora.Enums.Privileges;
 
 namespace Sora.Objects
 {
@@ -72,7 +71,7 @@ namespace Sora.Objects
 
         public bool JoinChannel(Presence pr)
         {
-            if (AdminOnly && (pr.User.Privileges & Privileges.Admin) != 0)
+            if (AdminOnly && pr.User.Permissions == Permission.ADMIN_CHANNEL)
             {
                 _mut.WaitOne();
                 _presences.Remove(pr);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Sora.Attributes;
 using Sora.Bot.Commands;
@@ -17,7 +16,6 @@ using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
 using Logger = Sora.Helpers.Logger;
 using Mod = Sora.Enums.Mod;
 using PlayMode = Sora.Enums.PlayMode;
-using Privileges = Sora.Enums.Privileges;
 using Users = Sora.Database.Models.Users;
 
 namespace Sora.Bot
@@ -30,7 +28,7 @@ namespace Sora.Bot
         public string Description;
         public List<Argument> Args;
         public int ExpectedArgs;
-        public Privileges RequiredPrivileges;
+        public Permission RequiredPermission;
         public SoraCommandExecution Callback;
     }
     
@@ -93,7 +91,7 @@ namespace Sora.Bot
                     Command = cls.Command,
                     Description = cls.Description,
                     ExpectedArgs = cls.ExpectedArgs,
-                    RequiredPrivileges = cls.RequiredPrivileges,
+                    RequiredPermission = cls.RequiredPermission,
                     Callback = cls.Execute
                 });
         }
@@ -202,7 +200,7 @@ namespace Sora.Bot
                 IEnumerable<SoraCommand> cmds = GetCommands(args.Message.Message.TrimStart('!'));
                 foreach (SoraCommand cmd in cmds)
                 {
-                    if (!args.pr.User.HasPrivileges(cmd.RequiredPrivileges))
+                    if (args.pr.User.Permissions != cmd.RequiredPermission)
                         continue;
                     
                     List<string> l = args.Message.Message.TrimStart('!').Split(" ")[1..].ToList();

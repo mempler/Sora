@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.Internal;
 using Sora.Database;
 using Sora.Helpers;
 using Console = Colorful.Console;
 using Logger = Sora.Helpers.Logger;
-using Privileges = Sora.Enums.Privileges;
 using Users = Sora.Database.Models.Users;
 
 namespace Sora.Services
@@ -117,13 +117,13 @@ namespace Sora.Services
                     },
                     new Argument
                     {
-                        ArgName  = "Privileges"
+                        ArgName  = "Permissions"
                     }
                 },
                 3,
                 args =>
                 {
-                    Users u = Users.NewUser(factory, args[0], args[1], args[2], (Privileges) (args.Length > 3 ? Convert.ToInt32(args[3]) : 0));
+                    Users u = Users.NewUser(factory, args[0], args[1], args[2], Permission.From(args[3..].Join(", ")));
                     Logger.Info("Created User",
                                 "%#F94848%" + u.Username,
                                 "%#B342F4%(", Users.GetUserId(factory, u.Username), "%#B342F4%)");

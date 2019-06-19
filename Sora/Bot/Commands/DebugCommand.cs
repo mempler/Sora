@@ -18,7 +18,7 @@ namespace Sora.Bot.Commands
 
         public int ExpectedArgs => 0;
 
-        public Privileges RequiredPrivileges => Privileges.Developer;
+        public Permission RequiredPermission => Permission.From(Permission.GROUP_DEVELOPER);
 
         public bool Execute(Presence executor, string[] args)
         {

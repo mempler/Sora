@@ -24,10 +24,8 @@ namespace Sora.Bot.Commands
                 ArgName  = "Reason"
             }
         };
-
         public int ExpectedArgs => 3;
-
-        public Privileges RequiredPrivileges => Privileges.ARestrict;
+        public Permission RequiredPermission => Permission.From(Permission.ADMIN_RESTRICT);
         public bool Execute(Presence executor, string[] args)
         {
             throw new System.NotImplementedException();
