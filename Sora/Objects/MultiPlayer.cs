@@ -21,6 +21,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using Sora.Allocation;
 using Sora.Enums;
 using Sora.Packets.Server;
 using Sora.Services;
@@ -34,7 +35,7 @@ using PlayMode = Sora.Enums.PlayMode;
 
 namespace Sora.Objects
 {
-    public class MultiplayerSlot
+    public class MultiplayerSlot : DynamicValues
     {
         public Mod Mods;
         public MultiSlotStatus Status;

@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Sora.Allocation;
 using Sora.Enums;
 using Sora.Packets.Client;
 using Sora.Packets.Server;
@@ -35,10 +36,8 @@ using Users = Sora.Database.Models.Users;
 
 namespace Sora.Objects
 {
-    public class Presence : IComparable
+    public class Presence : DynamicValues, IComparable
     {
-        private readonly Dictionary<object, object> _customValues = new Dictionary<object, object>();
-        
         private readonly ChannelService _cs;
         //public bool Disconnected;
 
@@ -144,24 +143,6 @@ namespace Sora.Objects
         public void Alert(string Message)
         {
             Write(new Announce(Message));
-        }
-
-        public object this[object key]
-        {
-            get => !_customValues.TryGetValue(key, out object val) ? default : val;
-            set => _customValues[key] = value;
-        }
-
-        public void Set<T>(object Key, T value)
-        {
-            _customValues[Key] = value;
-        }
-
-        public T Get<T>(object Key)
-        {
-            if (!_customValues.TryGetValue(Key, out object val))
-                return default;
-            return (T) val;
         }
     }
 }

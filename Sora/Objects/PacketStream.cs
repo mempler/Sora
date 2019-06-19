@@ -20,12 +20,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Sora.Allocation;
 using IPacket = Sora.Interfaces.IPacket;
 using Logger = Sora.Helpers.Logger;
 
 namespace Sora.Objects
 {
-    public class PacketStream
+    public class PacketStream : DynamicValues
     {
         private readonly Dictionary<string, Presence> _joinedPresences = new Dictionary<string, Presence>();
 

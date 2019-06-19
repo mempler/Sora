@@ -20,11 +20,12 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using Sora.Allocation;
 using Sora.Packets.Server;
 
 namespace Sora.Objects
 {
-    public class Channel
+    public class Channel : DynamicValues
     {
         private readonly Mutex _mut = new Mutex();
         private readonly List<Presence> _presences = new List<Presence>(); // should be { get; } maybe ?
