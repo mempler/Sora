@@ -77,5 +77,9 @@ namespace Sora.Enums
         BanchoSpecialLeaveMatchChannel,
 
         #endregion
+        
+        #region Other
+        AntiCheat
+        #endregion
     }
 }
