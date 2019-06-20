@@ -131,14 +131,18 @@ namespace Sora.Objects
 
         public bool TimeoutCheck() => LastRequest.Elapsed.Seconds > 60;
 
-        public void Write(IPacket p)
+        public Presence Write(IPacket p)
         {
-            if (BotPresence) return;
-            if (p == null) return;
+            if (BotPresence) return this;
+            if (p == null) return this;
             
             lock(packetList)
                 packetList.Add(p);
+
+            return this;
         }
+
+        public static Presence operator +(Presence instance, IPacket p) => instance.Write(p); 
 
         public void Alert(string Message)
         {

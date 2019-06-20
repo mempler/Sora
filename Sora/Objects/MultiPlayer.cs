@@ -19,6 +19,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using Sora.Allocation;
@@ -261,6 +262,7 @@ namespace Sora.Objects
             ClearSlot(slot);
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")]
         public void Broadcast(IPacket packet)
         {
             foreach (MultiplayerSlot slot in Slots.Where(x => x.UserId != -1))
@@ -269,22 +271,23 @@ namespace Sora.Objects
                 if (pr == null)
                     Leave(slot.UserId);
                 else
-                    pr.Write(packet);
+                    pr += packet;
             }
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")]
         public void Invite(Presence pr, Presence opr)
         {
             // Took me a while to figure out. i tried osu://mp/matchid/Password.Replace(" ", "_");
             string inviteUri = $"osump://{MatchId}/{Password.Replace(" ", "_")}";
     
-            opr.Write(new Invite(new MessageStruct
+            opr += new Invite(new MessageStruct
             {
                 ChannelTarget = pr.User.Username,
                 Message       = $"\0Hey, I want to play with you! Join me [{inviteUri} {Name}]",
                 Username      = pr.User.Username,
                 SenderId      = opr.User.Id
-            }));
+            });
         }
 
         public void SetSlot(

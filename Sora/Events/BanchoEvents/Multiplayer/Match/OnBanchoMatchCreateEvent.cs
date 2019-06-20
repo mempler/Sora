@@ -52,9 +52,9 @@ namespace Sora.Events.BanchoEvents.Multiplayer
                         "%#B342F4%(", args.room.MatchId, "%#B342F4%)");
 
             if (args.room.Join(args.pr, args.room.Password))
-                args.pr.Write(new MatchJoinSuccess(args.room));
+                args.pr += new MatchJoinSuccess(args.room);
             else
-                args.pr.Write(new MatchJoinFail());
+                args.pr += new MatchJoinFail();
             
             args.room.Update();
 

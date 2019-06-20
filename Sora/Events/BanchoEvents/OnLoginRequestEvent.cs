@@ -21,7 +21,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using MaxMind.GeoIP2.Responses;
 using Sora.Attributes;
 using Sora.Database;
@@ -39,17 +38,17 @@ using MStreamWriter = Sora.Helpers.MStreamWriter;
 using PlayMode = Sora.Enums.PlayMode;
 using Users = Sora.Database.Models.Users;
 
-namespace Sora.Events.BanchoEvents.Friends
+namespace Sora.Events.BanchoEvents
 {
     [EventClass]
     public class OnLoginRequestEvent
     {
         private readonly SoraDbContextFactory _factory;
         private readonly Config _cfg;
-        private readonly PresenceService _pcs;
         private readonly PacketStreamService _ps;
         private readonly ChannelService _cs;
         private readonly Cache _cache;
+        private PresenceService _pcs;
 
         public OnLoginRequestEvent(SoraDbContextFactory factory,
                                    Config cfg,
@@ -64,65 +63,6 @@ namespace Sora.Events.BanchoEvents.Friends
             _ps = ps;
             _cs = cs;
             _cache = cache;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        private struct CachableUser
-        {
-            public int Id;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-            public string Username;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-            public string Email;
-            
-            public int Privil;
-            public ulong Achievements;
-            
-            public byte CountryId;
-            public double lon;
-            public double lat;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        private struct CachableLeaderboard
-        {
-            public int Id;
-            public ulong RankedScoreOsu;
-            public ulong RankedScoreTaiko;
-            public ulong RankedScoreCtb;
-            public ulong RankedScoreMania;
-            public ulong TotalScoreOsu;
-            public ulong TotalScoreTaiko;
-            public ulong TotalScoreCtb;
-            public ulong TotalScoreMania;
-            public ulong Count300Osu;
-            public ulong Count300Taiko;
-            public ulong Count300Ctb;
-            public ulong Count300Mania;
-            public ulong Count100Osu;
-            public ulong Count100Taiko;
-            public ulong Count100Ctb;
-            public ulong Count100Mania;
-            public ulong Count50Osu;
-            public ulong Count50Taiko;
-            public ulong Count50Ctb;
-            public ulong Count50Mania;
-            public ulong CountMissOsu;
-            public ulong CountMissTaiko;
-            public ulong CountMissCtb;
-            public ulong CountMissMania;
-            public ulong PlayCountOsu;
-            public ulong PlayCountTaiko;
-            public ulong PlayCountCtb;
-            public ulong PlayCountMania;
-            public double PerformancePointsOsu;
-            public double PerformancePointsTaiko;
-            public double PerformancePointsCtb;
-            public double PerformancePointsMania;
-
-            public uint Rank;
         }
 
         [Event(EventType.BanchoLoginRequest)]
@@ -196,49 +136,49 @@ namespace Sora.Events.BanchoEvents.Friends
                     args.pr.Token = t;
                 }
 
-                _pcs.BeginPresence(args.pr);
+                _pcs += args.pr;
                 
                 Success(args.Writer, args.pr.User.Id);
 
-                args.pr.Write(new ProtocolNegotiation());
-                args.pr.Write(new UserPresence(args.pr));
-                args.pr.Write(new HandleUpdate(args.pr));
+                args.pr += new ProtocolNegotiation();
+                args.pr += new UserPresence(args.pr);
+                args.pr += new HandleUpdate(args.pr);
 
                 if ((args.pr.ClientPermissions & LoginPermissions.Supporter) == 0)
                 {
                     if (_cfg.Server.FreeDirect)
-                        args.pr.Write(new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter));
+                        args.pr += new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter);
                 }
                 else
-                    args.pr.Write(new LoginPermission(args.pr.ClientPermissions));
+                    args.pr += new LoginPermission(args.pr.ClientPermissions);
 
-                args.pr.Write(new FriendsList(Database.Models.Friends.GetFriends(_factory, args.pr.User.Id).ToList()));
-                args.pr.Write(new PresenceBundle(_pcs.GetUserIds(args.pr).ToList()));
+                args.pr += new FriendsList(Database.Models.Friends.GetFriends(_factory, args.pr.User.Id).ToList());
+                args.pr += new PresenceBundle(_pcs.GetUserIds(args.pr).ToList());
                 foreach (Presence opr in _pcs.AllPresences)
                 {
-                    args.pr.Write(new PresenceSingle(opr.User.Id));
-                    args.pr.Write(new UserPresence(opr));
-                    args.pr.Write(new HandleUpdate(opr));
+                    args.pr += new PresenceSingle(opr.User.Id);
+                    args.pr += new UserPresence(opr);
+                    args.pr += new HandleUpdate(opr);
                 }
 
                 foreach (Channel chanAuto in _cs.ChannelsAutoJoin)
                 {
                     if (chanAuto.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)
-                        args.pr.Write(new ChannelAvailableAutojoin(chanAuto));
+                        args.pr += new ChannelAvailableAutojoin(chanAuto);
                     else if (!chanAuto.AdminOnly)
-                        args.pr.Write(new ChannelAvailableAutojoin(chanAuto));
+                        args.pr += new ChannelAvailableAutojoin(chanAuto);
 
                     if (chanAuto.JoinChannel(args.pr))
-                        args.pr.Write(new ChannelJoinSuccess(chanAuto));
+                        args.pr += new ChannelJoinSuccess(chanAuto);
                     else
-                        args.pr.Write(new ChannelRevoked(chanAuto));
+                        args.pr += new ChannelRevoked(chanAuto);
                 }
 
                 foreach ((string _, Channel value) in _cs.Channels)
                     if (value.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)
-                        args.pr.Write(new ChannelAvailable(value));
+                        args.pr += new ChannelAvailable(value);
                     else if (!value.AdminOnly)
-                        args.pr.Write(new ChannelAvailable(value));
+                        args.pr += new ChannelAvailable(value);
                 
                 PacketStream stream = _ps.GetStream("main");
                 if (stream == null)

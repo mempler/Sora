@@ -49,7 +49,7 @@ namespace Sora.Objects
         public string ChannelName { get; }
         public string ChannelTopic { get; }
         public PacketStream BoundStream { get; }
-        public Presence BoundPresence { get; }
+        public Presence BoundPresence { get; private set; }
         public bool ReadOnly { get; set; }
         public bool AdminOnly { get; }
         public bool AutoJoin { get; }
@@ -113,7 +113,7 @@ namespace Sora.Objects
                 if (ReadOnly) return;
             if (BoundStream == null && BoundPresence != null)
             {
-                BoundPresence.Write(
+                BoundPresence += 
                     new SendIrcMessage(
                         new MessageStruct
                         {
@@ -121,8 +121,7 @@ namespace Sora.Objects
                             ChannelTarget = pr.User.Username,
                             Message       = message,
                             SenderId      = pr.User.Id
-                        })
-                );
+                        });
                 return;
             }
 

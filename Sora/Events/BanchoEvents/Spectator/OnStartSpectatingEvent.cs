@@ -46,17 +46,17 @@ namespace Sora.Events.BanchoEvents.Spectator
             {
                 opr.Spectator = new SpectatorStream($"spec-{args.SpectatorHostID}", opr);
                 opr.Spectator.Join(opr);
-                opr.Write(new ChannelJoinSuccess(opr.Spectator.SpecChannel));
+                opr += new ChannelJoinSuccess(opr.Spectator.SpecChannel);
             }
 
             args.pr.Spectator = opr.Spectator;
 
             opr.Spectator.Join(args.pr);
             if (opr.Spectator.SpecChannel.JoinChannel(args.pr))
-                args.pr.Write(new ChannelJoinSuccess(opr.Spectator.SpecChannel));
+                args.pr += new ChannelJoinSuccess(opr.Spectator.SpecChannel);
 
             opr.Spectator.Broadcast(new FellowSpectatorJoined(args.pr.User.Id));
-            opr.Write(new SpectatorJoined(args.pr.User.Id));
+            opr += new SpectatorJoined(args.pr.User.Id);
         }
     }
 }

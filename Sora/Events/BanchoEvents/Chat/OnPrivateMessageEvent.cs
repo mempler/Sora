@@ -51,7 +51,7 @@ namespace Sora.Events.BanchoEvents.Chat
    
             if (chan == null)
             {
-                args.pr.Write(new ChannelRevoked(args.Message.ChannelTarget));
+                args.pr += new ChannelRevoked(args.Message.ChannelTarget);
                 return;
             }
 

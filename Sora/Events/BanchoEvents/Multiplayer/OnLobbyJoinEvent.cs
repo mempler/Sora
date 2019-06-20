@@ -46,7 +46,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
             PacketStream                 lobbyStream = _ps.GetStream("lobby");
             IEnumerable<MultiplayerRoom> rooms       = _ms.GetRooms();
             foreach (MultiplayerRoom room in rooms)
-                args.pr.Write(new MatchNew(room));
+                args.pr += new MatchNew(room);
 
             lobbyStream.Join(args.pr);
         }

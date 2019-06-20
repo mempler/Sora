@@ -56,14 +56,14 @@ namespace Sora.Events.BanchoEvents.Chat
 
             if (channel == null)
             {
-                args.pr.Write(new ChannelRevoked(args.ChannelName));
+                args.pr += new ChannelRevoked(args.ChannelName);
                 return;
             }
 
             channel.LeaveChannel(args.pr); // leave channel before joining to fix some Issues.
 
             if (channel.JoinChannel(args.pr))
-                args.pr.Write(new ChannelJoinSuccess(channel));
+                args.pr += new ChannelJoinSuccess(channel);
 
             channel.BoundStream?.Broadcast(new ChannelAvailable(channel));
         }

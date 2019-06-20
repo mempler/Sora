@@ -44,9 +44,9 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         {
             MultiplayerRoom room = _ms.GetRoom(args.matchId);
             if (room != null && room.Join(args.pr, args.password.Replace(" ", "_")))
-                args.pr.Write(new MatchJoinSuccess(room));
+                args.pr += new MatchJoinSuccess(room);
             else
-                args.pr.Write(new MatchJoinFail());
+                args.pr += new MatchJoinFail();
 
             room?.Update();
             

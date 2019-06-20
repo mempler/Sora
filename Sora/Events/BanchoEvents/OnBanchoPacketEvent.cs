@@ -19,11 +19,12 @@
 #endregion
 
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Helpers;
+using Sora.Interfaces;
 using Sora.Objects;
 using Sora.Packets.Client;
 using Sora.Services;
@@ -55,7 +56,42 @@ namespace Sora.Events.BanchoEvents
             _ms = ms;
             _ps = ps;
         }
-        
+
+        private class EmptyPacket : IPacket
+        {
+            public void ReadFromStream(MStreamReader sr)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void WriteToStream(MStreamWriter sw)
+            {
+                throw new NotImplementedException();
+            }
+
+            public PacketId Id { get; }
+        }
+
+        /*
+        private object GetRightEventArgs(PacketId id)
+        {
+            IPacket p = new EmptyPacket();
+            IEnumerable<Type> packets = 
+                AppDomain.CurrentDomain
+                     .GetAssemblies()
+                     .SelectMany(t => t.GetTypes())
+                     .Where(t => t.IsClass && t.IsAssignableFrom(typeof(IPacket)))
+                     .Where(t =>
+                     {
+                         Logger.Info("Prop", t.GetProperty("Id"));
+                         return (PacketId) (t.GetProperty("Id")?.GetValue(p) ?? -1) == id;
+                     });
+
+            IEnumerable<object> inPack = packets.Select(Activator.CreateInstance);
+            return inPack.FirstOrDefault();
+        }
+        */
+
         [Event(EventType.BanchoPacket)]
         public async Task OnBanchoPacket(BanchoPacketArgs args)
         {
@@ -66,7 +102,7 @@ namespace Sora.Events.BanchoEvents
                     await _evmgr.RunEvent(
                         EventType.BanchoSendUserStatus,
                         new BanchoSendUserStatusArgs
-                            {pr = args.pr, status = args.Data.ReadData<SendUserStatus>().Status});
+                            { pr = args.pr, status = args.Data.ReadData<SendUserStatus>().Status });
                     break;
                 case PacketId.ClientPong:
                     await _evmgr.RunEvent(
@@ -76,7 +112,7 @@ namespace Sora.Events.BanchoEvents
                 case PacketId.ClientRequestStatusUpdate:
                     await _evmgr.RunEvent(
                         EventType.BanchoRequestStatusUpdate,
-                        new BanchoSendUserStatusArgs {pr = args.pr, status = args.pr.Status });
+                        new BanchoSendUserStatusArgs { pr = args.pr, status = args.pr.Status });
                     break;
                 case PacketId.ClientUserStatsRequest:
                     await _evmgr.RunEvent(
@@ -304,7 +340,6 @@ namespace Sora.Events.BanchoEvents
                     Logger.Debug(
                         $"PacketId: {args.PacketId} Length: {args.Data.BaseStream.Length} Data: {Hex.ToHex(args.Data.ReadToEnd())}");
                     break;
-
                 #endregion
             }
         }

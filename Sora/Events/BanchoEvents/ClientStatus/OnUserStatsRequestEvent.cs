@@ -48,15 +48,15 @@ namespace Sora.Events.BanchoEvents.ClientStatus
                 Presence opr = _ps.GetPresence(id);
                 if (opr == null)
                 {
-                    args.pr.Write(new HandleUserQuit(new UserQuitStruct
+                    args.pr += new HandleUserQuit(new UserQuitStruct
                     {
                         UserId     = id,
                         ErrorState = ErrorStates.Ok
-                    }));
+                    });
                     continue;
                 }
                 
-                args.pr.Write(new HandleUpdate(opr));
+                args.pr += new HandleUpdate(opr);
             }
         }
     }

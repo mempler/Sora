@@ -9,6 +9,7 @@
     <LangVersion>8</LangVersion>
 	<TieredCompilation>true</TieredCompilation>
 	<OutputType>Exe</OutputType>
+  <DebugType>full</DebugType>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">

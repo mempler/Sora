@@ -55,7 +55,7 @@ namespace Sora
             foreach (Assembly asm in _asma)
                 LoadAssembly(asm);
         }
-        
+
         public async Task RunEvent(EventType etype, IEventArgs args = null)
         {
             foreach (KeyValuePair<object, List<Tuple<EventType, List<MethodInfo>>>> evcls in _events)

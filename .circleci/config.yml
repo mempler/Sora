@@ -35,11 +35,6 @@ jobs:
           name: Build Server
           command: dotnet build Sora -c Release
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
 workflows:
   version: 2.1
   growserver:

@@ -35,12 +35,12 @@ namespace Sora.Events.BanchoEvents.Spectator
             if (args.pr?.Spectator == null) return;
             Presence opr = args.pr.Spectator.BoundPresence;
 
-            opr.Write(new FellowSpectatorLeft(args.pr.User.Id));
+            opr += new FellowSpectatorLeft(args.pr.User.Id);
             opr.Spectator.Broadcast(new SpectatorLeft(args.pr.User.Id));
 
             opr.Spectator.Left(args.pr);
             opr.Spectator.SpecChannel.LeaveChannel(args.pr);
-            args.pr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
+            args.pr += new ChannelRevoked(opr.Spectator.SpecChannel);
 
             args.pr.Spectator = null;
 
@@ -48,7 +48,7 @@ namespace Sora.Events.BanchoEvents.Spectator
 
             opr.Spectator.Left(opr);
             opr.Spectator.SpecChannel.LeaveChannel(opr);
-            opr.Write(new ChannelRevoked(opr.Spectator.SpecChannel));
+            opr += new ChannelRevoked(opr.Spectator.SpecChannel);
             opr.Spectator = null;
         }
     }

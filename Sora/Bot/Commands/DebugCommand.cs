@@ -36,7 +36,7 @@ namespace Sora.Bot.Commands
         public void OnBanchoPacketEvent(BanchoPacketArgs args)
         {
             if (args.pr.Get<bool>("IS_PACKET_DEBUGGING"))
-                args.pr.Write(new Announce($"PacketId: {args.PacketId}"));
+                args.pr += new Announce($"PacketId: {args.PacketId}");
         }
     }
 }

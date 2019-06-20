@@ -18,6 +18,7 @@
 */
 #endregion
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,14 +27,15 @@ using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Objects;
 
+#nullable enable
 namespace Sora.Services
 {
-    public class PresenceService
+    public class PresenceService : IEnumerable<Presence>
     {
         private readonly ChannelService _cs;
         private readonly EventManager _ev;
         
-        private readonly Dictionary<string, Presence> _presences = new Dictionary<string, Presence>();
+        private readonly Dictionary<string, Presence> _presences;
         public object Locker = new object();
 
         public IEnumerable<Presence> AllPresences
@@ -49,23 +51,24 @@ namespace Sora.Services
         {
             _cs = cs;
             _ev = ev;
+            _presences = new Dictionary<string, Presence>();
         }
         
-        public Presence GetPresence(string token)
+        public Presence? GetPresence(string token)
         {
             lock (Locker)
                 return _presences.TryGetValue(token, out Presence pr) ? pr : null;
         }
 
-        public Presence GetPresence(int userid)
+        public Presence? this[string token] => GetPresence(token);
+
+        public Presence? GetPresence(int userId)
         {
             lock (Locker)
-                foreach (KeyValuePair<string, Presence> presence in _presences)
-                    if (presence.Value.User.Id == userid)
-                        return presence.Value;
-
-            return null;
+                return _presences.FirstOrDefault(x => x.Value.User.Id == userId).Value;
         }
+
+        public Presence? this[int userId] => GetPresence(userId);
 
         [UsedImplicitly]
         public IEnumerable<int> GetUserIds()
@@ -82,62 +85,78 @@ namespace Sora.Services
                    .Select(z => z.Value.User.Id);
         }
 
-        public void BeginPresence(Presence presence)
+        public PresenceService BeginPresence(Presence presence)
         {
-            lock (Locker) {
-                // TODO: Add total playtime.
-                //presence.BeginSeason = DateTime.UtcNow;
-                if (presence == null) return;
-                
-                presence.ClientPermissions |= LoginPermissions.User;
+            if (presence == null)
+                return this;
+            
+            // TODO: Add total playtime.
+            //presence.BeginSeason = DateTime.UtcNow;
+            
+            presence.ClientPermissions |= LoginPermissions.User;
+            
+            if (presence.User.Permissions == Permission.COLOR_ORANGE)
+                presence.ClientPermissions |= LoginPermissions.Supporter;
+            if (presence.User.Permissions == Permission.COLOR_RED)
+            {
                 if (presence.User.Permissions == Permission.COLOR_ORANGE)
-                    presence.ClientPermissions |= LoginPermissions.Supporter;
-                if (presence.User.Permissions == Permission.COLOR_RED)
-                {
-                    if (presence.User.Permissions == Permission.COLOR_ORANGE)
-                        presence.ClientPermissions -= LoginPermissions.Supporter;
-                    presence.ClientPermissions |= LoginPermissions.BAT;
-                }
-                if (presence.User.Permissions == Permission.COLOR_BLUE) {
-                    if (presence.User.Permissions == Permission.COLOR_RED)
-                        presence.ClientPermissions -= LoginPermissions.BAT;
-                    presence.ClientPermissions |= LoginPermissions.Developer;
-                }
-                
-                presence.LastRequest.Start();
-                _presences.Add(presence.Token, presence);
-                _cs.AddChannel(new Channel(presence.User.Username, "", null, presence));
+                    presence.ClientPermissions -= LoginPermissions.Supporter;
+                presence.ClientPermissions |= LoginPermissions.BAT;
             }
+
+            if (presence.User.Permissions == Permission.COLOR_BLUE)
+            {
+                if (presence.User.Permissions == Permission.COLOR_RED)
+                    presence.ClientPermissions -= LoginPermissions.BAT;
+                presence.ClientPermissions |= LoginPermissions.Developer;
+            }
+
+            presence.LastRequest.Start();
+            _cs.AddChannel(new Channel(presence.User.Username, "", null, presence));
+            
+            lock (Locker) {
+                _presences.Add(presence.Token, presence);
+            }
+
+            return this;
         }
 
-        public void EndPresence(Presence pr, bool forceful)
+        public static PresenceService operator +(PresenceService instance, Presence pr) => instance.BeginPresence(pr);
+        public static PresenceService operator -(PresenceService instance, Presence pr) => instance.EndPresence(pr, true);
+
+        public PresenceService EndPresence(Presence pr, bool forceful)
         {
+            bool b;
             lock (Locker)
+                b = _presences.ContainsKey(pr.Token);
+            
+            if (forceful && b)
             {
-                if (forceful && _presences.ContainsKey(pr.Token))
-                {
-                    _cs.RemoveChannel(pr.PrivateChannel);
-
-                    foreach (PacketStream str in pr.JoinedStreams)
-                        str.Left(pr);
-
-                    #pragma warning disable 4014
-                    _ev.RunEvent(EventType.BanchoExit, new BanchoExitArgs {pr = pr, err = ErrorStates.Ok});
-                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs{ pr = pr});
-                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs{ pr = pr});
-                    _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs { pr = pr });
-                    #pragma warning restore 4014
-                    
-                    pr.LastRequest.Stop();
+                pr.LastRequest.Stop();
                 
+                _cs.RemoveChannel(pr.PrivateChannel);
+
+                foreach (PacketStream str in pr.JoinedStreams)
+                    str.Left(pr);
+
+                lock (Locker)
+                {
+                    #pragma warning disable 4014
+                    _ev.RunEvent(EventType.BanchoExit,
+                                 new BanchoExitArgs {pr = pr, err = ErrorStates.Ok});
+                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs {pr           = pr});
+                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs {pr           = pr});
+                    _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs {pr = pr});
+                    #pragma warning restore 4014
                     _presences.Remove(pr.Token);
-                    return;
                 }
+
+                return this;
             }
 
             pr["IS_LAST_REQUEST"] = true;
+            return this;
         }
-
         public void TimeoutCheck()
         {
             new Thread(() =>
@@ -157,17 +176,18 @@ namespace Sora.Services
 
                         foreach (Presence pr in toRemove)
                             EndPresence(pr, true);
-
-                        if (_presences == null) break;
                     }
                     catch
                     {
                         // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
                     }
 
-                    Thread.Sleep(1000); // wait a second. we don't want high cpu usage.
+                    Thread.Sleep(5000); // wait 5 seconds. we don't want high cpu usage.
                 }
             }).Start();
         }
+
+        public IEnumerator<Presence> GetEnumerator() => AllPresences.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -271,3 +271,4 @@ geoip/
 geoip
 data/
 Plugins/
+coverage.xml
