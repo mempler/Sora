@@ -24,6 +24,7 @@ before_build:
   - cmd: nuget restore -verbosity quiet
 
 build:
+  project: Sora
   parallel: true
   verbosity: minimal
 
