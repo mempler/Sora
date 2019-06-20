@@ -14,6 +14,12 @@ jobs:
   Build:
     executor: build_executor
     steps:
+      - run:
+          name: "Install Git"
+          command: |
+            apk update
+            apk upgrade
+            apk add --no-cache git
       - checkout
       - run:
           name: "Pull Submodules"
