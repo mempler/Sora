@@ -1,0 +1,41 @@
+version: 2.1
+
+general:
+  branches:
+    only:
+      - master
+
+executors:
+  build_executor:
+    docker:
+      - image: mcr.microsoft.com/dotnet/core-nightly/sdk:3.0.100-preview6-alpine3.9
+
+jobs:
+  Build:
+    executor: build_executor
+    steps:
+      - checkout
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule update --init --recursive
+            git submodule foreach --recursive git fetch
+            git submodule foreach git pull --ff-only origin master
+      - run:
+          name: Prepare NuGet
+          command: |
+            dotnet restore
+      - run:
+          name: Build Server
+          command: dotnet build Sora -c Release
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+workflows:
+  version: 2.1
+  growserver:
+    jobs:
+      - Build
