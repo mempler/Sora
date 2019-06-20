@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -41,27 +43,25 @@ namespace Sora.Database.Models
         [UsedImplicitly]
         public int FriendId { get; set; }
 
-        public static IEnumerable<int> GetFriends(SoraDbContextFactory factory, int userId) =>
-            factory.Get()
-                .Friends
-                .Where(t => t.UserId == userId)
-                .Select(x => x.FriendId).ToList();
+        public static IEnumerable<int> GetFriends(SoraDbContextFactory factory, int userId)
+        {
+            return factory.Get()
+                          .Friends
+                          .Where(t => t.UserId == userId)
+                          .Select(x => x.FriendId).ToList();
+        }
 
         public static void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            db.Context.Friends.Add(new Friends
-            {
-                UserId   = userId,
-                FriendId = friendId
-            });
+            using var db = factory.GetForWrite();
+
+            db.Context.Friends.Add(new Friends {UserId = userId, FriendId = friendId});
         }
 
         public static void RemoveFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
         }
     }

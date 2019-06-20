@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,13 +17,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Database;
+using Sora.Database.Models;
 using Sora.EventArgs;
-using Logger = Sora.Helpers.Logger;
-using Users = Sora.Database.Models.Users;
+using Sora.Helpers;
 
 namespace Sora.Events.BanchoEvents.Friends
 {
@@ -31,22 +33,21 @@ namespace Sora.Events.BanchoEvents.Friends
     {
         private readonly SoraDbContextFactory _factory;
 
-        public OnFriendAddEvent(SoraDbContextFactory factory)
-        {
-            _factory = factory;
-        }
-        
+        public OnFriendAddEvent(SoraDbContextFactory factory) => _factory = factory;
+
         public void OnFriendAdd(BanchoFriendAddArgs args)
         {
-            Users u = Users.GetUser(_factory, args.FriendId);
-            
+            var u = Users.GetUser(_factory, args.FriendId);
+
             if (u != null)
-                Logger.Info("%#F94848%" + args.pr.User.Username,
-                            "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
-                            "%#FFFFFF%added",
-                            "%#F94848%" + u.Username,
-                            "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as Friend!");
-            
+                Logger.Info(
+                    "%#F94848%" + args.pr.User.Username,
+                    "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                    "%#FFFFFF%added",
+                    "%#F94848%" + u.Username,
+                    "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as Friend!"
+                );
+
             Database.Models.Friends.AddFriend(_factory, args.pr.User.Id, args.FriendId);
         }
     }

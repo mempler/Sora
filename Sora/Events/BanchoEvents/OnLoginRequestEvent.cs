@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,47 +17,41 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
 using System.Diagnostics;
 using System.Linq;
-using MaxMind.GeoIP2.Responses;
 using Sora.Allocation;
 using Sora.Attributes;
 using Sora.Database;
+using Sora.Database.Models;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
-using LeaderboardRx = Sora.Database.Models.LeaderboardRx;
-using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
-using Localisation = Sora.Helpers.Localisation;
-using Logger = Sora.Helpers.Logger;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PlayMode = Sora.Enums.PlayMode;
-using Users = Sora.Database.Models.Users;
 
 namespace Sora.Events.BanchoEvents
 {
     [EventClass]
     public class OnLoginRequestEvent
     {
-        private readonly SoraDbContextFactory _factory;
-        private readonly Config _cfg;
-        private readonly PacketStreamService _ps;
-        private readonly ChannelService _cs;
         private readonly Cache _cache;
+        private readonly Config _cfg;
+        private readonly ChannelService _cs;
+        private readonly SoraDbContextFactory _factory;
+        private readonly PacketStreamService _ps;
         private PresenceService _pcs;
 
         public OnLoginRequestEvent(SoraDbContextFactory factory,
-                                   Config cfg,
-                                   PresenceService pcs,
-                                   PacketStreamService ps,
-                                   ChannelService cs,
-                                   Cache cache)
+            Config cfg,
+            PresenceService pcs,
+            PacketStreamService ps,
+            ChannelService cs,
+            Cache cache)
         {
             _factory = factory;
             _cfg = cfg;
@@ -71,22 +66,22 @@ namespace Sora.Events.BanchoEvents
         {
             try
             {
-                Stopwatch sw = new Stopwatch();
+                var sw = new Stopwatch();
                 sw.Start();
-                
-                Login loginData = LoginParser.ParseLogin(args.Reader);
+
+                var loginData = LoginParser.ParseLogin(args.Reader);
                 if (loginData == null)
                 {
                     Exception(args.Writer);
                     return;
                 }
 
-                string cacheKey = $"sora:user:{loginData.GetHashCode()}";
+                var cacheKey = $"sora:user:{loginData.GetHashCode()}";
 
-                Presence presence = _cache.Get<Presence>(cacheKey);
+                var presence = _cache.Get<Presence>(cacheKey);
                 if (presence == null)
                 {
-                    Users user = Users.GetUser(_factory, loginData.Username);
+                    var user = Users.GetUser(_factory, loginData.Username);
                     if (user == null)
                     {
                         LoginFailed(args.Writer);
@@ -101,7 +96,7 @@ namespace Sora.Events.BanchoEvents
 
                     if (args.IPAddress != "127.0.0.1" && args.IPAddress != "0.0.0.0")
                     {
-                        CityResponse data = Localisation.GetData(args.IPAddress);
+                        var data = Localisation.GetData(args.IPAddress);
 
                         args.pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
 
@@ -111,34 +106,34 @@ namespace Sora.Events.BanchoEvents
 
                     args.pr.User = user;
 
-                    args.pr.LeaderboardRx  = LeaderboardRx.GetLeaderboard(_factory, args.pr.User);
+                    args.pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(_factory, args.pr.User);
                     args.pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(_factory, args.pr.User);
 
                     args.pr.Rank = args.pr.LeaderboardStd.GetPosition(_factory, PlayMode.Osu);
 
-                    args.pr.Timezone         = loginData.Timezone;
+                    args.pr.Timezone = loginData.Timezone;
                     args.pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
 
-                    args.pr.Status.BeatmapId       = 0;
-                    args.pr.Status.StatusText      = "";
-                    args.pr.Status.CurrentMods     = 0;
+                    args.pr.Status.BeatmapId = 0;
+                    args.pr.Status.StatusText = "";
+                    args.pr.Status.CurrentMods = 0;
                     args.pr.Status.BeatmapChecksum = "";
-                    args.pr.Status.Playmode        = PlayMode.Osu;
-                    args.pr.Status.Status          = Status.Idle;
+                    args.pr.Status.Playmode = PlayMode.Osu;
+                    args.pr.Status.Status = Status.Idle;
 
                     args.pr.Rank = args.pr.LeaderboardStd.GetPosition(_factory, PlayMode.Osu);
-                    
+
                     _cache.Set(cacheKey, args.pr, TimeSpan.FromMinutes(30));
                 }
                 else
                 {
-                    string t = args.pr.Token;
+                    var t = args.pr.Token;
                     args.pr = presence;
                     args.pr.Token = t;
                 }
 
                 _pcs += args.pr;
-                
+
                 Success(args.Writer, args.pr.User.Id);
 
                 args.pr += new ProtocolNegotiation();
@@ -151,18 +146,20 @@ namespace Sora.Events.BanchoEvents
                         args.pr += new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter);
                 }
                 else
+                {
                     args.pr += new LoginPermission(args.pr.ClientPermissions);
+                }
 
                 args.pr += new FriendsList(Database.Models.Friends.GetFriends(_factory, args.pr.User.Id).ToList());
                 args.pr += new PresenceBundle(_pcs.GetUserIds(args.pr).ToList());
-                foreach (Presence opr in _pcs.AllPresences)
+                foreach (var opr in _pcs.AllPresences)
                 {
                     args.pr += new PresenceSingle(opr.User.Id);
                     args.pr += new UserPresence(opr);
                     args.pr += new HandleUpdate(opr);
                 }
 
-                foreach (Channel chanAuto in _cs.ChannelsAutoJoin)
+                foreach (var chanAuto in _cs.ChannelsAutoJoin)
                 {
                     if (chanAuto.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)
                         args.pr += new ChannelAvailableAutojoin(chanAuto);
@@ -180,8 +177,8 @@ namespace Sora.Events.BanchoEvents
                         args.pr += new ChannelAvailable(value);
                     else if (!value.AdminOnly)
                         args.pr += new ChannelAvailable(value);
-                
-                PacketStream stream = _ps.GetStream("main");
+
+                var stream = _ps.GetStream("main");
                 if (stream == null)
                 {
                     Exception(args.Writer);
@@ -192,7 +189,7 @@ namespace Sora.Events.BanchoEvents
                 stream.Broadcast(new UserPresence(args.pr));
                 stream.Broadcast(new HandleUpdate(args.pr));
                 stream.Join(args.pr);
-                
+
                 args.pr
                     .GetOutput()
                     .WriteTo(args.Writer.BaseStream);
@@ -200,9 +197,11 @@ namespace Sora.Events.BanchoEvents
                 sw.Stop();
                 Logger.Info("MS: ", sw.Elapsed.TotalMilliseconds);
 
-                Logger.Info("%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id, "%#B342F4%) %#FFFFFF%has logged in!");
-            }
-            catch (Exception ex)
+                Logger.Info(
+                    "%#F94848%" + args.pr.User.Username, "%#B342F4%(", args.pr.User.Id,
+                    "%#B342F4%) %#FFFFFF%has logged in!"
+                );
+            } catch (Exception ex)
             {
                 Logger.Err(ex);
                 Exception(args.Writer);

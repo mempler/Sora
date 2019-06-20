@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,15 +17,15 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
+using Sora.Helpers;
 using Sora.Packets.Server;
 using Sora.Services;
-using Logger = Sora.Helpers.Logger;
 
 namespace Sora.Events.BanchoEvents.ClientStatus
 {
@@ -39,21 +40,21 @@ namespace Sora.Events.BanchoEvents.ClientStatus
             _pcs = pcs;
             _pss = pss;
         }
-        
+
         [Event(EventType.BanchoExit)]
         public void OnBanchoExit(BanchoExitArgs args)
         {
-            PacketStream mainStream = _pss.GetStream("main");
+            var mainStream = _pss.GetStream("main");
 
-            Logger.Info("%#F94848%" + args.pr.User.Username,
-                        "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
-                        "%#FFFFFF%has Disconnected!");
-            
-            mainStream?.Broadcast(new HandleUserQuit(new UserQuitStruct
-            {
-                UserId     = args.pr.User.Id,
-                ErrorState = args.err
-            }), args.pr);
+            Logger.Info(
+                "%#F94848%" + args.pr.User.Username,
+                "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                "%#FFFFFF%has Disconnected!"
+            );
+
+            mainStream?.Broadcast(
+                new HandleUserQuit(new UserQuitStruct {UserId = args.pr.User.Id, ErrorState = args.err}), args.pr
+            );
         }
     }
 }

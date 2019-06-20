@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,16 +17,15 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
 using System.Collections.Generic;
 using System.Text;
-using IPacket = Sora.Interfaces.IPacket;
-using ISerializer = Sora.Interfaces.ISerializer;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PacketId = Sora.Enums.PacketId;
+using Sora.Enums;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Packets.Client
 {
@@ -71,21 +71,21 @@ namespace Sora.Packets.Client
 
         public void ReadFromStream(MStreamReader sr)
         {
-            Time         = sr.ReadInt32();
-            Id           = sr.ReadByte();
-            Count300     = sr.ReadUInt16();
-            Count100     = sr.ReadUInt16();
-            Count50      = sr.ReadUInt16();
-            CountGeki    = sr.ReadUInt16();
-            CountKatu    = sr.ReadUInt16();
-            CountMiss    = sr.ReadUInt16();
-            TotalScore   = sr.ReadInt32();
-            MaxCombo     = sr.ReadUInt16();
+            Time = sr.ReadInt32();
+            Id = sr.ReadByte();
+            Count300 = sr.ReadUInt16();
+            Count100 = sr.ReadUInt16();
+            Count50 = sr.ReadUInt16();
+            CountGeki = sr.ReadUInt16();
+            CountKatu = sr.ReadUInt16();
+            CountMiss = sr.ReadUInt16();
+            TotalScore = sr.ReadInt32();
+            MaxCombo = sr.ReadUInt16();
             CurrentCombo = sr.ReadUInt16();
-            Perfect      = sr.ReadBoolean();
-            CurrentHp    = sr.ReadByte();
-            TagByte      = sr.ReadByte();
-            ScoreV2      = sr.ReadBoolean();
+            Perfect = sr.ReadBoolean();
+            CurrentHp = sr.ReadByte();
+            TagByte = sr.ReadByte();
+            ScoreV2 = sr.ReadBoolean();
             ComboPortion = ScoreV2 ? sr.ReadDouble() : 0;
             BonusPortion = ScoreV2 ? sr.ReadDouble() : 0;
         }
@@ -107,20 +107,19 @@ namespace Sora.Packets.Client
             sw.Write(CurrentHp);
             sw.Write(TagByte);
             sw.Write(ScoreV2);
-            if (!ScoreV2) return;
+            if (!ScoreV2)
+                return;
             sw.Write(ComboPortion);
             sw.Write(BonusPortion);
         }
 
         public override string ToString()
-        {
-            return $"Time: {Time} Id: {Id}\n" +
-                   $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
-                   $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
-                   $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
-                   $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
-                   $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
-        }
+            => $"Time: {Time} Id: {Id}\n" +
+               $"Count300: {Count300} Count100: {Count100} Count50: {Count50} " +
+               $"CountGeki: {CountGeki} CountKatu: {CountKatu} CountMiss: {CountMiss}\n" +
+               $"TotalScore: {TotalScore} MaxCombo: {MaxCombo} CurrentCombo: {CurrentCombo} Perfect: {Perfect}\n" +
+               $"CurrentHp: {CurrentHp} TagByte: {TagByte}\n" +
+               $"ScoreV2: {ScoreV2} ComboPortion: {ComboPortion} BonusPortion: {BonusPortion}";
     }
 
     public class SpectatorFrame : ISerializer
@@ -136,15 +135,15 @@ namespace Sora.Packets.Client
 
             int count = sr.ReadInt16();
             ReplayFrames = new List<ReplayFrame>(count);
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                ReplayFrame rframes = sr.ReadData<ReplayFrame>();
+                var rframes = sr.ReadData<ReplayFrame>();
                 ReplayFrames.Add(rframes);
             }
 
             Action = sr.ReadByte();
 
-            ScoreFrame sframe = new ScoreFrame();
+            var sframe = new ScoreFrame();
             sframe.ReadFromStream(sr);
             ScoreFrame = sframe;
         }
@@ -153,7 +152,7 @@ namespace Sora.Packets.Client
         {
             sw.Write(Extra);
             sw.Write((short) ReplayFrames.Count);
-            foreach (ReplayFrame rframe in ReplayFrames)
+            foreach (var rframe in ReplayFrames)
                 sw.Write(rframe);
             sw.Write(Action);
             sw.Write(ScoreFrame);
@@ -161,8 +160,8 @@ namespace Sora.Packets.Client
 
         public override string ToString()
         {
-            StringBuilder repframes = new StringBuilder();
-            foreach (ReplayFrame f in ReplayFrames)
+            var repframes = new StringBuilder();
+            foreach (var f in ReplayFrames)
                 repframes.Append($"\t{f}\n");
             return $"Extra: {Extra}\nReplayFrames: [\n{repframes}]\nAction: {Action}\n{ScoreFrame}";
         }
@@ -179,10 +178,10 @@ namespace Sora.Packets.Client
         public void ReadFromStream(MStreamReader sr)
         {
             ButtonState = sr.ReadByte();
-            Button      = sr.ReadByte();
-            MouseX      = sr.ReadSingle();
-            MouseY      = sr.ReadSingle();
-            Time        = sr.ReadInt32();
+            Button = sr.ReadByte();
+            MouseX = sr.ReadSingle();
+            MouseY = sr.ReadSingle();
+            Time = sr.ReadInt32();
         }
 
         public void WriteToStream(MStreamWriter sw)
@@ -195,8 +194,6 @@ namespace Sora.Packets.Client
         }
 
         public override string ToString()
-        {
-            return $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
-        }
+            => $"ButtonState: {ButtonState} Button: {Button} MouseX: {MouseX} MouseY: {MouseY} Time: {Time}";
     }
 }

@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Sora.Enums;
 using Sora.Objects;
 using Sora.Services;
 
@@ -9,26 +9,18 @@ namespace Sora.Bot.Commands
     {
         public string Command => "restrict";
         public string Description => "Restrict a user.";
-        public List<Argument> Args => new List<Argument>
-        {
-            new Argument
+
+        public List<Argument> Args
+            => new List<Argument>
             {
-                ArgName = "User"
-            },
-            new Argument
-            {
-                ArgName  = "Duration (10d)"
-            },
-            new Argument
-            {
-                ArgName  = "Reason"
-            }
-        };
+                new Argument {ArgName = "User"},
+                new Argument {ArgName = "Duration (10d)"},
+                new Argument {ArgName = "Reason"}
+            };
+
         public int ExpectedArgs => 3;
         public Permission RequiredPermission => Permission.From(Permission.ADMIN_RESTRICT);
-        public bool Execute(Presence executor, string[] args)
-        {
-            throw new System.NotImplementedException();
-        }
+
+        public bool Execute(Presence executor, string[] args) => throw new NotImplementedException();
     }
 }

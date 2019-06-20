@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,17 +17,18 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
+using Sora.Enums;
 using Sora.Interfaces;
 using Sora.Objects;
-using Mod = Sora.Enums.Mod;
 
 namespace Sora.EventArgs
 {
     public class BanchoMatchChangeModsArgs : IEventArgs, INeedPresence
     {
-        public Presence pr { get; set; }
         public Mod mods { get; set; }
+        public Presence pr { get; set; }
     }
 }

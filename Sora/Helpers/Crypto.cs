@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -33,10 +35,10 @@ namespace Sora.Helpers
     {
         public static string RandomString(int n)
         {
-            StringBuilder ret   = new StringBuilder();
-            const string  ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/=";
+            var ret = new StringBuilder();
+            const string ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/=";
 
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
                 ret.Append(ascii[new Random().Next(0, ascii.Length)]);
 
             return ret.ToString();
@@ -44,19 +46,19 @@ namespace Sora.Helpers
 
         public static string EncryptString(string message, byte[] key, ref string iv)
         {
-            byte[] rawMessage = Encoding.ASCII.GetBytes(message);
+            var rawMessage = Encoding.ASCII.GetBytes(message);
 
-            byte[] newiv = iv == null ? Encoding.ASCII.GetBytes(RandomString(32)) : Convert.FromBase64String(iv);
+            var newiv = iv == null ? Encoding.ASCII.GetBytes(RandomString(32)) : Convert.FromBase64String(iv);
 
-            RijndaelEngine            engine         = new RijndaelEngine(256);
-            CbcBlockCipher            blockCipher    = new CbcBlockCipher(engine);
-            PaddedBufferedBlockCipher cipher         = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding());
-            KeyParameter              keyParam       = new KeyParameter(key);
-            ParametersWithIV          keyParamWithIv = new ParametersWithIV(keyParam, newiv, 0, 32);
+            var engine = new RijndaelEngine(256);
+            var blockCipher = new CbcBlockCipher(engine);
+            var cipher = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding());
+            var keyParam = new KeyParameter(key);
+            var keyParamWithIv = new ParametersWithIV(keyParam, newiv, 0, 32);
 
             cipher.Init(true, keyParamWithIv);
-            byte[] comparisonBytes = new byte[cipher.GetOutputSize(rawMessage.Length)];
-            int length          = cipher.ProcessBytes(rawMessage, comparisonBytes, 0);
+            var comparisonBytes = new byte[cipher.GetOutputSize(rawMessage.Length)];
+            var length = cipher.ProcessBytes(rawMessage, comparisonBytes, 0);
             cipher.DoFinal(comparisonBytes, length);
 
             iv = Convert.ToBase64String(newiv);
@@ -65,16 +67,16 @@ namespace Sora.Helpers
         }
 
         public static string DecryptString(byte[] message, byte[] key, byte[] iv)
-        {            
-            RijndaelEngine            engine         = new RijndaelEngine(256);
-            CbcBlockCipher            blockCipher    = new CbcBlockCipher(engine);
-            PaddedBufferedBlockCipher cipher         = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding());
-            KeyParameter              keyParam       = new KeyParameter(key);
-            ParametersWithIV          keyParamWithIv = new ParametersWithIV(keyParam, iv, 0, 32);
-            
+        {
+            var engine = new RijndaelEngine(256);
+            var blockCipher = new CbcBlockCipher(engine);
+            var cipher = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding());
+            var keyParam = new KeyParameter(key);
+            var keyParamWithIv = new ParametersWithIV(keyParam, iv, 0, 32);
+
             cipher.Init(false, keyParamWithIv);
-            byte[] comparisonBytes = new byte[cipher.GetOutputSize(message.Length)];
-            int    length          = cipher.ProcessBytes(message, comparisonBytes, 0);
+            var comparisonBytes = new byte[cipher.GetOutputSize(message.Length)];
+            var length = cipher.ProcessBytes(message, comparisonBytes, 0);
             cipher.DoFinal(comparisonBytes, length);
 
             return Encoding.UTF8.GetString(comparisonBytes);
@@ -82,13 +84,13 @@ namespace Sora.Helpers
 
         public static byte[] GetMd5(byte[] data)
         {
-            using MD5 md5 = MD5.Create();
+            using var md5 = MD5.Create();
             return md5.ComputeHash(data);
         }
 
         public static byte[] GetMd5(Stream data)
         {
-            using MD5 md5 = MD5.Create();
+            using var md5 = MD5.Create();
             return md5.ComputeHash(data);
         }
 

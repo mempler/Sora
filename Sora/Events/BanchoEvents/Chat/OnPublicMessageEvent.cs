@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -25,7 +27,6 @@ using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
-using Logger = Sora.Helpers.Logger;
 
 namespace Sora.Events.BanchoEvents.Chat
 {
@@ -34,11 +35,8 @@ namespace Sora.Events.BanchoEvents.Chat
     {
         private readonly ChannelService _cs;
 
-        public OnPublicMessageEvent(ChannelService cs)
-        {
-            _cs = cs;
-        }
-        
+        public OnPublicMessageEvent(ChannelService cs) => _cs = cs;
+
         [Event(EventType.BanchoSendIrcMessage)]
         public void OnPublicMessage(BanchoSendIRCMessageArgs args)
         {
@@ -62,10 +60,12 @@ namespace Sora.Events.BanchoEvents.Chat
                 return;
             }
 
-            Logger.Info($"{L_COL.RED}{args.pr.User.Username}",
-                        $"{L_COL.PURPLE}( {args.pr.User.Id} )",
-                        $"{L_COL.YELLOW}{args.Message.ChannelTarget}",
-                        $"{L_COL.WHITE}=>", args.Message.Message.Replace("\n", " "));
+            Logger.Info(
+                $"{L_COL.RED}{args.pr.User.Username}",
+                $"{L_COL.PURPLE}( {args.pr.User.Id} )",
+                $"{L_COL.YELLOW}{args.Message.ChannelTarget}",
+                $"{L_COL.WHITE}=>", args.Message.Message.Replace("\n", " ")
+            );
 
             chan.WriteMessage(args.pr, args.Message.Message);
         }

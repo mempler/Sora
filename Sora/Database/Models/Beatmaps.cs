@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -24,11 +26,10 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Sora.Enums;
 using Sora.Helpers;
 using Sora.Objects;
-using Fixer = Sora.Helpers.Fixer;
-using PlayMode = Sora.Enums.PlayMode;
-using RankedStatus = Sora.Enums.RankedStatus;
+
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Sora.Database.Models
@@ -125,71 +126,76 @@ namespace Sora.Database.Models
 
         public static Beatmaps FetchFromApi(ICheesegullConfig cfg, string fileMd5, int beatmapId = -1)
         {
-            Cheesegull cg = new Cheesegull(cfg);
-            
+            var cg = new Cheesegull(cfg);
+
             if (!string.IsNullOrEmpty(fileMd5))
                 cg.SetBM(fileMd5);
-            
+
             else if (beatmapId != -1)
                 cg.SetBM(beatmapId);
 
-            List<CheesegullBeatmapSet> bmSet = cg.GetSets();
+            var bmSet = cg.GetSets();
             if (bmSet.Count == 0)
                 return null;
 
-            CheesegullBeatmap bm = bmSet[0].ChildrenBeatmaps.FirstOrDefault(x => x.FileMD5 == fileMd5 || x.BeatmapID == beatmapId);
+            var bm = bmSet[0].ChildrenBeatmaps.FirstOrDefault(x => x.FileMD5 == fileMd5 || x.BeatmapID == beatmapId);
             if (string.IsNullOrEmpty(bm.FileMD5))
                 return null;
 
-            Beatmaps b = new Beatmaps
+            var b = new Beatmaps
             {
-                Ar               = bm.AR,
-                Artist           = bmSet[0].Artist,
-                Bpm              = bm.BPM,
-                Cs               = bm.CS,
-                Difficulty       = bm.DifficultyRating,
-                Hp               = bm.HP,
-                Id               = bm.BeatmapID,
-                Od               = bm.OD,
-                Tags             = bmSet[0].Tags,
-                Title            = bmSet[0].Title,
-                BeatmapCreator   = bmSet[0].Creator,
+                Ar = bm.AR,
+                Artist = bmSet[0].Artist,
+                Bpm = bm.BPM,
+                Cs = bm.CS,
+                Difficulty = bm.DifficultyRating,
+                Hp = bm.HP,
+                Id = bm.BeatmapID,
+                Od = bm.OD,
+                Tags = bmSet[0].Tags,
+                Title = bmSet[0].Title,
+                BeatmapCreator = bmSet[0].Creator,
                 BeatmapCreatorId = -1, // -1 because we do not own this beatmap.
-                DifficultyName   = bm.DiffName,
-                HitLength        = bm.HitLength,
-                LastUpdate       = DateTime.Now,
-                PassCount        = 0,
-                PlayCount        = 0,
-                PlayMode         = bm.Mode,
-                RankedDate       = Convert.ToDateTime(bmSet[0].ApprovedDate),
-                RankedStatus     = Fixer.FixRankedStatus((Cheesegull.RankedStatus) bmSet[0].RankedStatus),
-                TotalLength      = bm.TotalLength,
-                BeatmapSetId     = bm.ParentSetID,
-                FileMd5          = bm.FileMD5
+                DifficultyName = bm.DiffName,
+                HitLength = bm.HitLength,
+                LastUpdate = DateTime.Now,
+                PassCount = 0,
+                PlayCount = 0,
+                PlayMode = bm.Mode,
+                RankedDate = Convert.ToDateTime(bmSet[0].ApprovedDate),
+                RankedStatus = Fixer.FixRankedStatus((Cheesegull.RankedStatus) bmSet[0].RankedStatus),
+                TotalLength = bm.TotalLength,
+                BeatmapSetId = bm.ParentSetID,
+                FileMd5 = bm.FileMD5
             };
-            
+
             return b;
         }
 
-        public static Beatmaps FetchFromDatabase(SoraDbContextFactory factory, string fileMd5, int beatmapId = -1) =>
-            factory.Get().Beatmaps.FirstOrDefault(
+        public static Beatmaps FetchFromDatabase(SoraDbContextFactory factory, string fileMd5, int beatmapId = -1)
+        {
+            return factory.Get().Beatmaps.FirstOrDefault(
                 bm => bm.FileMd5 == fileMd5 ||
-                      bm.Id ==beatmapId);
+                      bm.Id == beatmapId
+            );
+        }
 
         public static void InsertBeatmap(SoraDbContextFactory factory, Beatmaps bm)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             if (db.Context.BeatmapSets.Count(x => x.Id == bm.BeatmapSetId) < 1)
-                db.Context.BeatmapSets.Add(new BeatmapSets
-                {
-                    Id             = bm.BeatmapSetId,
-                    Beatmaps       = new List<Beatmaps>(new[] {bm}),
-                    FavouriteCount = 0,
-                    PassCount      = 0,
-                    LastUpdate     = DateTime.UtcNow,
-                    PlayCount      = 0
-                });
+                db.Context.BeatmapSets.Add(
+                    new BeatmapSets
+                    {
+                        Id = bm.BeatmapSetId,
+                        Beatmaps = new List<Beatmaps>(new[] {bm}),
+                        FavouriteCount = 0,
+                        PassCount = 0,
+                        LastUpdate = DateTime.UtcNow,
+                        PlayCount = 0
+                    }
+                );
             if (db.Context.Beatmaps.Count(x => x.Id == bm.Id) < 1)
                 db.Context.Beatmaps.Add(bm);
             else

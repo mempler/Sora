@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 namespace Sora.Objects
@@ -27,7 +29,7 @@ namespace Sora.Objects
 
         public SpectatorStream(string name, Presence boundPresence) : base(name)
         {
-            SpecChannel   = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
+            SpecChannel = new Channel("#spectator", "an Osu! Default Channel", this, boundPresence);
             BoundPresence = boundPresence;
         }
     }

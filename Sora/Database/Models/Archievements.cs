@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
 using System.Linq;
 using System.Net;
 using ImageMagick;
@@ -8,7 +7,7 @@ using Sora.Interfaces;
 
 namespace Sora.Database.Models
 {
-    public class Achievements : IOsuStringable
+    public class Achievements
     {
         [Key]
         [Required]
@@ -30,29 +29,30 @@ namespace Sora.Database.Models
         [Required]
         public string IconURI { get; set; }
 
+        public string ToOsuString() => $"{Name}+{DisplayName}+{Description}".Replace('\n', '\t');
 
         public byte[] GetIconImage(bool x2 = false)
         {
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(IconURI);
+            var request = (HttpWebRequest) WebRequest.Create(IconURI);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-            using Stream stream = response.GetResponseStream();
-            using MagickImage image = new MagickImage(stream);
+            using var response = (HttpWebResponse) request.GetResponse();
+            using var stream = response.GetResponseStream();
+            using var image = new MagickImage(stream);
             if (x2)
                 image.Resize(385, 420);
             else
                 image.Resize(193, 210);
-                
+
             return image.ToByteArray(MagickFormat.Png);
         }
 
-        public string ToOsuString() => $"{Name}+{DisplayName}+{Description}".Replace('\n', '\t');
-
         public static Achievements GetAchievement(SoraDbContextFactory factory, string name)
-            => factory.Get().Achievements.FirstOrDefault(x => x.Name == name);
+        {
+            return factory.Get().Achievements.FirstOrDefault(x => x.Name == name);
+        }
 
-        public static Achievements NewAchievement (
+        public static Achievements NewAchievement(
             SoraDbContextFactory factory,
             string name,
             string displayName,
@@ -60,18 +60,19 @@ namespace Sora.Database.Models
             string iconUri,
             bool insert = true)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            Achievements a = new Achievements
+            using var db = factory.GetForWrite();
+
+            var a = new Achievements
             {
-                Name        = name,
+                Name = name,
                 DisplayName = displayName,
                 Description = desc,
-                IconURI     = iconUri,
-                BitId       = 1ul << db.Context.Achievements.Count()
+                IconURI = iconUri,
+                BitId = 1ul << db.Context.Achievements.Count()
             };
 
-            if (!insert) return a;
+            if (!insert)
+                return a;
 
             db.Context.Achievements.Add(a);
 

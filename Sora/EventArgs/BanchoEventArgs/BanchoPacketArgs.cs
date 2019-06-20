@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,19 +17,20 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
+using Sora.Enums;
+using Sora.Helpers;
 using Sora.Interfaces;
 using Sora.Objects;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using PacketId = Sora.Enums.PacketId;
 
 namespace Sora.EventArgs
 {
     public class BanchoPacketArgs : IEventArgs, INeedPresence
     {
-        public Presence pr { get; set; }
-        public PacketId PacketId;
         public MStreamReader Data;
+        public PacketId PacketId;
+        public Presence pr { get; set; }
     }
 }

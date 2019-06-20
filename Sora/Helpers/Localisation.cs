@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -34,16 +36,17 @@ namespace Sora.Helpers
         public static void Initialize()
         {
             if (Directory.Exists("geoip") && Directory.Exists("geoip/GeoLite2-City") &&
-                File.Exists("geoip/GeoLite2-City/GeoLite2-City.mmdb")) return;
+                File.Exists("geoip/GeoLite2-City/GeoLite2-City.mmdb"))
+                return;
 
-            WebRequest request =
+            var request =
                 WebRequest.Create("http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz");
-            using (WebResponse response = request.GetResponse())
+            using (var response = request.GetResponse())
             {
-                Stream maxMindTarGz = response.GetResponseStream();
-                Stream gzipStream   = new GZipInputStream(maxMindTarGz);
+                var maxMindTarGz = response.GetResponseStream();
+                Stream gzipStream = new GZipInputStream(maxMindTarGz);
 
-                TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
+                var tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
                 tarArchive.ExtractContents("geoip");
                 tarArchive.Close();
 
@@ -51,20 +54,20 @@ namespace Sora.Helpers
                 maxMindTarGz?.Close();
             }
 
-            foreach (string dir in Directory.GetDirectories("geoip"))
+            foreach (var dir in Directory.GetDirectories("geoip"))
                 if (dir.Contains("GeoLite2-City"))
                     Directory.Move(dir, "geoip/GeoLite2-City");
         }
 
         public static CityResponse GetData(string ip)
         {
-            using DatabaseReader client = new DatabaseReader("geoip/GeoLite2-City/GeoLite2-City.mmdb");
+            using var client = new DatabaseReader("geoip/GeoLite2-City/GeoLite2-City.mmdb");
             return client.City(ip);
         }
 
         public static CountryIds StringToCountryId(string x)
         {
-            if (Enum.TryParse(typeof(CountryIds), x, true, out object o))
+            if (Enum.TryParse(typeof(CountryIds), x, true, out var o))
                 return (CountryIds) o;
             return CountryIds.BL;
         }

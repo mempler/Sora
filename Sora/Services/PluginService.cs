@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -31,34 +33,33 @@ namespace Sora.Services
     {
         protected override Assembly Load(AssemblyName assemblyName) => null;
     }
-    
+
     public class PluginService
     {
-        private readonly Dictionary<string, Assembly> _loadedPlugins
-            = new Dictionary<string, Assembly>(); 
-        
-        private readonly Dictionary<Assembly, IPlugin> _entryPoints
-            = new Dictionary<Assembly, IPlugin>(); 
-        
         private readonly PluginAssemblyLoadContext _context
             = new PluginAssemblyLoadContext();
 
+        private readonly Dictionary<Assembly, IPlugin> _entryPoints
+            = new Dictionary<Assembly, IPlugin>();
+
         private readonly EventManager _ev;
-        
+
+        private readonly Dictionary<string, Assembly> _loadedPlugins
+            = new Dictionary<string, Assembly>();
+
         public PluginService(EventManager ev) => _ev = ev;
 
         public bool LoadPlugin(string filename)
         {
             try
             {
-                Assembly asm = _context.LoadFromAssemblyPath(filename);
+                var asm = _context.LoadFromAssemblyPath(filename);
                 _loadedPlugins.Add(filename, asm);
                 _ev.LoadAssembly(asm);
                 Logger.Info("Loaded new Assembly", asm);
                 GetEntryPoint(asm)?.OnEnable();
                 return true;
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 Logger.Err(ex);
                 return false;
@@ -69,26 +70,29 @@ namespace Sora.Services
         {
             if (_entryPoints.ContainsKey(asm))
                 return _entryPoints[asm];
-            
-            Type iplug = asm.GetTypes()
-                            .FirstOrDefault(x => x.IsClass &&
-                                                 (x.BaseType == typeof(IPlugin) ||
-                                                  x.BaseType == typeof(Plugin)));
-            
-            if (iplug == null) {
+
+            var iplug = asm.GetTypes()
+                           .FirstOrDefault(
+                               x => x.IsClass &&
+                                    (x.BaseType == typeof(IPlugin) ||
+                                     x.BaseType == typeof(Plugin))
+                           );
+
+            if (iplug == null)
+            {
                 Logger.Warn("No entry point found for plugin", asm);
                 _entryPoints.Add(asm, null);
                 return null;
             }
 
-            object[] tArgs = (from cInfo in iplug.GetConstructors()
-                              from pInfo in cInfo.GetParameters()
-                              select _ev.Provider.GetService(pInfo.ParameterType)).ToArray();
+            var tArgs = (from cInfo in iplug.GetConstructors()
+                         from pInfo in cInfo.GetParameters()
+                         select _ev.Provider.GetService(pInfo.ParameterType)).ToArray();
 
             if (tArgs.Any(x => x == null))
                 throw new Exception("Could not find Dependency, are you sure you registered the Dependency?");
-            
-            IPlugin retVal = Activator.CreateInstance(iplug, tArgs) as IPlugin;
+
+            var retVal = Activator.CreateInstance(iplug, tArgs) as IPlugin;
 
             _entryPoints.Add(asm, retVal);
 
@@ -101,8 +105,7 @@ namespace Sora.Services
             {
                 _context.Unload();
                 return true;
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 Logger.Err(ex);
                 return false;

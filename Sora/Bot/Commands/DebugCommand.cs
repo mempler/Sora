@@ -24,9 +24,9 @@ namespace Sora.Bot.Commands
         {
             if (executor["IS_PACKET_DEBUGGING"] == null)
                 executor["IS_PACKET_DEBUGGING"] = false;
-            
+
             executor["IS_PACKET_DEBUGGING"] = !(bool) executor["IS_PACKET_DEBUGGING"];
-            
+
             executor.Alert("Debugger has been " + ((bool) executor["IS_PACKET_DEBUGGING"] ? "Enabled" : "Disabled"));
 
             return false;

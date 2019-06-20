@@ -5,18 +5,14 @@ using System.Threading.Tasks;
 using Sora.Attributes;
 using Sora.Bot.Commands;
 using Sora.Database;
+using Sora.Database.Models;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Helpers;
 using Sora.Objects;
 using Sora.Packets.Client;
 using Sora.Packets.Server;
 using Sora.Services;
-using LeaderboardRx = Sora.Database.Models.LeaderboardRx;
-using LeaderboardStd = Sora.Database.Models.LeaderboardStd;
-using Logger = Sora.Helpers.Logger;
-using Mod = Sora.Enums.Mod;
-using PlayMode = Sora.Enums.PlayMode;
-using Users = Sora.Database.Models.Users;
 
 namespace Sora.Bot
 {
@@ -31,30 +27,28 @@ namespace Sora.Bot
         public Permission RequiredPermission;
         public SoraCommandExecution Callback;
     }
-    
+
     [EventClass]
     public class Sora
     {
-        private List<SoraCommand> _commands = new List<SoraCommand>();
-        private EventManager _ev;
-        private PacketStreamService _pss;
+        private readonly List<SoraCommand> _commands = new List<SoraCommand>();
+        private readonly ChannelService _cs;
+        private readonly EventManager _ev;
+        private readonly SoraDbContextFactory _factory;
+        private readonly object _mut = new object();
         private readonly IServiceProvider _provider;
+        private readonly PresenceService _ps;
+        private readonly PacketStreamService _pss;
         private MultiplayerService _ms;
-        private PresenceService _ps;
-        private ChannelService _cs;
-        private SoraDbContextFactory _factory;
-        private object _mut = new object();
-              
-        private Presence _botPresence { get; set; }
-        
+
         public Sora(SoraDbContextFactory factory,
-                    IServiceProvider provider,
-                    PacketStreamService pss,
-                    MultiplayerService ms,
-                    PresenceService ps,
-                    ChannelService cs,
-                    EventManager ev
-            )
+            IServiceProvider provider,
+            PacketStreamService pss,
+            MultiplayerService ms,
+            PresenceService ps,
+            ChannelService cs,
+            EventManager ev
+        )
         {
             _provider = provider;
             _factory = factory;
@@ -72,28 +66,34 @@ namespace Sora.Bot
             #endregion
         }
 
+        private Presence _botPresence { get; set; }
+
         public void RegisterCommandClass<T>()
             where T : ISoraCommand
         {
-            Type t = typeof(T);
-            object[] tArgs = (from cInfo in t.GetConstructors()
-                              from pInfo in cInfo.GetParameters()
-                              select _provider.GetService(pInfo.ParameterType)).ToArray();
+            var t = typeof(T);
+            var tArgs = (from cInfo in t.GetConstructors()
+                         from pInfo in cInfo.GetParameters()
+                         select _provider.GetService(pInfo.ParameterType)).ToArray();
 
             if (tArgs.Any(x => x == null))
                 throw new Exception("Could not find Dependency, are you sure you registered the Dependency?");
 
-            ISoraCommand cls = (ISoraCommand) Activator.CreateInstance(t, tArgs);
-            lock(_mut)
-                _commands.Add(new SoraCommand
-                {
-                    Args = cls.Args,
-                    Command = cls.Command,
-                    Description = cls.Description,
-                    ExpectedArgs = cls.ExpectedArgs,
-                    RequiredPermission = cls.RequiredPermission,
-                    Callback = cls.Execute
-                });
+            var cls = (ISoraCommand) Activator.CreateInstance(t, tArgs);
+            lock (_mut)
+            {
+                _commands.Add(
+                    new SoraCommand
+                    {
+                        Args = cls.Args,
+                        Command = cls.Command,
+                        Description = cls.Description,
+                        ExpectedArgs = cls.ExpectedArgs,
+                        RequiredPermission = cls.RequiredPermission,
+                        Callback = cls.Execute
+                    }
+                );
+            }
         }
 
         public Task RunAsync()
@@ -103,23 +103,23 @@ namespace Sora.Bot
                 User = Users.GetUser(_factory, 100),
                 Status = new UserStatus
                 {
-                    Status          = Status.Watching,
-                    Playmode        = PlayMode.Osu,
+                    Status = Status.Watching,
+                    Playmode = PlayMode.Osu,
                     BeatmapChecksum = "nothing",
-                    BeatmapId       = 0,
-                    StatusText      = "over you!",
-                    CurrentMods     = Mod.TouchDevice
+                    BeatmapId = 0,
+                    StatusText = "over you!",
+                    CurrentMods = Mod.TouchDevice
                 },
-                LeaderboardRx    = LeaderboardRx.GetLeaderboard(_factory, 100),
-                LeaderboardStd   = LeaderboardStd.GetLeaderboard(_factory, 100),
-                Timezone         = 0,
+                LeaderboardRx = LeaderboardRx.GetLeaderboard(_factory, 100),
+                LeaderboardStd = LeaderboardStd.GetLeaderboard(_factory, 100),
+                Timezone = 0,
                 BlockNonFriendDm = false,
-                Lon              = 0d,
-                Lat              = 0d,
-                BotPresence      = true
+                Lon = 0d,
+                Lat = 0d,
+                BotPresence = true
             };
 
-            PacketStream stream = _pss.GetStream("main");
+            var stream = _pss.GetStream("main");
             if (stream != null)
             {
                 stream.Broadcast(new PresenceSingle(_botPresence.User.Id));
@@ -128,29 +128,29 @@ namespace Sora.Bot
             }
 
             _ps.BeginPresence(_botPresence);
-            
+
             Logger.Info("Hey, I'm Sora! I'm a bot and i say Hello World!");
 
             return Task.CompletedTask;
         }
-        
+
         public void SoraCommand(string Command, string Description, List<Argument> args,
-                                SoraCommand.SoraCommandExecution cb)
+            SoraCommand.SoraCommandExecution cb)
         {
             lock (_mut)
-                _commands.Add(new SoraCommand
-                {
-                    Command     = Command,
-                    Description = Description,
-                    Args        = args,
-                    Callback    = cb
-                });
+            {
+                _commands.Add(
+                    new SoraCommand {Command = Command, Description = Description, Args = args, Callback = cb}
+                );
+            }
         }
 
         public IEnumerable<SoraCommand> GetCommands(string Command)
         {
             lock (_mut)
+            {
                 return _commands.Where(z => z.Command == Command.Split(" ")[0]);
+            }
         }
 
         public async void SendMessage(string msg, string channelTarget, bool isPrivate)
@@ -162,54 +162,61 @@ namespace Sora.Bot
                 _botPresence = _ps.GetPresence(100);
 
             if (!isPrivate)
-                await _ev.RunEvent(EventType.BanchoSendIrcMessage, new BanchoSendIRCMessageArgs
-                {
-                    Message = new MessageStruct
+                await _ev.RunEvent(
+                    EventType.BanchoSendIrcMessage,
+                    new BanchoSendIRCMessageArgs
                     {
-                        Message       = msg,
-                        Username      = _botPresence.User.Username,
-                        ChannelTarget = channelTarget,
-                        SenderId      = _botPresence.User.Id
-                    },
-                    pr = _botPresence
-                });
+                        Message = new MessageStruct
+                        {
+                            Message = msg,
+                            Username = _botPresence.User.Username,
+                            ChannelTarget = channelTarget,
+                            SenderId = _botPresence.User.Id
+                        },
+                        pr = _botPresence
+                    }
+                );
             else
-                await _ev.RunEvent(EventType.BanchoSendIrcMessagePrivate, new BanchoSendIRCMessageArgs
-                {
-                    Message = new MessageStruct
+                await _ev.RunEvent(
+                    EventType.BanchoSendIrcMessagePrivate,
+                    new BanchoSendIRCMessageArgs
                     {
-                        Message       = msg,
-                        Username      = _botPresence.User.Username,
-                        ChannelTarget = channelTarget,
-                        SenderId      = _botPresence.User.Id
-                    },
-                    pr = _botPresence
-                });
+                        Message = new MessageStruct
+                        {
+                            Message = msg,
+                            Username = _botPresence.User.Username,
+                            ChannelTarget = channelTarget,
+                            SenderId = _botPresence.User.Id
+                        },
+                        pr = _botPresence
+                    }
+                );
         }
 
         [Event(EventType.BanchoSendIrcMessage)]
         public void OnPublicMessageEvent(BanchoSendIRCMessageArgs args)
         {
-            if (args.pr == _botPresence) return;
-            
+            if (args.pr == _botPresence)
+                return;
+
             if (args.Message.Message.StartsWith("!"))
             {
                 if (_cs.GetChannel(args.Message.ChannelTarget) == null)
                     return;
 
-                IEnumerable<SoraCommand> cmds = GetCommands(args.Message.Message.TrimStart('!'));
-                foreach (SoraCommand cmd in cmds)
+                var cmds = GetCommands(args.Message.Message.TrimStart('!'));
+                foreach (var cmd in cmds)
                 {
                     if (args.pr.User.Permissions != cmd.RequiredPermission)
                         continue;
-                    
-                    List<string> l = args.Message.Message.TrimStart('!').Split(" ")[1..].ToList();
+
+                    var l = args.Message.Message.TrimStart('!').Split(" ")[1..].ToList();
                     if (l.Count < cmd.ExpectedArgs)
                     {
-                        string aList = "\t<";
+                        var aList = "\t<";
 
-                        int i = 0;
-                        foreach (Argument a in cmd.Args)
+                        var i = 0;
+                        foreach (var a in cmd.Args)
                         {
                             aList += a.ArgName;
                             if (i >= cmd.ExpectedArgs)
@@ -222,7 +229,10 @@ namespace Sora.Bot
                         if (cmd.Args.Count > 0)
                             aList += ">";
 
-                        SendMessage($"Insufficient amount of Arguments!\nUsage:\n     !{cmd.Command} {aList}", args.Message.ChannelTarget, false);
+                        SendMessage(
+                            $"Insufficient amount of Arguments!\nUsage:\n     !{cmd.Command} {aList}",
+                            args.Message.ChannelTarget, false
+                        );
                         break;
                     }
 
@@ -235,7 +245,8 @@ namespace Sora.Bot
         [Event(EventType.BanchoSendIrcMessage)]
         public void OnPrivateMessageEvent(BanchoSendIRCMessageArgs args)
         {
-            if (args.pr == _botPresence) return;
+            if (args.pr == _botPresence)
+                return;
         }
     }
 }

@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 // ReSharper disable UnusedMember.Global
@@ -29,7 +31,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sora.Enums;
-using PlayMode = Sora.Enums.PlayMode;
 
 // ReSharper disable AccessToDisposedClosure
 namespace Sora.Database.Models
@@ -112,12 +113,11 @@ namespace Sora.Database.Models
         [NotMapped]
         public int Position { get; set; }
 
-
         public string ToOsuString(SoraDbContextFactory factory)
         {
             if (ScoreOwner == null)
                 ScoreOwner = Users.GetUser(factory, UserId);
-            
+
             return $"{Id}|" +
                    $"{ScoreOwner.Username.Replace("|", "I")}|" +
                    $"{TotalScore}|" +
@@ -138,76 +138,88 @@ namespace Sora.Database.Models
 
         public static IEnumerable<Scores> GetScores(
             SoraDbContextFactory factory,
-            
             string fileMd5, Users user, PlayMode playMode = PlayMode.Osu,
             bool relaxing = false,
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
             CountryIds cid = 0;
-            
+
             if (countryOnly)
                 cid = UserStats.GetUserStats(factory, user.Id).CountryId;
 
-            IQueryable<IGrouping<int, Scores>> query = factory.Get().Scores
-                                         .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                                         .Where(score
-                                                    => relaxing
-                                                        ? (score.Mods & Mod.Relax) != 0
-                                                        : (score.Mods & Mod.Relax) == 0)
-                                         .Where(score
-                                                    => !friendsOnly || factory.Get().Friends
-                                                                         .Where(f => f.UserId == user.Id)
-                                                                         .Select(f => f.FriendId)
-                                                                         .Contains(score.UserId))
-                                         .Where(score
-                                                    => !countryOnly || factory.Get().UserStats
-                                                                         .Select(c => c.CountryId)
-                                                                         .Contains(cid))
-                                         .Where(score => !modOnly || score.Mods == mods)
-                                         .Where(score => !onlySelf || score.UserId == user.Id)
-                                         .OrderByDescending(score => score.TotalScore)
-                                         .GroupBy(s => s.UserId)
-                                         .Take(50);
+            var query = factory.Get().Scores
+                               .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                               .Where(
+                                   score
+                                       => relaxing
+                                           ? (score.Mods & Mod.Relax) != 0
+                                           : (score.Mods & Mod.Relax) == 0
+                               )
+                               .Where(
+                                   score
+                                       => !friendsOnly || factory.Get().Friends
+                                                                 .Where(f => f.UserId == user.Id)
+                                                                 .Select(f => f.FriendId)
+                                                                 .Contains(score.UserId)
+                               )
+                               .Where(
+                                   score
+                                       => !countryOnly || factory.Get().UserStats
+                                                                 .Select(c => c.CountryId)
+                                                                 .Contains(cid)
+                               )
+                               .Where(score => !modOnly || score.Mods == mods)
+                               .Where(score => !onlySelf || score.UserId == user.Id)
+                               .OrderByDescending(score => score.TotalScore)
+                               .GroupBy(s => s.UserId)
+                               .Take(50);
 
             IEnumerable<Scores> result = query.ToArray().Select(s => s.Select(xs => xs).First()).ToList();
-            
-            foreach (Scores s in result)
+
+            foreach (var s in result)
                 s.Position = factory.Get().Scores
-                               .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                               .Where(score
-                                          => relaxing
-                                              ? (score.Mods & Mod.Relax) != 0
-                                              : (score.Mods & Mod.Relax) == 0)
-                               .OrderByDescending(score => score.TotalScore)
-                               .IndexOf(s) + 1;
+                                    .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                                    .Where(
+                                        score
+                                            => relaxing
+                                                ? (score.Mods & Mod.Relax) != 0
+                                                : (score.Mods & Mod.Relax) == 0
+                                    )
+                                    .OrderByDescending(score => score.TotalScore)
+                                    .IndexOf(s) + 1;
             return result;
         }
 
-        public static int GetTotalScores(SoraDbContextFactory factory, string fileMd5) =>
-            factory.Get().Scores.Count(score => score.FileMd5 == fileMd5);
+        public static int GetTotalScores(SoraDbContextFactory factory, string fileMd5)
+        {
+            return factory.Get().Scores.Count(score => score.FileMd5 == fileMd5);
+        }
 
-        public static Scores GetScore(SoraDbContextFactory factory, int scoreId) {
-            Scores s = factory.Get().Scores.First(score => score.Id == scoreId);
+        public static Scores GetScore(SoraDbContextFactory factory, int scoreId)
+        {
+            var s = factory.Get().Scores.First(score => score.Id == scoreId);
             s.ScoreOwner = Users.GetUser(factory, s.UserId);
             return s;
         }
 
         public static void InsertScore(SoraDbContextFactory factory, Scores score)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            List<Scores> sc =
+            using var db = factory.GetForWrite();
+
+            var sc =
                 db.Context.Scores
                   .Where(s => s.FileMd5 == score.FileMd5 && s.PlayMode == score.PlayMode)
-                  .Where(s => (score.Mods & Mod.Relax) != 0
-                             ? (score.Mods & Mod.Relax) != 0
-                             : (score.Mods & Mod.Relax) == 0)
+                  .Where(
+                      s => (score.Mods & Mod.Relax) != 0
+                          ? (score.Mods & Mod.Relax) != 0
+                          : (score.Mods & Mod.Relax) == 0
+                  )
                   .Where(s => s.UserId == score.UserId)
                   .OrderByDescending(s => s.TotalScore)
                   .ToList();
 
-            bool isBetter = sc.Any(scr => scr.TotalScore < score.TotalScore);
+            var isBetter = sc.Any(scr => scr.TotalScore < score.TotalScore);
 
             if (isBetter)
                 db.Context.RemoveRange(sc);

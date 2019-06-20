@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -29,33 +31,30 @@ namespace Sora.Database
 {
     public sealed class SoraDbContext : DbContext
     {
-        private class MySQLConfig : IMySQLConfig
-        {
-            public CMySql MySql { get; set; }
-        }
-        
         private static MemoryCache _memoryCache;
-        
+
         private readonly IMySQLConfig _config;
 
         public SoraDbContext()
-            : this(null) { }
+            : this(null)
+        {
+        }
 
         public SoraDbContext(ConfigUtil cfgUtil = null, IMySQLConfig config = null)
         {
-            if (cfgUtil == null) {
+            if (cfgUtil == null)
+            {
                 if (_memoryCache == null)
-                    _memoryCache = new MemoryCache(new MemoryCacheOptions
-                    {
-                        ExpirationScanFrequency = TimeSpan.FromDays(365)
-                    });
+                    _memoryCache = new MemoryCache(
+                        new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)}
+                    );
                 cfgUtil = new ConfigUtil(_memoryCache);
             }
+
             _config = config;
             if (config == null)
                 _config = cfgUtil.ReadConfig<MySQLConfig>();
         }
-       
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<Users> Users { get; set; }
@@ -84,9 +83,11 @@ namespace Sora.Database
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<BeatmapSets> BeatmapSets { get; set; }
 
+        public void Migrate()
+        {
+            Database.Migrate();
+        }
 
-        public void Migrate() => Database.Migrate();
-        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (_config.MySql.Hostname == null)
@@ -105,6 +106,11 @@ namespace Sora.Database
                     mysqlOptions.AnsiCharSet(CharSet.Utf8mb4);
                 }
             );
+        }
+
+        private class MySQLConfig : IMySQLConfig
+        {
+            public CMySql MySql { get; set; }
         }
     }
 }

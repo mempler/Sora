@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,27 +17,30 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
 
 namespace Sora.Events.BanchoEvents.Multiplayer
 {
     [EventClass]
     public class OnBanchoMatchChangeSlotEvent
-    {   
+    {
         [Event(EventType.BanchoMatchChangeSlot)]
         public void OnBanchoMatchChangeSlot(BanchoMatchChangeSlotArgs args)
         {
-            if (args.pr.JoinedRoom == null) return;
-            if (args.SlotId > 16) return;
-            MultiplayerSlot newSlot = args.pr.JoinedRoom.Slots[args.SlotId];
-            if (newSlot.UserId != -1) return;
+            if (args.pr.JoinedRoom == null)
+                return;
+            if (args.SlotId > 16)
+                return;
+            var newSlot = args.pr.JoinedRoom.Slots[args.SlotId];
+            if (newSlot.UserId != -1)
+                return;
 
-            MultiplayerSlot oldSlot = args.pr.JoinedRoom.GetSlotByUserId(args.pr.User.Id);
+            var oldSlot = args.pr.JoinedRoom.GetSlotByUserId(args.pr.User.Id);
 
             args.pr.JoinedRoom.SetSlot(newSlot, oldSlot);
             args.pr.JoinedRoom.ClearSlot(oldSlot);

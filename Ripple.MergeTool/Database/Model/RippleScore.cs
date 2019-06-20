@@ -25,7 +25,7 @@ namespace Ripple.MergeTool.Database.Model
 
         [Required]
         public Mod mods { get; set; }
-        
+
         [Required]
         [Column("300_count")]
         public int C300 { get; set; }
@@ -33,7 +33,7 @@ namespace Ripple.MergeTool.Database.Model
         [Required]
         [Column("100_count")]
         public int C100 { get; set; }
-        
+
         [Required]
         [Column("50_count")]
         public int C50 { get; set; }

@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -30,8 +32,10 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchLock)]
         public void OnBanchoMatchLock(BanchoMatchLockArgs args)
         {
-            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id) return;
-            if (args.SlotId > 16) return;
+            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id)
+                return;
+            if (args.SlotId > 16)
+                return;
 
             args.pr.JoinedRoom.LockSlot(args.pr.JoinedRoom.Slots[args.SlotId]);
         }

@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,12 +17,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Logger = Sora.Helpers.Logger;
+using Sora.Helpers;
 
 namespace Sora.Events.BanchoEvents.Multiplayer
 {
@@ -31,12 +33,15 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchStart)]
         public void OnBanchoMatchStart(BanchoMatchStartArgs args)
         {
-            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id) return;
+            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id)
+                return;
 
-            Logger.Info("%#FFFFFF% a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
-                        args.pr.JoinedRoom.Name,
-                        "%#B342F4%(", args.pr.JoinedRoom.MatchId, "%#B342F4%) %#FFFFFF%has started their Match!");
-            
+            Logger.Info(
+                "%#FFFFFF% a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
+                args.pr.JoinedRoom.Name,
+                "%#B342F4%(", args.pr.JoinedRoom.MatchId, "%#B342F4%) %#FFFFFF%has started their Match!"
+            );
+
             args.pr.JoinedRoom.Start();
         }
     }

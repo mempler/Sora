@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,15 +17,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
-using Mod = Sora.Enums.Mod;
 
 namespace Sora.Events.BanchoEvents.ClientStatus
 {
@@ -33,19 +33,16 @@ namespace Sora.Events.BanchoEvents.ClientStatus
     {
         private readonly PacketStreamService _pss;
 
-        public OnSendUserStatusEvent(PacketStreamService pss)
-        {
-            _pss = pss;
-        }
-        
+        public OnSendUserStatusEvent(PacketStreamService pss) => _pss = pss;
+
         [Event(EventType.BanchoSendUserStatus)]
         public void OnSendUserStatus(BanchoSendUserStatusArgs args)
         {
             args.pr.Status = args.status;
             args.pr["IS_RELAXING"] = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
             //Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
-            
-            PacketStream main = _pss.GetStream("main");
+
+            var main = _pss.GetStream("main");
             //main.Broadcast(new UserPresence(args.pr));
             main.Broadcast(new HandleUpdate(args.pr));
         }

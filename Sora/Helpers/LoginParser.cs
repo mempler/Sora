@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.IO;
@@ -26,17 +28,18 @@ namespace Sora.Helpers
     {
         public static Login ParseLogin(MStreamReader reader)
         {
-            Login l = new Login();
-            using (StreamReader s = new StreamReader(reader.BaseStream))
+            var l = new Login();
+            using (var s = new StreamReader(reader.BaseStream))
             {
                 l.Username = s.ReadLine();
                 l.Password = s.ReadLine();
-                string[] otherData = s.ReadLine()?.Split('|');
-                if (otherData == null || otherData.Length < 5) return null;
-                l.Build             = otherData[0];
-                l.Timezone          = byte.Parse(otherData[1]);
-                l.DisplayLocation   = otherData[2] == "1";
-                l.SecurityHash      = otherData[3];
+                var otherData = s.ReadLine()?.Split('|');
+                if (otherData == null || otherData.Length < 5)
+                    return null;
+                l.Build = otherData[0];
+                l.Timezone = byte.Parse(otherData[1]);
+                l.DisplayLocation = otherData[2] == "1";
+                l.SecurityHash = otherData[3];
                 l.BlockNonFriendDMs = otherData[4] == "1";
             }
 
@@ -55,13 +58,11 @@ namespace Sora.Helpers
         public string Username;
 
         public override int GetHashCode()
-        {
-            return (BlockNonFriendDMs ? 1 : 0) +
-                   (DisplayLocation ? 1 : 0) +
-                   Password.GetHashCode() *
-                   SecurityHash.GetHashCode() *
-                   Username.GetHashCode() /
-                   Timezone;
-        }
+            => (BlockNonFriendDMs ? 1 : 0) +
+               (DisplayLocation ? 1 : 0) +
+               Password.GetHashCode() *
+               SecurityHash.GetHashCode() *
+               Username.GetHashCode() /
+               Timezone;
     }
 }

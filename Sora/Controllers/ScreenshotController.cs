@@ -20,7 +20,7 @@ namespace Jibril.Controllers
 
             if (!System.IO.File.Exists($"data/screenshots/{screenshot}"))
                 return NotFound($"Could not find ScreenShot with the Id of {screenshot}");
-            
+
             return File(System.IO.File.OpenRead($"data/screenshots/{screenshot}"), "image/jpg");
         }
     }

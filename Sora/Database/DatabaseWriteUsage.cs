@@ -8,35 +8,41 @@ namespace Sora.Database
     {
         public readonly SoraDbContext Context;
         private readonly Action<DatabaseWriteUsage> usageCompleted;
+        public List<Exception> Errors = new List<Exception>();
+
+        private bool isDisposed;
+
+        /// <summary>
+        ///     Whether this write usage will commit a transaction on completion.
+        ///     If false, there is a parent usage responsible for transaction commit.
+        /// </summary>
+        public bool IsTransactionLeader = false;
 
         public DatabaseWriteUsage(SoraDbContext context, Action<DatabaseWriteUsage> onCompleted)
         {
-            Context        = context;
+            Context = context;
             usageCompleted = onCompleted;
         }
 
         public bool PerformedWrite { get; private set; }
 
-        private bool isDisposed;
-        public List<Exception> Errors = new List<Exception>();
-
-        /// <summary>
-        /// Whether this write usage will commit a transaction on completion.
-        /// If false, there is a parent usage responsible for transaction commit.
-        /// </summary>
-        public bool IsTransactionLeader = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         protected void Dispose(bool disposing)
         {
-            if (isDisposed) return;
+            if (isDisposed)
+                return;
 
             isDisposed = true;
 
             try
             {
                 PerformedWrite |= Context.SaveChanges() > 0;
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 Errors.Add(e);
                 throw;
@@ -45,12 +51,6 @@ namespace Sora.Database
             {
                 usageCompleted?.Invoke(this);
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         ~DatabaseWriteUsage()

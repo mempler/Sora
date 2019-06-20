@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Enums;
@@ -30,7 +32,7 @@ namespace Sora.Helpers
         {
             if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
                 return 0;
-            
+
             switch (playMode)
             {
                 case PlayMode.Osu:

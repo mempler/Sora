@@ -12,52 +12,49 @@ namespace Sora
     {
         private static IWebHost _host;
         private static readonly CancellationTokenSource cts = new CancellationTokenSource();
+
         private static void Main()
         {
             Console.CancelKeyPress += OnProcessExit;
 
-            MemoryCache c = new MemoryCache(new MemoryCacheOptions
-            {
-                ExpirationScanFrequency = TimeSpan.FromDays(365)
-            });
-            ConfigUtil cfgUtil = new ConfigUtil(c);
+            var c = new MemoryCache(new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)});
+            var cfgUtil = new ConfigUtil(c);
 
-            IServerConfig scfg = cfgUtil.ReadConfig("config.json", new Config
-            {
-                Server = new CServer
+            IServerConfig scfg = cfgUtil.ReadConfig(
+                "config.json",
+                new Config
                 {
-                    Hostname   = "0.0.0.0",
-                    Port       = 4312,
-                    ScreenshotHostname = "gigamons.de",
-                    FreeDirect = true
-                },
-                Cheesegull = new CCheesegull
-                {
-                    URI = "https://pisstau.be"
-                },
-                MySql = new CMySql
-                {
-                    Hostname = "localhost",
-                    Port     = 3306,
-                    Username = "root",
-                    Password = string.Empty,
-                    Database = "Sora"
+                    Server = new CServer
+                    {
+                        Hostname = "0.0.0.0", Port = 4312, ScreenshotHostname = "gigamons.de", FreeDirect = true
+                    },
+                    Cheesegull = new CCheesegull {URI = "https://pisstau.be"},
+                    MySql = new CMySql
+                    {
+                        Hostname = "localhost",
+                        Port = 3306,
+                        Username = "root",
+                        Password = string.Empty,
+                        Database = "Sora"
+                    }
                 }
-            });
-            
-            _host = new WebHostBuilder()
-                       .UseContentRoot(Directory.GetCurrentDirectory())
-                       .UseKestrel(cfg =>
-                       {
-                           cfg.Limits.MaxRequestBodySize = null;
+            );
 
-                           if (!IPAddress.TryParse(scfg.Server.Hostname, out IPAddress ipAddress))
-                               ipAddress = Dns.GetHostEntry(scfg.Server.Hostname).AddressList[0];
-                           
-                           cfg.Listen(ipAddress, scfg.Server.Port);
-                       })
-                       .UseStartup<Startup>()
-                       .Build();
+            _host = new WebHostBuilder()
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseKestrel(
+                        cfg =>
+                        {
+                            cfg.Limits.MaxRequestBodySize = null;
+
+                            if (!IPAddress.TryParse(scfg.Server.Hostname, out var ipAddress))
+                                ipAddress = Dns.GetHostEntry(scfg.Server.Hostname).AddressList[0];
+
+                            cfg.Listen(ipAddress, scfg.Server.Port);
+                        }
+                    )
+                    .UseStartup<Startup>()
+                    .Build();
             _host.RunAsync(cts.Token).GetAwaiter().GetResult();
         }
 

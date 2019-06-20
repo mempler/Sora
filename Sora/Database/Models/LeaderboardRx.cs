@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -84,7 +86,6 @@ namespace Sora.Database.Models
         [DefaultValue(0)]
         public ulong Count100Ctb { get; set; }
 
-
         [Required]
         [DefaultValue(0)]
         public ulong Count50Osu { get; set; }
@@ -96,7 +97,6 @@ namespace Sora.Database.Models
         [Required]
         [DefaultValue(0)]
         public ulong Count50Ctb { get; set; }
-
 
         [Required]
         [DefaultValue(0)]
@@ -136,10 +136,11 @@ namespace Sora.Database.Models
 
         public static LeaderboardRx GetLeaderboard(SoraDbContextFactory factory, int userId)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            LeaderboardRx result = db.Context.LeaderboardRx.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-            if (result != null) return result;
+            using var db = factory.GetForWrite();
+
+            var result = db.Context.LeaderboardRx.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+            if (result != null)
+                return result;
 
             db.Context.LeaderboardRx.Add(new LeaderboardRx {Id = userId});
 
@@ -148,8 +149,8 @@ namespace Sora.Database.Models
 
         public void IncreaseScore(SoraDbContextFactory factory, ulong score, bool ranked, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -174,10 +175,11 @@ namespace Sora.Database.Models
 
             db.Context.LeaderboardRx.Update(this);
         }
+
         public void IncreaseCount300(SoraDbContextFactory factory, ulong c, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -193,10 +195,11 @@ namespace Sora.Database.Models
 
             db.Context.LeaderboardRx.Update(this);
         }
+
         public void IncreaseCount100(SoraDbContextFactory factory, ulong c, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -212,10 +215,11 @@ namespace Sora.Database.Models
 
             db.Context.LeaderboardRx.Update(this);
         }
+
         public void IncreaseCount50(SoraDbContextFactory factory, ulong c, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -231,10 +235,11 @@ namespace Sora.Database.Models
 
             db.Context.LeaderboardRx.Update(this);
         }
+
         public void IncreaseCountMiss(SoraDbContextFactory factory, ulong c, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -250,10 +255,11 @@ namespace Sora.Database.Models
 
             db.Context.LeaderboardRx.Update(this);
         }
+
         public void IncreasePlaycount(SoraDbContextFactory factory, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
+            using var db = factory.GetForWrite();
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -272,16 +278,16 @@ namespace Sora.Database.Models
 
         public void UpdatePP(SoraDbContextFactory factory, PlayMode mode)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            double TotalPP = db.Context.Scores
-                               .Where(s => (s.Mods & Mod.Relax) == 0)
-                               .Where(s => s.PlayMode == mode)
-                               .Where(s => s.UserId == Id)
-                               .OrderByDescending(s => s.PeppyPoints)
-                               .Take(100).ToList()
-                               .Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i))
-                               .Sum();
+            using var db = factory.GetForWrite();
+
+            var TotalPP = db.Context.Scores
+                            .Where(s => (s.Mods & Mod.Relax) == 0)
+                            .Where(s => s.PlayMode == mode)
+                            .Where(s => s.UserId == Id)
+                            .OrderByDescending(s => s.PeppyPoints)
+                            .Take(100).ToList()
+                            .Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i))
+                            .Sum();
 
             switch (mode)
             {
@@ -305,8 +311,8 @@ namespace Sora.Database.Models
 
         public uint GetPosition(SoraDbContextFactory factory, PlayMode mode)
         {
-            int pos = 0;
-            
+            var pos = 0;
+
             switch (mode)
             {
                 case PlayMode.Osu:
@@ -319,7 +325,7 @@ namespace Sora.Database.Models
                     pos = factory.Get().LeaderboardRx.Count(x => x.PerformancePointsCtb > PerformancePointsCtb);
                     break;
             }
-            
+
             return (uint) pos;
         }
 

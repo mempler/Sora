@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -32,11 +34,8 @@ namespace Sora.Events.BanchoEvents.Chat
     {
         private readonly ChannelService _cs;
 
-        public OnChannelLeaveEvent(ChannelService cs)
-        {
-            _cs = cs;
-        }
-        
+        public OnChannelLeaveEvent(ChannelService cs) => _cs = cs;
+
         [Event(EventType.BanchoChannelLeave)]
         public void OnChannelLeave(BanchoChannelLeaveArgs args)
         {

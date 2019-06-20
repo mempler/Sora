@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -30,11 +32,8 @@ namespace Sora.Events.BanchoEvents.Multiplayer
     {
         private readonly PacketStreamService _ps;
 
-        public OnLobbyPartEvent(PacketStreamService ps)
-        {
-            _ps = ps;
-        }
-        
+        public OnLobbyPartEvent(PacketStreamService ps) => _ps = ps;
+
         [Event(EventType.BanchoLobbyPart)]
         public void OnLobbyPart(BanchoLobbyPartArgs args)
         {

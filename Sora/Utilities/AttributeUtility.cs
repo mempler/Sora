@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -30,7 +32,7 @@ namespace Sora.Utilities
         public static IEnumerable<Type> GetTFromClass<T>(Assembly asm)
             where T : Attribute
         {
-            IEnumerable<Type> types =
+            var types =
                 from t in asm.GetTypes()
                 where t.GetCustomAttributes<T>(false)
                        .Any(x => x != null)
@@ -41,7 +43,7 @@ namespace Sora.Utilities
         public static IEnumerable<MethodInfo> GetTFromMethod<T>(Type classType)
             where T : Attribute
         {
-            IEnumerable<MethodInfo> methods =
+            var methods =
                 from m in classType.GetMethods()
                 where m.GetCustomAttributes<T>(false)
                        .Any(x => x != null)
@@ -49,6 +51,5 @@ namespace Sora.Utilities
 
             return methods;
         }
-
     }
 }

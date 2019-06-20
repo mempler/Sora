@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -31,21 +33,33 @@ namespace Sora.Services
         public ChannelService(PacketStreamService streamService)
         {
             AddChannel(new Channel("#osu", "Osu! default channel.", streamService.GetStream("main"), autoJoin: true));
-            AddChannel(new Channel("#announce", "Osu! default channel.", streamService.GetStream("main"),
-                                   readOnly: true,
-                                   autoJoin: true));
-            AddChannel(new Channel("#userlog", "Osu! default channel.", streamService.GetStream("main"),
-                                   readOnly: true));
+            AddChannel(
+                new Channel(
+                    "#announce", "Osu! default channel.", streamService.GetStream("main"),
+                    readOnly: true,
+                    autoJoin: true
+                )
+            );
+            AddChannel(
+                new Channel(
+                    "#userlog", "Osu! default channel.", streamService.GetStream("main"),
+                    readOnly: true
+                )
+            );
             AddChannel(new Channel("#lobby", "Osu! default channel", streamService.GetStream("main")));
-            AddChannel(new Channel("#admin", "Admin. is an administration channel.", streamService.GetStream("admin"),
-                                   adminOnly: true, autoJoin: true));
+            AddChannel(
+                new Channel(
+                    "#admin", "Admin. is an administration channel.", streamService.GetStream("admin"),
+                    adminOnly: true, autoJoin: true
+                )
+            );
         }
-        
+
         public void AddChannel(Channel channel)
         {
             if (channel.AutoJoin)
                 ChannelsAutoJoin.Add(channel);
-            
+
             Channels.TryAdd(channel.ChannelName, channel);
         }
 
@@ -57,15 +71,16 @@ namespace Sora.Services
 
         public void RemoveChannel(string channelName)
         {
-            Channel chan = GetChannel(channelName);
-            if (chan == null) return;
+            var chan = GetChannel(channelName);
+            if (chan == null)
+                return;
             ChannelsAutoJoin.Remove(chan);
             Channels.Remove(chan.ChannelName);
         }
 
         public Channel GetChannel(string channelName)
         {
-            Channels.TryGetValue(channelName, out Channel x);
+            Channels.TryGetValue(channelName, out var x);
             return x;
         }
     }

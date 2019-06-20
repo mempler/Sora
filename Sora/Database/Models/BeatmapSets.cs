@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -54,11 +56,14 @@ namespace Sora.Database.Models
         [DefaultValue(0)]
         public int PassCount { get; set; }
 
-        public Beatmaps GetBeatmap(string fileMd5) => Beatmaps?.FirstOrDefault(b => b.FileMd5 == fileMd5);
+        public Beatmaps GetBeatmap(string fileMd5)
+        {
+            return Beatmaps?.FirstOrDefault(b => b.FileMd5 == fileMd5);
+        }
 
         public static BeatmapSets GetBeatmapSet(SoraDbContextFactory factory, int setId)
         {
-            BeatmapSets sts = factory.Get().BeatmapSets.FirstOrDefault(s => s.Id == setId);
+            var sts = factory.Get().BeatmapSets.FirstOrDefault(s => s.Id == setId);
 
             if (sts != null)
                 sts.Beatmaps = factory.Get().Beatmaps.Where(s => s.BeatmapSetId == sts.Id).ToList();

@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -34,10 +36,7 @@ namespace Sora.Services
             return Rooms.Select(x => x.Value);
         }
 
-        public MultiplayerRoom GetRoom(long matchId)
-        {
-            return Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
-        }
+        public MultiplayerRoom GetRoom(long matchId) => Rooms.ContainsKey(matchId) ? Rooms[matchId] : null;
 
         public long Add(MultiplayerRoom room)
         {
@@ -48,7 +47,8 @@ namespace Sora.Services
 
         public void Remove(long matchId)
         {
-            if (!Rooms.ContainsKey(matchId)) return;
+            if (!Rooms.ContainsKey(matchId))
+                return;
             Rooms.Remove(matchId);
         }
     }

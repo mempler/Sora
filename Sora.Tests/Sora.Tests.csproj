@@ -16,4 +16,8 @@
       <ProjectReference Include="..\Sora\Sora.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="HelperTests" />
+    </ItemGroup>
+
 </Project>

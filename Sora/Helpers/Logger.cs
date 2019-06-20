@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -38,22 +40,25 @@ namespace Sora.Helpers
         public const string DARK_RED = "%#800000%";
         public const string BLUE = "%#1E88E5%";
     }
-    
+
     public static class Logger
     {
-        public static void Log(params object[] msg) => Debug(msg);
+        public static void Log(params object[] msg)
+        {
+            Debug(msg);
+        }
 
         private static void PrintColorized(string Prefix, Color PrefixColor, bool exit, IEnumerable<object> msg)
         {
-            Color color = PrefixColor;
+            var color = PrefixColor;
 
-            string m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);
+            var m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);
             Console.WriteFormatted(Prefix, color);
 
             color = Color.White;
-            foreach (string x in Regex.Split(m, @"\%(.*?)\%"))
+            foreach (var x in Regex.Split(m, @"\%(.*?)\%"))
             {
-                if (!x.StartsWith('#') || !IsHex(x.TrimStart('#')) || x.Length != 7)
+                if (!x.StartsWith('#') || !Hex.IsHex(x.TrimStart('#')) || x.Length != 7)
                 {
                     Console.WriteFormatted(x, color);
                     continue;
@@ -71,25 +76,28 @@ namespace Sora.Helpers
         public static void Debug(params object[] msg)
             #if DEBUG
             => PrintColorized("[DEBUG]", Color.FromArgb(0xCECECE), false, msg);
-            #else
+        #else
             { }
-            #endif
-            
+        #endif
 
         public static void Info(params object[] msg)
-            => PrintColorized("[INFO]", Color.FromArgb(0x37B6FF), false, msg);
+        {
+            PrintColorized("[INFO]", Color.FromArgb(0x37B6FF), false, msg);
+        }
 
         public static void Warn(params object[] msg)
-            => PrintColorized("[WARNING]", Color.FromArgb(0xFFDA38), false, msg);
+        {
+            PrintColorized("[WARNING]", Color.FromArgb(0xFFDA38), false, msg);
+        }
 
         public static void Err(params object[] msg)
-            => PrintColorized("[ERROR]", Color.FromArgb(0xFF4C4C), false, msg);
+        {
+            PrintColorized("[ERROR]", Color.FromArgb(0xFF4C4C), false, msg);
+        }
 
         public static void Fatal(params object[] msg)
-            => PrintColorized("[FATAL]", Color.FromArgb(0x910000), true, msg);
-
-        private static bool IsHex(IEnumerable<char> chars) =>
-            chars.Select(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')
-                 .All(isHex => isHex);
+        {
+            PrintColorized("[FATAL]", Color.FromArgb(0x910000), true, msg);
+        }
     }
 }

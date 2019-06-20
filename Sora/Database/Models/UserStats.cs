@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.ComponentModel;
@@ -38,14 +40,14 @@ namespace Sora.Database.Models
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public CountryIds CountryId { get; set; }
 
-
         // ReSharper disable once MemberCanBePrivate.Global
         public static UserStats GetUserStats(SoraDbContextFactory factory, int userId)
         {
-            using DatabaseWriteUsage db = factory.GetForWrite();
-            
-            UserStats val = db.Context.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-            if (val != null) return val;
+            using var db = factory.GetForWrite();
+
+            var val = db.Context.UserStats.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
+            if (val != null)
+                return val;
 
             db.Context.UserStats.Add(val = new UserStats {Id = userId, CountryId = 0});
             return val;

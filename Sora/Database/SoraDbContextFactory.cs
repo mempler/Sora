@@ -7,16 +7,15 @@ namespace Sora.Database
     // Modified version of https://github.com/ppy/osu/blob/master/osu.Game/Database/DatabaseContextFactory.cs under MIT License!
     public class SoraDbContextFactory
     {
-        private ThreadLocal<SoraDbContext> threadContexts;
-
         private readonly object writeLock = new object();
-
-        private bool currentWriteDidWrite;
         private bool currentWriteDidError;
 
-        private int currentWriteUsages;
+        private bool currentWriteDidWrite;
 
         private IDbContextTransaction currentWriteTransaction;
+
+        private int currentWriteUsages;
+        private ThreadLocal<SoraDbContext> threadContexts;
 
         public SoraDbContextFactory()
         {
@@ -24,14 +23,15 @@ namespace Sora.Database
         }
 
         /// <summary>
-        /// Get a context for the current thread for read-only usage.
-        /// If a <see cref="DatabaseWriteUsage"/> is in progress, the existing write-safe context will be returned.
+        ///     Get a context for the current thread for read-only usage.
+        ///     If a <see cref="DatabaseWriteUsage" /> is in progress, the existing write-safe context will be returned.
         /// </summary>
         public SoraDbContext Get() => threadContexts.Value;
 
         /// <summary>
-        /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
-        /// This method may block if a write is already active on a different thread.
+        ///     Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying
+        ///     context).
+        ///     This method may block if a write is already active on a different thread.
         /// </summary>
         /// <param name="withTransaction">Whether to start a transaction for this write.</param>
         /// <returns>A usage containing a usable context.</returns>
@@ -57,8 +57,7 @@ namespace Sora.Database
                     // we want to try-catch the retrieval of the context because it could throw an error (in CreateContext).
                     context = threadContexts.Value;
                 }
-            }
-            catch
+            } catch
             {
                 // retrieval of a context could trigger a fatal error.
                 Monitor.Exit(writeLock);
@@ -67,12 +66,15 @@ namespace Sora.Database
 
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(context, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
+            return new DatabaseWriteUsage(context, usageCompleted)
+            {
+                IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1
+            };
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
         {
-            int usages = Interlocked.Decrement(ref currentWriteUsages);
+            var usages = Interlocked.Decrement(ref currentWriteUsages);
 
             try
             {
@@ -114,15 +116,15 @@ namespace Sora.Database
             threadContexts = new ThreadLocal<SoraDbContext>(CreateContext, true);
         }
 
-        protected virtual SoraDbContext CreateContext() => new SoraDbContext
-        {
-            Database = { AutoTransactionsEnabled = false }
-        };
+        protected virtual SoraDbContext CreateContext()
+            => new SoraDbContext {Database = {AutoTransactionsEnabled = false}};
 
         public void ResetDatabase()
         {
             lock (writeLock)
+            {
                 recycleThreadContexts();
+            }
         }
     }
 }

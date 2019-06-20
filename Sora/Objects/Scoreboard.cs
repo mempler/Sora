@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -30,10 +32,10 @@ namespace Sora.Objects
 {
     public class Scoreboard
     {
+        private readonly Config _cfg;
         private readonly bool _countryOnly;
 
         private readonly SoraDbContextFactory _factory;
-        private readonly Config _cfg;
         private readonly string _fileMd5;
         private readonly bool _friendsOnly;
         private readonly bool _modOnly;
@@ -45,31 +47,31 @@ namespace Sora.Objects
         private List<Scores> _scores;
 
         public Scoreboard(SoraDbContextFactory factory, Config cfg,
-                          string fileMd5, Users user,
-                          PlayMode playMode = PlayMode.Osu, bool relaxing = false,
-                          bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
-                          Mod mods = Mod.None)
+            string fileMd5, Users user,
+            PlayMode playMode = PlayMode.Osu, bool relaxing = false,
+            bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
+            Mod mods = Mod.None)
         {
             _factory = factory;
             _cfg = cfg;
-            _fileMd5     = fileMd5;
-            _user        = user;
-            _playMode    = playMode;
-            _relaxing    = relaxing;
+            _fileMd5 = fileMd5;
+            _user = user;
+            _playMode = playMode;
+            _relaxing = relaxing;
             _friendsOnly = friendsOnly;
             _countryOnly = countryOnly;
-            _modOnly     = modOnly;
-            _mods        = mods;
+            _modOnly = modOnly;
+            _mods = mods;
         }
 
         public string ToOsuString()
         {
-            StringBuilder x = new StringBuilder();
+            var x = new StringBuilder();
             SetScores();
             SetBeatmap();
 
             x.Append(ScoreboardHeader());
-            foreach (Scores score in _scores)
+            foreach (var score in _scores)
                 x.Append($"{score?.ToOsuString(_factory)}\n");
 
             return x.ToString();
@@ -98,16 +100,23 @@ namespace Sora.Objects
         {
             _scores = new List<Scores>
             {
-                Scores.GetScores(_factory, _fileMd5, _user, _playMode, _relaxing, _friendsOnly, _countryOnly, _modOnly,
-                                 _mods, true).FirstOrDefault()
+                Scores.GetScores(
+                    _factory, _fileMd5, _user, _playMode, _relaxing, _friendsOnly, _countryOnly, _modOnly,
+                    _mods, true
+                ).FirstOrDefault()
             };
-            _scores.AddRange(Scores.GetScores(_factory, _fileMd5, _user, _playMode, _relaxing, _friendsOnly,
-                                              _countryOnly, _modOnly, _mods));
+            _scores.AddRange(
+                Scores.GetScores(
+                    _factory, _fileMd5, _user, _playMode, _relaxing, _friendsOnly,
+                    _countryOnly, _modOnly, _mods
+                )
+            );
         }
 
         private void SetBeatmap()
         {
-            if ((_bm = Beatmaps.FetchFromDatabase(_factory, _fileMd5)) != null) return;
+            if ((_bm = Beatmaps.FetchFromDatabase(_factory, _fileMd5)) != null)
+                return;
             if ((_bm = Beatmaps.FetchFromApi(_cfg, _fileMd5)) != null)
                 Beatmaps.InsertBeatmap(_factory, _bm);
         }

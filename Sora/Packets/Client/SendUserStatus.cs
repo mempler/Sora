@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,15 +17,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Enums;
-using IPacket = Sora.Interfaces.IPacket;
-using Mod = Sora.Enums.Mod;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PacketId = Sora.Enums.PacketId;
-using PlayMode = Sora.Enums.PlayMode;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Packets.Client
 {
@@ -37,12 +35,12 @@ namespace Sora.Packets.Client
         {
             Status = new UserStatus
             {
-                Status          = (Status) sr.ReadByte(),
-                StatusText      = sr.ReadString(),
+                Status = (Status) sr.ReadByte(),
+                StatusText = sr.ReadString(),
                 BeatmapChecksum = sr.ReadString(),
-                CurrentMods     = (Mod) sr.ReadUInt32(),
-                Playmode        = (PlayMode) sr.ReadByte(),
-                BeatmapId       = sr.ReadUInt32()
+                CurrentMods = (Mod) sr.ReadUInt32(),
+                Playmode = (PlayMode) sr.ReadByte(),
+                BeatmapId = sr.ReadUInt32()
             };
         }
 
@@ -67,9 +65,6 @@ namespace Sora.Packets.Client
         public uint BeatmapId;
 
         public override string ToString()
-        {
-            return
-                $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
-        }
+            => $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
     }
 }

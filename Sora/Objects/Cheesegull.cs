@@ -8,263 +8,255 @@ using Sora.Helpers;
 
 namespace Sora.Objects
 {
-	public struct CheesegullBeatmapSet
-	{
-		public int SetID;
-		public List<CheesegullBeatmap> ChildrenBeatmaps;
-		public RankedStatus RankedStatus;
-		public string ApprovedDate;
-		public string LastUpdate;
-		public string LastChecked;
-		public string Artist;
-		public string Title;
-		public string Creator;
-		public string Source;
-		public string Tags;
-		public bool HasVideo;
-		public int Genre;
-		public int Language;
-		public int Favourites;
-	}
+    public struct CheesegullBeatmapSet
+    {
+        public int SetID;
+        public List<CheesegullBeatmap> ChildrenBeatmaps;
+        public RankedStatus RankedStatus;
+        public string ApprovedDate;
+        public string LastUpdate;
+        public string LastChecked;
+        public string Artist;
+        public string Title;
+        public string Creator;
+        public string Source;
+        public string Tags;
+        public bool HasVideo;
+        public int Genre;
+        public int Language;
+        public int Favourites;
+    }
 
-	public struct CheesegullBeatmap
-	{
-		public int BeatmapID;
-		public int ParentSetID;
-		public string DiffName;
-		public string FileMD5;
-		public PlayMode Mode;
-		public float BPM;
-		public float AR;
-		public float OD;
-		public float CS;
-		public float HP;
-		public int TotalLength;
-		public int HitLength;
-		public int Playcount;
-		public int Passcount;
-		public int MaxCombo;
-		public double DifficultyRating;
-	}
+    public struct CheesegullBeatmap
+    {
+        public int BeatmapID;
+        public int ParentSetID;
+        public string DiffName;
+        public string FileMD5;
+        public PlayMode Mode;
+        public float BPM;
+        public float AR;
+        public float OD;
+        public float CS;
+        public float HP;
+        public int TotalLength;
+        public int HitLength;
+        public int Playcount;
+        public int Passcount;
+        public int MaxCombo;
+        public double DifficultyRating;
+    }
 
     public class Cheesegull
     {
-	    public enum RankedStatus
-	    {
-		    Graveyard = -2,
-		    Wip = -1,
-		    Pending = 0,
-		    Ranked = 1,
-		    Approved = 2,
-		    Qualified = 3,
-		    Loved = 4,
-	    }
-	    
-	    private readonly ICheesegullConfig _cfg;
-	    private List<CheesegullBeatmapSet> _sets;
-	    private string _query;
+        public enum RankedStatus
+        {
+            Graveyard = -2,
+            Wip = -1,
+            Pending = 0,
+            Ranked = 1,
+            Approved = 2,
+            Qualified = 3,
+            Loved = 4
+        }
 
-	    private static int CheeseStatus(int status)
+        private readonly ICheesegullConfig _cfg;
+        private string _query;
+        private List<CheesegullBeatmapSet> _sets;
+
+        public Cheesegull(ICheesegullConfig cfg) => _cfg = cfg;
+
+        private static int CheeseStatus(int status)
         {
             switch (status)
             {
                 case 0:
-	                return 1;
+                    return 1;
                 case 2:
-	                return 0;
+                    return 0;
                 case 3:
-	                return 3;
+                    return 3;
                 case 4:
-	                return -100;
+                    return -100;
                 case 5:
-	                return -2;
+                    return -2;
                 case 7:
-	                return 2;
+                    return 2;
                 case 8:
-	                return 4;
+                    return 4;
                 default:
-	                return 1;
+                    return 1;
             }
-        }
-
-        public Cheesegull(ICheesegullConfig cfg)
-        {
-	        _cfg = cfg;
         }
 
         public void Search(string query, int rankedStatus, int playMode, int page)
         {
-	        query = query.ToLower();
-	        if (query.Contains("newest") || query.Contains("top rated") || query.Contains("most played"))
-		        query = "";
+            query = query.ToLower();
+            if (query.Contains("newest") || query.Contains("top rated") || query.Contains("most played"))
+                query = "";
 
-	        rankedStatus = CheeseStatus(rankedStatus);
+            rankedStatus = CheeseStatus(rankedStatus);
 
-	        string pm;
-	        if (playMode < 3 || playMode > 3)
-		        pm  = "";
-	        else pm = $"mode={playMode.ToString()}&";
-	        
-	        query = $"?{pm}amount={100}&offset={page*100}&status={rankedStatus}&query={query}";
-	        string request_url = _cfg.Cheesegull.URI + "/api/search" + query;
-	        
-	        Logger.Debug($"{L_COL.YELLOW}Cheesegull {L_COL.WHITE}REQUEST_URI: {request_url}");
+            string pm;
+            if (playMode < 3 || playMode > 3)
+                pm = "";
+            else
+                pm = $"mode={playMode.ToString()}&";
 
-	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
-	        request.AutomaticDecompression = DecompressionMethods.GZip;
+            query = $"?{pm}amount={100}&offset={page * 100}&status={rankedStatus}&query={query}";
+            var request_url = _cfg.Cheesegull.URI + "/api/search" + query;
 
-	        using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
-	        using (Stream stream = response.GetResponseStream())
-	        using (StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
-	        {
-		        string result = reader.ReadToEnd();
-		        _sets = JsonConvert.DeserializeObject<List<CheesegullBeatmapSet>>(result);
-	        }
+            Logger.Debug($"{L_COL.YELLOW}Cheesegull {L_COL.WHITE}REQUEST_URI: {request_url}");
 
-	        _query = query;
+            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (var response = (HttpWebResponse) request.GetResponse())
+            using (var stream = response.GetResponseStream())
+            using (var reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
+            {
+                var result = reader.ReadToEnd();
+                _sets = JsonConvert.DeserializeObject<List<CheesegullBeatmapSet>>(result);
+            }
+
+            _query = query;
         }
 
         public void SetBMSet(int SetId)
         {
-	        string request_url = _cfg.Cheesegull.URI + "/api/s/" + SetId;
+            var request_url = _cfg.Cheesegull.URI + "/api/s/" + SetId;
 
-	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
-	        request.AutomaticDecompression = DecompressionMethods.GZip;
+            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
 
-	        using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-	        using Stream stream = response.GetResponseStream();
-	        using StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
-	        string result = reader.ReadToEnd();
-	        _sets = new List<CheesegullBeatmapSet>(new[]
-	        {
-		        JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)
-	        });
+            using var response = (HttpWebResponse) request.GetResponse();
+            using var stream = response.GetResponseStream();
+            using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
+            var result = reader.ReadToEnd();
+            _sets = new List<CheesegullBeatmapSet>(new[] {JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)});
         }
 
         public void SetBM(int BeatmapId)
         {
-	        string request_url = _cfg.Cheesegull.URI + "/api/b/" + BeatmapId;
+            var request_url = _cfg.Cheesegull.URI + "/api/b/" + BeatmapId;
 
-	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
-	        request.AutomaticDecompression = DecompressionMethods.GZip;
+            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
 
-	        using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-	        using Stream stream = response.GetResponseStream();
-	        using StreamReader reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
-	        string result = reader.ReadToEnd();
+            using var response = (HttpWebResponse) request.GetResponse();
+            using var stream = response.GetResponseStream();
+            using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
+            var result = reader.ReadToEnd();
 
-	        if (result == "null")
-	        {
-		        _sets = new List<CheesegullBeatmapSet>();
-		        return;
-	        }
-	        
-	        SetBMSet(JsonConvert.DeserializeObject<CheesegullBeatmap>(result).ParentSetID);
+            if (result == "null")
+            {
+                _sets = new List<CheesegullBeatmapSet>();
+                return;
+            }
+
+            SetBMSet(JsonConvert.DeserializeObject<CheesegullBeatmap>(result).ParentSetID);
         }
 
         public void SetBM(string Hash)
         {
-	        string request_url = _cfg.Cheesegull.URI + "/api/hash/" + Hash;
+            var request_url = _cfg.Cheesegull.URI + "/api/hash/" + Hash;
 
-	        HttpWebRequest request = (HttpWebRequest) WebRequest.Create(request_url);
-	        request.AutomaticDecompression = DecompressionMethods.GZip;
+            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
 
-	        using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-	        using Stream          stream   = response.GetResponseStream();
-	        using StreamReader    reader   = new StreamReader(stream ?? throw new Exception("Request Failed!"));
-	        string                result   = reader.ReadToEnd();
-	        if (result != "null")
-		        _sets = new List<CheesegullBeatmapSet>(new[]
-		        {
-			        JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)
-		        });
-	        else
-		        _sets = new List<CheesegullBeatmapSet>();
+            using var response = (HttpWebResponse) request.GetResponse();
+            using var stream = response.GetResponseStream();
+            using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
+            var result = reader.ReadToEnd();
+            if (result != "null")
+                _sets = new List<CheesegullBeatmapSet>(
+                    new[] {JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)}
+                );
+            else
+                _sets = new List<CheesegullBeatmapSet>();
         }
-        
+
         public string ToDirect()
         {
-	        string RetStr = string.Empty;
+            var RetStr = string.Empty;
 
-	        if (_sets == null)
-		        _sets = new List<CheesegullBeatmapSet>();
-	        
-	        if (_sets.Count >= 100)
-		        RetStr += "101";
-	        else
-		        RetStr += _sets.Count.ToString();
+            if (_sets == null)
+                _sets = new List<CheesegullBeatmapSet>();
 
-	        RetStr += "\n";
+            if (_sets.Count >= 100)
+                RetStr += "101";
+            else
+                RetStr += _sets.Count.ToString();
 
-	        if (_sets.Count > 0)
-	        {
-		        foreach (CheesegullBeatmapSet set in _sets)
-		        {
-			        double MaxDiff = 0;
+            RetStr += "\n";
 
-			        foreach (CheesegullBeatmap cbm in set.ChildrenBeatmaps)
-				        if (cbm.DifficultyRating > MaxDiff)
-					        MaxDiff = cbm.DifficultyRating;
+            if (_sets.Count > 0)
+                foreach (var set in _sets)
+                {
+                    double MaxDiff = 0;
 
-			        MaxDiff *= 1.5;
+                    foreach (var cbm in set.ChildrenBeatmaps)
+                        if (cbm.DifficultyRating > MaxDiff)
+                            MaxDiff = cbm.DifficultyRating;
 
-			        RetStr += $"{set.SetID}.osz|" +
-			                  $"{set.Artist}|" +
-			                  $"{set.Title}|" +
-			                  $"{set.Creator}|" +
-			                  $"{set.RankedStatus}|" +
-			                  $"{MaxDiff + ".00"}|" +
-			                  $"{set.LastUpdate}|" +
-			                  $"{set.SetID}|" +
-			                  $"{set.SetID}|" +
-			                  $"0|" +
-			                  $"1234|" +
-			                  $"{Convert.ToInt32(set.HasVideo)}|" +
-			                  $"{Convert.ToInt32(set.HasVideo) * 4321}|";
+                    MaxDiff *= 1.5;
 
-			        foreach (CheesegullBeatmap cb in set.ChildrenBeatmaps)
-				        RetStr += $"{cb.DiffName.Replace("@", "")} " +
-				                  $"({Math.Round(cb.DifficultyRating, 2)}★~" +
-				                  $"{cb.BPM}♫~AR" +
-				                  $"{cb.AR}~OD" +
-				                  $"{cb.OD}~CS" +
-				                  $"{cb.CS}~HP" +
-				                  $"{cb.HP}~" +
-				                  $"{(int) MathF.Floor(cb.TotalLength) / 60}m" +
-				                  $"{cb.TotalLength%60}s)@" +
-				                  $"{(int) cb.Mode},";
-			        
-				    RetStr = RetStr.TrimEnd(',') + "|\n";
-		        }
-	        }
-	        else if (_sets.Count <= 0)
-		        RetStr = "-1\nNo Beatmaps were found!";
-	        else if (_sets.Count <= 0 && _query == string.Empty)
-		        RetStr = "-1\nWhoops, looks like osu!direct is down!";
+                    RetStr += $"{set.SetID}.osz|" +
+                              $"{set.Artist}|" +
+                              $"{set.Title}|" +
+                              $"{set.Creator}|" +
+                              $"{set.RankedStatus}|" +
+                              $"{MaxDiff + ".00"}|" +
+                              $"{set.LastUpdate}|" +
+                              $"{set.SetID}|" +
+                              $"{set.SetID}|" +
+                              "0|" +
+                              "1234|" +
+                              $"{Convert.ToInt32(set.HasVideo)}|" +
+                              $"{Convert.ToInt32(set.HasVideo) * 4321}|";
 
-	        return RetStr;
+                    foreach (var cb in set.ChildrenBeatmaps)
+                        RetStr += $"{cb.DiffName.Replace("@", "")} " +
+                                  $"({Math.Round(cb.DifficultyRating, 2)}★~" +
+                                  $"{cb.BPM}♫~AR" +
+                                  $"{cb.AR}~OD" +
+                                  $"{cb.OD}~CS" +
+                                  $"{cb.CS}~HP" +
+                                  $"{cb.HP}~" +
+                                  $"{(int) MathF.Floor(cb.TotalLength) / 60}m" +
+                                  $"{cb.TotalLength % 60}s)@" +
+                                  $"{(int) cb.Mode},";
+
+                    RetStr = RetStr.TrimEnd(',') + "|\n";
+                }
+            else if (_sets.Count <= 0)
+                RetStr = "-1\nNo Beatmaps were found!";
+            else if (_sets.Count <= 0 && _query == string.Empty)
+                RetStr = "-1\nWhoops, looks like osu!direct is down!";
+
+            return RetStr;
         }
 
         public string ToNP()
         {
-	        if (_sets.Count <= 0)
-		        return "0";
+            if (_sets.Count <= 0)
+                return "0";
 
-	        CheesegullBeatmapSet set = _sets[0];
-	        
-	        return $"{set.SetID}.osz|" +
-	               $"{set.Artist}|" +
-	               $"{set.Title}|" +
-	               $"{set.Creator}|" +
-	               $"{set.RankedStatus}|" +
-	               $"10.00|" +
-	               $"{set.LastUpdate}|" +
-	               $"{set.SetID}|" +
-	               $"{set.SetID}|" +
-	               $"{Convert.ToInt32(set.HasVideo)}|" +
-	               $"0|" +
-	               $"1234|" +
-	               $"{Convert.ToInt32(set.HasVideo) * 4321}\r\n";
+            var set = _sets[0];
+
+            return $"{set.SetID}.osz|" +
+                   $"{set.Artist}|" +
+                   $"{set.Title}|" +
+                   $"{set.Creator}|" +
+                   $"{set.RankedStatus}|" +
+                   "10.00|" +
+                   $"{set.LastUpdate}|" +
+                   $"{set.SetID}|" +
+                   $"{set.SetID}|" +
+                   $"{Convert.ToInt32(set.HasVideo)}|" +
+                   "0|" +
+                   "1234|" +
+                   $"{Convert.ToInt32(set.HasVideo) * 4321}\r\n";
         }
 
         public List<CheesegullBeatmapSet> GetSets() => _sets;

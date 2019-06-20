@@ -2,37 +2,37 @@ namespace Sora.Objects
 {
     public class Chart
     {
+        private readonly double _accuracyAfter;
+        private readonly double _accuracyBefore;
+        private readonly string _achievementsNew;
         private readonly string _chartId;
         private readonly string _chartName;
         private readonly string _chartUrl;
-        private readonly int _rankBefore;
-        private readonly int _rankAfter;
-        private readonly int _maxComboBefore;
         private readonly int _maxComboAfter;
-        private readonly double _accuracyBefore;
-        private readonly double _accuracyAfter;
+        private readonly int _maxComboBefore;
+        private readonly int _onlineScoreId;
+        private readonly double _ppAfter;
+        private readonly double _ppBefore;
+        private readonly int _rankAfter;
+        private readonly int _rankBefore;
         private readonly ulong _rankedScoreBefore;
         private readonly ulong _totalScoreAfter;
-        private readonly double _ppBefore;
-        private readonly double _ppAfter;
-        private readonly int _onlineScoreId;
-        private readonly string _achievementsNew;
 
         public Chart(string chartId,
-                     string chartName,
-                     string chartUrl,
-                     int rankBefore,
-                     int rankAfter,
-                     int maxComboBefore,
-                     int maxComboAfter,
-                     double accuracyBefore,
-                     double accuracyAfter,
-                     ulong rankedScoreBefore,
-                     ulong totalScoreAfter,
-                     double ppBefore,
-                     double ppAfter,
-                     int onlineScoreId,
-                     string achievements_new = null
+            string chartName,
+            string chartUrl,
+            int rankBefore,
+            int rankAfter,
+            int maxComboBefore,
+            int maxComboAfter,
+            double accuracyBefore,
+            double accuracyAfter,
+            ulong rankedScoreBefore,
+            ulong totalScoreAfter,
+            double ppBefore,
+            double ppAfter,
+            int onlineScoreId,
+            string achievements_new = null
         )
         {
             _chartId = chartId;
@@ -51,27 +51,24 @@ namespace Sora.Objects
             _onlineScoreId = onlineScoreId;
             _achievementsNew = achievements_new;
         }
-        
+
         public string ToOsuString()
-        {
-            return
-                $"chartId:{_chartId}" +
-                $"|chartUrl:{_chartUrl}" +
-                $"|chartName:{_chartName}" +
-                $"|rankBefore:{_rankBefore}" +
-                $"|rankAfter:{_rankAfter}" +
-                $"|maxComboBefore:{_maxComboBefore}" +
-                $"|maxComboAfter:{_maxComboAfter}" +
-                $"|accuracyBefore:{_accuracyBefore}" +
-                $"|accuracyAfter:{_accuracyAfter}" +
-                $"|rankedScoreBefore:{_rankedScoreBefore}" +
-                $"|rankedScoreAfter:{_rankedScoreBefore}" +
-                $"|totalScoreBefore:{_totalScoreAfter}" +
-                $"|totalScoreAfter:{_totalScoreAfter}" +
-                $"|ppBefore:{_ppBefore}" +
-                $"|ppAfter:{_ppAfter}" +
-                (_achievementsNew == null ? ""  : "|achievements-new:" + _achievementsNew) +
-                $"|onlineScoreId:{_onlineScoreId}";
-        }
+            => $"chartId:{_chartId}" +
+               $"|chartUrl:{_chartUrl}" +
+               $"|chartName:{_chartName}" +
+               $"|rankBefore:{_rankBefore}" +
+               $"|rankAfter:{_rankAfter}" +
+               $"|maxComboBefore:{_maxComboBefore}" +
+               $"|maxComboAfter:{_maxComboAfter}" +
+               $"|accuracyBefore:{_accuracyBefore}" +
+               $"|accuracyAfter:{_accuracyAfter}" +
+               $"|rankedScoreBefore:{_rankedScoreBefore}" +
+               $"|rankedScoreAfter:{_rankedScoreBefore}" +
+               $"|totalScoreBefore:{_totalScoreAfter}" +
+               $"|totalScoreAfter:{_totalScoreAfter}" +
+               $"|ppBefore:{_ppBefore}" +
+               $"|ppAfter:{_ppAfter}" +
+               (_achievementsNew == null ? "" : "|achievements-new:" + _achievementsNew) +
+               $"|onlineScoreId:{_onlineScoreId}";
     }
 }

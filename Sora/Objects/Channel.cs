@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -37,13 +39,13 @@ namespace Sora.Objects
             PacketStream boundStream = null, Presence boundPresence = null,
             bool readOnly = false, bool adminOnly = false, bool autoJoin = false)
         {
-            ChannelName   = channelName;
-            ChannelTopic  = channelTopic;
-            BoundStream   = boundStream;
+            ChannelName = channelName;
+            ChannelTopic = channelTopic;
+            BoundStream = boundStream;
             BoundPresence = boundPresence;
-            ReadOnly      = readOnly;
-            AdminOnly     = adminOnly;
-            AutoJoin      = autoJoin;
+            ReadOnly = readOnly;
+            AdminOnly = adminOnly;
+            AutoJoin = autoJoin;
         }
 
         public string ChannelName { get; }
@@ -58,11 +60,13 @@ namespace Sora.Objects
         {
             get
             {
-                if (_userCount > -1) return _userCount;
-                if (_presences == null) return 0;
+                if (_userCount > -1)
+                    return _userCount;
+                if (_presences == null)
+                    return 0;
 
                 _mut.WaitOne();
-                int c = _presences.Count;
+                var c = _presences.Count;
                 _mut.ReleaseMutex();
 
                 return c;
@@ -82,7 +86,8 @@ namespace Sora.Objects
                 return true;
             }
 
-            if (AdminOnly) return false;
+            if (AdminOnly)
+                return false;
 
             _mut.WaitOne();
             _presences.Remove(pr);
@@ -100,8 +105,7 @@ namespace Sora.Objects
                 {
                     _presences.Remove(pr);
                 }
-            }
-            catch
+            } catch
             {
                 // Ignored
             }
@@ -110,18 +114,20 @@ namespace Sora.Objects
         public void WriteMessage(Presence pr, string message, bool skipReadonly = false)
         {
             if (!skipReadonly && pr.User.Id != 100)
-                if (ReadOnly) return;
+                if (ReadOnly)
+                    return;
             if (BoundStream == null && BoundPresence != null)
             {
-                BoundPresence += 
+                BoundPresence +=
                     new SendIrcMessage(
                         new MessageStruct
                         {
-                            Username      = pr.User.Username,
+                            Username = pr.User.Username,
                             ChannelTarget = pr.User.Username,
-                            Message       = message,
-                            SenderId      = pr.User.Id
-                        });
+                            Message = message,
+                            SenderId = pr.User.Id
+                        }
+                    );
                 return;
             }
 
@@ -129,18 +135,16 @@ namespace Sora.Objects
                 new SendIrcMessage(
                     new MessageStruct
                     {
-                        Username      = pr.User.Username,
+                        Username = pr.User.Username,
                         ChannelTarget = ChannelName,
-                        Message       = message,
-                        SenderId      = pr.User.Id
+                        Message = message,
+                        SenderId = pr.User.Id
                     }
-                ), pr);
+                ), pr
+            );
         }
 
         public override string ToString()
-        {
-            return
-                $"Channel: {ChannelName} ChannelTopic: {ChannelTopic} BoundStream: {BoundStream?.StreamName} ChannelOwner: {BoundPresence?.User?.Username}";
-        }
+            => $"Channel: {ChannelName} ChannelTopic: {ChannelTopic} BoundStream: {BoundStream?.StreamName} ChannelOwner: {BoundPresence?.User?.Username}";
     }
 }

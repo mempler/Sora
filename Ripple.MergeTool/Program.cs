@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
 using Ripple.MergeTool.Database;
-using Ripple.MergeTool.Database.Model;
 using Ripple.MergeTool.Tools;
 using Sora.Database;
 using Sora.Database.Models;
@@ -16,32 +14,32 @@ namespace Ripple.MergeTool
     internal static class Program
     {
         private static MemoryCache _memoryCache;
-        
+
         private static void Main()
         {
             Logger.Info("Ripple Merger v0.0.1a");
 
             if (_memoryCache == null)
-                _memoryCache = new MemoryCache(new MemoryCacheOptions
-                {
-                    ExpirationScanFrequency = TimeSpan.FromDays(365)
-                });
-            ConfigUtil cfgUtil = new ConfigUtil(_memoryCache);
+                _memoryCache = new MemoryCache(
+                    new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)}
+                );
+            var cfgUtil = new ConfigUtil(_memoryCache);
 
-            RippleDbContext.RippleConfig cfg =
+            var cfg =
                 cfgUtil.ReadConfig<RippleDbContext.RippleConfig>();
 
-            SoraDbContextFactory factory = new SoraDbContextFactory();
-            RippleDbContext rippleCtx = new RippleDbContext();
-            
+            var factory = new SoraDbContextFactory();
+            var rippleCtx = new RippleDbContext();
+
             #region User Database merge
 
-            using (DatabaseWriteUsage db = factory.GetForWrite()) {
-                foreach (RippleUser user in rippleCtx.Users)
+            using (var db = factory.GetForWrite())
+            {
+                foreach (var user in rippleCtx.Users)
                 {
                     if (db.Context.Users.Any(x => x.Username == user.username)) // Skip double Users
                         continue;
-                    
+
                     if (user.id == 999) // We don't need fokabot! gtfu
                         continue;
 
@@ -54,26 +52,29 @@ namespace Ripple.MergeTool
 
                     Logger.Info($"User: {user.username} ( {user.id} )");
 
-                    db.Context.Users.Add(new Users
-                    {
-                        Username   = user.username,
-                        Password   = user.password_md5,
-                        Permissions = PrivilegeMerger.Merge(user.privileges),
-                        Email      = user.email
-                    });
+                    db.Context.Users.Add(
+                        new Users
+                        {
+                            Username = user.username,
+                            Password = user.password_md5,
+                            Permissions = PrivilegeMerger.Merge(user.privileges),
+                            Email = user.email
+                        }
+                    );
                 }
             }
+
             #endregion
-            
+
             #region Beatmap Databse merge
 
-            using (DatabaseWriteUsage db = factory.GetForWrite())
+            using (var db = factory.GetForWrite())
             {
-                foreach (RippleBeatmap rMap in rippleCtx.Beatmaps)
+                foreach (var rMap in rippleCtx.Beatmaps)
                 {
                     if (db.Context.Beatmaps.Any(x => x.Id == rMap.beatmap_id))
                         continue;
-                    
+
                     Logger.Info($"Importing {rMap.beatmap_id}");
 
                     Beatmaps sMap;
@@ -81,12 +82,12 @@ namespace Ripple.MergeTool
                     {
                         sMap.RankedStatus = rMap.ranked;
 
-                        string LetsMapPath = Path.Join(cfg.CRipple.LetsBeatmapPath, "/" + sMap.Id + ".osu");
-                        string SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + sMap.FileMd5);
+                        var LetsMapPath = Path.Join(cfg.CRipple.LetsBeatmapPath, "/" + sMap.Id + ".osu");
+                        var SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + sMap.FileMd5);
 
                         Logger.Info(LetsMapPath);
                         Logger.Info(SoraMapPath);
-                        
+
                         if (File.Exists(LetsMapPath) && !File.Exists(SoraMapPath))
                             File.Copy(LetsMapPath, SoraMapPath);
                         else
@@ -99,16 +100,16 @@ namespace Ripple.MergeTool
                     }
                 }
             }
-            #endregion
-            
-            #region Score Database Merge.
-            foreach (RippleScore score in rippleCtx.Scores)
-            {
-                Scores soraScore = new Scores
-                {
 
-                };
+            #endregion
+
+            #region Score Database Merge.
+
+            foreach (var score in rippleCtx.Scores)
+            {
+                var soraScore = new Scores();
             }
+
             #endregion
 
             Logger.Info("Done! Requires manual Checking...");

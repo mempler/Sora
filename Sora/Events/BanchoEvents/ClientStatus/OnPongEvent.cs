@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -31,8 +33,9 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoPong)]
         public void OnPong(BanchoPongArgs args)
         {
-            if (args.pr.Spectator == null || args.pr.Spectator?.BoundPresence == args.pr) return;
-            
+            if (args.pr.Spectator == null || args.pr.Spectator?.BoundPresence == args.pr)
+                return;
+
             //args.pr.Spectator?.Broadcast(new UserPresence(args.pr));
             args.pr += new HandleUpdate(args.pr);
             args.pr.Spectator?.Broadcast(new HandleUpdate(args.pr));

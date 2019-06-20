@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,12 +17,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
 
@@ -30,31 +31,29 @@ namespace Sora.Events.BanchoEvents.Multiplayer
     [EventClass]
     public class OnBanchoMatchJoinEvent
     {
-        private readonly MultiplayerService _ms;
         private readonly EventManager _ev;
+        private readonly MultiplayerService _ms;
 
         public OnBanchoMatchJoinEvent(MultiplayerService ms, EventManager ev)
         {
             _ms = ms;
             _ev = ev;
         }
-    
+
         [Event(EventType.BanchoMatchJoin)]
         public async void OnBanchoMatchJoin(BanchoMatchJoinArgs args)
         {
-            MultiplayerRoom room = _ms.GetRoom(args.matchId);
+            var room = _ms.GetRoom(args.matchId);
             if (room != null && room.Join(args.pr, args.password.Replace(" ", "_")))
                 args.pr += new MatchJoinSuccess(room);
             else
                 args.pr += new MatchJoinFail();
 
             room?.Update();
-            
-            await _ev.RunEvent(EventType.BanchoChannelJoin, new BanchoChannelJoinArgs
-            {
-                pr          = args.pr,
-                ChannelName = "#multiplayer"
-            });
+
+            await _ev.RunEvent(
+                EventType.BanchoChannelJoin, new BanchoChannelJoinArgs {pr = args.pr, ChannelName = "#multiplayer"}
+            );
         }
     }
 }

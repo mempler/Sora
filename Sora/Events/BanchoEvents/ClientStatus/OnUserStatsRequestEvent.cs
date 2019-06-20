@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,12 +17,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
 using Sora.Packets.Server;
 using Sora.Services;
 
@@ -32,30 +33,23 @@ namespace Sora.Events.BanchoEvents.ClientStatus
     {
         private readonly PresenceService _ps;
 
-        public OnUserStatsRequestEvent(PresenceService ps)
-        {
-            _ps = ps;
-        }
+        public OnUserStatsRequestEvent(PresenceService ps) => _ps = ps;
 
         [Event(EventType.BanchoUserStatsRequest)]
         public void OnUserStatsRequest(BanchoUserStatsRequestArgs args)
         {
-            foreach (int id in args.userIds)
+            foreach (var id in args.userIds)
             {
                 if (id == args.pr.User.Id)
                     continue;
-                
-                Presence opr = _ps.GetPresence(id);
+
+                var opr = _ps.GetPresence(id);
                 if (opr == null)
                 {
-                    args.pr += new HandleUserQuit(new UserQuitStruct
-                    {
-                        UserId     = id,
-                        ErrorState = ErrorStates.Ok
-                    });
+                    args.pr += new HandleUserQuit(new UserQuitStruct {UserId = id, ErrorState = ErrorStates.Ok});
                     continue;
                 }
-                
+
                 args.pr += new HandleUpdate(opr);
             }
         }

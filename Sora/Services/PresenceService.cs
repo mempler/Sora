@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections;
@@ -34,18 +36,9 @@ namespace Sora.Services
     {
         private readonly ChannelService _cs;
         private readonly EventManager _ev;
-        
+
         private readonly Dictionary<string, Presence> _presences;
         public object Locker = new object();
-
-        public IEnumerable<Presence> AllPresences
-        {
-            get
-            {
-                lock (Locker)
-                    return _presences.Select(x => x.Value);
-            }
-        }
 
         public PresenceService(ChannelService cs, EventManager ev)
         {
@@ -53,48 +46,71 @@ namespace Sora.Services
             _ev = ev;
             _presences = new Dictionary<string, Presence>();
         }
-        
-        public Presence? GetPresence(string token)
+
+        public IEnumerable<Presence> AllPresences
         {
-            lock (Locker)
-                return _presences.TryGetValue(token, out Presence pr) ? pr : null;
+            get
+            {
+                lock (Locker)
+                {
+                    return _presences.Select(x => x.Value);
+                }
+            }
         }
 
         public Presence? this[string token] => GetPresence(token);
 
+        public Presence? this[int userId] => GetPresence(userId);
+
+        public IEnumerator<Presence> GetEnumerator() => AllPresences.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public Presence? GetPresence(string token)
+        {
+            lock (Locker)
+            {
+                return _presences.TryGetValue(token, out var pr) ? pr : null;
+            }
+        }
+
         public Presence? GetPresence(int userId)
         {
             lock (Locker)
+            {
                 return _presences.FirstOrDefault(x => x.Value.User.Id == userId).Value;
+            }
         }
-
-        public Presence? this[int userId] => GetPresence(userId);
 
         [UsedImplicitly]
         public IEnumerable<int> GetUserIds()
         {
             lock (Locker)
+            {
                 return _presences.Select(x => x.Value.User.Id);
+            }
         }
 
         public IEnumerable<int> GetUserIds(Presence pr)
         {
             lock (Locker)
+            {
                 return _presences
-                   .Where(x => x.Value.Token != pr.Token)
-                   .Select(z => z.Value.User.Id);
+                       .Where(x => x.Value.Token != pr.Token)
+                       .Select(z => z.Value.User.Id);
+            }
         }
 
         public PresenceService BeginPresence(Presence presence)
         {
             if (presence == null)
                 return this;
-            
+
             // TODO: Add total playtime.
             //presence.BeginSeason = DateTime.UtcNow;
-            
+
             presence.ClientPermissions |= LoginPermissions.User;
-            
+
             if (presence.User.Permissions == Permission.COLOR_ORANGE)
                 presence.ClientPermissions |= LoginPermissions.Supporter;
             if (presence.User.Permissions == Permission.COLOR_RED)
@@ -113,8 +129,9 @@ namespace Sora.Services
 
             presence.LastRequest.Start();
             _cs.AddChannel(new Channel(presence.User.Username, "", null, presence));
-            
-            lock (Locker) {
+
+            lock (Locker)
+            {
                 _presences.Add(presence.Token, presence);
             }
 
@@ -122,30 +139,36 @@ namespace Sora.Services
         }
 
         public static PresenceService operator +(PresenceService instance, Presence pr) => instance.BeginPresence(pr);
-        public static PresenceService operator -(PresenceService instance, Presence pr) => instance.EndPresence(pr, true);
+
+        public static PresenceService operator -(PresenceService instance, Presence pr)
+            => instance.EndPresence(pr, true);
 
         public PresenceService EndPresence(Presence pr, bool forceful)
         {
             bool b;
             lock (Locker)
+            {
                 b = _presences.ContainsKey(pr.Token);
-            
+            }
+
             if (forceful && b)
             {
                 pr.LastRequest.Stop();
-                
+
                 _cs.RemoveChannel(pr.PrivateChannel);
 
-                foreach (PacketStream str in pr.JoinedStreams)
+                foreach (var str in pr.JoinedStreams)
                     str.Left(pr);
 
                 lock (Locker)
                 {
                     #pragma warning disable 4014
-                    _ev.RunEvent(EventType.BanchoExit,
-                                 new BanchoExitArgs {pr = pr, err = ErrorStates.Ok});
-                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs {pr           = pr});
-                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs {pr           = pr});
+                    _ev.RunEvent(
+                        EventType.BanchoExit,
+                        new BanchoExitArgs {pr = pr, err = ErrorStates.Ok}
+                    );
+                    _ev.RunEvent(EventType.BanchoLobbyPart, new BanchoLobbyPartArgs {pr = pr});
+                    _ev.RunEvent(EventType.BanchoMatchPart, new BanchoMatchPartArgs {pr = pr});
                     _ev.RunEvent(EventType.BanchoStopSpectating, new BanchoStopSpectatingArgs {pr = pr});
                     #pragma warning restore 4014
                     _presences.Remove(pr.Token);
@@ -157,37 +180,36 @@ namespace Sora.Services
             pr["IS_LAST_REQUEST"] = true;
             return this;
         }
+
         public void TimeoutCheck()
         {
-            new Thread(() =>
-            {
-                while (true)
+            new Thread(
+                () =>
                 {
-                    try
+                    while (true)
                     {
-                        List<Presence> toRemove = new List<Presence>();
-                        lock (Locker)
+                        try
                         {
-                            foreach ((string _, Presence value) in _presences)
-                                if (!value.BotPresence)
-                                    if (value.TimeoutCheck())
-                                        toRemove.Add(value);
+                            var toRemove = new List<Presence>();
+                            lock (Locker)
+                            {
+                                foreach ((string _, Presence value) in _presences)
+                                    if (!value.BotPresence)
+                                        if (value.TimeoutCheck())
+                                            toRemove.Add(value);
+                            }
+
+                            foreach (var pr in toRemove)
+                                EndPresence(pr, true);
+                        } catch
+                        {
+                            // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
                         }
 
-                        foreach (Presence pr in toRemove)
-                            EndPresence(pr, true);
+                        Thread.Sleep(5000); // wait 5 seconds. we don't want high cpu usage.
                     }
-                    catch
-                    {
-                        // Do not EVER let the TimeoutCheck Crash. else we have a Memory Leak.
-                    }
-
-                    Thread.Sleep(5000); // wait 5 seconds. we don't want high cpu usage.
                 }
-            }).Start();
+            ).Start();
         }
-
-        public IEnumerator<Presence> GetEnumerator() => AllPresences.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

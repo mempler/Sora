@@ -6,7 +6,7 @@ namespace Sora.Helpers
     {
         public static bool IsRanked(Mod mods)
         {
-            bool r = (mods & Mod.Relax2) == 0;
+            var r = (mods & Mod.Relax2) == 0;
             if ((mods & Mod.Cinema) != 0)
                 r = false;
             if ((mods & Mod.Autoplay) != 0)

@@ -1,8 +1,7 @@
+using System;
 using Sora.Enums;
-using IPacket = Sora.Interfaces.IPacket;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PacketId = Sora.Enums.PacketId;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Packets.Server
 {
@@ -13,9 +12,15 @@ namespace Sora.Packets.Server
         public LoginPermission(LoginPermissions perm) => Permission = perm;
 
         public PacketId Id => PacketId.ServerLoginPermissions;
-        
-        public void ReadFromStream(MStreamReader sr) => throw new System.NotImplementedException();
 
-        public void WriteToStream(MStreamWriter sw) => sw.Write((int) Permission);
+        public void ReadFromStream(MStreamReader sr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteToStream(MStreamWriter sw)
+        {
+            sw.Write((int) Permission);
+        }
     }
 }

@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ namespace Sora.Services
     public class PacketStreamService
     {
         private readonly Dictionary<string, PacketStream> _packetStreams = new Dictionary<string, PacketStream>();
-        
+
         public PacketStreamService()
         {
             NewStream(new PacketStream("main"));
@@ -36,12 +38,18 @@ namespace Sora.Services
 
         public PacketStream GetStream(string name)
         {
-            _packetStreams.TryGetValue(name, out PacketStream x);
+            _packetStreams.TryGetValue(name, out var x);
             return x;
         }
 
-        public void NewStream(PacketStream str) => _packetStreams[str.StreamName] = str;
+        public void NewStream(PacketStream str)
+        {
+            _packetStreams[str.StreamName] = str;
+        }
 
-        public void RemoveStream(string name) => _packetStreams[name] = null;
+        public void RemoveStream(string name)
+        {
+            _packetStreams[name] = null;
+        }
     }
 }

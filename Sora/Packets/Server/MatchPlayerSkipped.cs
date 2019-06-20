@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,13 +17,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
-using IPacket = Sora.Interfaces.IPacket;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PacketId = Sora.Enums.PacketId;
+using Sora.Enums;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Packets.Server
 {
@@ -30,10 +31,7 @@ namespace Sora.Packets.Server
     {
         public int SlotId;
 
-        public MatchPlayerSkipped(int slotId)
-        {
-            SlotId = slotId;
-        }
+        public MatchPlayerSkipped(int slotId) => SlotId = slotId;
 
         public void ReadFromStream(MStreamReader sr)
         {

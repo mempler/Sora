@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System;
@@ -35,11 +37,8 @@ namespace Sora.Helpers
         }
 
         public long Length => BaseStream.Length;
-        
-        public static MStreamWriter New()
-        {
-            return new MStreamWriter(new MemoryStream());
-        }
+
+        public static MStreamWriter New() => new MStreamWriter(new MemoryStream());
 
         public void Write(ISerializer seri)
         {
@@ -48,8 +47,8 @@ namespace Sora.Helpers
 
         public void Write(IPacket packet)
         {
-            using MStreamWriter x = New();
-            
+            using var x = New();
+
             base.Write((short) packet.Id);
             base.Write((byte) 0);
             /* Packet Data */
@@ -57,7 +56,7 @@ namespace Sora.Helpers
             /* END */
             base.Write((int) x.Length);
             Write(x);
-            
+
             x.Close();
         }
 
@@ -88,7 +87,7 @@ namespace Sora.Helpers
 
         public override void Write(byte[] buff)
         {
-            int length = buff.Length;
+            var length = buff.Length;
             Write(length);
             if (length > 0)
                 base.Write(buff);
@@ -96,9 +95,10 @@ namespace Sora.Helpers
 
         public void Write(List<int> list)
         {
-            short count = (short) list.Count;
+            var count = (short) list.Count;
             Write(count);
-            for (int i = 0; i < count; i++) Write(list[i]);
+            for (var i = 0; i < count; i++)
+                Write(list[i]);
         }
 
         public void WriteRawBuffer(byte[] buff)
@@ -161,20 +161,17 @@ namespace Sora.Helpers
                         Write((decimal) obj);
                         break;
                     default:
-                        BinaryFormatter b = new BinaryFormatter
+                        var b = new BinaryFormatter
                         {
                             AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat     = FormatterTypeStyle.TypesWhenNeeded
+                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
                         };
                         b.Serialize(BaseStream, obj);
                         break;
                 }
         }
 
-        public byte[] ToArray()
-        {
-            return ((MemoryStream) BaseStream).ToArray();
-        }
+        public byte[] ToArray() => ((MemoryStream) BaseStream).ToArray();
     }
 
     public class MStreamReader : BinaryReader
@@ -184,34 +181,32 @@ namespace Sora.Helpers
         }
 
         public override string ReadString()
-        {
-            return (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
-        }
+            => (ReadByte() == 0x00 ? "" : base.ReadString()) ?? throw new InvalidOperationException();
 
         public byte[] ReadBytes()
         {
-            int len = ReadInt32();
+            var len = ReadInt32();
             return len > 0 ? base.ReadBytes(len) : len < 0 ? null : new byte[0];
         }
 
         public List<int> ReadInt32List()
         {
-            short count = ReadInt16();
+            var count = ReadInt16();
             if (count < 0)
                 return new List<int>();
-            List<int> outList = new List<int>(count);
-            for (int i = 0; i < count; i++)
+            var outList = new List<int>(count);
+            for (var i = 0; i < count; i++)
                 outList.Add(ReadInt32());
             return outList;
         }
 
         public T ReadPacket<T>() where T : IPacket, new()
         {
-            T packet = new T();
+            var packet = new T();
             ReadInt16();
             ReadByte();
-            byte[] rawPacketData = ReadBytes();
-            using (MStreamWriter x = MStreamWriter.New())
+            var rawPacketData = ReadBytes();
+            using (var x = MStreamWriter.New())
             {
                 x.WriteRawBuffer(rawPacketData);
                 x.BaseStream.Position = 0;
@@ -223,15 +218,16 @@ namespace Sora.Helpers
 
         public T ReadData<T>() where T : ISerializer, new()
         {
-            T data = new T();
+            var data = new T();
             data.ReadFromStream(this);
             return data;
         }
 
         public byte[] ReadToEnd()
         {
-            List<byte> x = new List<byte>();
-            while (BaseStream.Position != BaseStream.Length) x.Add(ReadByte());
+            var x = new List<byte>();
+            while (BaseStream.Position != BaseStream.Length)
+                x.Add(ReadByte());
 
             return x.ToArray();
         }

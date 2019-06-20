@@ -15,7 +15,7 @@ namespace Sora.Allocation
 
         public object this[object key]
         {
-            get => !_customValues.TryGetValue(key, out object val) ? default : val;
+            get => !_customValues.TryGetValue(key, out var val) ? default : val;
             set => _customValues[key] = value;
         }
 
@@ -26,7 +26,7 @@ namespace Sora.Allocation
 
         public T Get<T>(object Key)
         {
-            if (!_customValues.TryGetValue(Key, out object val))
+            if (!_customValues.TryGetValue(Key, out var val))
                 return default;
             return (T) val;
         }

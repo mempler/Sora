@@ -10,7 +10,7 @@ namespace Ripple.MergeTool.Database.Model
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
-        
+
         [Required]
         public string username { get; set; }
 

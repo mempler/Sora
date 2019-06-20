@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,12 +17,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
-using IPacket = Sora.Interfaces.IPacket;
-using MStreamReader = Sora.Helpers.MStreamReader;
-using MStreamWriter = Sora.Helpers.MStreamWriter;
-using PacketId = Sora.Enums.PacketId;
+using Sora.Enums;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Packets.Server
 {
@@ -29,10 +30,7 @@ namespace Sora.Packets.Server
     {
         public MessageStruct Msg;
 
-        public Invite(MessageStruct message)
-        {
-            Msg = message;
-        }
+        public Invite(MessageStruct message) => Msg = message;
 
         public PacketId Id => PacketId.ServerInvite;
 
@@ -40,10 +38,10 @@ namespace Sora.Packets.Server
         {
             Msg = new MessageStruct
             {
-                Username      = sr.ReadString(),
-                Message       = sr.ReadString(),
+                Username = sr.ReadString(),
+                Message = sr.ReadString(),
                 ChannelTarget = sr.ReadString(),
-                SenderId      = sr.ReadInt32()
+                SenderId = sr.ReadInt32()
             };
         }
 

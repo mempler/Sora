@@ -6,8 +6,8 @@ namespace Sora.Helpers
     {
         public static string ToString(Mod mods)
         {
-            string ret = string.Empty;
-            
+            var ret = string.Empty;
+
             if (mods == Mod.None)
                 ret = "NoMod";
             if ((mods & Mod.NoFail) > 0)
@@ -33,6 +33,7 @@ namespace Sora.Helpers
                 ret += "NC";
                 ret = ret.Replace("DT", "");
             }
+
             if ((mods & Mod.Flashlight) > 0)
                 ret += "FL";
             if ((mods & Mod.Autoplay) > 0)

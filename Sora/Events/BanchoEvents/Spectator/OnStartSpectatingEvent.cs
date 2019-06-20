@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
@@ -32,16 +34,14 @@ namespace Sora.Events.BanchoEvents.Spectator
     {
         private readonly PresenceService _ps;
 
-        public OnStartSpectatingEvent(PresenceService ps)
-        {
-            _ps = ps;
-        }
-        
+        public OnStartSpectatingEvent(PresenceService ps) => _ps = ps;
+
         [Event(EventType.BanchoStartSpectating)]
         public void OnStartSpectating(BanchoStartSpectatingArgs args)
         {
-            Presence opr = _ps.GetPresence(args.SpectatorHostID);
-            if (opr == null) return;
+            var opr = _ps.GetPresence(args.SpectatorHostID);
+            if (opr == null)
+                return;
             if (opr.Spectator == null)
             {
                 opr.Spectator = new SpectatorStream($"spec-{args.SpectatorHostID}", opr);

@@ -11,40 +11,42 @@ namespace Sora
         public static void CreateDefaultAchievements(SoraDbContextFactory factory)
         {
             if (factory.Get().Achievements.FirstOrDefault(x => x.Name == "oog") == null)
-                Achievements.NewAchievement(factory,
-                                            "oog",
-                                            "Oooooooooooooooog!",
-                                            "You just oooged JSE",
-                                            "https://onii-chan-please.come-inside.me/achivement_oog.png");
+                Achievements.NewAchievement(
+                    factory,
+                    "oog",
+                    "Oooooooooooooooog!",
+                    "You just oooged JSE",
+                    "https://onii-chan-please.come-inside.me/achivement_oog.png"
+                );
         }
-        
+
         public static string ProcessAchievements(SoraDbContextFactory factory,
-                                                 
-                                                 Users user,
-                                                 Scores score,
-                                                 CheesegullBeatmap map,
-                                                 CheesegullBeatmapSet set,
-                                                 
-                                                 LeaderboardStd oldLB,
-                                                 LeaderboardStd newLB)
+            Users user,
+            Scores score,
+            CheesegullBeatmap map,
+            CheesegullBeatmapSet set,
+            LeaderboardStd oldLB,
+            LeaderboardStd newLB)
         {
-            List<Achievements> _l = new List<Achievements>();
-            
-            if ((int) newLB.PerformancePointsOsu == 4914) {
-                Achievements ach = Achievements.GetAchievement(factory, "oog");
+            var _l = new List<Achievements>();
+
+            if ((int) newLB.PerformancePointsOsu == 4914)
+            {
+                var ach = Achievements.GetAchievement(factory, "oog");
                 if (!user.AlreadyOptainedAchievement(ach))
                     _l.Add(ach);
             }
 
             // Insert custom achievements here. I'll implement a Plugin System later! but this will work for now.
-            
-            
+
+
             // END OF CUSTOM ACHIEVEMENTS
-            
-            string retVal = "";
-            foreach (Achievements ach in _l) retVal += ach.ToOsuString() + "/";
+
+            var retVal = "";
+            foreach (var ach in _l)
+                retVal += ach.ToOsuString() + "/";
             retVal.TrimEnd('/');
-            
+
             return retVal;
         }
     }

@@ -7,7 +7,7 @@ namespace Ripple.MergeTool.Tools
     {
         public static Permission Merge(RipplePrivileges priv)
         {
-            Permission retVal = new Permission();
+            var retVal = new Permission();
 
             if ((priv & RipplePrivileges.USER_NORMAL) != 0)
                 retVal += Permission.DEFAULT;

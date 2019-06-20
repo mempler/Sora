@@ -1,4 +1,5 @@
 #region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,13 +17,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
-using Sora.Objects;
-using Logger = Sora.Helpers.Logger;
+using Sora.Helpers;
 
 namespace Sora.Events.BanchoEvents.Multiplayer
 {
@@ -31,37 +32,35 @@ namespace Sora.Events.BanchoEvents.Multiplayer
     {
         private readonly EventManager _ev;
 
-        public OnBanchoMatchPartEvent(EventManager ev)
-        {
-            _ev = ev;
-        }
+        public OnBanchoMatchPartEvent(EventManager ev) => _ev = ev;
 
         [Event(EventType.BanchoMatchPart)]
         public async void OnBanchoMatchPart(BanchoMatchPartArgs args)
         {
-            if (args.pr.JoinedRoom == null) return;
+            if (args.pr.JoinedRoom == null)
+                return;
 
-            MultiplayerRoom room = args.pr.JoinedRoom;
+            var room = args.pr.JoinedRoom;
             room.Leave(args.pr);
             if (room.HostId == args.pr.User.Id)
                 room.SetRandomHost();
 
-            await _ev.RunEvent(EventType.BanchoChannelLeave, new BanchoChannelLeaveArgs
-            {
-                pr = args.pr,
-                ChannelName = "#multiplayer"
-            });
-            
+            await _ev.RunEvent(
+                EventType.BanchoChannelLeave, new BanchoChannelLeaveArgs {pr = args.pr, ChannelName = "#multiplayer"}
+            );
+
             if (room.HostId != -1)
             {
                 room.Update();
                 return;
             }
-            
-            Logger.Info("Detected Empty %#f1fc5a%Multiplayer Room %#FFFFFF%called",
-                        "%#F94848%" + room.Name,
-                        "%#B342F4%(", room.MatchId, "%#B342F4%)%#FFFFFF% Cleaning up...");
-            
+
+            Logger.Info(
+                "Detected Empty %#f1fc5a%Multiplayer Room %#FFFFFF%called",
+                "%#F94848%" + room.Name,
+                "%#B342F4%(", room.MatchId, "%#B342F4%)%#FFFFFF% Cleaning up..."
+            );
+
             room.Dispand();
         }
     }

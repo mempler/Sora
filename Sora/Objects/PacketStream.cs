@@ -1,4 +1,5 @@
 ﻿#region LICENSE
+
 /*
     Sora - A Modular Bancho written in C#
     Copyright (C) 2019 Robin A. P.
@@ -16,13 +17,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 #endregion
 
 using System.Collections.Generic;
 using System.Linq;
 using Sora.Allocation;
-using IPacket = Sora.Interfaces.IPacket;
-using Logger = Sora.Helpers.Logger;
+using Sora.Helpers;
+using Sora.Interfaces;
 
 namespace Sora.Objects
 {
@@ -30,10 +32,7 @@ namespace Sora.Objects
     {
         private readonly Dictionary<string, Presence> _joinedPresences = new Dictionary<string, Presence>();
 
-        public PacketStream(string name)
-        {
-            StreamName = name;
-        }
+        public PacketStream(string name) => StreamName = name;
 
         public string StreamName { get; }
 

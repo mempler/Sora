@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sora.Allocation;
 using Sora.Database;
@@ -23,21 +22,21 @@ namespace Sora.Controllers
     [Route("/web/")]
     public class WebController : Controller
     {
-        private readonly SoraDbContextFactory _factory;
-        private readonly EventManager _ev;
         private readonly Cache _cache;
         private readonly Config _config;
-        private readonly Bot.Sora _sora;
+        private readonly EventManager _ev;
+        private readonly SoraDbContextFactory _factory;
         private readonly PerformancePointsProcessor _pointsProcessor;
         private readonly PresenceService _ps;
+        private readonly Bot.Sora _sora;
 
         public WebController(SoraDbContextFactory factory,
-                             EventManager ev,
-                             Cache cache,
-                             Config config,
-                             Bot.Sora sora,
-                             PerformancePointsProcessor pointsProcessor,
-                             PresenceService ps)
+            EventManager ev,
+            Cache cache,
+            Config config,
+            Bot.Sora sora,
+            PerformancePointsProcessor pointsProcessor,
+            PresenceService ps)
         {
             _factory = factory;
             _ev = ev;
@@ -47,18 +46,18 @@ namespace Sora.Controllers
             _pointsProcessor = pointsProcessor;
             _ps = ps;
         }
-        
+
         #region GET /web/
+
         [HttpGet]
-        public IActionResult Index()
-        {
-            return Ok("ERR: you sneaky little mouse :3");
-        }
+        public IActionResult Index() => Ok("ERR: you sneaky little mouse :3");
+
         #endregion
 
         #region GET /web/osu-osz2-getscores.php
+
         [HttpGet("osu-osz2-getscores.php")]
-        public IActionResult GetScoreResult (
+        public IActionResult GetScoreResult(
             [FromQuery(Name = "s")] int s,
             [FromQuery(Name = "vv")] int scoreboardVersion,
             [FromQuery(Name = "v")] ScoreboardType type,
@@ -72,31 +71,37 @@ namespace Sora.Controllers
             [FromQuery(Name = "us")] string us,
             [FromQuery(Name = "ha")] string pa)
         {
-            Users user = Users.GetUser(_factory, Users.GetUserId(_factory, us));
+            var user = Users.GetUser(_factory, Users.GetUserId(_factory, us));
             if (user == null || !user.IsPassword(pa))
                 return Ok("error: pass");
 
-            string cache_hash =
-                Hex.ToHex(Crypto.GetMd5(
-                              $"{fileMD5}{playMode}{mods}{type}{user.Id}{user.Username}"));
+            var cache_hash =
+                Hex.ToHex(
+                    Crypto.GetMd5(
+                        $"{fileMD5}{playMode}{mods}{type}{user.Id}{user.Username}"
+                    )
+                );
 
-            string cachedData = _cache.Get<string>($"sora:Scoreboards:{cache_hash}");
+            var cachedData = _cache.Get<string>($"sora:Scoreboards:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
 
-            Scoreboard sboard = new Scoreboard(_factory, _config,
-                                               fileMD5, user, playMode,
-                                               (mods & Mod.Relax) != 0,
-                                               type == ScoreboardType.Friends,
-                                               type == ScoreboardType.Country,
-                                               type == ScoreboardType.Mods,
-                                               mods);
+            var sboard = new Scoreboard(
+                _factory, _config,
+                fileMD5, user, playMode,
+                (mods & Mod.Relax) != 0,
+                type == ScoreboardType.Friends,
+                type == ScoreboardType.Country,
+                type == ScoreboardType.Mods,
+                mods
+            );
 
-            _cache.Set($"sora:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(), TimeSpan.FromSeconds(30));         
-            
+            _cache.Set($"sora:Scoreboards:{cache_hash}", cachedData = sboard.ToOsuString(), TimeSpan.FromSeconds(30));
+
             return Ok(cachedData);
         }
+
         #endregion
 
         #region POST /web/osu-submit-modular-selector.php
@@ -108,44 +113,43 @@ namespace Sora.Controllers
             string iv = Request.Form["iv"];
             string osuver = Request.Form["osuver"];
             string pass = Request.Form["pass"];
-            
-            (bool b, Scores scores) = ScoreSubmittionParser.ParseScore(_factory, score, iv,osuver);
+
+            var (b, scores) = ScoreSubmittionParser.ParseScore(_factory, score, iv, osuver);
 
             if (scores.UserId == -1)
                 return Ok("error: pass");
 
             if (scores.ScoreOwner == null)
                 scores.ScoreOwner = Users.GetUser(_factory, scores.UserId);
-            
+
             if (scores.ScoreOwner == null)
                 return Ok("error: pass");
-            
+
             if (!scores.ScoreOwner.IsPassword(pass))
                 return Ok("error: pass");
 
-            bool isRelaxing = (scores.Mods & Mod.Relax) != 0;
-            Presence pr = _ps.GetPresence(scores.ScoreOwner.Id);
-            
+            var isRelaxing = (scores.Mods & Mod.Relax) != 0;
+            var pr = _ps.GetPresence(scores.ScoreOwner.Id);
+
             if (!b || !RankedMods.IsRanked(scores.Mods))
             {
                 if (isRelaxing)
                 {
-                    LeaderboardRx rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
+                    var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
                     rx.IncreasePlaycount(_factory, scores.PlayMode);
                     rx.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
                 }
                 else
                 {
-                    LeaderboardStd std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
+                    var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
                     std.IncreasePlaycount(_factory, scores.PlayMode);
                     std.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
                 }
 
-                await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
-                {
-                    userIds = new List<int> {scores.ScoreOwner.Id},
-                    pr      = pr
-                });
+                await _ev.RunEvent(
+                    EventType.BanchoUserStatsRequest,
+                    new BanchoUserStatsRequestArgs {userIds = new List<int> {scores.ScoreOwner.Id}, pr = pr}
+                );
 
                 return Ok("Thanks for your hard work!");
             }
@@ -166,18 +170,18 @@ namespace Sora.Controllers
             }
             */
 
-            IFormFile ReplayFile = Request.Form.Files.GetFile("score");
+            var ReplayFile = Request.Form.Files.GetFile("score");
 
             if (!Directory.Exists("data/replays"))
                 Directory.CreateDirectory("data/replays");
 
-            await using (MemoryStream m = new MemoryStream())
+            await using (var m = new MemoryStream())
             {
                 ReplayFile.CopyTo(m);
                 m.Position = 0;
                 scores.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(m)) ?? string.Empty;
-                if (!string.IsNullOrEmpty(scores.ReplayMd5)) 
-                    await using (FileStream replayFile = System.IO.File.Create($"data/replays/{scores.ReplayMd5}"))
+                if (!string.IsNullOrEmpty(scores.ReplayMd5))
+                    await using (var replayFile = System.IO.File.Create($"data/replays/{scores.ReplayMd5}"))
                     {
                         m.Position = 0;
                         m.WriteTo(replayFile);
@@ -190,39 +194,46 @@ namespace Sora.Controllers
 
             if (isRelaxing)
                 scores.Mods -= Mod.Relax;
-            scores.PeppyPoints =  _pointsProcessor.Compute(scores);
+            scores.PeppyPoints = _pointsProcessor.Compute(scores);
             if (isRelaxing)
                 scores.Mods |= Mod.Relax;
-            
-            Scores oldScore = Scores.GetScores(_factory,
-                                               scores.FileMd5,
-                                               scores.ScoreOwner,
-                                               scores.PlayMode,
-                                               isRelaxing,
-                                               false,
-                                               false,
-                                               false,
-                                               scores.Mods,
-                                        true).FirstOrDefault();
-            
-            LeaderboardStd oldStd    = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-            uint           oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
+
+            var oldScore = Scores.GetScores(
+                _factory,
+                scores.FileMd5,
+                scores.ScoreOwner,
+                scores.PlayMode,
+                isRelaxing,
+                false,
+                false,
+                false,
+                scores.Mods,
+                true
+            ).FirstOrDefault();
+
+            var oldStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
+            var oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
 
             if (oldScore != null && oldScore.TotalScore <= scores.TotalScore)
             {
-                using DatabaseWriteUsage db = _factory.GetForWrite();
+                using var db = _factory.GetForWrite();
                 db.Context.Scores.Remove(oldScore);
                 System.IO.File.Delete($"data/replays/{oldScore.ReplayMd5}");
 
                 Scores.InsertScore(_factory, scores);
-            } else if (oldScore == null)
+            }
+            else if (oldScore == null)
+            {
                 Scores.InsertScore(_factory, scores);
+            }
             else
+            {
                 System.IO.File.Delete($"data/replays/{scores.ReplayMd5}");
+            }
 
             if (isRelaxing)
             {
-                LeaderboardRx rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
+                var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
                 rx.IncreasePlaycount(_factory, scores.PlayMode);
                 rx.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
                 rx.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
@@ -231,17 +242,16 @@ namespace Sora.Controllers
                 rx.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
 
                 rx.UpdatePP(_factory, scores.PlayMode);
-                
+
                 pr.LeaderboardRx = rx;
-                await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
-                {
-                    userIds = new List<int> {scores.ScoreOwner.Id},
-                    pr      = pr
-                });
+                await _ev.RunEvent(
+                    EventType.BanchoUserStatsRequest,
+                    new BanchoUserStatsRequestArgs {userIds = new List<int> {scores.ScoreOwner.Id}, pr = pr}
+                );
             }
             else
             {
-                LeaderboardStd std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
+                var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
                 std.IncreasePlaycount(_factory, scores.PlayMode);
                 std.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
                 std.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
@@ -251,28 +261,30 @@ namespace Sora.Controllers
 
                 std.UpdatePP(_factory, scores.PlayMode);
             }
-            
-            LeaderboardStd newStd    = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-            uint           newStdPos = newStd.GetPosition(_factory, scores.PlayMode);
+
+            var newStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
+            var newStdPos = newStd.GetPosition(_factory, scores.PlayMode);
 
 
-            Scores NewScore = Scores.GetScores(_factory,
-                                               scores.FileMd5,
-                                               scores.ScoreOwner,
-                                               scores.PlayMode,
-                                               isRelaxing,
-                                               false,
-                                               false,
-                                               false,
-                                               scores.Mods,
-                                               true).FirstOrDefault();
-            
-            Cheesegull cg = new Cheesegull(_config);
+            var NewScore = Scores.GetScores(
+                _factory,
+                scores.FileMd5,
+                scores.ScoreOwner,
+                scores.PlayMode,
+                isRelaxing,
+                false,
+                false,
+                false,
+                scores.Mods,
+                true
+            ).FirstOrDefault();
+
+            var cg = new Cheesegull(_config);
             cg.SetBM(scores.FileMd5);
 
-            List<CheesegullBeatmapSet> sets = cg.GetSets();
-            CheesegullBeatmap          bm   = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == scores.FileMd5) ?? new CheesegullBeatmap();
-            
+            var sets = cg.GetSets();
+            var bm = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == scores.FileMd5) ?? new CheesegullBeatmap();
+
             double oldAcc;
             double newAcc;
 
@@ -281,40 +293,48 @@ namespace Sora.Controllers
 
             double oldPP;
             double newPP;
-            
+
             switch (scores.PlayMode)
             {
                 case PlayMode.Osu:
-                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Osu,
-                                                  oldStd.Count100Osu,
-                                                  oldStd.Count50Osu,
-                                                  oldStd.Count300Osu, 0, 0,
-                                                  PlayMode.Osu);
+                    oldAcc = Accuracy.GetAccuracy(
+                        oldStd.Count300Osu,
+                        oldStd.Count100Osu,
+                        oldStd.Count50Osu,
+                        oldStd.Count300Osu, 0, 0,
+                        PlayMode.Osu
+                    );
 
-                    newAcc = Accuracy.GetAccuracy(newStd.Count300Osu,
-                                                  newStd.Count100Osu,
-                                                  newStd.Count50Osu,
-                                                  newStd.Count300Osu, 0, 0,
-                                                  PlayMode.Osu);
+                    newAcc = Accuracy.GetAccuracy(
+                        newStd.Count300Osu,
+                        newStd.Count100Osu,
+                        newStd.Count50Osu,
+                        newStd.Count300Osu, 0, 0,
+                        PlayMode.Osu
+                    );
 
                     oldRankedScore = oldStd.RankedScoreOsu;
                     newRankedScore = newStd.RankedScoreOsu;
-                    
+
                     oldPP = oldStd.PerformancePointsOsu;
                     newPP = newStd.PerformancePointsOsu;
                     break;
                 case PlayMode.Taiko:
-                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Taiko,
-                                                  oldStd.Count100Taiko,
-                                                  oldStd.Count50Taiko,
-                                                  oldStd.Count300Taiko, 0, 0,
-                                                  PlayMode.Taiko);
+                    oldAcc = Accuracy.GetAccuracy(
+                        oldStd.Count300Taiko,
+                        oldStd.Count100Taiko,
+                        oldStd.Count50Taiko,
+                        oldStd.Count300Taiko, 0, 0,
+                        PlayMode.Taiko
+                    );
 
-                    newAcc = Accuracy.GetAccuracy(newStd.Count300Taiko,
-                                                  newStd.Count100Taiko,
-                                                  newStd.Count50Taiko,
-                                                  newStd.Count300Taiko, 0, 0,
-                                                  PlayMode.Taiko);
+                    newAcc = Accuracy.GetAccuracy(
+                        newStd.Count300Taiko,
+                        newStd.Count100Taiko,
+                        newStd.Count50Taiko,
+                        newStd.Count300Taiko, 0, 0,
+                        PlayMode.Taiko
+                    );
 
                     oldRankedScore = oldStd.RankedScoreTaiko;
                     newRankedScore = newStd.RankedScoreTaiko;
@@ -323,17 +343,21 @@ namespace Sora.Controllers
                     newPP = newStd.PerformancePointsTaiko;
                     break;
                 case PlayMode.Ctb:
-                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Ctb,
-                                                  oldStd.Count100Ctb,
-                                                  oldStd.Count50Ctb,
-                                                  oldStd.Count300Ctb, 0, 0,
-                                                  PlayMode.Ctb);
+                    oldAcc = Accuracy.GetAccuracy(
+                        oldStd.Count300Ctb,
+                        oldStd.Count100Ctb,
+                        oldStd.Count50Ctb,
+                        oldStd.Count300Ctb, 0, 0,
+                        PlayMode.Ctb
+                    );
 
-                    newAcc = Accuracy.GetAccuracy(newStd.Count300Ctb,
-                                                  newStd.Count100Ctb,
-                                                  newStd.Count50Ctb,
-                                                  newStd.Count300Ctb, 0, 0,
-                                                  PlayMode.Ctb);
+                    newAcc = Accuracy.GetAccuracy(
+                        newStd.Count300Ctb,
+                        newStd.Count100Ctb,
+                        newStd.Count50Ctb,
+                        newStd.Count300Ctb, 0, 0,
+                        PlayMode.Ctb
+                    );
 
                     oldRankedScore = oldStd.RankedScoreCtb;
                     newRankedScore = newStd.RankedScoreCtb;
@@ -342,18 +366,22 @@ namespace Sora.Controllers
                     newPP = newStd.PerformancePointsCtb;
                     break;
                 case PlayMode.Mania:
-                    oldAcc = Accuracy.GetAccuracy(oldStd.Count300Mania,
-                                                  oldStd.Count100Mania,
-                                                  oldStd.Count50Mania,
-                                                  oldStd.Count300Mania, 0, 0,
-                                                  PlayMode.Mania);
+                    oldAcc = Accuracy.GetAccuracy(
+                        oldStd.Count300Mania,
+                        oldStd.Count100Mania,
+                        oldStd.Count50Mania,
+                        oldStd.Count300Mania, 0, 0,
+                        PlayMode.Mania
+                    );
 
-                    newAcc = Accuracy.GetAccuracy(newStd.Count300Mania,
-                                                  newStd.Count100Mania,
-                                                  newStd.Count50Mania,
-                                                  newStd.Count300Mania, 0, 0,
-                                                  PlayMode.Mania);
-                    
+                    newAcc = Accuracy.GetAccuracy(
+                        newStd.Count300Mania,
+                        newStd.Count100Mania,
+                        newStd.Count50Mania,
+                        newStd.Count300Mania, 0, 0,
+                        PlayMode.Mania
+                    );
+
                     oldRankedScore = oldStd.RankedScoreMania;
                     newRankedScore = newStd.RankedScoreMania;
 
@@ -363,7 +391,7 @@ namespace Sora.Controllers
                 default:
                     return Ok("");
             }
-            
+
             if (NewScore?.Position == 1 && (oldScore == null || oldScore.TotalScore < NewScore.TotalScore))
                 _sora.SendMessage(
                     $"[http://{_config.Server.Hostname}/{scores.ScoreOwner.Id} {scores.ScoreOwner.Username}] " +
@@ -371,17 +399,19 @@ namespace Sora.Controllers
                     $"using {ModUtil.ToString(NewScore.Mods)} " +
                     $"Good job! +{NewScore.PeppyPoints:F}PP",
                     "#announce",
-                    false);
-            
+                    false
+                );
+
             Logger.Info(
                 $"{L_COL.RED}{scores?.ScoreOwner.Username}",
-                        $"{L_COL.PURPLE}( {scores?.ScoreOwner.Id} ){L_COL.WHITE}",
-                        $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PeppyPoints:F}PP",
-                        $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{NewScore?.Accuracy * 100:F}",
-                        $"{L_COL.WHITE}on {L_COL.YELLOW}{sets?[0].Title} [{bm.DiffName}]",
-                        $"{L_COL.WHITE}using {L_COL.BLUE}{ModUtil.ToString(NewScore?.Mods ?? Mod.None)}");
+                $"{L_COL.PURPLE}( {scores?.ScoreOwner.Id} ){L_COL.WHITE}",
+                $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PeppyPoints:F}PP",
+                $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{NewScore?.Accuracy * 100:F}",
+                $"{L_COL.WHITE}on {L_COL.YELLOW}{sets?[0].Title} [{bm.DiffName}]",
+                $"{L_COL.WHITE}using {L_COL.BLUE}{ModUtil.ToString(NewScore?.Mods ?? Mod.None)}"
+            );
 
-            Chart bmChart = new Chart(
+            var bmChart = new Chart(
                 "beatmap",
                 "Beatmap Ranking",
                 $"https://osu.ppy.sh/b/{bm.BeatmapID}",
@@ -399,8 +429,8 @@ namespace Sora.Controllers
             );
 
             cg.SetBMSet(bm.ParentSetID);
-            
-            Chart overallChart = new Chart(
+
+            var overallChart = new Chart(
                 "overall",
                 "Global Ranking",
                 $"https://osu.ppy.sh/u/{scores.ScoreOwner.Id}",
@@ -415,20 +445,23 @@ namespace Sora.Controllers
                 oldPP,
                 newPP,
                 NewScore?.Id ?? 0,
-                AchievementProcessor.ProcessAchievements(_factory, scores.ScoreOwner, scores, bm, cg.GetSets()[0], oldStd, newStd)
+                AchievementProcessor.ProcessAchievements(
+                    _factory, scores.ScoreOwner, scores, bm, cg.GetSets()[0], oldStd, newStd
+                )
             );
-            
-            pr.LeaderboardStd = newStd;
-            await _ev.RunEvent(EventType.BanchoUserStatsRequest, new BanchoUserStatsRequestArgs
-            {
-                userIds = new List<int>{scores.ScoreOwner.Id},
-                pr      = pr
-            });
 
-            return Ok($"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" + 
-                      bmChart.ToOsuString() + "\n" + overallChart.ToOsuString());
+            pr.LeaderboardStd = newStd;
+            await _ev.RunEvent(
+                EventType.BanchoUserStatsRequest,
+                new BanchoUserStatsRequestArgs {userIds = new List<int> {scores.ScoreOwner.Id}, pr = pr}
+            );
+
+            return Ok(
+                $"beatmapId:{bm.BeatmapID}|beatmapSetId:{bm.ParentSetID}|beatmapPlaycount:0|beatmapPasscount:0|approvedDate:\n\n" +
+                bmChart.ToOsuString() + "\n" + overallChart.ToOsuString()
+            );
         }
-        
+
         #endregion
 
         #region GET /web/osu-getreplay.php
@@ -439,16 +472,16 @@ namespace Sora.Controllers
             [FromQuery(Name = "m")] PlayMode mode,
             [FromQuery(Name = "u")] string userName,
             [FromQuery(Name = "h")] string pass
-            )
+        )
         {
-            Users user = Users.GetUser(_factory, Users.GetUserId(_factory, userName));
+            var user = Users.GetUser(_factory, Users.GetUserId(_factory, userName));
             if (user == null)
                 return Ok("err: pass");
 
             if (!user.IsPassword(pass))
                 return Ok("err: pass");
 
-            Scores s = Scores.GetScore(_factory, replayId);
+            var s = Scores.GetScore(_factory, replayId);
             if (s == null)
                 return NotFound();
 
@@ -465,31 +498,29 @@ namespace Sora.Controllers
             [FromQuery(Name = "r")] int rankedStatus,
             [FromQuery(Name = "p")] int page,
             [FromQuery(Name = "q")] string query,
-            
             [FromQuery(Name = "u")] string userName,
             [FromQuery(Name = "h")] string pass
         )
         {
-            Users user = Users.GetUser(_factory, Users.GetUserId(_factory, userName));
+            var user = Users.GetUser(_factory, Users.GetUserId(_factory, userName));
             if (user == null)
                 return Ok("err: pass");
 
             if (!user.IsPassword(pass))
                 return Ok("err: pass");
 
-            string cache_hash = Hex.ToHex(Crypto.GetMd5($"m{playMode}r{rankedStatus}p{page}q{query}"));
+            var cache_hash = Hex.ToHex(Crypto.GetMd5($"m{playMode}r{rankedStatus}p{page}q{query}"));
 
-            string cachedData = _cache.Get<string>($"sora:DirectSearches:{cache_hash}");
+            var cachedData = _cache.Get<string>($"sora:DirectSearches:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
 
-            Cheesegull cg = new Cheesegull(_config);
+            var cg = new Cheesegull(_config);
             try
             {
                 cg.Search(query, rankedStatus, playMode, page);
-            }
-            catch
+            } catch
             {
                 // Ignored
             }
@@ -497,45 +528,44 @@ namespace Sora.Controllers
             Response.ContentType = "text/plain";
 
             _cache.Set($"sora:DirectSearches:{cache_hash}", cachedData = cg.ToDirect(), TimeSpan.FromMinutes(10));
-            
+
             return Ok(cachedData);
         }
 
         #endregion
 
         #region GET /web/osu-search-set.php
+
         [HttpGet("osu-search-set.php")]
         public IActionResult GetDirectNP(
             [FromQuery(Name = "s")] int setId,
             [FromQuery(Name = "b")] int beatmapId,
-
             [FromQuery(Name = "u")] string userName,
             [FromQuery(Name = "h")] string pass
         )
         {
-            Users user = Users.GetUser(_factory, userName);
+            var user = Users.GetUser(_factory, userName);
             if (user == null)
                 return Ok("err: pass");
 
             if (!user.IsPassword(pass))
                 return Ok("err: pass");
 
-            string cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}|b{beatmapId}"));
+            var cache_hash = Hex.ToHex(Crypto.GetMd5($"s{setId}|b{beatmapId}"));
 
-            string cachedData = _cache.Get<string>($"sora:DirectNP:{cache_hash}");
+            var cachedData = _cache.Get<string>($"sora:DirectNP:{cache_hash}");
 
             if (!string.IsNullOrEmpty(cachedData))
                 return Ok(cachedData);
 
-            Cheesegull cg = new Cheesegull(_config);
+            var cg = new Cheesegull(_config);
             try
             {
                 if (setId != 0)
                     cg.SetBMSet(setId);
                 else
                     cg.SetBM(beatmapId);
-            }
-            catch
+            } catch
             {
                 // ignored
             }
@@ -546,33 +576,37 @@ namespace Sora.Controllers
 
             return Ok(cachedData);
         }
+
         #endregion
-        
+
         #region GET /web/check-updates.php
 
         [HttpGet("check-updates.php")]
         public IActionResult CheckUpdates(
             [FromQuery] string action,
             [FromQuery(Name = "stream")] string qstream,
-            [FromQuery]ulong time)
+            [FromQuery] ulong time)
         {
             string answer;
             if ((answer = _cache.Get<string>("sora:updater:" + action + qstream)) != null)
                 return Ok(answer);
-            
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create($"http://osu.ppy.sh/web/check-updates.php?action={action}&stream={qstream}&time={time}");
+
+            var request = (HttpWebRequest) WebRequest.Create(
+                $"http://osu.ppy.sh/web/check-updates.php?action={action}&stream={qstream}&time={time}"
+            );
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using HttpWebResponse response = (HttpWebResponse) request.GetResponse();
-            using Stream          stream   = response.GetResponseStream();
-            using StreamReader    reader   = new StreamReader(stream ?? throw new Exception("Request Failed!"));
-            
-            string result = reader.ReadToEnd();
+            using var response = (HttpWebResponse) request.GetResponse();
+            using var stream = response.GetResponseStream();
+            using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
+
+            var result = reader.ReadToEnd();
             _cache.Set("sora:updater:" + action + qstream, result, TimeSpan.FromDays(1));
             return Ok(result);
         }
+
         #endregion
-        
+
         #region POST /web/osu-screenshot.php
 
         [HttpPost("osu-screenshot.php")]
@@ -580,19 +614,19 @@ namespace Sora.Controllers
         {
             if (!Directory.Exists("data/screenshots"))
                 Directory.CreateDirectory("data/screenshots");
-            
-            IFormFile screenshot = Request.Form.Files.GetFile("ss");
-            string    Randi      = Crypto.RandomString(16);
-            using(Stream stream = screenshot.OpenReadStream())
-            using (FileStream fs = System.IO.File.OpenWrite($"data/screenshots/{Randi}"))
+
+            var screenshot = Request.Form.Files.GetFile("ss");
+            var Randi = Crypto.RandomString(16);
+            using (var stream = screenshot.OpenReadStream())
+            using (var fs = System.IO.File.OpenWrite($"data/screenshots/{Randi}"))
             {
                 Image.FromStream(stream)
-                      .Save(fs, ImageFormat.Jpeg);
+                     .Save(fs, ImageFormat.Jpeg);
             }
 
             return Ok($"http://{_config.Server.ScreenshotHostname}/ss/{Randi}");
         }
-        
+
         #endregion
     }
 }
