@@ -21,11 +21,13 @@
 using System;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Sora.Helpers
+namespace Sora.Allocation
 {
     public class Cache
     {
         private readonly IMemoryCache _memoryCache;
+
+        public static Cache New() => new Cache(new MemoryCache(new MemoryCacheOptions()));
 
         public Cache(IMemoryCache memoryCache)
         {

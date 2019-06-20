@@ -22,6 +22,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using MaxMind.GeoIP2.Responses;
+using Sora.Allocation;
 using Sora.Attributes;
 using Sora.Database;
 using Sora.Enums;
