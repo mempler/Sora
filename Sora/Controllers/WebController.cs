@@ -58,21 +58,17 @@ namespace Sora.Controllers
 
         [HttpGet("osu-osz2-getscores.php")]
         public IActionResult GetScoreResult(
-            [FromQuery(Name = "s")] int s,
-            [FromQuery(Name = "vv")] int scoreboardVersion,
             [FromQuery(Name = "v")] ScoreboardType type,
             [FromQuery(Name = "c")] string fileMD5,
             [FromQuery(Name = "f")] string f,
             [FromQuery(Name = "m")] PlayMode playMode,
             [FromQuery(Name = "i")] int i,
             [FromQuery(Name = "mods")] Mod mods,
-            [FromQuery(Name = "h")] string h,
-            [FromQuery(Name = "aa")] int a,
             [FromQuery(Name = "us")] string us,
             [FromQuery(Name = "ha")] string pa)
         {
             var user = Users.GetUser(_factory, Users.GetUserId(_factory, us));
-            if (user == null || !user.IsPassword(pa))
+            if (user?.IsPassword(pa) != true)
                 return Ok("error: pass");
 
             var cache_hash =
@@ -114,7 +110,7 @@ namespace Sora.Controllers
             string osuver = Request.Form["osuver"];
             string pass = Request.Form["pass"];
 
-            var (b, scores) = ScoreSubmittionParser.ParseScore(_factory, score, iv, osuver);
+            var (b, scores) = ScoreSubmissionParser.ParseScore(_factory, score, iv, osuver);
 
             if (scores.UserId == -1)
                 return Ok("error: pass");
@@ -137,13 +133,13 @@ namespace Sora.Controllers
                 {
                     var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
                     rx.IncreasePlaycount(_factory, scores.PlayMode);
-                    rx.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
+                    rx.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
                 }
                 else
                 {
                     var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
                     std.IncreasePlaycount(_factory, scores.PlayMode);
-                    std.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
+                    std.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
                 }
 
                 await _ev.RunEvent(
@@ -194,7 +190,7 @@ namespace Sora.Controllers
 
             if (isRelaxing)
                 scores.Mods -= Mod.Relax;
-            scores.PeppyPoints = _pointsProcessor.Compute(scores);
+            scores.PeppyPoints = PerformancePointsProcessor.Compute(scores);
             if (isRelaxing)
                 scores.Mods |= Mod.Relax;
 
@@ -238,8 +234,9 @@ namespace Sora.Controllers
                 rx.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
                 rx.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
                 rx.IncreaseCount50(_factory, scores.Count50, scores.PlayMode);
-                rx.IncreaseScore(_factory, scores.TotalScore, true, scores.PlayMode);
-                rx.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
+                rx.IncreaseCountMiss(_factory, scores.CountMiss, scores.PlayMode);
+                rx.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
+                rx.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
 
                 rx.UpdatePP(_factory, scores.PlayMode);
 
@@ -256,8 +253,9 @@ namespace Sora.Controllers
                 std.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
                 std.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
                 std.IncreaseCount50(_factory, scores.Count50, scores.PlayMode);
-                std.IncreaseScore(_factory, scores.TotalScore, true, scores.PlayMode);
-                std.IncreaseScore(_factory, scores.TotalScore, false, scores.PlayMode);
+                std.IncreaseCountMiss(_factory, scores.CountMiss, scores.PlayMode);
+                std.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
+                std.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
 
                 std.UpdatePP(_factory, scores.PlayMode);
             }
@@ -403,8 +401,8 @@ namespace Sora.Controllers
                 );
 
             Logger.Info(
-                $"{L_COL.RED}{scores?.ScoreOwner.Username}",
-                $"{L_COL.PURPLE}( {scores?.ScoreOwner.Id} ){L_COL.WHITE}",
+                $"{L_COL.RED}{scores.ScoreOwner.Username}",
+                $"{L_COL.PURPLE}( {scores.ScoreOwner.Id} ){L_COL.WHITE}",
                 $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PeppyPoints:F}PP",
                 $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{NewScore?.Accuracy * 100:F}",
                 $"{L_COL.WHITE}on {L_COL.YELLOW}{sets?[0].Title} [{bm.DiffName}]",
@@ -421,8 +419,8 @@ namespace Sora.Controllers
                 NewScore?.MaxCombo ?? 0,
                 oldScore?.Accuracy * 100 ?? 0,
                 NewScore?.Accuracy * 100 ?? 0,
-                oldScore?.TotalScore ?? 0,
-                NewScore?.TotalScore ?? 0,
+                (ulong) (oldScore?.TotalScore ?? 0),
+                (ulong) (NewScore?.TotalScore ?? 0),
                 oldScore?.PeppyPoints ?? 0,
                 NewScore?.PeppyPoints ?? 0,
                 NewScore?.Id ?? 0

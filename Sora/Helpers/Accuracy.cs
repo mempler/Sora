@@ -27,25 +27,34 @@ namespace Sora.Helpers
     public static class Accuracy
     {
         public static double GetAccuracy(
-            ulong count300, ulong count100, ulong count50, ulong countMiss,
-            ulong countGeki, ulong countKatu, PlayMode playMode)
+            int count300, int count100, int count50, int countMiss,
+            int countGeki, int countKatu, PlayMode playMode)
         {
-            if (count300 + count100 + count100 + count50 + countMiss + countGeki + countKatu == 0)
-                return 0;
-
+            var totalHits = count50 + count100 + count300 + countMiss;
+            
             switch (playMode)
             {
                 case PlayMode.Osu:
-                    return (count50 * 50 + count100 * 100 + count300 * 300) / ((countMiss + count50 + count300 +
-                                                                                count100) * (double) 300);
+                    return totalHits > 0
+                        ? (double) (count50 * 50 + count100 * 100 + count300 * 300) /
+                          (totalHits * 300)
+                        : 1;
                 case PlayMode.Taiko:
-                    return (count50 * 50 + count300 * 100) / ((double) (countMiss + count100 + count300) * 100);
+                    return totalHits > 0
+                        ? (double) (count100 * 150 + count300 * 300)
+                          / (totalHits * 300)
+                        : 1;
                 case PlayMode.Ctb:
-                    return (count300 + count100 + count50) / (double) count300 + count100 + count50 + count300 +
-                           countKatu;
+                    return totalHits > 0
+                        ? (double) (count50 + count100 + count300)
+                          / totalHits
+                        : 1;
                 case PlayMode.Mania:
-                    return (count50 * 50 + count100 * 100 + countKatu * 200 + count300 * 300 + countGeki * 300) /
-                           ((double) (countMiss + count50 + count100 + count300 + countGeki + countKatu) * 300);
+                    totalHits += countGeki + countKatu;
+                    return totalHits > 0
+                        ? (double) (count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) /
+                          (totalHits * 300)
+                        : 1;
                 default:
                     return 0;
             }

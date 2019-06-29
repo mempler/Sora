@@ -76,13 +76,14 @@ namespace Sora.Objects
 
         public bool JoinChannel(Presence pr)
         {
-            if (AdminOnly && pr.User.Permissions == Permission.ADMIN_CHANNEL)
+            if (AdminOnly &&
+                pr.User.Permissions == Permission.ADMIN_CHANNEL)
             {
                 _mut.WaitOne();
                 _presences.Remove(pr);
                 _presences.Add(pr);
                 _mut.ReleaseMutex();
-
+                
                 return true;
             }
 

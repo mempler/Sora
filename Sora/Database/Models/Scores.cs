@@ -61,7 +61,7 @@ namespace Sora.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong TotalScore { get; set; }
+        public int TotalScore { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -77,27 +77,27 @@ namespace Sora.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300 { get; set; }
+        public int Count300 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count100 { get; set; }
+        public int Count100 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count50 { get; set; }
+        public int Count50 { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMiss { get; set; }
+        public int CountMiss { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountGeki { get; set; }
+        public int CountGeki { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountKatu { get; set; }
+        public int CountKatu { get; set; }
 
         [Required]
         public DateTime Date { get; set; }

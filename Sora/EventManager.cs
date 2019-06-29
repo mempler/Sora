@@ -43,17 +43,30 @@ namespace Sora
 
         public IServiceProvider Provider { get; private set; }
 
+        /// <summary>
+        /// Set Active Service Provider
+        /// </summary>
+        /// <param name="provider"></param>
         public void SetProvider(IServiceProvider provider)
         {
             Provider = provider;
         }
 
+        /// <summary>
+        /// Register Events from all assemblies passed by Constructor
+        /// </summary>
         public void RegisterEvents()
         {
             foreach (var asm in _asma)
                 LoadAssembly(asm);
         }
 
+        /// <summary>
+        /// Run a Specified Event based on EventType
+        /// </summary>
+        /// <param name="etype">an EventType to determine which event should be called</param>
+        /// <param name="args">This will throw an Error if you choose the wrong EventArgs!</param>
+        /// <returns>Awaiter</returns>
         public async Task RunEvent(EventType etype, IEventArgs args = null)
         {
             foreach (var evcls in _events)
@@ -77,6 +90,11 @@ namespace Sora
             }
         }
 
+        /// <summary>
+        /// LoadAssembly into EventManager for Plugins and Self!
+        /// </summary>
+        /// <param name="asm">Assembly of the given Plugin / Application</param>
+        /// <exception cref="Exception">Given Dependencies hasn't been found</exception>
         public void LoadAssembly(Assembly asm)
         {
             var eat = AttributeUtility

@@ -58,21 +58,9 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreOsu
                     );
                     sw.Write(
-                        (float) Accuracy.GetAccuracy(
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count300Osu
-                                : Presence.LeaderboardStd.Count300Osu,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count100Osu
-                                : Presence.LeaderboardStd.Count100Osu,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count50Osu
-                                : Presence.LeaderboardStd.Count50Osu,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.CountMissOsu
-                                : Presence.LeaderboardStd.CountMissOsu, 0, 0,
-                            Presence.Status.Playmode
-                        )
+                        (float) (Presence.Get<bool>("IS_RELAXING")
+                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
+                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -98,21 +86,9 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreTaiko
                     );
                     sw.Write(
-                        (float) Accuracy.GetAccuracy(
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count300Taiko
-                                : Presence.LeaderboardStd.Count300Taiko,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count100Taiko
-                                : Presence.LeaderboardStd.Count100Taiko,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count50Taiko
-                                : Presence.LeaderboardStd.Count50Taiko,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.CountMissTaiko
-                                : Presence.LeaderboardStd.CountMissTaiko, 0, 0,
-                            Presence.Status.Playmode
-                        )
+                        (float) (Presence.Get<bool>("IS_RELAXING")
+                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
+                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -138,21 +114,9 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreCtb
                     );
                     sw.Write(
-                        (float) Accuracy.GetAccuracy(
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count300Ctb
-                                : Presence.LeaderboardStd.Count300Ctb,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count100Ctb
-                                : Presence.LeaderboardStd.Count100Ctb,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.Count50Ctb
-                                : Presence.LeaderboardStd.Count50Ctb,
-                            Presence.Get<bool>("IS_RELAXING")
-                                ? Presence.LeaderboardRx.CountMissCtb
-                                : Presence.LeaderboardStd.CountMissCtb, 0, 0,
-                            Presence.Status.Playmode
-                        )
+                        (float) (Presence.Get<bool>("IS_RELAXING")
+                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
+                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -174,13 +138,7 @@ namespace Sora.Packets.Server
                 case PlayMode.Mania:
                     sw.Write(Presence.LeaderboardStd.RankedScoreMania);
                     sw.Write(
-                        (float) Accuracy.GetAccuracy(
-                            Presence.LeaderboardStd.Count300Mania,
-                            Presence.LeaderboardStd.Count100Mania,
-                            Presence.LeaderboardStd.Count50Mania,
-                            Presence.LeaderboardStd.CountMissMania, 0, 0,
-                            Presence.Status.Playmode
-                        )
+                        (float) Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode)
                     );
                     sw.Write((uint) Presence.LeaderboardStd.PlayCountMania);
                     sw.Write(Presence.LeaderboardStd.TotalScoreMania);

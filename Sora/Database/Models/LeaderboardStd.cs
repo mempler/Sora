@@ -28,6 +28,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Sora.Enums;
+using Sora.Helpers;
 
 namespace Sora.Database.Models
 {
@@ -72,67 +73,67 @@ namespace Sora.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300Osu { get; set; }
+        public int Count300Osu { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300Taiko { get; set; }
+        public int Count300Taiko { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300Ctb { get; set; }
+        public int Count300Ctb { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count300Mania { get; set; }
+        public int Count300Mania { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count100Osu { get; set; }
+        public int Count100Osu { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count100Taiko { get; set; }
+        public int Count100Taiko { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count100Ctb { get; set; }
+        public int Count100Ctb { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count100Mania { get; set; }
+        public int Count100Mania { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count50Osu { get; set; }
+        public int Count50Osu { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count50Taiko { get; set; }
+        public int Count50Taiko { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count50Ctb { get; set; }
+        public int Count50Ctb { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong Count50Mania { get; set; }
+        public int Count50Mania { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMissOsu { get; set; }
+        public int CountMissOsu { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMissTaiko { get; set; }
+        public int CountMissTaiko { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMissCtb { get; set; }
+        public int CountMissCtb { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public ulong CountMissMania { get; set; }
+        public int CountMissMania { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -179,6 +180,23 @@ namespace Sora.Database.Models
             return new LeaderboardStd {Id = userId};
         }
 
+        public double GetAccuracy(PlayMode mode)
+        {
+            switch (mode)
+            {
+                case PlayMode.Osu:
+                    return Accuracy.GetAccuracy(Count300Osu, Count100Osu, Count50Osu, CountMissOsu, 0, 0, PlayMode.Osu);
+                case PlayMode.Taiko:
+                    return Accuracy.GetAccuracy(Count300Taiko, Count100Taiko, Count50Taiko, CountMissTaiko, 0, 0, PlayMode.Osu);
+                case PlayMode.Ctb:
+                    return Accuracy.GetAccuracy(Count300Ctb, Count100Ctb, Count50Ctb, CountMissCtb, 0, 0, PlayMode.Osu);
+                case PlayMode.Mania:
+                    return Accuracy.GetAccuracy(Count300Mania, Count100Mania, Count50Mania, CountMissMania, 0, 0, PlayMode.Osu);
+            }
+
+            return 0;
+        }
+
         public void IncreaseScore(SoraDbContextFactory factory, ulong score, bool ranked, PlayMode mode)
         {
             using var db = factory.GetForWrite();
@@ -214,7 +232,7 @@ namespace Sora.Database.Models
             db.Context.LeaderboardStd.Update(this);
         }
 
-        public void IncreaseCount300(SoraDbContextFactory factory, ulong c, PlayMode mode)
+        public void IncreaseCount300(SoraDbContextFactory factory, int c, PlayMode mode)
         {
             using var db = factory.GetForWrite();
 
@@ -237,7 +255,7 @@ namespace Sora.Database.Models
             db.Context.LeaderboardStd.Update(this);
         }
 
-        public void IncreaseCount100(SoraDbContextFactory factory, ulong c, PlayMode mode)
+        public void IncreaseCount100(SoraDbContextFactory factory, int c, PlayMode mode)
         {
             using var db = factory.GetForWrite();
 
@@ -260,7 +278,7 @@ namespace Sora.Database.Models
             db.Context.LeaderboardStd.Update(this);
         }
 
-        public void IncreaseCount50(SoraDbContextFactory factory, ulong c, PlayMode mode)
+        public void IncreaseCount50(SoraDbContextFactory factory, int c, PlayMode mode)
         {
             using var db = factory.GetForWrite();
 
@@ -283,7 +301,7 @@ namespace Sora.Database.Models
             db.Context.LeaderboardStd.Update(this);
         }
 
-        public void IncreaseCountMiss(SoraDbContextFactory factory, ulong c, PlayMode mode)
+        public void IncreaseCountMiss(SoraDbContextFactory factory, int c, PlayMode mode)
         {
             using var db = factory.GetForWrite();
 

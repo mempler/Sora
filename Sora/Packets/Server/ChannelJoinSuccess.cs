@@ -29,7 +29,7 @@ namespace Sora.Packets.Server
 {
     public class ChannelJoinSuccess : IPacket
     {
-        public Channel Channel;
+        private Channel Channel;
 
         public ChannelJoinSuccess(Channel channel) => Channel = channel;
 

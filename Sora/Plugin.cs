@@ -26,7 +26,14 @@ namespace Sora
 {
     public interface IPlugin
     {
+        /// <summary>
+        /// Enable Plugin
+        /// </summary>
         void OnEnable();
+        
+        /// <summary>
+        /// Disable Plugin
+        /// </summary>
         void OnDisable();
     }
 

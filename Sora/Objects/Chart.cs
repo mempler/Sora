@@ -15,8 +15,8 @@ namespace Sora.Objects
         private readonly double _ppBefore;
         private readonly int _rankAfter;
         private readonly int _rankBefore;
-        private readonly ulong _rankedScoreBefore;
-        private readonly ulong _totalScoreAfter;
+        private readonly int _rankedScoreBefore;
+        private readonly int _totalScoreAfter;
 
         public Chart(string chartId,
             string chartName,
@@ -44,8 +44,8 @@ namespace Sora.Objects
             _maxComboAfter = maxComboAfter;
             _accuracyBefore = accuracyBefore;
             _accuracyAfter = accuracyAfter;
-            _rankedScoreBefore = rankedScoreBefore;
-            _totalScoreAfter = totalScoreAfter;
+            _rankedScoreBefore = (int) rankedScoreBefore;
+            _totalScoreAfter = (int) totalScoreAfter;
             _ppBefore = ppBefore;
             _ppAfter = ppAfter;
             _onlineScoreId = onlineScoreId;

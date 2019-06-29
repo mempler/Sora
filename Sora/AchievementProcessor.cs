@@ -8,6 +8,11 @@ namespace Sora
 {
     public static class AchievementProcessor
     {
+        
+        /// <summary>
+        /// Create Default Achievements
+        /// </summary>
+        /// <param name="factory">Context Factory</param>
         public static void CreateDefaultAchievements(SoraDbContextFactory factory)
         {
             if (factory.Get().Achievements.FirstOrDefault(x => x.Name == "oog") == null)
@@ -20,6 +25,17 @@ namespace Sora
                 );
         }
 
+        /// <summary>
+        /// Check if User has Obtained an achievement on this Score Submission
+        /// </summary>
+        /// <param name="factory">Context Factory</param>
+        /// <param name="user">Who tries to Obtain</param>
+        /// <param name="score">Submitted Score</param>
+        /// <param name="map">Beatmap</param>
+        /// <param name="set">Beatmap Set</param>
+        /// <param name="oldLB">Old LeaderBoard</param>
+        /// <param name="newLB">New LeaderBoard</param>
+        /// <returns>Obtained Achievements</returns>
         public static string ProcessAchievements(SoraDbContextFactory factory,
             Users user,
             Scores score,

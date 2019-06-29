@@ -5,22 +5,18 @@ using Sora.Allocation;
 
 namespace Sora.Tests.AllocationTests
 {
-    [TestFixture]
     public class CacheTests
     {
-        private Cache _cache;
+        private readonly Cache _cache;
         
-        public CacheTests()
-        {
-            _cache = Cache.New();
-        }
+        public CacheTests() => _cache = Cache.New();
 
         [Test]
         public void TestValues()
         {
-            _cache.Set("Some Key", "Hello", TimeSpan.FromSeconds(1));
+            _cache.Set("Some Key", "Hello", TimeSpan.FromMilliseconds(50));
             Assert.NotNull(_cache.Get<string>("Some Key"));
-            Thread.Sleep(1000);
+            Thread.Sleep(50);
             Assert.Null(_cache.Get<string>("Some Key"));
         }
     }

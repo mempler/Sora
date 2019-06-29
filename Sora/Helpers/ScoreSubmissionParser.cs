@@ -28,16 +28,16 @@ using Sora.Enums;
 
 namespace Sora.Helpers
 {
-    public static class ScoreSubmittionParser
+    public static class ScoreSubmissionParser
     {
         private const string PrivateKey = "osu!-scoreburgr---------{0}";
 
-        public static (bool Pass, Scores score) ParseScore(SoraDbContextFactory factory, string encscore, string iv,
-            string osuversion)
+        public static (bool Pass, Scores score) ParseScore(SoraDbContextFactory factory, string encScore, string iv,
+            string osuVersion)
         {
             var decryptedScore = Crypto.DecryptString(
-                Convert.FromBase64String(encscore),
-                Encoding.ASCII.GetBytes(string.Format(PrivateKey, osuversion)),
+                Convert.FromBase64String(encScore),
+                Encoding.ASCII.GetBytes(string.Format(PrivateKey, osuVersion)),
                 Convert.FromBase64String(iv)
             );
 
@@ -46,13 +46,13 @@ namespace Sora.Helpers
             {
                 FileMd5 = x[0],
                 UserId = Users.GetUserId(factory, x[1]),
-                Count300 = ulong.Parse(x[3]),
-                Count100 = ulong.Parse(x[4]),
-                Count50 = ulong.Parse(x[5]),
-                CountGeki = ulong.Parse(x[6]),
-                CountKatu = ulong.Parse(x[7]),
-                CountMiss = ulong.Parse(x[8]),
-                TotalScore = ulong.Parse(x[9]),
+                Count300 = int.Parse(x[3]),
+                Count100 = int.Parse(x[4]),
+                Count50 = int.Parse(x[5]),
+                CountGeki = int.Parse(x[6]),
+                CountKatu = int.Parse(x[7]),
+                CountMiss = int.Parse(x[8]),
+                TotalScore = int.Parse(x[9]),
                 MaxCombo = short.Parse(x[10]),
                 Mods = (Mod) uint.Parse(x[13]),
                 PlayMode = (PlayMode) byte.Parse(x[15]),

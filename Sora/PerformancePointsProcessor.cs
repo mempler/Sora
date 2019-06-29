@@ -198,15 +198,15 @@ namespace Sora
                                        .ToArray(),
                     Ruleset = LegacyHelper.Convert(dbScore.PlayMode).RulesetInfo,
                     Passed = true,
-                    TotalScore = (long) dbScore.TotalScore,
+                    TotalScore = dbScore.TotalScore,
                     Statistics = new Dictionary<HitResult, int>
                     {
-                        [HitResult.Perfect] = (int) dbScore.Count300,
-                        [HitResult.Good] = (int) dbScore.Count100,
-                        [HitResult.Great] = (int) dbScore.CountGeki,
-                        [HitResult.Meh] = (int) dbScore.Count50,
-                        [HitResult.Miss] = (int) dbScore.CountMiss,
-                        [HitResult.Ok] = (int) dbScore.CountKatu,
+                        [HitResult.Perfect] = dbScore.Count300,
+                        [HitResult.Good] = dbScore.Count100,
+                        [HitResult.Great] = dbScore.CountGeki,
+                        [HitResult.Meh] = dbScore.Count50,
+                        [HitResult.Miss] = dbScore.CountMiss,
+                        [HitResult.Ok] = dbScore.CountKatu,
                         [HitResult.None] = 0
                     }
                 },
@@ -231,11 +231,16 @@ namespace Sora
 
     public class PerformancePointsProcessor
     {
-        public double Compute(Scores dbscore)
+        /// <summary>
+        /// Compute Performance Points from given Score and Replay!
+        /// </summary>
+        /// <param name="dbScore"></param>
+        /// <returns>Performance Points</returns>
+        public static double Compute(Scores dbScore)
         {
-            var workingBeatmap = new ProcessorWorkingBeatmap("data/beatmaps/" + dbscore.FileMd5);
+            var workingBeatmap = new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5);
             var psp = new ProcessorScoreParser(workingBeatmap);
-            var score = psp.Parse(dbscore);
+            var score = psp.Parse(dbScore);
 
             var categoryAttribs = new Dictionary<string, double>();
             var pp = score.ScoreInfo.Ruleset

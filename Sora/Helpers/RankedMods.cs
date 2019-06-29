@@ -7,6 +7,7 @@ namespace Sora.Helpers
         public static bool IsRanked(Mod mods)
         {
             var r = (mods & Mod.Relax2) == 0;
+            
             if ((mods & Mod.Cinema) != 0)
                 r = false;
             if ((mods & Mod.Autoplay) != 0)
@@ -15,6 +16,7 @@ namespace Sora.Helpers
                 r = false;
             if ((mods & Mod.HardRock) != 0 && (mods & Mod.Easy) != 0)
                 r = false;
+            
             return r;
         }
     }
