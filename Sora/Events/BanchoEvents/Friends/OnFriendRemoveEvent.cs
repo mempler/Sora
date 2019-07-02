@@ -23,6 +23,7 @@
 using Sora.Attributes;
 using Sora.Database;
 using Sora.Database.Models;
+using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
 
@@ -35,6 +36,7 @@ namespace Sora.Events.BanchoEvents.Friends
 
         public OnFriendRemoveEvent(SoraDbContextFactory factory) => _factory = factory;
 
+        [Event(EventType.BanchoFriendRemove)]
         public void OnFriendRemove(BanchoFriendRemoveArgs args)
         {
             var u = Users.GetUser(_factory, args.FriendId);

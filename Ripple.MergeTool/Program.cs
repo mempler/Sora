@@ -2,11 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Amib.Threading;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Ripple.MergeTool.Database;
 using Ripple.MergeTool.Tools;
 using Sora.Database;
 using Sora.Database.Models;
+using Sora.Enums;
 using Sora.Helpers;
 
 namespace Ripple.MergeTool
@@ -14,19 +17,22 @@ namespace Ripple.MergeTool
     internal static class Program
     {
         private static MemoryCache _memoryCache;
-
+        private static SmartThreadPool _pool;
         private static void Main()
         {
             Logger.Info("Ripple Merger v0.0.1a");
 
-            if (_memoryCache == null)
-                _memoryCache = new MemoryCache(
-                    new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)}
-                );
+            _memoryCache = new MemoryCache(
+                new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)}
+            );
+
+            _pool = new SmartThreadPool {MaxThreads = Environment.ProcessorCount * 2};
+
+            _pool.Start();
+            
             var cfgUtil = new ConfigUtil(_memoryCache);
 
-            var cfg =
-                cfgUtil.ReadConfig<RippleDbContext.RippleConfig>();
+            var cfg = cfgUtil.ReadConfig<RippleDbContext.RippleConfig>();
 
             var factory = new SoraDbContextFactory();
             var rippleCtx = new RippleDbContext();
@@ -35,14 +41,11 @@ namespace Ripple.MergeTool
 
             using (var db = factory.GetForWrite())
             {
-                foreach (var user in rippleCtx.Users)
+                foreach (var user in rippleCtx.Users.Where(u => u.id != 999))
                 {
                     if (db.Context.Users.Any(x => x.Username == user.username)) // Skip double Users
                         continue;
-
-                    if (user.id == 999) // We don't need fokabot! gtfu
-                        continue;
-
+                    
                     if (user.email == null || user.password_md5 == null || user.username == null)
                     {
                         Logger.Info($"Invalid User! {user.id}");
@@ -67,39 +70,38 @@ namespace Ripple.MergeTool
             #endregion
 
             #region Beatmap Databse merge
+            foreach (var rMap in rippleCtx.Beatmaps.Where(m =>
+                m.ranked == RankedStatus.Approved ||
+                m.ranked == RankedStatus.Ranked
+            )) _pool.QueueWorkItem(rippleMap => {
+                if (factory.Get().Beatmaps.Any(x => x.Id == rippleMap.beatmap_id))
+                    return;
 
-            using (var db = factory.GetForWrite())
-            {
-                foreach (var rMap in rippleCtx.Beatmaps)
-                {
-                    if (db.Context.Beatmaps.Any(x => x.Id == rMap.beatmap_id))
-                        continue;
+                Beatmaps sMap;
+                if ((sMap = Beatmaps.FetchFromApi(cfg, null, rippleMap.beatmap_id)) == null)
+                    return;
 
-                    Logger.Info($"Importing {rMap.beatmap_id}");
+                Logger.Info($"Importing {rippleMap.beatmap_id}");
+                
+                sMap.RankedStatus = rippleMap.ranked;
+                
+                var LetsMapPath = Path.Join(cfg.CRipple.LetsBeatmapPath, "/" + sMap.Id + ".osu");
+                var SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + sMap.FileMd5);
+                
+                Logger.Debug(LetsMapPath);
+                Logger.Debug(SoraMapPath);
+                
+                if (File.Exists(LetsMapPath) && !File.Exists(SoraMapPath))
+                    File.Copy(LetsMapPath, SoraMapPath);
 
-                    Beatmaps sMap;
-                    if ((sMap = Beatmaps.FetchFromApi(cfg, null, rMap.beatmap_id)) != null)
-                    {
-                        sMap.RankedStatus = rMap.ranked;
-
-                        var LetsMapPath = Path.Join(cfg.CRipple.LetsBeatmapPath, "/" + sMap.Id + ".osu");
-                        var SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + sMap.FileMd5);
-
-                        Logger.Info(LetsMapPath);
-                        Logger.Info(SoraMapPath);
-
-                        if (File.Exists(LetsMapPath) && !File.Exists(SoraMapPath))
-                            File.Copy(LetsMapPath, SoraMapPath);
-                        else
-                            BeatmapDownloader.GetBeatmap(sMap.FileMd5, cfg);
-
-                        if (db.Context.Beatmaps.Count(x => x.Id == sMap.Id) < 1)
-                            db.Context.Beatmaps.Add(sMap);
-                        else
-                            db.Context.Beatmaps.Update(sMap);
-                    }
-                }
-            }
+                if (factory.Get().Beatmaps.Count(x => x.Id == sMap.Id) < 1)
+                    using (var db = factory.GetForWrite())
+                        db.Context.Beatmaps.Add(sMap);
+                else
+                    using (var db = factory.GetForWrite())
+                        db.Context.Beatmaps.Update(sMap);
+            }, rMap);
+            _pool.WaitForIdle();
 
             #endregion
 

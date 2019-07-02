@@ -50,6 +50,7 @@ namespace Sora.Helpers
 
         private static void PrintColorized(string Prefix, Color PrefixColor, bool exit, IEnumerable<object> msg)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             var color = PrefixColor;
 
             var m = msg.Aggregate(string.Empty, (current, x) => current + " " + x);

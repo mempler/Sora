@@ -108,10 +108,10 @@ namespace Sora.Objects
 
             Logger.Debug($"{L_COL.YELLOW}Cheesegull {L_COL.WHITE}REQUEST_URI: {request_url}");
 
-            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            var request = (HttpWebRequest)WebRequest.Create(request_url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using (var response = (HttpWebResponse) request.GetResponse())
+            using (var response = (HttpWebResponse)request.GetResponse())
             using (var stream = response.GetResponseStream())
             using (var reader = new StreamReader(stream ?? throw new Exception("Request Failed!")))
             {
@@ -126,24 +126,24 @@ namespace Sora.Objects
         {
             var request_url = _cfg.Cheesegull.URI + "/api/s/" + SetId;
 
-            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            var request = (HttpWebRequest)WebRequest.Create(request_url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using var response = (HttpWebResponse) request.GetResponse();
+            using var response = (HttpWebResponse)request.GetResponse();
             using var stream = response.GetResponseStream();
             using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
             var result = reader.ReadToEnd();
-            _sets = new List<CheesegullBeatmapSet>(new[] {JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)});
+            _sets = new List<CheesegullBeatmapSet>(new[] { JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result) });
         }
 
         public void SetBM(int BeatmapId)
         {
             var request_url = _cfg.Cheesegull.URI + "/api/b/" + BeatmapId;
 
-            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            var request = (HttpWebRequest)WebRequest.Create(request_url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using var response = (HttpWebResponse) request.GetResponse();
+            using var response = (HttpWebResponse)request.GetResponse();
             using var stream = response.GetResponseStream();
             using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
             var result = reader.ReadToEnd();
@@ -161,16 +161,16 @@ namespace Sora.Objects
         {
             var request_url = _cfg.Cheesegull.URI + "/api/hash/" + Hash;
 
-            var request = (HttpWebRequest) WebRequest.Create(request_url);
+            var request = (HttpWebRequest)WebRequest.Create(request_url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            using var response = (HttpWebResponse) request.GetResponse();
+            using var response = (HttpWebResponse)request.GetResponse();
             using var stream = response.GetResponseStream();
             using var reader = new StreamReader(stream ?? throw new Exception("Request Failed!"));
             var result = reader.ReadToEnd();
             if (result != "null")
                 _sets = new List<CheesegullBeatmapSet>(
-                    new[] {JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result)}
+                    new[] { JsonConvert.DeserializeObject<CheesegullBeatmapSet>(result) }
                 );
             else
                 _sets = new List<CheesegullBeatmapSet>();
@@ -183,10 +183,7 @@ namespace Sora.Objects
             if (_sets == null)
                 _sets = new List<CheesegullBeatmapSet>();
 
-            if (_sets.Count >= 100)
-                RetStr += "101";
-            else
-                RetStr += _sets.Count.ToString();
+            RetStr += _sets.Count >= 100 ? "101" : _sets.Count.ToString();
 
             RetStr += "\n";
 
@@ -205,9 +202,9 @@ namespace Sora.Objects
                               $"{set.Artist}|" +
                               $"{set.Title}|" +
                               $"{set.Creator}|" +
-                              $"{set.RankedStatus}|" +
-                              $"{MaxDiff + ".00"}|" +
-                              $"{set.LastUpdate}|" +
+                              $"{(int)set.RankedStatus}|" +
+                              $"{MaxDiff:0.00}|" +
+                              $"{set.LastUpdate}Z|" +
                               $"{set.SetID}|" +
                               $"{set.SetID}|" +
                               "0|" +
@@ -223,11 +220,11 @@ namespace Sora.Objects
                                   $"{cb.OD}~CS" +
                                   $"{cb.CS}~HP" +
                                   $"{cb.HP}~" +
-                                  $"{(int) MathF.Floor(cb.TotalLength) / 60}m" +
+                                  $"{(int)MathF.Floor(cb.TotalLength) / 60}m" +
                                   $"{cb.TotalLength % 60}s)@" +
-                                  $"{(int) cb.Mode},";
+                                  $"{(int)cb.Mode},";
 
-                    RetStr = RetStr.TrimEnd(',') + "|\n";
+                    RetStr = RetStr.TrimEnd(',') + "|\r\n";
                 }
             else if (_sets.Count <= 0)
                 RetStr = "-1\nNo Beatmaps were found!";
@@ -248,7 +245,7 @@ namespace Sora.Objects
                    $"{set.Artist}|" +
                    $"{set.Title}|" +
                    $"{set.Creator}|" +
-                   $"{set.RankedStatus}|" +
+                   $"{(int)set.RankedStatus}|" +
                    "10.00|" +
                    $"{set.LastUpdate}|" +
                    $"{set.SetID}|" +

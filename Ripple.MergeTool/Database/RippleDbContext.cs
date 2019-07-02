@@ -23,7 +23,7 @@ namespace Ripple.MergeTool.Database
                 );
             var cfgUtil = new ConfigUtil(_memoryCache);
 
-            var config = cfgUtil.ReadConfig<MySQLConfig>();
+            var config = cfgUtil.ReadConfig<MySQLConfig>("ripple.config.json");
 
             if (config.MySql.Hostname == null)
                 Logger.Fatal("MySQL Hostname cannot be null!");

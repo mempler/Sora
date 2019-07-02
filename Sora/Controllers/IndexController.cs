@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Sora.Enums;
@@ -134,6 +135,48 @@ namespace Sora.Controllers
             }
 
             return Ok();
+        }
+        
+        
+        // GET /d/:BeatmapSetId
+        [Route("/d/{beatmapId}")]
+        public async Task<IActionResult> GETDownloadBeatmap([FromServices] ICheesegullConfig cfg, string beatmapId)
+        {
+            var noVid = false;
+            int realId;
+            
+            if (beatmapId.EndsWith("n")) {
+                if (!int.TryParse(beatmapId, out realId))
+                {
+                    return StatusCode(
+                        404, $"Beatmap wasn't found due to an Invalid BeatmapId, Value was: {beatmapId}\n" +
+                             "Usage: /d/[BeatmapId](n[o video])"
+                    );
+                }
+
+                noVid = true;
+            }
+            else if (!int.TryParse(beatmapId, out realId))
+            {
+                return StatusCode(
+                    404, $"Beatmap wasn't found due to an Invalid BeatmapId, Value was: {beatmapId}\n" +
+                         "Usage: /d/[BeatmapId](n[o video])"
+                );
+            }
+            
+            var wc = new System.Net.WebClient();
+            var data = await Task.Run(() => wc.DownloadData($"{cfg.Cheesegull.URI}/d/{realId}" + (noVid ? "?novideo" : "")));
+
+            Logger.Info($"{cfg.Cheesegull.URI}/d/{realId}" + (noVid ? "?novideo" : ""));
+            
+            var fileName = realId.ToString();
+            if (!string.IsNullOrEmpty(wc.ResponseHeaders["Content-Disposition"]))
+                fileName = new ContentDisposition(wc.ResponseHeaders["Content-Disposition"]).FileName;
+
+            return File(new MemoryStream(data), "APPLICATION/octet-stream", fileName);
+            
+            // osu.ppy.sh/d/ -> bm6.ppy.sh/d/ -> pisstau.be/d/ didn't worked :c
+            //return Redirect($"https://bm6.ppy.sh/d/{realId}" + (noVid ? "?novideo" : ""));
         }
 
         private async Task<ActionResult> RetOut(Stream stream)

@@ -23,6 +23,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Sora.Allocation;
+using Sora.Helpers;
 using Sora.Packets.Server;
 
 namespace Sora.Objects
@@ -117,6 +118,14 @@ namespace Sora.Objects
             if (!skipReadonly && pr.User.Id != 100)
                 if (ReadOnly)
                     return;
+
+            Logger.Info(
+                $"{L_COL.RED}{pr.User.Username}",
+                $"{L_COL.PURPLE}( {pr.User.Id} )",
+                $"{L_COL.YELLOW}{ChannelName}",
+                $"{L_COL.WHITE}=>", message.Replace("\n", " ")
+            );
+
             if (BoundStream == null && BoundPresence != null)
             {
                 BoundPresence +=

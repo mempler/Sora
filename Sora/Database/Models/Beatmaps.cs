@@ -130,7 +130,7 @@ namespace Sora.Database.Models
 
             if (!string.IsNullOrEmpty(fileMd5))
                 cg.SetBM(fileMd5);
-
+            
             else if (beatmapId != -1)
                 cg.SetBM(beatmapId);
 

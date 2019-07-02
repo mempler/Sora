@@ -8,13 +8,13 @@ namespace Sora.Helpers
 {
     public static class BeatmapDownloader
     {
-        public static string GetBeatmap(string hash, ICheesegullConfig cfg)
+        public static string GetBeatmap(string hash, ICheesegullConfig cfg, string beatmapPath = "data/beatmaps")
         {
             if (!Directory.Exists("data/beatmaps"))
                 Directory.CreateDirectory("data/beatmaps");
 
-            if (File.Exists($"data/beatmaps/{hash}"))
-                return $"data/beatmaps/{hash}";
+            if (File.Exists($"{beatmapPath}/{hash}"))
+                return $"{beatmapPath}/{hash}";
 
             var cg = new Cheesegull(cfg);
             cg.SetBM(hash);
@@ -37,10 +37,10 @@ namespace Sora.Helpers
                 if (result.Length < 1)
                     return string.Empty;
 
-                File.WriteAllText($"data/beatmaps/{hash}", result);
+                File.WriteAllText($"{beatmapPath}/{hash}", result);
             }
 
-            return $"data/beatmaps/{hash}";
+            return $"{beatmapPath}/{hash}";
         }
     }
 }

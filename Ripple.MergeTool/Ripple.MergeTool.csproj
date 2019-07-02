@@ -9,4 +9,12 @@
       <ProjectReference Include="..\Sora\Sora.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="data\beatmaps" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SmartThreadPool.NetCore" Version="2.3.0" />
+    </ItemGroup>
+
 </Project>

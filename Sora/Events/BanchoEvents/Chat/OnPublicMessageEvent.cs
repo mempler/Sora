@@ -59,14 +59,7 @@ namespace Sora.Events.BanchoEvents.Chat
                 args.pr += new ChannelRevoked(args.Message.ChannelTarget);
                 return;
             }
-
-            Logger.Info(
-                $"{L_COL.RED}{args.pr.User.Username}",
-                $"{L_COL.PURPLE}( {args.pr.User.Id} )",
-                $"{L_COL.YELLOW}{args.Message.ChannelTarget}",
-                $"{L_COL.WHITE}=>", args.Message.Message.Replace("\n", " ")
-            );
-
+            
             chan.WriteMessage(args.pr, args.Message.Message);
         }
     }
