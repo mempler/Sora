@@ -24,7 +24,7 @@ namespace Ripple.MergeTool.Database.Model
         public int max_combo { get; set; }
 
         [Required]
-        public Mod mods { get; set; }
+        public int mods { get; set; }
 
         [Required]
         [Column("300_count")]
@@ -39,11 +39,11 @@ namespace Ripple.MergeTool.Database.Model
         public int C50 { get; set; }
 
         [Required]
-        [Column("geki_count")]
+        [Column("gekis_count")]
         public int CGeki { get; set; }
 
         [Required]
-        [Column("katu_count")]
+        [Column("katus_count")]
         public int CKatu { get; set; }
 
         [Required]
@@ -54,12 +54,9 @@ namespace Ripple.MergeTool.Database.Model
         public string time { get; set; } // Why is that a varchar.... Ripple ?!?
 
         [Required]
-        public PlayMode play_mode { get; set; }
+        public sbyte play_mode { get; set; }
 
         [Required]
         public double accuracy { get; set; }
-
-        [Required]
-        public double pp { get; set; } // Requires Recalculation!
     }
 }

@@ -14,6 +14,7 @@ namespace Ripple.MergeTool.Database
         public DbSet<RippleBeatmap> Beatmaps { get; set; }
         public DbSet<RippleUser> Users { get; set; }
         public DbSet<RippleScore> Scores { get; set; }
+        public DbSet<RippleFriends> Friends { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

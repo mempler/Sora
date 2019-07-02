@@ -160,7 +160,7 @@ namespace Sora.Objects
         public void SetBM(string Hash)
         {
             var request_url = _cfg.Cheesegull.URI + "/api/hash/" + Hash;
-
+            
             var request = (HttpWebRequest)WebRequest.Create(request_url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 

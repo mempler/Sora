@@ -10,8 +10,8 @@ namespace Sora.Helpers
     {
         public static string GetBeatmap(string hash, ICheesegullConfig cfg, string beatmapPath = "data/beatmaps")
         {
-            if (!Directory.Exists("data/beatmaps"))
-                Directory.CreateDirectory("data/beatmaps");
+            if (!Directory.Exists(beatmapPath))
+                Directory.CreateDirectory(beatmapPath);
 
             if (File.Exists($"{beatmapPath}/{hash}"))
                 return $"{beatmapPath}/{hash}";

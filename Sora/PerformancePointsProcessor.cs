@@ -158,9 +158,9 @@ namespace Sora
             }
         }
 
-        public Score Parse(Scores dbScore)
+        public Score Parse(Scores dbScore, string replayPath = null)
         {
-            using var rawReplay = File.OpenRead("data/replays/" + dbScore.ReplayMd5);
+            using var rawReplay = replayPath == null ? File.OpenRead("data/replays/" + dbScore.ReplayMd5) : File.OpenRead(replayPath);
 
             var properties = new byte[5];
             if (rawReplay.Read(properties, 0, 5) != 5)
@@ -236,11 +236,16 @@ namespace Sora
         /// </summary>
         /// <param name="dbScore"></param>
         /// <returns>Performance Points</returns>
-        public static double Compute(Scores dbScore)
+        public static double Compute(Scores dbScore, string replayPath = null, string beatmapPath = null)
         {
-            var workingBeatmap = new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5);
+            ProcessorWorkingBeatmap workingBeatmap;
+            if (beatmapPath == null)
+                workingBeatmap = new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5);
+            else
+                workingBeatmap = new ProcessorWorkingBeatmap(beatmapPath);
+            
             var psp = new ProcessorScoreParser(workingBeatmap);
-            var score = psp.Parse(dbScore);
+            var score = psp.Parse(dbScore, replayPath);
 
             var categoryAttribs = new Dictionary<string, double>();
             var pp = score.ScoreInfo.Ruleset

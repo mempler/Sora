@@ -75,8 +75,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="data\avatars" />
-    <Folder Include="data\beatmaps" />
-    <Folder Include="data\replays" />
+    <Folder Include="data" />
   </ItemGroup>
 </Project>
