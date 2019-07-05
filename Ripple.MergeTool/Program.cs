@@ -115,7 +115,6 @@ namespace Ripple.MergeTool
                         db.Context.Beatmaps.Update(sMap);
             }, rMap);
             _pool.WaitForIdle();
-
             #endregion
             
             #region Score Database Merge
@@ -216,8 +215,9 @@ namespace Ripple.MergeTool
                                     soraScore.PeppyPoints = PerformancePointsProcessor.Compute(
                                         soraScore, ReplaySoraPath, SoraMapPath
                                     );
-                            } catch (Exception)
+                            } catch (Exception ex)
                             {
+                                Logger.Err(ex);
                                 Logger.Info($"Failed to Calculate PP for score {rScore.id}");
                             }
                         }

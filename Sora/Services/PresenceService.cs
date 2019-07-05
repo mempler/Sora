@@ -58,6 +58,20 @@ namespace Sora.Services
             }
         }
 
+        public int ConnectedPresences
+        {
+            get
+            {
+                if (_presences == null)
+                    return 0;
+                
+                lock (Locker)
+                {
+                    return _presences.Count;
+                }
+            }
+        }
+
         public Presence? this[string token] => GetPresence(token);
 
         public Presence? this[int userId] => GetPresence(userId);

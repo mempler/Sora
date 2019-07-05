@@ -136,6 +136,10 @@ namespace Sora.Objects
         {
             if (BotPresence)
                 return this;
+            
+            if ((bool) this["IRC"])
+                return this;
+            
             if (p == null)
                 return this;
 

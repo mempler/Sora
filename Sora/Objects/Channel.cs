@@ -56,6 +56,7 @@ namespace Sora.Objects
         public bool ReadOnly { get; set; }
         public bool AdminOnly { get; }
         public bool AutoJoin { get; }
+        public List<Presence> PresenceList => _presences;
 
         public int UserCount
         {

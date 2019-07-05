@@ -26,7 +26,7 @@ namespace Sora
                 {
                     Server = new CServer
                     {
-                        Hostname = "0.0.0.0", Port = 4312, ScreenshotHostname = "gigamons.de", FreeDirect = true
+                        Hostname = "0.0.0.0", Port = 4312, IRCPort = 6667, ScreenshotHostname = "gigamons.de", FreeDirect = true
                     },
                     Cheesegull = new CCheesegull {URI = "https://pisstau.be"},
                     MySql = new CMySql

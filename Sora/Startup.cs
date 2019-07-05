@@ -15,6 +15,7 @@ using Sora.Allocation;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Helpers;
+using Sora.Server;
 using Sora.Services;
 
 namespace Sora
@@ -59,6 +60,7 @@ namespace Sora
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<ChannelService>()
                     .AddSingleton<Bot.Sora>()
+                    .AddSingleton<IRCServer>()
                     .AddSingleton<PerformancePointsProcessor>()
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
 
@@ -88,7 +90,8 @@ namespace Sora
             ChannelService cs,
             PresenceService ps,
             ConsoleCommandService ccs,
-            Bot.Sora s
+            Bot.Sora s,
+            IRCServer ircServer
         )
         {
             app.UseMiddleware<LoggingMiddleware>();
@@ -159,14 +162,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             app.UseDeveloperExceptionPage();
 
             app.UseMvc(
-                routes =>
-                {
-                    routes.MapRoute(
-                        "default",
-                        "{controller=Home}/{action=Index}/{id?}"
-                    );
-                }
+                routes => routes.MapRoute(
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}"
+                )
             );
+
+            ircServer.StartAsync();
         }
 
         public class LoggingMiddleware
