@@ -120,108 +120,115 @@ namespace Ripple.MergeTool
             
             #region Score Database Merge
             Logger.Info("Begin Merging of Scores");
-            
-            foreach (var score in rippleCtx.Scores)
+
+            var bmLock = new object();
+            foreach (var rDBScore in rippleCtx.Scores)
             {
-                var scoreDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                if (double.TryParse(score.time, out var i))
-                    scoreDate = scoreDate.AddSeconds(i).ToUniversalTime();
-                else
-                    scoreDate = DateTime.Now;
+                _pool.QueueWorkItem(
+                    (rScore, boundUsers) =>
+                    {
+                        var scoreDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        scoreDate = double.TryParse(rScore.time, out var i) ? scoreDate.AddSeconds(i).ToUniversalTime() : DateTime.Now;
+                        
+                        var soraScore = new Scores
+                        {
+                            Accuracy = rScore.accuracy,
+                            Count300 = rScore.C300,
+                            Count100 = rScore.C100,
+                            Count50 = rScore.C50,
+                            CountGeki = rScore.CGeki,
+                            CountKatu = rScore.CKatu,
+                            CountMiss = rScore.CMiss,
+                            Date = scoreDate,
+                            FileMd5 = rScore.beatmap_md5,
+                            PlayMode = (PlayMode) rScore.play_mode,
+                            Mods = (Mod) rScore.mods,
+                            MaxCombo = (short) rScore.max_combo,
+                            TotalScore = rScore.score
+                        };
 
-                var user = BoundUsers.FirstOrDefault(use => use.Item2 == score.userid);
-                
-                if (user == null) // Deleted user ?
-                {
-                    Logger.Info($"User for UserId {score.userid} not found! Skipping Score...");
-                    continue;
-                }
+                        soraScore.ScoreMd5 = Hex.ToHex(
+                            Crypto.GetMd5(
+                                $"{soraScore.Count300 + soraScore.Count100}{soraScore.FileMd5}{soraScore.CountMiss}{soraScore.CountGeki}{soraScore.CountKatu}{soraScore.Date}{soraScore.Mods}"
+                            )
+                        );
 
-                var soraScore = new Scores
-                {
-                    Accuracy = score.accuracy,
-                    Count300 = score.C300,
-                    Count100 = score.C100,
-                    Count50 = score.C50,
-                    CountGeki = score.CGeki,
-                    CountKatu = score.CKatu,
-                    CountMiss = score.CMiss,
-                    Date = scoreDate,
-                    FileMd5 = score.beatmap_md5,
-                    PlayMode = (PlayMode) score.play_mode,
-                    Mods = (Mod) score.mods,
-                    MaxCombo = (short) score.max_combo,
-                    TotalScore = score.score,
-                    UserId = user.Item1.Id,
-                    ScoreOwner = user.Item1
-                };
+                        // Prevent Multiple Records
+                        if (factory.Get().Scores.Any(s => s.ScoreMd5 == soraScore.ScoreMd5))
+                            return;
 
-                soraScore.ScoreMd5 = Hex.ToHex(
-                    Crypto.GetMd5(
-                        $"{soraScore.Count300 + soraScore.Count100}{soraScore.FileMd5}{soraScore.CountMiss}{soraScore.CountGeki}{soraScore.CountKatu}{soraScore.Date}{soraScore.Mods}"
-                    )
+                        var user = boundUsers.FirstOrDefault(use => use.Item2 == rScore.userid);
+
+                        if (user == null) // Deleted user ?
+                        {
+                            Logger.Info($"User for UserId {rScore.userid} not found! Skipping Score...");
+                            return;
+                        }
+
+                        soraScore.UserId = user.Item1.Id;
+                        soraScore.ScoreOwner = user.Item1;
+
+                        var ReplaySoraPath = string.Empty;
+                        var ReplayRipplePath = Path.Join(cfg.CRipple.LetsReplaysPath, "replay_" + rScore.id + ".osr");
+
+                        if (!Directory.Exists(Path.Join(cfg.SoraDataDirectory, "/replays/")))
+                            Directory.CreateDirectory(Path.Join(cfg.SoraDataDirectory, "/replays/"));
+
+                        if (File.Exists(ReplayRipplePath))
+                        {
+                            using (var f = File.OpenRead(ReplayRipplePath))
+                                soraScore.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(f));
+                            
+                            ReplaySoraPath = Path.Join(cfg.SoraDataDirectory, "/replays/", soraScore.ReplayMd5);
+                            
+                            if (!File.Exists(ReplaySoraPath))
+                                File.Copy(ReplayRipplePath, ReplaySoraPath);
+                        }
+
+                        var WorkingBeatmap = factory.Get().Beatmaps.FirstOrDefault(
+                            bm => bm.RankedStatus == RankedStatus.Approved ||
+                                  bm.RankedStatus == RankedStatus.Ranked
+                                  && bm.FileMd5 == soraScore.FileMd5
+                        );
+                        
+                        if (WorkingBeatmap != null) {
+                            
+                            var SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + soraScore.FileMd5);
+                            try {
+                                lock (bmLock)
+                                    if (!File.Exists(SoraMapPath))
+                                        BeatmapDownloader.GetBeatmap(soraScore.FileMd5, cfg, Path.Join(cfg.SoraDataDirectory, "/beatmaps/"));
+                            } catch (Exception ex)
+                            {
+                                Logger.Err(ex);
+                            }
+
+                            lock (bmLock)
+                                if (!File.Exists(SoraMapPath))
+                                {
+                                    Logger.Info($"Map {soraScore.FileMd5} Doesn't Exists! Skipping...");
+                                    return;
+                                }
+
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(ReplaySoraPath))
+                                    soraScore.PeppyPoints = PerformancePointsProcessor.Compute(
+                                        soraScore, ReplaySoraPath, SoraMapPath
+                                    );
+                            } catch (Exception)
+                            {
+                                Logger.Info($"Failed to Calculate PP for score {rScore.id}");
+                            }
+                        }
+
+                        if (soraScore.ReplayMd5 == null)
+                            soraScore.ReplayMd5 = " ";
+                        
+                        using (var db = factory.GetForWrite())
+                            db.Context.Scores.Add(soraScore);
+                    }, rDBScore, BoundUsers
                 );
-
-                // Prevent Multiple Records
-                if (factory.Get().Scores.Any(s => s.ScoreMd5 == soraScore.ScoreMd5))
-                    continue;
-
-                var ReplaySoraPath = string.Empty;
-                var ReplayRipplePath = Path.Join(cfg.CRipple.LetsReplaysPath, "replay_" + score.id + ".osr");
-
-                if (!Directory.Exists(Path.Join(cfg.SoraDataDirectory, "/replays/")))
-                    Directory.CreateDirectory(Path.Join(cfg.SoraDataDirectory, "/replays/"));
-
-                if (File.Exists(ReplayRipplePath))
-                {
-                    using (var f = File.OpenRead(ReplayRipplePath))
-                        soraScore.ReplayMd5 = Hex.ToHex(Crypto.GetMd5(f));
-                    
-                    ReplaySoraPath = Path.Join(cfg.SoraDataDirectory, "/replays/", soraScore.ReplayMd5);
-                    
-                    if (!File.Exists(ReplaySoraPath))
-                        File.Copy(ReplayRipplePath, ReplaySoraPath);
-                }
-
-                var WorkingBeatmap = factory.Get().Beatmaps.FirstOrDefault(
-                    bm => bm.RankedStatus == RankedStatus.Approved ||
-                          bm.RankedStatus == RankedStatus.Ranked
-                          && bm.FileMd5 == soraScore.FileMd5
-                );
-                
-                if (WorkingBeatmap != null) {
-                    var SoraMapPath = Path.Join(cfg.SoraDataDirectory, "/beatmaps/" + soraScore.FileMd5);
-                    try {
-                        if (!File.Exists(SoraMapPath))
-                            BeatmapDownloader.GetBeatmap(soraScore.FileMd5, cfg, Path.Join(cfg.SoraDataDirectory, "/beatmaps/"));
-                    } catch (Exception ex)
-                    {
-                        Logger.Err(ex);
-                    }
-
-                    if (!File.Exists(SoraMapPath))
-                    {
-                        Logger.Info($"Map {soraScore.FileMd5} Doesn't Exists! Skipping...");
-                        continue;
-                    }
-
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(ReplaySoraPath))
-                            soraScore.PeppyPoints = PerformancePointsProcessor.Compute(
-                                soraScore, ReplaySoraPath, SoraMapPath
-                            );
-                    } catch (Exception)
-                    {
-                        Logger.Info($"Failed to Calculate PP for score {score.id}");
-                    }
-                }
-
-                if (soraScore.ReplayMd5 == null)
-                    soraScore.ReplayMd5 = " ";
-                
-                using (var db = factory.GetForWrite())
-                    db.Context.Scores.Add(soraScore);
             }
             #endregion
 
