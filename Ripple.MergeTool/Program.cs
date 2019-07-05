@@ -230,6 +230,7 @@ namespace Ripple.MergeTool
                     }, rDBScore, BoundUsers
                 );
             }
+            _pool.WaitForIdle();
             #endregion
 
             #region Friend Database Merge
