@@ -41,7 +41,7 @@ namespace Sora
             );
 
             _host = new WebHostBuilder()
-                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseContentRoot(Path.Join(Directory.GetCurrentDirectory(), "/data"))
                     .UseKestrel(
                         cfg =>
                         {
