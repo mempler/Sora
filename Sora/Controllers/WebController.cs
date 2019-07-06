@@ -26,7 +26,6 @@ namespace Sora.Controllers
         private readonly Config _config;
         private readonly EventManager _ev;
         private readonly SoraDbContextFactory _factory;
-        private readonly PerformancePointsProcessor _pointsProcessor;
         private readonly PresenceService _ps;
         private readonly Bot.Sora _sora;
 
@@ -35,7 +34,6 @@ namespace Sora.Controllers
             Cache cache,
             Config config,
             Bot.Sora sora,
-            PerformancePointsProcessor pointsProcessor,
             PresenceService ps)
         {
             _factory = factory;
@@ -43,7 +41,6 @@ namespace Sora.Controllers
             _cache = cache;
             _config = config;
             _sora = sora;
-            _pointsProcessor = pointsProcessor;
             _ps = ps;
         }
 
@@ -392,7 +389,7 @@ namespace Sora.Controllers
 
             if (NewScore?.Position == 1 && (oldScore == null || oldScore.TotalScore < NewScore.TotalScore))
                 _sora.SendMessage(
-                    $"[http://{_config.Server.Hostname}/{scores.ScoreOwner.Id} {scores.ScoreOwner.Username}] " +
+                    $"[http://{_config.Server.ScreenshotHostname}/{scores.ScoreOwner.Id} {scores.ScoreOwner.Username}] " +
                     $"has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {sets?[0].Title} [{bm.DiffName}]] " +
                     $"using {ModUtil.ToString(NewScore.Mods)} " +
                     $"Good job! +{NewScore.PeppyPoints:F}PP",

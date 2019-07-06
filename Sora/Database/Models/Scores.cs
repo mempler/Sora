@@ -175,19 +175,23 @@ namespace Sora.Database.Models
                                .GroupBy(s => s.UserId)
                                .Take(50);
 
-            IEnumerable<Scores> result = query.ToArray().Select(s => s.Select(xs => xs).First()).ToList();
+            var result = query.ToArray().Select(s => s.Select(
+                xs =>
+                {
+                    xs.Position = factory.Get().Scores
+                                        .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                                        .Where(
+                                            score
+                                                => relaxing
+                                                    ? (score.Mods & Mod.Relax) != 0
+                                                    : (score.Mods & Mod.Relax) == 0
+                                        )
+                                        .OrderByDescending(score => score.TotalScore)
+                                        .IndexOf(xs) + 1;
+                    
+                    return xs;
+                }).First());
 
-            foreach (var s in result)
-                s.Position = factory.Get().Scores
-                                    .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                                    .Where(
-                                        score
-                                            => relaxing
-                                                ? (score.Mods & Mod.Relax) != 0
-                                                : (score.Mods & Mod.Relax) == 0
-                                    )
-                                    .OrderByDescending(score => score.TotalScore)
-                                    .IndexOf(s) + 1;
             return result;
         }
 
@@ -216,8 +220,7 @@ namespace Sora.Database.Models
                           : (score.Mods & Mod.Relax) == 0
                   )
                   .Where(s => s.UserId == score.UserId)
-                  .OrderByDescending(s => s.TotalScore)
-                  .ToList();
+                  .OrderByDescending(s => s.TotalScore);
 
             var isBetter = sc.Any(scr => scr.TotalScore < score.TotalScore);
 
