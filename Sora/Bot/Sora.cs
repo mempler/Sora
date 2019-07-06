@@ -116,8 +116,10 @@ namespace Sora.Bot
                 BlockNonFriendDm = false,
                 Lon = 0d,
                 Lat = 0d,
-                BotPresence = true
             };
+
+            _botPresence["BOT"] = true;
+            _botPresence["IRC"] = true;
 
             var stream = _pss.GetStream("main");
             if (stream != null)

@@ -20,6 +20,7 @@
 
 #endregion
 
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,6 +31,12 @@ using Sora.Helpers;
 
 namespace Sora.Database.Models
 {
+    public enum PasswordVersion
+    {
+        V1, // Md5 + BCrypt
+        V2  // Sha512(Md5 + salt + Secret Key) SCrypt  TODO: Implement!
+    }
+    
     public class Users
     {
         [Required]
@@ -39,6 +46,10 @@ namespace Sora.Database.Models
         [Required]
         public string Username { get; set; }
 
+        [Required]
+        [DefaultValue(PasswordVersion.V1)] // making it V1 for legacy reasons
+        public PasswordVersion PasswordVersion { get; set; }
+        
         [Required]
         public string Password { get; set; }
 
@@ -60,7 +71,13 @@ namespace Sora.Database.Models
         [Required]
         public ulong Achievements { get; set; }
 
-        public bool IsPassword(string s) => BCrypt.validate_password(s, Password);
+        //public bool IsPassword(string s) => BCrypt.validate_password(s, Password);
+        public bool IsPassword(string s)
+            => PasswordVersion switch {
+                    PasswordVersion.V1 => BCrypt.Net.BCrypt.Verify(s, Password),
+                    PasswordVersion.V2 => throw new NotImplementedException(),
+                    _                  => throw new ArgumentOutOfRangeException()
+               };
 
         public static int GetUserId(SoraDbContextFactory factory, string username)
         {
@@ -91,16 +108,15 @@ namespace Sora.Database.Models
         )
         {
             var md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
-            //string bcryptPass = BCrypt.Net.BCrypt.HashPassword(Encoding.UTF8.GetString(md5Pass));
-            var bcryptPass = BCrypt.generate_hash(Hex.ToHex(md5Pass));
-            Logger.Info(bcryptPass);
+            var bcryptPass = BCrypt.Net.BCrypt.HashPassword(Hex.ToHex(md5Pass), 16);
 
             var u = new Users
             {
                 Username = username,
                 Password = bcryptPass,
                 Email = email,
-                Permissions = permissions ?? new Permission()
+                Permissions = permissions ?? new Permission(),
+                PasswordVersion = PasswordVersion.V1
             };
 
             if (insert)
@@ -109,7 +125,7 @@ namespace Sora.Database.Models
             return u;
         }
 
-        public override string ToString() => $"ID: {Id}, Email: {Email}, Privileges: {Permissions}";
+        public override string ToString() => $"ID: {Id}, Email: {Email}, Permissions: {Permissions}";
 
         public void ObtainAchievement(SoraDbContextFactory factory, Achievements ach)
         {

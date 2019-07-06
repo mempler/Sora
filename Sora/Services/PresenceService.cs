@@ -207,8 +207,8 @@ namespace Sora.Services
                             var toRemove = new List<Presence>();
                             lock (Locker)
                             {
-                                foreach ((string _, Presence value) in _presences)
-                                    if (!value.BotPresence)
+                                foreach ((string _, Presence? value) in _presences)
+                                    if ((bool?) value["IRC"] == true)
                                         if (value.TimeoutCheck())
                                             toRemove.Add(value);
                             }

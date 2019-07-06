@@ -45,8 +45,7 @@ namespace Sora.Objects
         public readonly Stopwatch LastRequest;
 
         public bool BlockNonFriendDm;
-
-        public bool BotPresence;
+        
         public LoginPermissions ClientPermissions;
         public CountryIds CountryId;
 
@@ -134,10 +133,7 @@ namespace Sora.Objects
 
         public Presence Write(IPacket p)
         {
-            if (BotPresence)
-                return this;
-            
-            if ((bool) this["IRC"])
+            if (this["IRC"] != null && (bool) this["IRC"])
                 return this;
             
             if (p == null)
