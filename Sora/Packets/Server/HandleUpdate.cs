@@ -58,9 +58,7 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreOsu
                     );
                     sw.Write(
-                        (float) (Presence.Get<bool>("IS_RELAXING")
-                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
-                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
+                        (float) Presence.Get<double>("ACCURACY")
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -86,9 +84,7 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreTaiko
                     );
                     sw.Write(
-                        (float) (Presence.Get<bool>("IS_RELAXING")
-                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
-                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
+                        (float) Presence.Get<double>("ACCURACY")
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -114,9 +110,7 @@ namespace Sora.Packets.Server
                             : Presence.LeaderboardStd.RankedScoreCtb
                     );
                     sw.Write(
-                        (float) (Presence.Get<bool>("IS_RELAXING")
-                            ? Presence.LeaderboardRx.GetAccuracy(Presence.Status.Playmode)
-                            : Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode))
+                        (float) Presence.Get<double>("ACCURACY")
                     );
                     sw.Write(
                         (uint) (Presence.Get<bool>("IS_RELAXING")
@@ -138,7 +132,7 @@ namespace Sora.Packets.Server
                 case PlayMode.Mania:
                     sw.Write(Presence.LeaderboardStd.RankedScoreMania);
                     sw.Write(
-                        (float) Presence.LeaderboardStd.GetAccuracy(Presence.Status.Playmode)
+                        (float) Presence.Get<double>("ACCURACY")
                     );
                     sw.Write((uint) Presence.LeaderboardStd.PlayCountMania);
                     sw.Write(Presence.LeaderboardStd.TotalScoreMania);

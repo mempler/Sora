@@ -59,10 +59,8 @@ namespace Sora.Helpers
                 Date = DateTime.UtcNow
             };
 
-            score.Accuracy = Accuracy.GetAccuracy(
-                score.Count300, score.Count100, score.Count50, score.CountMiss,
-                score.CountGeki, score.CountKatu, score.PlayMode
-            );
+            score.ComputeAccuracy();
+            
             score.ScoreMd5 = Hex.ToHex(
                 Crypto.GetMd5(
                     $"{score.Count300 + score.Count100}{score.FileMd5}{score.CountMiss}{score.CountGeki}{score.CountKatu}{score.Date}{score.Mods}"

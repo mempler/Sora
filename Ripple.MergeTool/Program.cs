@@ -4,9 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Amib.Threading;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using NUnit.Framework;
 using Ripple.MergeTool.Database;
 using Ripple.MergeTool.Tools;
 using Sora;
@@ -131,7 +129,6 @@ namespace Ripple.MergeTool
                         
                         var soraScore = new Scores
                         {
-                            Accuracy = rScore.accuracy,
                             Count300 = rScore.C300,
                             Count100 = rScore.C100,
                             Count50 = rScore.C50,
@@ -155,6 +152,8 @@ namespace Ripple.MergeTool
                         // Prevent Multiple Records
                         if (factory.Get().Scores.Any(s => s.ScoreMd5 == soraScore.ScoreMd5))
                             return;
+
+                        soraScore.ComputeAccuracy();
 
                         var user = boundUsers.FirstOrDefault(use => use.Item2 == rScore.userid);
 
@@ -212,7 +211,7 @@ namespace Ripple.MergeTool
                             try
                             {
                                 if (!string.IsNullOrEmpty(ReplaySoraPath))
-                                    soraScore.PeppyPoints = PerformancePointsProcessor.Compute(
+                                    soraScore.PerformancePoints = PerformancePointsProcessor.Compute(
                                         soraScore, ReplaySoraPath, SoraMapPath
                                     );
                             } catch (Exception ex)
@@ -225,8 +224,7 @@ namespace Ripple.MergeTool
                         if (soraScore.ReplayMd5 == null)
                             soraScore.ReplayMd5 = " ";
                         
-                        using (var db = factory.GetForWrite())
-                            db.Context.Scores.Add(soraScore);
+                        Scores.InsertScore(factory, soraScore);
                     }, rDBScore, BoundUsers
                 );
             }

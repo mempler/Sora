@@ -29,6 +29,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sora.Enums;
 
@@ -108,7 +109,7 @@ namespace Sora.Database.Models
 
         [Required]
         [DefaultValue(0)]
-        public double PeppyPoints { get; set; }
+        public double PerformancePoints { get; set; }
 
         [NotMapped]
         public int Position { get; set; }
@@ -143,7 +144,7 @@ namespace Sora.Database.Models
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
-            CountryIds cid = 0;
+CountryIds cid = 0;
 
             if (countryOnly)
                 cid = UserStats.GetUserStats(factory, user.Id).CountryId;
@@ -178,16 +179,20 @@ namespace Sora.Database.Models
             var result = query.ToArray().Select(s => s.Select(
                 xs =>
                 {
-                    xs.Position = factory.Get().Scores
-                                        .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
-                                        .Where(
-                                            score
-                                                => relaxing
-                                                    ? (score.Mods & Mod.Relax) != 0
-                                                    : (score.Mods & Mod.Relax) == 0
-                                        )
-                                        .OrderByDescending(score => score.TotalScore)
-                                        .IndexOf(xs) + 1;
+                    xs.Position = factory.Get()
+                                         .Scores
+                                         .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
+                                         .Where(
+                                             score
+                                                 => relaxing
+                                                     ? (score.Mods & Mod.Relax) != 0
+                                                     : (score.Mods & Mod.Relax) == 0
+                                         )
+                                         .Where(
+                                             score => (score.Mods & Mod.Relax2) == 0
+                                         )
+                                         .OrderByDescending(score => score.TotalScore)
+                                         .IndexOf(xs) + 1;
                     
                     return xs;
                 }).First());
@@ -229,5 +234,40 @@ namespace Sora.Database.Models
 
             db.Context.Add(score);
         }
+
+        public double ComputeAccuracy(bool update = true)
+        {
+            var totalHits = Count50 + Count100 + Count300 + CountMiss;
+
+            if (PlayMode == PlayMode.Mania)
+                totalHits += CountGeki + CountKatu;
+            
+            var acc = PlayMode switch {
+                PlayMode.Osu => totalHits > 0
+                    ? (double) (Count50 * 50 + Count100 * 100 + Count300 * 300) /
+                      (totalHits * 300)
+                    : 1,
+                PlayMode.Taiko => totalHits > 0
+                    ? (double) (Count100 * 150 + Count300 * 300) /
+                      (totalHits * 300)
+                    : 1,
+                PlayMode.Ctb => totalHits > 0
+                    ? (double) (Count50 + Count100 + Count300) /
+                      totalHits
+                    : 1,
+                PlayMode.Mania => totalHits > 0
+                    ? (double) (Count50 * 50 + Count100 * 100 + CountKatu * 200 + (Count300 + CountGeki) * 300) /
+                      (totalHits * 300)
+                    : 1,
+                _ => 0
+            };
+
+            if (update)
+                Accuracy = acc;
+
+            return acc;
+        }
+
+        public double ComputePerformancePoints() => PerformancePointsProcessor.Compute(this);
     }
 }

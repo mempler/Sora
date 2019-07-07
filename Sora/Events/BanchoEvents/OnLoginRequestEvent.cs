@@ -138,6 +138,9 @@ namespace Sora.Events.BanchoEvents
 
                 args.pr += new ProtocolNegotiation();
                 args.pr += new UserPresence(args.pr);
+
+                args.pr["ACCURACY"] = args.pr.LeaderboardStd.GetAccuracy(_factory, PlayMode.Osu);
+                
                 args.pr += new HandleUpdate(args.pr);
 
                 if ((args.pr.ClientPermissions & LoginPermissions.Supporter) == 0)

@@ -101,6 +101,8 @@ namespace Sora.Database
                 $"Port={_config.MySql.Port};CharSet=utf8mb4;",
                 mysqlOptions =>
                 {
+                    mysqlOptions.CommandTimeout(int.MaxValue);
+                    
                     mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb);
                     mysqlOptions.UnicodeCharSet(CharSet.Utf8mb4);
                     mysqlOptions.AnsiCharSet(CharSet.Utf8mb4);

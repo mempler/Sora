@@ -27,8 +27,8 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using Sora.Enums;
-using Sora.Helpers;
 
 namespace Sora.Database.Models
 {
@@ -62,54 +62,6 @@ namespace Sora.Database.Models
         [Required]
         [DefaultValue(0)]
         public ulong TotalScoreCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count300Osu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count300Taiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count300Ctb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count100Osu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count100Taiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count100Ctb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count50Osu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count50Taiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int Count50Ctb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int CountMissOsu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int CountMissTaiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int CountMissCtb { get; set; }
 
         [Required]
         [DefaultValue(0)]
@@ -148,21 +100,32 @@ namespace Sora.Database.Models
             return new LeaderboardRx {Id = userId};
         }
 
-        public double GetAccuracy(PlayMode mode)
+        public double GetAccuracy(SoraDbContextFactory factory, PlayMode mode)
         {
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    return Accuracy.GetAccuracy(Count300Osu, Count100Osu, Count50Osu, CountMissOsu, 0, 0, PlayMode.Osu);
-                case PlayMode.Taiko:
-                    return Accuracy.GetAccuracy(
-                        Count300Taiko, Count100Taiko, Count50Taiko, CountMissTaiko, 0, 0, PlayMode.Osu
-                    );
-                case PlayMode.Ctb:
-                    return Accuracy.GetAccuracy(Count300Ctb, Count100Ctb, Count50Ctb, CountMissCtb, 0, 0, PlayMode.Osu);
-            }
+            var totalAcc = 0d;
+            var divideTotal = 0d;
+            var i = 0;
 
-            return 0;
+            factory.Get()
+                   .Scores
+                   .Where(s => s.PlayMode == mode)
+                   .Where(s => (s.Mods & Mod.Relax) != 0 && (s.Mods & Mod.Relax2) == 0)
+                   .Where(s => s.UserId == Id)
+                   .Take(500)
+                   .OrderByDescending(s => s.PerformancePoints)
+                   .ForEach(
+                       s =>
+                       {
+                           var divide = Math.Pow(.95d, i);
+
+                           totalAcc += s.Accuracy * divide;
+                           divideTotal += divide;
+
+                           i++;
+                       }
+                   );
+
+            return divideTotal > 0 ? totalAcc / divideTotal : 0;
         }
         public void IncreaseScore(SoraDbContextFactory factory, ulong score, bool ranked, PlayMode mode)
         {
@@ -187,86 +150,6 @@ namespace Sora.Database.Models
                         RankedScoreCtb += score;
                     else
                         TotalScoreCtb += score;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void IncreaseCount300(SoraDbContextFactory factory, int c, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    Count300Osu += c;
-                    break;
-                case PlayMode.Taiko:
-                    Count300Taiko += c;
-                    break;
-                case PlayMode.Ctb:
-                    Count300Ctb += c;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void IncreaseCount100(SoraDbContextFactory factory, int c, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    Count100Osu += c;
-                    break;
-                case PlayMode.Taiko:
-                    Count100Taiko += c;
-                    break;
-                case PlayMode.Ctb:
-                    Count100Ctb += c;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void IncreaseCount50(SoraDbContextFactory factory, int c, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    Count50Osu += c;
-                    break;
-                case PlayMode.Taiko:
-                    Count50Taiko += c;
-                    break;
-                case PlayMode.Ctb:
-                    Count50Ctb += c;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void IncreaseCountMiss(SoraDbContextFactory factory, int c, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    CountMissOsu += c;
-                    break;
-                case PlayMode.Taiko:
-                    CountMissTaiko += c;
-                    break;
-                case PlayMode.Ctb:
-                    CountMissCtb += c;
                     break;
             }
 
@@ -301,9 +184,9 @@ namespace Sora.Database.Models
                             .Where(s => (s.Mods & Mod.Relax) == 0)
                             .Where(s => s.PlayMode == mode)
                             .Where(s => s.UserId == Id)
-                            .OrderByDescending(s => s.PeppyPoints)
+                            .OrderByDescending(s => s.PerformancePoints)
                             .Take(100).ToList()
-                            .Select((t, i) => t.PeppyPoints * Math.Pow(0.95d, i))
+                            .Select((t, i) => t.PerformancePoints * Math.Pow(0.95d, i))
                             .Sum();
 
             switch (mode)

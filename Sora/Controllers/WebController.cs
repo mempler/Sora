@@ -187,7 +187,7 @@ namespace Sora.Controllers
 
             if (isRelaxing)
                 scores.Mods -= Mod.Relax;
-            scores.PeppyPoints = PerformancePointsProcessor.Compute(scores);
+            scores.ComputePerformancePoints();
             if (isRelaxing)
                 scores.Mods |= Mod.Relax;
 
@@ -206,6 +206,9 @@ namespace Sora.Controllers
 
             var oldStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
             var oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
+            
+            var oldAcc = oldStd.GetAccuracy(_factory, scores.PlayMode);
+            double newAcc;
 
             if (oldScore != null && oldScore.TotalScore <= scores.TotalScore)
             {
@@ -228,10 +231,6 @@ namespace Sora.Controllers
             {
                 var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
                 rx.IncreasePlaycount(_factory, scores.PlayMode);
-                rx.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
-                rx.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
-                rx.IncreaseCount50(_factory, scores.Count50, scores.PlayMode);
-                rx.IncreaseCountMiss(_factory, scores.CountMiss, scores.PlayMode);
                 rx.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
                 rx.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
 
@@ -247,10 +246,6 @@ namespace Sora.Controllers
             {
                 var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
                 std.IncreasePlaycount(_factory, scores.PlayMode);
-                std.IncreaseCount300(_factory, scores.Count300, scores.PlayMode);
-                std.IncreaseCount100(_factory, scores.Count100, scores.PlayMode);
-                std.IncreaseCount50(_factory, scores.Count50, scores.PlayMode);
-                std.IncreaseCountMiss(_factory, scores.CountMiss, scores.PlayMode);
                 std.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
                 std.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
 
@@ -259,7 +254,7 @@ namespace Sora.Controllers
 
             var newStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
             var newStdPos = newStd.GetPosition(_factory, scores.PlayMode);
-
+            newAcc = newStd.GetAccuracy(_factory, scores.PlayMode);
 
             var NewScore = Scores.GetScores(
                 _factory,
@@ -280,9 +275,6 @@ namespace Sora.Controllers
             var sets = cg.GetSets();
             var bm = sets?[0].ChildrenBeatmaps.First(x => x.FileMD5 == scores.FileMd5) ?? new CheesegullBeatmap();
 
-            double oldAcc;
-            double newAcc;
-
             ulong oldRankedScore;
             ulong newRankedScore;
 
@@ -292,22 +284,6 @@ namespace Sora.Controllers
             switch (scores.PlayMode)
             {
                 case PlayMode.Osu:
-                    oldAcc = Accuracy.GetAccuracy(
-                        oldStd.Count300Osu,
-                        oldStd.Count100Osu,
-                        oldStd.Count50Osu,
-                        oldStd.Count300Osu, 0, 0,
-                        PlayMode.Osu
-                    );
-
-                    newAcc = Accuracy.GetAccuracy(
-                        newStd.Count300Osu,
-                        newStd.Count100Osu,
-                        newStd.Count50Osu,
-                        newStd.Count300Osu, 0, 0,
-                        PlayMode.Osu
-                    );
-
                     oldRankedScore = oldStd.RankedScoreOsu;
                     newRankedScore = newStd.RankedScoreOsu;
 
@@ -315,22 +291,6 @@ namespace Sora.Controllers
                     newPP = newStd.PerformancePointsOsu;
                     break;
                 case PlayMode.Taiko:
-                    oldAcc = Accuracy.GetAccuracy(
-                        oldStd.Count300Taiko,
-                        oldStd.Count100Taiko,
-                        oldStd.Count50Taiko,
-                        oldStd.Count300Taiko, 0, 0,
-                        PlayMode.Taiko
-                    );
-
-                    newAcc = Accuracy.GetAccuracy(
-                        newStd.Count300Taiko,
-                        newStd.Count100Taiko,
-                        newStd.Count50Taiko,
-                        newStd.Count300Taiko, 0, 0,
-                        PlayMode.Taiko
-                    );
-
                     oldRankedScore = oldStd.RankedScoreTaiko;
                     newRankedScore = newStd.RankedScoreTaiko;
 
@@ -338,22 +298,6 @@ namespace Sora.Controllers
                     newPP = newStd.PerformancePointsTaiko;
                     break;
                 case PlayMode.Ctb:
-                    oldAcc = Accuracy.GetAccuracy(
-                        oldStd.Count300Ctb,
-                        oldStd.Count100Ctb,
-                        oldStd.Count50Ctb,
-                        oldStd.Count300Ctb, 0, 0,
-                        PlayMode.Ctb
-                    );
-
-                    newAcc = Accuracy.GetAccuracy(
-                        newStd.Count300Ctb,
-                        newStd.Count100Ctb,
-                        newStd.Count50Ctb,
-                        newStd.Count300Ctb, 0, 0,
-                        PlayMode.Ctb
-                    );
-
                     oldRankedScore = oldStd.RankedScoreCtb;
                     newRankedScore = newStd.RankedScoreCtb;
 
@@ -361,22 +305,6 @@ namespace Sora.Controllers
                     newPP = newStd.PerformancePointsCtb;
                     break;
                 case PlayMode.Mania:
-                    oldAcc = Accuracy.GetAccuracy(
-                        oldStd.Count300Mania,
-                        oldStd.Count100Mania,
-                        oldStd.Count50Mania,
-                        oldStd.Count300Mania, 0, 0,
-                        PlayMode.Mania
-                    );
-
-                    newAcc = Accuracy.GetAccuracy(
-                        newStd.Count300Mania,
-                        newStd.Count100Mania,
-                        newStd.Count50Mania,
-                        newStd.Count300Mania, 0, 0,
-                        PlayMode.Mania
-                    );
-
                     oldRankedScore = oldStd.RankedScoreMania;
                     newRankedScore = newStd.RankedScoreMania;
 
@@ -392,7 +320,7 @@ namespace Sora.Controllers
                     $"[http://{_config.Server.ScreenshotHostname}/{scores.ScoreOwner.Id} {scores.ScoreOwner.Username}] " +
                     $"has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {sets?[0].Title} [{bm.DiffName}]] " +
                     $"using {ModUtil.ToString(NewScore.Mods)} " +
-                    $"Good job! +{NewScore.PeppyPoints:F}PP",
+                    $"Good job! +{NewScore.PerformancePoints:F}PP",
                     "#announce",
                     false
                 );
@@ -400,7 +328,7 @@ namespace Sora.Controllers
             Logger.Info(
                 $"{L_COL.RED}{scores.ScoreOwner.Username}",
                 $"{L_COL.PURPLE}( {scores.ScoreOwner.Id} ){L_COL.WHITE}",
-                $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PeppyPoints:F}PP",
+                $"has just submitted a Score! he earned {L_COL.BLUE}{NewScore?.PerformancePoints:F}PP",
                 $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{NewScore?.Accuracy * 100:F}",
                 $"{L_COL.WHITE}on {L_COL.YELLOW}{sets?[0].Title} [{bm.DiffName}]",
                 $"{L_COL.WHITE}using {L_COL.BLUE}{ModUtil.ToString(NewScore?.Mods ?? Mod.None)}"
@@ -418,8 +346,8 @@ namespace Sora.Controllers
                 NewScore?.Accuracy * 100 ?? 0,
                 (ulong) (oldScore?.TotalScore ?? 0),
                 (ulong) (NewScore?.TotalScore ?? 0),
-                oldScore?.PeppyPoints ?? 0,
-                NewScore?.PeppyPoints ?? 0,
+                oldScore?.PerformancePoints ?? 0,
+                NewScore?.PerformancePoints ?? 0,
                 NewScore?.Id ?? 0
             );
 
