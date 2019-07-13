@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchTransferHostEvent
@@ -32,13 +33,14 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchTransferHost)]
         public void OnBanchoMatchTransferHost(BanchoMatchTransferHostArgs args)
         {
-            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null ||
+                args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").HostId != args.pr.User.Id)
                 return;
             if (args.SlotId > 16)
                 return;
-            var slot = args.pr.JoinedRoom.Slots[args.SlotId];
+            var slot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Slots[args.SlotId];
 
-            args.pr.JoinedRoom.SetHost(slot.UserId);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").SetHost(slot.UserId);
         }
     }
 }

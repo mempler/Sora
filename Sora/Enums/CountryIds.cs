@@ -26,6 +26,7 @@ namespace Sora.Enums
 {
     public enum CountryIds : byte
     {
+        XX = 0,
         BL = 0,
         AD = 3,
         AF = 5,

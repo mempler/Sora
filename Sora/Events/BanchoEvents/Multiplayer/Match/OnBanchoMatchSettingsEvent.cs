@@ -24,8 +24,9 @@ using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchSettingsEvent
@@ -33,17 +34,17 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchChangeSettings)]
         public void OnBroadcastFrames(BanchoMatchChangeSettingsArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null)
                 return;
-            if (args.pr.JoinedRoom.HostId != args.pr.User.Id)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").HostId != args.pr.User.Id)
                 return;
 
-            if (args.pr.JoinedRoom.Name != args.room.Name)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Name != args.room.Name)
                 Logger.Info(
                     "%#F94848%" + args.pr.User.Username,
                     "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
                     "%#FFFFFF% renamed a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
-                    args.pr.JoinedRoom.Name,
+                    args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Name,
                     "%#B342F4%(", args.room.MatchId, "%#B342F4%)",
                     "%#FFFFFF%and is now called %#F94848%" +
                     args.room.Name,
@@ -58,7 +59,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
                 "%#B342F4%(", args.room.MatchId, "%#B342F4%)"
             );
 
-            args.pr.JoinedRoom.ChangeSettings(args.room);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").ChangeSettings(args.room);
         }
     }
 }

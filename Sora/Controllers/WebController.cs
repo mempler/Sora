@@ -128,15 +128,21 @@ namespace Sora.Controllers
             {
                 if (isRelaxing)
                 {
-                    var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
-                    rx.IncreasePlaycount(_factory, scores.PlayMode);
-                    rx.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
+                    var rx = LeaderboardRx.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+                    
+                    rx.IncreasePlaycount(scores.PlayMode);
+                    rx.IncreaseScore((ulong) scores.TotalScore, false, scores.PlayMode);
+                    
+                    rx.SaveChanges(_factory);
                 }
                 else
                 {
-                    var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-                    std.IncreasePlaycount(_factory, scores.PlayMode);
-                    std.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
+                    var std = LeaderboardStd.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+                    
+                    std.IncreasePlaycount(scores.PlayMode);
+                    std.IncreaseScore((ulong) scores.TotalScore, false, scores.PlayMode);
+                    
+                    std.SaveChanges(_factory);
                 }
 
                 await _ev.RunEvent(
@@ -146,22 +152,6 @@ namespace Sora.Controllers
 
                 return Ok("Thanks for your hard work!");
             }
-
-            /*
-            switch (scores.PlayMode)
-            {
-                case PlayMode.Osu:
-                    oppai op = new oppai(BeatmapDownloader.GetBeatmap(scores.FileMd5, _config));
-                    op.SetAcc((int) scores.Count300, (int) scores.Count50, (int) scores.CountMiss);
-                    op.SetCombo(scores.MaxCombo);
-                    op.SetMods(scores.Mods);
-                    op.Calculate();
-                     
-                    scores.PeppyPoints = op.GetPP();
-                    Logger.Info("Peppy Points:", scores.PeppyPoints);
-                    break;
-            }
-            */
 
             var ReplayFile = Request.Form.Files.GetFile("score");
 
@@ -204,10 +194,10 @@ namespace Sora.Controllers
                 true
             ).FirstOrDefault();
 
-            var oldStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-            var oldStdPos = oldStd.GetPosition(_factory, scores.PlayMode);
+            var oldStd = LeaderboardStd.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+            var oldStdPos = oldStd.GetPosition(_factory.Get(), scores.PlayMode);
             
-            var oldAcc = oldStd.GetAccuracy(_factory, scores.PlayMode);
+            var oldAcc = oldStd.GetAccuracy(_factory.Get(), scores.PlayMode);
             double newAcc;
 
             if (oldScore != null && oldScore.TotalScore <= scores.TotalScore)
@@ -229,14 +219,18 @@ namespace Sora.Controllers
 
             if (isRelaxing)
             {
-                var rx = LeaderboardRx.GetLeaderboard(_factory, scores.ScoreOwner);
-                rx.IncreasePlaycount(_factory, scores.PlayMode);
-                rx.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
-                rx.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
+                var rx = LeaderboardRx.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+                
+                rx.IncreasePlaycount(scores.PlayMode);
+                rx.IncreaseScore((ulong) scores.TotalScore, true, scores.PlayMode);
+                rx.IncreaseScore((ulong) scores.TotalScore, false, scores.PlayMode);
 
-                rx.UpdatePP(_factory, scores.PlayMode);
+                rx.UpdatePP(_factory.Get(), scores.PlayMode);
 
-                pr.LeaderboardRx = rx;
+                rx.SaveChanges(_factory);
+                
+                pr["LB_RX"] = rx;
+                
                 await _ev.RunEvent(
                     EventType.BanchoUserStatsRequest,
                     new BanchoUserStatsRequestArgs {userIds = new List<int> {scores.ScoreOwner.Id}, pr = pr}
@@ -244,17 +238,20 @@ namespace Sora.Controllers
             }
             else
             {
-                var std = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-                std.IncreasePlaycount(_factory, scores.PlayMode);
-                std.IncreaseScore(_factory, (ulong) scores.TotalScore, true, scores.PlayMode);
-                std.IncreaseScore(_factory, (ulong) scores.TotalScore, false, scores.PlayMode);
+                var std = LeaderboardStd.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+                
+                std.IncreasePlaycount(scores.PlayMode);
+                std.IncreaseScore((ulong) scores.TotalScore, true, scores.PlayMode);
+                std.IncreaseScore((ulong) scores.TotalScore, false, scores.PlayMode);
 
-                std.UpdatePP(_factory, scores.PlayMode);
+                std.UpdatePP(_factory.Get(), scores.PlayMode);
+
+                std.SaveChanges(_factory);
             }
 
-            var newStd = LeaderboardStd.GetLeaderboard(_factory, scores.ScoreOwner);
-            var newStdPos = newStd.GetPosition(_factory, scores.PlayMode);
-            newAcc = newStd.GetAccuracy(_factory, scores.PlayMode);
+            var newStd = LeaderboardStd.GetLeaderboard(_factory.Get(), scores.ScoreOwner);
+            var newStdPos = newStd.GetPosition(_factory.Get(), scores.PlayMode);
+            newAcc = newStd.GetAccuracy(_factory.Get(), scores.PlayMode);
 
             var NewScore = Scores.GetScores(
                 _factory,
@@ -373,7 +370,8 @@ namespace Sora.Controllers
                 )
             );
 
-            pr.LeaderboardStd = newStd;
+            pr["LB_STD"] = newStd;
+            
             await _ev.RunEvent(
                 EventType.BanchoUserStatsRequest,
                 new BanchoUserStatsRequestArgs {userIds = new List<int> {scores.ScoreOwner.Id}, pr = pr}

@@ -17,6 +17,7 @@ namespace Sora
 
         public enum RecalcOptionTypes
         {
+            None,
             Performance,
             Accuracy,
             Duplicates,
@@ -110,6 +111,8 @@ namespace Sora
                                       "Performing of Deletion of Lower Scores!"
                                   );
                                   recalcProcessor.ProcessLowerScores();
+                                  break;
+                              case RecalcOptionTypes.None:
                                   break;
                               default:
                                   Logger.Info("RecalcOptionType is not known!");

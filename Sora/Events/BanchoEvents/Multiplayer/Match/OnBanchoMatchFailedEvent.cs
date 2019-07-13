@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchFailedEvent
@@ -32,7 +33,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchFailed)]
         public void OnBanchoMatchFailed(BanchoMatchFailedArgs args)
         {
-            args.pr.JoinedRoom?.Failed(args.pr);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.Failed(args.pr);
         }
     }
 }

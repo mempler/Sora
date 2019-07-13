@@ -91,10 +91,15 @@ namespace Sora
                                .SelectMany(scores => scores)
                                .OrderByDescending(score => score.TotalScore)
                                .GroupBy(s => s.UserId)
+                               .Select(s => s.FirstOrDefault())
+                               .GroupBy(s => s.FileMd5)
                                .Select(s => s.FirstOrDefault());
 
             var deletableScores = ctx.Scores
                                      .Where(s => !topScores.Any(sc => sc.Id == s.Id));
+
+            Logger.Info($"Total amount of {topScores.Count()} Top Scores!");
+            Logger.Info($"Total amount of {deletableScores.Count()} Deletable Scores!");
             
             ctx.Scores.RemoveRange(deletableScores);
         }

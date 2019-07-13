@@ -22,6 +22,7 @@
 
 using System;
 using Sora.Enums;
+using Sora.Extensions;
 using Sora.Helpers;
 using Sora.Interfaces;
 using Sora.Objects;
@@ -46,14 +47,14 @@ namespace Sora.Packets.Server
             if (Presence == null)
                 throw new ArgumentNullException();
 
-            sw.Write(Presence.User.Id);
-            sw.Write(Presence.User.Username, false);
-            sw.Write(Presence.Timezone);
-            sw.Write((byte) Presence.CountryId);
-            sw.Write((int) Presence.ClientPermissions);
-            sw.Write(Presence.Lat);
-            sw.Write(Presence.Lon);
-            sw.Write(Presence.Rank);
+            sw.Write( Presence.User.Id );
+            sw.Write( Presence.User.Username, false );
+            sw.Write( Presence["TIMEZONE"].As<byte>() );
+            sw.Write( Presence["COUNTRY_ID"].As<byte>() );
+            sw.Write( Presence["CL_PERM"].As<int>() );
+            sw.Write( Presence["LON"].As<double>() );
+            sw.Write( Presence["LAT"].As<double>() );
+            sw.Write( Presence["LB_RANK"].As<uint>() );
         }
     }
 }

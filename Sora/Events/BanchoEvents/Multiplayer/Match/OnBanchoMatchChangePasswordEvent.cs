@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchChangePasswordEvent
@@ -32,12 +33,13 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchChangePassword)]
         public void OnBanchoMatchChangePassword(BanchoMatchChangePasswordArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null)
                 return;
-            if (args.pr.JoinedRoom.HostId != args.pr.User.Id)
+            
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").HostId != args.pr.User.Id)
                 return;
 
-            args.pr.JoinedRoom.SetPassword(args.room.Password);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").SetPassword(args.room.Password);
         }
     }
 }

@@ -23,9 +23,10 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 using Sora.Packets.Server;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchScoreUpdateEvent
@@ -33,8 +34,8 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchScoreUpdate)]
         public void OnBanchoMatchScoreUpdate(BanchoMatchScoreUpdateArgs args)
         {
-            args.pr.JoinedRoom?.Broadcast(
-                new MatchScoreUpdate(args.pr.JoinedRoom.GetSlotIdByUserId(args.pr.User.Id), args.Frame)
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.Broadcast(
+                new MatchScoreUpdate(args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").GetSlotIdByUserId(args.pr.User.Id), args.Frame)
             );
         }
     }

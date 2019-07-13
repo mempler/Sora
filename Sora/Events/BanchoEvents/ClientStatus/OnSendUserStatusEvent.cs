@@ -38,8 +38,8 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoSendUserStatus)]
         public void OnSendUserStatus(BanchoSendUserStatusArgs args)
         {
-            args.pr.Status = args.status;
-            args.pr["IS_RELAXING"] = (args.pr.Status.CurrentMods & Mod.Relax) != 0;
+            args.pr["STATUS"] = args.status;
+            args.pr["IS_RELAXING"] = (args.status.CurrentMods & Mod.Relax) != 0;
             //Logger.Debug("OnSendUserStatusEvent", "Is Relaxing", args.pr.Relax);
 
             var main = _pss.GetStream("main");

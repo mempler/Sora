@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchChangeSlotEvent
@@ -32,18 +33,20 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchChangeSlot)]
         public void OnBanchoMatchChangeSlot(BanchoMatchChangeSlotArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null)
                 return;
+            
             if (args.SlotId > 16)
                 return;
-            var newSlot = args.pr.JoinedRoom.Slots[args.SlotId];
+            
+            var newSlot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Slots[args.SlotId];
             if (newSlot.UserId != -1)
                 return;
 
-            var oldSlot = args.pr.JoinedRoom.GetSlotByUserId(args.pr.User.Id);
+            var oldSlot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").GetSlotByUserId(args.pr.User.Id);
 
-            args.pr.JoinedRoom.SetSlot(newSlot, oldSlot);
-            args.pr.JoinedRoom.ClearSlot(oldSlot);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").SetSlot(newSlot, oldSlot);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").ClearSlot(oldSlot);
         }
     }
 }

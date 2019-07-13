@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnMatchChangeModsEvent
@@ -32,10 +33,11 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchChangeMods)]
         public void OnBanchoMatchChangeMods(BanchoMatchChangeModsArgs args)
         {
-            var slot = args.pr.JoinedRoom?.GetSlotByUserId(args.pr.User.Id);
+            var slot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.GetSlotByUserId(args.pr.User.Id);
             if (slot == null)
                 return;
-            args.pr.JoinedRoom.SetMods(args.mods, slot);
+            
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").SetMods(args.mods, slot);
         }
     }
 }

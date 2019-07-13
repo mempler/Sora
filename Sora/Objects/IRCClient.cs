@@ -60,6 +60,7 @@ namespace Sora.Objects
 
         public void Stop()
         {
+            exit = true;
         }
 
         public void SendMessage(string message)
@@ -91,6 +92,11 @@ namespace Sora.Objects
                 int i;
                 while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
+                    if (exit)
+                    {
+                        return;
+                    }
+                    
                     var data = Encoding.UTF8.GetString(bytes, 0, i).Split("\n");
 
                     foreach (var cmd in data.Select(d => d.Split(" "))
@@ -141,8 +147,8 @@ namespace Sora.Objects
 
                                 Presence = new Presence(_cs);
                                 Presence.User = User;
-                                Presence.Status = new UserStatus();
                                 
+                                Presence["STATUS"] = new UserStatus();
                                 Presence["IRC"] = true;
 
                                 WriteConnectionResponse();

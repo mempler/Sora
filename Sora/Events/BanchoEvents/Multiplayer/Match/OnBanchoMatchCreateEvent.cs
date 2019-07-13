@@ -27,7 +27,7 @@ using Sora.Helpers;
 using Sora.Packets.Server;
 using Sora.Services;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchCreateEvent

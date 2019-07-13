@@ -31,6 +31,7 @@ using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
 using Sora.Objects;
+using Sora.Packets.Client;
 using Sora.Packets.Server;
 using Sora.Services;
 
@@ -98,30 +99,35 @@ namespace Sora.Events.BanchoEvents
                     {
                         var data = Localisation.GetData(args.IPAddress);
 
-                        args.pr.CountryId = Localisation.StringToCountryId(data.Country.IsoCode);
-
-                        args.pr.Lon = data.Location.Longitude ?? 0;
-                        args.pr.Lat = data.Location.Latitude ?? 0;
+                        args.pr["COUNTRY_ID"] = Localisation.StringToCountryId(data.Country.IsoCode);
+                        args.pr["LON"] = data.Location.Longitude ?? 0;
+                        args.pr["LAT"] = data.Location.Latitude ?? 0;
+                    }
+                    else {
+                        args.pr["COUNTRY_ID"] = CountryIds.XX;
+                        args.pr["LON"] = 0d;
+                        args.pr["LAT"] = 0d;
                     }
 
                     args.pr.User = user;
 
-                    args.pr.LeaderboardRx = LeaderboardRx.GetLeaderboard(_factory, args.pr.User);
-                    args.pr.LeaderboardStd = LeaderboardStd.GetLeaderboard(_factory, args.pr.User);
+                    args.pr["LB_RX"] = LeaderboardRx.GetLeaderboard(_factory.Get(), args.pr.User);
+                    args.pr["LB_STD"] = LeaderboardStd.GetLeaderboard(_factory.Get(), args.pr.User);
 
-                    args.pr.Rank = args.pr.LeaderboardStd.GetPosition(_factory, PlayMode.Osu);
+                    args.pr["LB_RANK"] = args.pr.Get<LeaderboardStd>("LB_STD").GetPosition(_factory.Get(), PlayMode.Osu);
 
-                    args.pr.Timezone = loginData.Timezone;
-                    args.pr.BlockNonFriendDm = loginData.BlockNonFriendDMs;
+                    args.pr["TIMEZONE"] = loginData.Timezone;
+                    args.pr["BLOCK_NON_FRIENDS_DM"] = loginData.BlockNonFriendDMs;
 
-                    args.pr.Status.BeatmapId = 0;
-                    args.pr.Status.StatusText = "";
-                    args.pr.Status.CurrentMods = 0;
-                    args.pr.Status.BeatmapChecksum = "";
-                    args.pr.Status.Playmode = PlayMode.Osu;
-                    args.pr.Status.Status = Status.Idle;
-
-                    args.pr.Rank = args.pr.LeaderboardStd.GetPosition(_factory, PlayMode.Osu);
+                    args.pr["STATUS"] = new UserStatus
+                    {
+                        BeatmapId = 0,
+                        StatusText = "",
+                        CurrentMods = 0,
+                        BeatmapChecksum = "",
+                        Playmode = PlayMode.Osu,
+                        Status = Status.Unknown
+                    };
 
                     _cache.Set(cacheKey, args.pr, TimeSpan.FromMinutes(30));
                 }
@@ -139,29 +145,27 @@ namespace Sora.Events.BanchoEvents
                 args.pr += new ProtocolNegotiation();
                 args.pr += new UserPresence(args.pr);
 
-                args.pr["ACCURACY"] = args.pr.LeaderboardStd.GetAccuracy(_factory, PlayMode.Osu);
+                args.pr["ACCURACY"] = args.pr.Get<LeaderboardStd>("LB_STD").GetAccuracy(_factory.Get(), PlayMode.Osu);
                 
                 args.pr += new HandleUpdate(args.pr);
 
-                if ((args.pr.ClientPermissions & LoginPermissions.Supporter) == 0)
+                args.pr["CL_PERM"] = LoginPermissions.User;
+                
+                if (!args.pr.User.Permissions.HasPermission(Permission.GROUP_DONATOR))
                 {
                     if (_cfg.Server.FreeDirect)
-                        args.pr += new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter);
+                        args.pr += new LoginPermission(LoginPermissions.User | LoginPermissions.Supporter |
+                                                       args.pr.Get<LoginPermissions>("CL_PERM")
+                        );
                 }
                 else
                 {
-                    args.pr += new LoginPermission(args.pr.ClientPermissions);
+                    args.pr += new LoginPermission(args.pr.Get<LoginPermissions>("CL_PERM"));
                 }
 
                 args.pr += new FriendsList(Database.Models.Friends.GetFriends(_factory, args.pr.User.Id).ToList());
                 args.pr += new PresenceBundle(_pcs.GetUserIds(args.pr).ToList());
-                foreach (var opr in _pcs.AllPresences)
-                {
-                    args.pr += new PresenceSingle(opr.User.Id);
-                    args.pr += new UserPresence(opr);
-                    args.pr += new HandleUpdate(opr);
-                }
-
+                
                 foreach (var chanAuto in _cs.ChannelsAutoJoin)
                 {
                     if (chanAuto.AdminOnly && args.pr.User.Permissions == Permission.ADMIN_CHANNEL)

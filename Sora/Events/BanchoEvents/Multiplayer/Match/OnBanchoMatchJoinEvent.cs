@@ -26,7 +26,7 @@ using Sora.EventArgs;
 using Sora.Packets.Server;
 using Sora.Services;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchJoinEvent
@@ -44,7 +44,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         public async void OnBanchoMatchJoin(BanchoMatchJoinArgs args)
         {
             var room = _ms.GetRoom(args.matchId);
-            if (room != null && room.Join(args.pr, args.password.Replace(" ", "_")))
+            if (room?.Join(args.pr, args.password.Replace(" ", "_")) == true)
                 args.pr += new MatchJoinSuccess(room);
             else
                 args.pr += new MatchJoinFail();

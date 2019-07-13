@@ -24,6 +24,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Sora.Allocation;
 using Sora.Database.Models;
 using Sora.Enums;
@@ -35,60 +37,28 @@ using Sora.Services;
 
 namespace Sora.Objects
 {
-    public class Presence : DynamicValues, IComparable
+    public partial class Presence : DynamicValues, IComparable
     {
         private readonly ChannelService _cs;
-        //public bool Disconnected;
 
-        // ReSharper disable once CollectionNeverUpdated.Global
-        public readonly List<PacketStream> JoinedStreams = new List<PacketStream>();
         public readonly Stopwatch LastRequest;
 
-        public bool BlockNonFriendDm;
+        public readonly List<PacketStream> JoinedStreams = new List<PacketStream>();
         
-        public LoginPermissions ClientPermissions;
-        public CountryIds CountryId;
-
-        //public DateTime BeginSeason;
-        public MultiplayerRoom JoinedRoom;
-
-        public double Lat;
-        public LeaderboardRx LeaderboardRx;
-
-        //public UserStats Stats;
-        public LeaderboardStd LeaderboardStd;
-
-        public object locker;
-
-        public double Lon;
-
-        //public MStreamWriter Stream;
-        public List<IPacket> packetList;
-
-        // ReSharper disable once MemberCanBeMadeStatic.Global
-        public uint Rank = 0;
+        private readonly List<IPacket> packetList;
 
         public SpectatorStream Spectator;
-
-        public UserStatus
-            Status = new UserStatus {BeatmapChecksum = "", StatusText = ""}; // Predefined strings to prevent Issues.
-
-        public byte Timezone;
 
         public Users User;
 
         public Presence(ChannelService cs)
         {
             _cs = cs;
-
-            locker = new object();
+            
             LastRequest = new Stopwatch();
             Token = Guid.NewGuid().ToString();
-            //Stream      = new MStreamWriter(new MemoryStream());
             packetList = new List<IPacket>();
-
-            LeaderboardStd = null;
-            LeaderboardRx = null;
+            
             User = null;
         }
 
@@ -105,32 +75,34 @@ namespace Sora.Objects
             return pr.Token == Token ? 0 : 1;
         }
 
-        protected bool Equals(Presence pr) => Token == pr.Token;
-
         public MemoryStream GetOutput()
         {
             LastRequest.Restart();
-
             IPacket[] copy;
-            lock (locker)
+
+            Monitor.Enter(packetList);
+            try
             {
                 copy = new IPacket[packetList.Count];
                 packetList.CopyTo(copy);
                 packetList.Clear();
             }
-
+            finally
+            {
+                Monitor.Exit(packetList);
+            }
+            
             var res = MStreamWriter.New();
-
-            foreach (var p in copy)
-                res.Write(p);
+            
+            res.Write(copy);
 
             res.BaseStream.Position = 0;
 
             return (MemoryStream) res.BaseStream;
         }
-
+        
         public bool TimeoutCheck() => LastRequest.Elapsed.Seconds > 60;
-
+        
         public Presence Write(IPacket p)
         {
             if (this["IRC"] != null && (bool) this["IRC"])
@@ -146,12 +118,6 @@ namespace Sora.Objects
 
             return this;
         }
-
         public static Presence operator +(Presence instance, IPacket p) => instance.Write(p);
-
-        public void Alert(string Message)
-        {
-            Write(new Announce(Message));
-        }
     }
 }

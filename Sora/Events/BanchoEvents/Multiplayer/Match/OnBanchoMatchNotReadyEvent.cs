@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchNotReadyEvent
@@ -32,13 +33,13 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchNotReady)]
         public void OnBanchoMatchNotReady(BanchoMatchNotReadyArgs args)
         {
-            var slot = args.pr.JoinedRoom?.GetSlotByUserId(args.pr.User.Id);
+            var slot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.GetSlotByUserId(args.pr.User.Id);
             if (slot == null)
                 return;
 
             slot.Status = MultiSlotStatus.NotReady;
 
-            args.pr.JoinedRoom.Update();
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Update();
         }
     }
 }

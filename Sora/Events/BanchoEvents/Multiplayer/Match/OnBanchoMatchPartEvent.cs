@@ -24,8 +24,9 @@ using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchPartEvent
@@ -37,10 +38,10 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchPart)]
         public async void OnBanchoMatchPart(BanchoMatchPartArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null)
                 return;
 
-            var room = args.pr.JoinedRoom;
+            var room = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH");
             room.Leave(args.pr);
             if (room.HostId == args.pr.User.Id)
                 room.SetRandomHost();

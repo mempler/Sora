@@ -123,23 +123,25 @@ namespace Sora.Services
             // TODO: Add total playtime.
             //presence.BeginSeason = DateTime.UtcNow;
 
-            presence.ClientPermissions |= LoginPermissions.User;
-
+            var cl_perms = LoginPermissions.User;
+            
             if (presence.User.Permissions == Permission.COLOR_ORANGE)
-                presence.ClientPermissions |= LoginPermissions.Supporter;
+                cl_perms |= LoginPermissions.Supporter;
             if (presence.User.Permissions == Permission.COLOR_RED)
             {
                 if (presence.User.Permissions == Permission.COLOR_ORANGE)
-                    presence.ClientPermissions -= LoginPermissions.Supporter;
-                presence.ClientPermissions |= LoginPermissions.BAT;
+                    cl_perms -= LoginPermissions.Supporter;
+                cl_perms |= LoginPermissions.BAT;
             }
 
             if (presence.User.Permissions == Permission.COLOR_BLUE)
             {
                 if (presence.User.Permissions == Permission.COLOR_RED)
-                    presence.ClientPermissions -= LoginPermissions.BAT;
-                presence.ClientPermissions |= LoginPermissions.Developer;
+                    cl_perms -= LoginPermissions.BAT;
+                cl_perms |= LoginPermissions.Developer;
             }
+
+            presence["CL_PERMISSIONS"] = cl_perms;
 
             presence.LastRequest.Start();
             _cs.AddChannel(new Channel(presence.User.Username, "", null, presence));

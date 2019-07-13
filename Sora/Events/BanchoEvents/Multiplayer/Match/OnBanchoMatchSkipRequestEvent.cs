@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchSkipRequestEvent
@@ -32,7 +33,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchSkipRequest)]
         public void OnBanchoMatchSkipRequest(BanchoMatchSkipRequestArgs args)
         {
-            args.pr.JoinedRoom?.Skip(args.pr);
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.Skip(args.pr);
         }
     }
 }

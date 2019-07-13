@@ -23,8 +23,6 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -32,81 +30,16 @@ using Sora.Enums;
 
 namespace Sora.Database.Models
 {
-    public class LeaderboardRx
+    [Table("LeaderboardRx")]
+    public class LeaderboardRx : Leaderboard<LeaderboardRx>
     {
-        [Key]
-        [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong RankedScoreOsu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong RankedScoreTaiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong RankedScoreCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong TotalScoreOsu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong TotalScoreTaiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong TotalScoreCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong PlayCountOsu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong PlayCountTaiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public ulong PlayCountCtb { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public double PerformancePointsOsu { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public double PerformancePointsTaiko { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public double PerformancePointsCtb { get; set; }
-
-        public static LeaderboardRx GetLeaderboard(SoraDbContextFactory factory, int userId)
-        {
-            using var db = factory.GetForWrite();
-
-            var result = db.Context.LeaderboardRx.Where(t => t.Id == userId).Select(e => e).FirstOrDefault();
-            if (result != null)
-                return result;
-
-            db.Context.LeaderboardRx.Add(new LeaderboardRx {Id = userId});
-
-            return new LeaderboardRx {Id = userId};
-        }
-
-        public double GetAccuracy(SoraDbContextFactory factory, PlayMode mode)
+        public override double GetAccuracy(SoraDbContext ctx, PlayMode mode)
         {
             var totalAcc = 0d;
             var divideTotal = 0d;
             var i = 0;
-
-            factory.Get()
+            
+                ctx
                    .Scores
                    .Where(s => s.PlayMode == mode)
                    .Where(s => (s.Mods & Mod.Relax) != 0 && (s.Mods & Mod.Relax2) == 0)
@@ -127,60 +60,11 @@ namespace Sora.Database.Models
 
             return divideTotal > 0 ? totalAcc / divideTotal : 0;
         }
-        public void IncreaseScore(SoraDbContextFactory factory, ulong score, bool ranked, PlayMode mode)
+        
+        public override void UpdatePP(SoraDbContext ctx, PlayMode mode)
         {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    if (ranked)
-                        RankedScoreOsu += score;
-                    else
-                        TotalScoreOsu += score;
-                    break;
-                case PlayMode.Taiko:
-                    if (ranked)
-                        RankedScoreTaiko += score;
-                    else
-                        TotalScoreTaiko += score;
-                    break;
-                case PlayMode.Ctb:
-                    if (ranked)
-                        RankedScoreCtb += score;
-                    else
-                        TotalScoreCtb += score;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void IncreasePlaycount(SoraDbContextFactory factory, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    PlayCountOsu++;
-                    break;
-                case PlayMode.Taiko:
-                    PlayCountTaiko++;
-                    break;
-                case PlayMode.Ctb:
-                    PlayCountCtb++;
-                    break;
-            }
-
-            db.Context.LeaderboardRx.Update(this);
-        }
-
-        public void UpdatePP(SoraDbContextFactory factory, PlayMode mode)
-        {
-            using var db = factory.GetForWrite();
-
-            var TotalPP = db.Context.Scores
+            var TotalPP = ctx
+                            .Scores
                             .Where(s => (s.Mods & Mod.Relax) == 0)
                             .Where(s => s.PlayMode == mode)
                             .Where(s => s.UserId == Id)
@@ -205,31 +89,6 @@ namespace Sora.Database.Models
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
             }
-
-            db.Context.LeaderboardRx.Update(this);
         }
-
-        public uint GetPosition(SoraDbContextFactory factory, PlayMode mode)
-        {
-            var pos = 0;
-
-            switch (mode)
-            {
-                case PlayMode.Osu:
-                    pos = factory.Get().LeaderboardRx.Count(x => x.PerformancePointsOsu > PerformancePointsOsu);
-                    break;
-                case PlayMode.Taiko:
-                    pos = factory.Get().LeaderboardRx.Count(x => x.PerformancePointsTaiko > PerformancePointsTaiko);
-                    break;
-                case PlayMode.Ctb:
-                    pos = factory.Get().LeaderboardRx.Count(x => x.PerformancePointsCtb > PerformancePointsCtb);
-                    break;
-            }
-
-            return (uint) pos;
-        }
-
-        public static LeaderboardRx GetLeaderboard(SoraDbContextFactory factory, Users user)
-            => GetLeaderboard(factory, user.Id);
     }
 }

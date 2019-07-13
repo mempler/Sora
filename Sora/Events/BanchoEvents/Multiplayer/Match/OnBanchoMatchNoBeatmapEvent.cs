@@ -23,8 +23,9 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchNoBeatmapEvent
@@ -32,13 +33,14 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchNoBeatmap)]
         public void OnBanchoMatchNoBeatmap(BanchoMatchNoBeatmapArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null)
                 return;
-            var slot = args.pr.JoinedRoom.GetSlotByUserId(args.pr.User.Id);
+            
+            var slot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").GetSlotByUserId(args.pr.User.Id);
 
             slot.Status = MultiSlotStatus.NoMap;
 
-            args.pr.JoinedRoom.Update();
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Update();
         }
     }
 }

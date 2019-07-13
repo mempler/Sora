@@ -60,6 +60,12 @@ namespace Sora.Helpers
             x.Close();
         }
 
+        public void Write(IEnumerable<IPacket> packetList)
+        {
+            foreach (var p in packetList)
+                Write(p);
+        }
+
         public void Write(BinaryWriter w)
         {
             w.BaseStream.Position = 0;

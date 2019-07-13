@@ -232,7 +232,7 @@ namespace Sora.Objects
             slot.Status = MultiSlotStatus.NotReady;
             Channel.JoinChannel(pr);
             stream.Join(pr);
-            pr.JoinedRoom = this;
+            pr["ACTIVE_MATCH"] = this;
             return true;
         }
 
@@ -244,7 +244,7 @@ namespace Sora.Objects
             ClearSlot(slot);
             Channel.LeaveChannel(pr);
             stream.Left(pr);
-            pr.JoinedRoom = null;
+            pr["ACTIVE_MATCH"] = this;
         }
 
         public void Leave(int userId)

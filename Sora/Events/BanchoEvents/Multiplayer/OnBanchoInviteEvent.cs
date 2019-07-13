@@ -23,6 +23,7 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 using Sora.Services;
 
 namespace Sora.Events.BanchoEvents.Multiplayer
@@ -37,12 +38,14 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoInvite)]
         public void OnBanchoInvite(BanchoInviteArgs args)
         {
-            if (args.pr.JoinedRoom == null)
+            if (args.pr["ACTIVE_MATCH"] == null)
                 return;
+            
             var opr = _ps.GetPresence(args.UserId);
             if (opr == null)
                 return;
-            args.pr.JoinedRoom.Invite(args.pr, opr);
+            
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Invite(args.pr, opr);
         }
     }
 }

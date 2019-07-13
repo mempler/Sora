@@ -24,8 +24,9 @@ using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
 using Sora.Helpers;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchStartEvent
@@ -33,16 +34,17 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchStart)]
         public void OnBanchoMatchStart(BanchoMatchStartArgs args)
         {
-            if (args.pr.JoinedRoom == null || args.pr.JoinedRoom.HostId != args.pr.User.Id)
+            if (args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH") == null ||
+                args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").HostId != args.pr.User.Id)
                 return;
 
             Logger.Info(
                 "%#FFFFFF% a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" +
-                args.pr.JoinedRoom.Name,
-                "%#B342F4%(", args.pr.JoinedRoom.MatchId, "%#B342F4%) %#FFFFFF%has started their Match!"
+                args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Name,
+                "%#B342F4%(", args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").MatchId, "%#B342F4%) %#FFFFFF%has started their Match!"
             );
 
-            args.pr.JoinedRoom.Start();
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Start();
         }
     }
 }

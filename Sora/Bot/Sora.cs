@@ -100,26 +100,28 @@ namespace Sora.Bot
         {
             _botPresence = new Presence(_cs)
             {
-                User = Users.GetUser(_factory, 100),
-                Status = new UserStatus
-                {
-                    Status = Status.Watching,
-                    Playmode = PlayMode.Osu,
-                    BeatmapChecksum = "nothing",
-                    BeatmapId = 0,
-                    StatusText = "over you!",
-                    CurrentMods = Mod.TouchDevice
-                },
-                LeaderboardRx = LeaderboardRx.GetLeaderboard(_factory, 100),
-                LeaderboardStd = LeaderboardStd.GetLeaderboard(_factory, 100),
-                Timezone = 0,
-                BlockNonFriendDm = false,
-                Lon = 0d,
-                Lat = 0d,
+                User = Users.GetUser(_factory, 100)
             };
 
+            _botPresence["STATUS"] = new UserStatus
+            {
+                Status = Status.Watching,
+                Playmode = PlayMode.Osu,
+                BeatmapChecksum = "nothing",
+                BeatmapId = 0,
+                StatusText = "over you!",
+                CurrentMods = Mod.TouchDevice
+            };
             _botPresence["BOT"] = true;
             _botPresence["IRC"] = true;
+            _botPresence["LB_STD"] = LeaderboardStd.GetLeaderboard(_factory.Get(), 100);
+            _botPresence["LB_RX"] = LeaderboardRx.GetLeaderboard(_factory.Get(), 100);
+            
+            _botPresence["TIMEZONE"] = 0;
+            _botPresence["BLOCK_NON_FRIENDS_DM"] = false;
+            _botPresence["LON"] = 0d;
+            _botPresence["LAT"] = 0d;
+            _botPresence["COUNTRYID"] = CountryIds.XX;
 
             var stream = _pss.GetStream("main");
             if (stream != null)

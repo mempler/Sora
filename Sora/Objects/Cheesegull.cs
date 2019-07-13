@@ -200,7 +200,7 @@ namespace Sora.Objects
 
                     RetStr += $"{set.SetID}.osz|" +
                               $"{set.Artist}|" +
-                              $"{set.Title}|" +
+                              $"{set.Title.Replace("|", "")}|" +
                               $"{set.Creator}|" +
                               $"{(int)set.RankedStatus}|" +
                               $"{MaxDiff:0.00}|" +

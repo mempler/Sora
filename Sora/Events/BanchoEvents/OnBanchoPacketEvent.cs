@@ -96,7 +96,7 @@ namespace Sora.Events.BanchoEvents
                 case PacketId.ClientRequestStatusUpdate:
                     await _evmgr.RunEvent(
                         EventType.BanchoRequestStatusUpdate,
-                        new BanchoSendUserStatusArgs {pr = args.pr, status = args.pr.Status}
+                        new BanchoSendUserStatusArgs {pr = args.pr, status = args.pr.Get<UserStatus>("STATUS")}
                     );
                     break;
                 case PacketId.ClientUserStatsRequest:

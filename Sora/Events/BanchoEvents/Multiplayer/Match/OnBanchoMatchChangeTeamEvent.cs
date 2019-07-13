@@ -24,8 +24,9 @@ using System;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs;
+using Sora.Objects;
 
-namespace Sora.Events.BanchoEvents.Multiplayer
+namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
     public class OnBanchoMatchChangeTeamEvent
@@ -33,7 +34,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
         [Event(EventType.BanchoMatchChangeTeam)]
         public void OnBanchoMatchChangeTeam(BanchoMatchChangeTeamArgs args)
         {
-            var slot = args.pr.JoinedRoom?.GetSlotByUserId(args.pr.User.Id);
+            var slot = args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH")?.GetSlotByUserId(args.pr.User.Id);
             if (slot == null)
                 return;
 
@@ -53,7 +54,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
                     break;
             }
 
-            args.pr.JoinedRoom.Update();
+            args.pr.Get<MultiplayerRoom>("ACTIVE_MATCH").Update();
         }
     }
 }
