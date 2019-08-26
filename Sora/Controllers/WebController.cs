@@ -513,9 +513,10 @@ namespace Sora.Controllers
                 return Ok(answer);
 
             var request = (HttpWebRequest) WebRequest.Create(
-                $"http://osu.ppy.sh/web/check-updates.php?action={action}&stream={qstream}&time={time}"
+                $"http://1.1.1.1/web/check-updates.php?action={action}&stream={qstream}&time={time}"
             );
             request.AutomaticDecompression = DecompressionMethods.GZip;
+            request.Host = "osu.ppy.sh";
 
             using var response = (HttpWebResponse) request.GetResponse();
             using var stream = response.GetResponseStream();

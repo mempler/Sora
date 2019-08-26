@@ -58,7 +58,6 @@ namespace Sora
             );
 
             _host = new WebHostBuilder()
-                    .UseContentRoot(Path.Join(Directory.GetCurrentDirectory(), "/data"))
                     .UseKestrel(
                         cfg =>
                         {
@@ -120,8 +119,8 @@ namespace Sora
                           }
                       }
                   );
-            
-            _host.RunAsync(cts.Token).GetAwaiter().GetResult();
+
+            _host.RunAsync(cts.Token).Wait();
         }
 
         private static void OnProcessExit(object sender, System.EventArgs e)

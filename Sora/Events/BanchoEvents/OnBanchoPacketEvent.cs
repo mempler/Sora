@@ -114,6 +114,12 @@ namespace Sora.Events.BanchoEvents
                         new BanchoEmptyEventArgs {pr = args.pr}
                     );
                     break;
+                case PacketId.ClientUserPresenceRequest:
+                    await _evmgr.RunEvent(
+                        EventType.BanchoUserPresenceRequest,
+                        new BanchoClientUserPresenceRequestArgs {pr = args.pr, userIds = args.Data.ReadData<UserPresenceRequest>().UserIds }
+                    );
+                    break;
 
                 #endregion
 

@@ -20,8 +20,10 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Sora.Database;
 using Sora.Database.Models;
@@ -68,7 +70,27 @@ namespace Sora.Objects
         {
             var x = new StringBuilder();
             SetScores();
-            SetBeatmap();
+            try
+            {
+                SetBeatmap();
+            }
+            catch (WebException ex)
+            {
+                var status = (ex.Response as HttpWebResponse)?.StatusCode;
+                switch (status)
+                {
+                    case HttpStatusCode.NotFound:
+                        break;
+                    default:
+                        Logger.Err("Failed to set Beatmap from FileMd5:", _fileMd5, ex);
+                        return $"{(int) RankedStatus.NotSubmited}|false";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Err("Failed to set Beatmap from FileMd5:", _fileMd5, ex);
+                return $"{(int) RankedStatus.NotSubmited}|false";
+            }
 
             x.Append(ScoreboardHeader());
             foreach (var score in _scores)

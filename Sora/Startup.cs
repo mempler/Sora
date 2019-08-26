@@ -94,31 +94,8 @@ namespace Sora
             IRCServer ircServer
         )
         {
-            app.UseMiddleware<LoggingMiddleware>();
-
-            Logger.Info(
-                @"%#FFFFFF%Sora V1.0.0
-
-%#800000%=============================== %#F94848%License %#800000%=================================
-%#F94848%Sora - A Modular Bancho written in C#
-Copyright (C) 2019 Robin A. P.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-%#800000%==========================================================================
-
-"
-            );
+            Logger.Info(Constants.License);
+            
             var w = new Stopwatch();
             Logger.Info("Generating %#F94848%Database%#FFFFFF%! this could take a while.");
             w.Start();
@@ -169,28 +146,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             );
 
             ircServer.StartAsync();
-        }
-
-        public class LoggingMiddleware
-        {
-            private readonly RequestDelegate _next;
-
-            public LoggingMiddleware(RequestDelegate next) => _next = next;
-
-            public async Task Invoke(HttpContext context)
-            {
-                try
-                {
-                    await _next(context);
-                } catch (InvalidOperationException)
-                {
-                    throw;
-                } catch (Exception ex)
-                {
-                    Logger.Err(ex);
-                    await _next(context);
-                }
-            }
         }
     }
 }
