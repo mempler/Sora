@@ -208,12 +208,8 @@ namespace Sora.Services
                         {
                             var toRemove = new List<Presence>();
                             lock (Locker)
-                            {
-                                foreach ((string _, Presence? value) in _presences)
-                                    if ((bool?) value["IRC"] == true)
-                                        if (value.TimeoutCheck())
-                                            toRemove.Add(value);
-                            }
+                                toRemove.AddRange(from Presence value in _presences where (bool?) value["IRC"] == true where value.TimeoutCheck() select value);
+
 
                             foreach (var pr in toRemove)
                                 EndPresence(pr, true);

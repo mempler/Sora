@@ -74,7 +74,7 @@ namespace Sora.Database.Models
         //public bool IsPassword(string s) => BCrypt.validate_password(s, Password);
         public bool IsPassword(string s)
             => PasswordVersion switch {
-                    PasswordVersion.V1 => BCrypt.Net.BCrypt.Verify(s, Password),
+                    PasswordVersion.V1 => BCrypt.validate_password(s, Password),
                     PasswordVersion.V2 => throw new NotImplementedException(),
                     _                  => throw new ArgumentOutOfRangeException()
                };
@@ -108,7 +108,7 @@ namespace Sora.Database.Models
         )
         {
             var md5Pass = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password));
-            var bcryptPass = BCrypt.Net.BCrypt.HashPassword(Hex.ToHex(md5Pass), 16);
+            var bcryptPass = BCrypt.generate_hash(Hex.ToHex(md5Pass));
 
             var u = new Users
             {
