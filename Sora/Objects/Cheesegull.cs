@@ -98,7 +98,7 @@ namespace Sora.Objects
             rankedStatus = CheeseStatus(rankedStatus);
 
             string pm;
-            if (playMode < 3 || playMode > 3)
+            if (playMode < 0 || playMode > 3)
                 pm = "";
             else
                 pm = $"mode={playMode.ToString()}&";
