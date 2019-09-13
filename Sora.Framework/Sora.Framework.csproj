@@ -6,10 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Objects\Multiplayer" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="lib\*.dll">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

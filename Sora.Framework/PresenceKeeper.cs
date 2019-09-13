@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Sora.Framework.Allocation;
 using Sora.Framework.Objects;
 using Sora.Framework.Utilities;
 
@@ -14,7 +15,7 @@ namespace Sora.Framework
         bool TryGet(int userId, out Presence pr);
     }
     
-    public class PresenceKeeper : IPresenceKeeper
+    public class PresenceKeeper : DynamicValues, IPresenceKeeper
     {
         protected readonly Dictionary<string, Presence> Presences =
             new Dictionary<string, Presence>();

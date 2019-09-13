@@ -22,15 +22,16 @@
 
 using System;
 using Sora.Framework.Enums;
+using Sora.Framework.Objects.Multiplayer;
 using Sora.Framework.Utilities;
 
 namespace Sora.Framework.Packets.Server
 {
     public class MatchJoinSuccess : IPacket
     {
-        public MultiplayerRoom Room;
+        public Match Match;
 
-        public MatchJoinSuccess(MultiplayerRoom room) => Room = room;
+        public MatchJoinSuccess(Match match) => Match = match;
 
         public PacketId Id => PacketId.ServerMatchJoinSuccess;
 
@@ -41,7 +42,7 @@ namespace Sora.Framework.Packets.Server
 
         public void WriteToStream(MStreamWriter sw)
         {
-            sw.Write(Room);
+            sw.Write(Match);
         }
     }
 }

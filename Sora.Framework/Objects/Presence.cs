@@ -2,6 +2,7 @@ using System;
 using Sora.Enums;
 using Sora.Framework.Allocation;
 using Sora.Framework.Enums;
+using Sora.Framework.Objects.Multiplayer;
 using Sora.Framework.Utilities;
 
 namespace Sora.Framework.Objects
@@ -39,6 +40,8 @@ namespace Sora.Framework.Objects
         public UserInformation Info { get; set; }
         
         public Permission Permission => User.Permissions;
+        
+        public Match ActiveMatch { get; set; }
 
         public Presence(User user)
         {
