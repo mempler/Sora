@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Objects\Multiplayer" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="lib\*.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Include="lib\*.so">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="BouncyCastle.NetCore" Version="1.8.5" />
+        <PackageReference Include="Colorful.Console" Version="1.2.9" />
+        <PackageReference Include="MaxMind.GeoIP2" Version="3.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+        <PackageReference Include="SharpZipLib" Version="1.2.0" />
+    </ItemGroup>
+
+</Project>

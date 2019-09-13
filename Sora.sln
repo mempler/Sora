@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Tests", "Sora.Tests\So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.API", "plugins\Sora.API\Sora.API.csproj", "{FF162780-46EB-4696-8892-32B22C29A698}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework", "Sora.Framework\Sora.Framework.csproj", "{53B95480-0384-45BA-AB1A-91806C32E69A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{FF162780-46EB-4696-8892-32B22C29A698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF162780-46EB-4696-8892-32B22C29A698}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF162780-46EB-4696-8892-32B22C29A698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53B95480-0384-45BA-AB1A-91806C32E69A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53B95480-0384-45BA-AB1A-91806C32E69A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53B95480-0384-45BA-AB1A-91806C32E69A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53B95480-0384-45BA-AB1A-91806C32E69A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +105,7 @@ Global
 		{DD6035CF-DA80-4013-ACBC-9148115F1445} = {5BF7D1D4-97CE-4D5C-BB4C-F8E2F31CBE57}
 		{1E418266-4377-447B-B720-E865D3DFA9A9} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{FF162780-46EB-4696-8892-32B22C29A698} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
+		{53B95480-0384-45BA-AB1A-91806C32E69A} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}
