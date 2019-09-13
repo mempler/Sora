@@ -39,12 +39,12 @@ namespace Sora.Framework
             }
         }
 
-        public virtual void Join(Presence pr)
+        public virtual void Join(Presence sender)
         {
             try
             {
                 RWL.AcquireWriterLock(50);
-                Presences[pr.Token] = pr;
+                Presences[sender.Token] = sender;
             }
             finally
             {
@@ -52,12 +52,12 @@ namespace Sora.Framework
             }
         }
 
-        public virtual void Leave(Presence pr)
+        public virtual void Leave(Presence sender)
         {
             try
             {
                 RWL.AcquireWriterLock(50);
-                Presences.Remove(pr.Token);
+                Presences.Remove(sender.Token);
             }
             finally
             {
