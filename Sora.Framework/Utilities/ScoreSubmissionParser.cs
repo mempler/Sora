@@ -24,6 +24,7 @@ using System;
 using System.Text;
 using Sora.Framework.Enums;
 using Sora.Framework.Objects;
+using Sora.Framework.Objects.Scores;
 
 namespace Sora.Framework.Utilities
 {
@@ -40,7 +41,7 @@ namespace Sora.Framework.Utilities
                 Convert.FromBase64String(iv)
             );
 
-            var x = decryptedScore.Split(":");
+            var x = decryptedScore.Split(':');
             var score = new Score
             {
                 FileMd5 = x[0],

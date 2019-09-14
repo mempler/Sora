@@ -116,7 +116,7 @@ namespace Sora.Framework.Utilities
                              $"{cb.BPM}♫~AR" + $"{cb.AR}~OD" +
                              $"{cb.OD}~CS" + $"{cb.CS}~HP" +
                              $"{cb.HP}~" +
-                             $"{(int) MathF.Floor(cb.TotalLength) / 60}m" +
+                             $"{(int) Math.Floor((double) cb.TotalLength) / 60}m" +
                              $"{cb.TotalLength % 60}s)@" +
                              $"{(int) cb.Mode},"
                     );

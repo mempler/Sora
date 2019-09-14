@@ -2,7 +2,7 @@ using System;
 using Sora.Framework.Enums;
 using Sora.Framework.Utilities;
 
-namespace Sora.Framework.Objects
+namespace Sora.Framework.Objects.Scores
 {
     public class Score
     {
@@ -19,6 +19,11 @@ namespace Sora.Framework.Objects
         public Mod Mods;
         public PlayMode PlayMode;
         public DateTime Date;
+
+        public int Id; // ID of Score, Required for Scoreboard.
+        public int? ReplayId; // ID which the Replay has been saved! Required for Scoreboard
+        public int UserId; // Required for Scoreboard.
+        public int Position; // Position in Scoreboard.
 
         public double ComputeAccuracy()
         {
@@ -64,5 +69,25 @@ namespace Sora.Framework.Objects
                 $"{Count300 + Count100}{FileMd5}{CountMiss}{CountGeki}{CountKatu}{Date}{Mods}"
             )
         );
+
+        public string ToOsuString()
+        {
+            return $"{Id}|" +
+                   $"{UserName.Replace("|", "I")}|" +
+                   $"{TotalScore}|" +
+                   $"{MaxCombo}|" +
+                   $"{Count50}|" +
+                   $"{Count100}|" +
+                   $"{Count300}|" +
+                   $"{CountMiss}|" +
+                   $"{CountGeki}|" +
+                   $"{CountKatu}|" +
+                   $"{CountMiss > 0}|" +
+                   $"{(short) Mods}|" +
+                   $"{UserId}|" +
+                   $"{Position}|" +
+                   $"{(int) Date.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds}|" +
+                   $"{ReplayId ?? 0}";
+        }
     }
 }

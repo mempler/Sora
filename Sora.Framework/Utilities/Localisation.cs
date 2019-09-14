@@ -67,7 +67,7 @@ namespace Sora.Framework.Utilities
 
         public static CountryId StringToCountryId(string x)
         {
-            if (Enum.TryParse(typeof(CountryId), x, true, out var o))
+            if (Enum.TryParse(x, true, out CountryId o))
                 return (CountryId) o;
             return CountryId.BL;
         }

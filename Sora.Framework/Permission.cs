@@ -41,7 +41,7 @@ namespace Sora.Framework
         /// Generate Permissions Class from String based on "Perm1, Perm2, Perm3"
         /// </summary>
         /// <param name="perm">Permisison</param>
-        public static Permission From(string perm) => new Permission() + perm.Split(", ");
+        public static Permission From(string perm) => new Permission() + perm.Split(", ".ToCharArray());
 
         /// <summary>
         /// Add string as Permission to This

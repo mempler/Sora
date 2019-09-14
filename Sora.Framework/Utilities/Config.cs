@@ -20,7 +20,7 @@ namespace Sora.Framework.Utilities
 
         public ConfigUtil(IMemoryCache cache) => _cache = cache;
 
-        public bool ReadConfig<T>(out T c, string cfgName = "config.json", T defaultConfig = default)
+        public bool TryReadConfig<T>(out T c, string cfgName = "config.json", T defaultConfig = default)
             where T : class, IConfig, new()
         {
             if (_cache.TryGetValue(cfgName, out c))

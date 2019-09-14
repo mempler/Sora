@@ -59,7 +59,7 @@ namespace Sora.Framework.Utilities
             color = Color.White;
             foreach (var x in Regex.Split(m, @"\%(.*?)\%"))
             {
-                if (!x.StartsWith('#') || !Hex.IsHex(x.TrimStart('#')) || x.Length != 7)
+                if (!x.StartsWith("#") || !Hex.IsHex(x.TrimStart('#')) || x.Length != 7)
                 {
                     Console.WriteFormatted(x, color);
                     continue;
