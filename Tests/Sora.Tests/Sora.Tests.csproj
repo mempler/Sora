@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+        <PackageReference Include="NUnit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.15.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Database\Models" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\olSora\olSora.csproj" />
+    </ItemGroup>
+
+</Project>

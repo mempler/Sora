@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sora", "Sora\Sora.csproj", "{8F272BCA-61A5-41BB-AE63-648AF5671823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "olSora", "olSora\olSora.csproj", "{8F272BCA-61A5-41BB-AE63-648AF5671823}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamplePlugin", "ExamplePlugin\ExamplePlugin.csproj", "{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamplePlugin", "Examples\ExamplePlugin\ExamplePlugin.csproj", "{B1C611BC-EDA9-4706-AC15-EE9C9DE2EBC2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{F357BCA8-CE01-4AE4-8C27-643B54CC9214}"
 EndProject
@@ -31,15 +31,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Osu", "os
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Taiko", "osu\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj", "{8FCA7CC4-DEFB-4009-A1BD-B919B5D4B277}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ripple.MergeTool", "Ripple.MergeTool\Ripple.MergeTool.csproj", "{DD6035CF-DA80-4013-ACBC-9148115F1445}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ripple.MergeTool", "src\Ripple.MergeTool\Ripple.MergeTool.csproj", "{DD6035CF-DA80-4013-ACBC-9148115F1445}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Tests", "Sora.Tests\Sora.Tests.csproj", "{1E418266-4377-447B-B720-E865D3DFA9A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Tests", "Tests\Sora.Tests\Sora.Tests.csproj", "{1E418266-4377-447B-B720-E865D3DFA9A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.API", "plugins\Sora.API\Sora.API.csproj", "{FF162780-46EB-4696-8892-32B22C29A698}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework", "Sora.Framework\Sora.Framework.csproj", "{53B95480-0384-45BA-AB1A-91806C32E69A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework", "src\Sora.Framework\Sora.Framework.csproj", "{53B95480-0384-45BA-AB1A-91806C32E69A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework.Tests", "Sora.Framework.Tests\Sora.Framework.Tests.csproj", "{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework.Tests", "Tests\Sora.Framework.Tests\Sora.Framework.Tests.csproj", "{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora", "src\Sora\Sora.csproj", "{6C44EF7D-360D-4E78-963B-138F1058D415}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,10 @@ Global
 		{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C44EF7D-360D-4E78-963B-138F1058D415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C44EF7D-360D-4E78-963B-138F1058D415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C44EF7D-360D-4E78-963B-138F1058D415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C44EF7D-360D-4E78-963B-138F1058D415}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +118,7 @@ Global
 		{1E418266-4377-447B-B720-E865D3DFA9A9} = {CDBAE606-50E3-429D-8769-73773D992957}
 		{FF162780-46EB-4696-8892-32B22C29A698} = {93D09E01-30F2-4B3B-88F7-EC2E62AB3840}
 		{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A} = {CDBAE606-50E3-429D-8769-73773D992957}
+		{6C44EF7D-360D-4E78-963B-138F1058D415} = {F357BCA8-CE01-4AE4-8C27-643B54CC9214}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A9CBD0A5-3EDC-4215-A58C-BE4C0F16F22A}

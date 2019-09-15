@@ -272,3 +272,4 @@ geoip
 data/
 Plugins/
 coverage.xml
+/src/Sora/config.xml
