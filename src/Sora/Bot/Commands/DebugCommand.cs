@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Sora.Attributes;
 using Sora.Enums;
-using Sora.EventArgs;
-using Sora.Objects;
-using Sora.Packets.Server;
-using Sora.Services;
+using Sora.EventArgs.BanchoEventArgs;
+using Sora.Framework;
+using Sora.Framework.Objects;
 
 namespace Sora.Bot.Commands
 {
@@ -35,8 +34,8 @@ namespace Sora.Bot.Commands
         [Event(EventType.BanchoPacket)]
         public void OnBanchoPacketEvent(BanchoPacketArgs args)
         {
-            if (args.pr.Get<bool>("IS_PACKET_DEBUGGING"))
-                args.pr += new Announce($"PacketId: {args.PacketId}");
+            if (!(bool) args.pr["IS_PACKET_DEBUGGING"])
+                args.pr.Alert($"PacketId: {args.PacketId}");
         }
     }
 }

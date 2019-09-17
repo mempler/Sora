@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Sora.Objects;
-using Sora.Services;
+using Sora.Framework;
+using Sora.Framework.Objects;
 
 namespace Sora.Bot.Commands
 {

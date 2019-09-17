@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Sora.Framework\Sora.Framework.csproj" />
+      <ProjectReference Include="..\..\src\Sora.Framework\Sora.Framework.csproj" />
     </ItemGroup>
 
 </Project>

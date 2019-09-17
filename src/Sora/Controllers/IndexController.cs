@@ -43,7 +43,7 @@ namespace Sora.Controllers
                 Response.Headers["cho-protocol"] = "19";
                 Response.Headers["Connection"] = "keep-alive";
                 Response.Headers["Keep-Alive"] = "timeout=60, max=100";
-                Response.Headers["cho-server"] = "olSora (https://github.com/Mempler/Sora)";
+                Response.Headers["cho-server"] = "Sora (https://github.com/Mempler/Sora)";
 
                 Response.StatusCode = 200;
 
@@ -55,7 +55,7 @@ namespace Sora.Controllers
                     using (var mr = new MStreamReader(body))
                     {
                         var pr = new Presence(new User());
-                        if (clientToken == string.Empty)
+                        if (string.IsNullOrEmpty(clientToken))
                         {
                             Response.Headers["cho-token"] = pr.Token.ToString();
                             string ip = Response.Headers["X-Forwarded-For"];

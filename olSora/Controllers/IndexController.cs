@@ -179,15 +179,6 @@ namespace Sora.Controllers
             //return Redirect($"https://bm6.ppy.sh/d/{realId}" + (noVid ? "?novideo" : ""));
         }
 
-        private async Task<ActionResult> RetOut(Stream stream)
-        {
-            stream.Position = 0;
 
-            var m = new MemoryStream();
-            await stream.CopyToAsync(m);
-            m.Position = 0;
-
-            return File(m, "application/octet-stream");
-        }
     }
 }

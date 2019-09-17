@@ -10,11 +10,11 @@ namespace Sora.Framework.Tests.Utilities
         {
             var pw = Crypto.RandomString(32); // Random Password with length of 32.
             Assert.NotNull(pw);
-            var pwHash = BCrypt.generate_hash(pw);
+            var pwHash = Crypto.BCrypt.generate_hash(pw);
             Assert.NotNull(pwHash);
             
-            Assert.IsTrue(BCrypt.validate_password(pw, pwHash));
-            Assert.IsFalse(BCrypt.validate_password(pw + "kaese", pwHash));
+            Assert.IsTrue(Crypto.BCrypt.validate_password(pw, pwHash));
+            Assert.IsFalse(Crypto.BCrypt.validate_password(pw + "kaese", pwHash));
         }
     }
 }

@@ -5,11 +5,12 @@ using System.Threading;
 using Sora.Framework.Allocation;
 using Sora.Framework.Enums;
 using Sora.Framework.Objects.Multiplayer;
+using Sora.Framework.Packets.Server;
 using Sora.Framework.Utilities;
 
 namespace Sora.Framework.Objects
 {
-    public struct UserStatus
+    public class UserStatus
     {
         public Status Status;
         public string StatusText;
@@ -23,7 +24,7 @@ namespace Sora.Framework.Objects
                 $"Status: {Status}, StatusText: {StatusText}, BeatmapChecksum: {CurrentMods}, Playmode: {Playmode}, BeatmapId: {BeatmapId}";
     }
 
-    public struct UserInformation
+    public class UserInformation
     {
         public byte TimeZone;
         public CountryId CountryId;
@@ -50,9 +51,9 @@ namespace Sora.Framework.Objects
     
     public class Presence : DynamicValues, IPacketPusher
     {
-        public Token Token { get; }
+        public Token Token { get; set; }
         
-        public User User { get; }
+        public User User { get; set;  }
         public UserStatus Status { get; set; }
         public UserInformation Info { get; set; }
         
@@ -88,6 +89,9 @@ namespace Sora.Framework.Objects
         
         public void Push(IPacket packet)
         {
+            if ((bool) this["IRC"])
+                return;
+            
             try
             {
                 _rwl.AcquireWriterLock(50);
@@ -101,11 +105,15 @@ namespace Sora.Framework.Objects
 
         public void WritePackets(MStreamWriter writer)
         {
+            if ((bool) this["IRC"])
+                return;
+            
             try
             {
                 _rwl.AcquireWriterLock(5000);
                 foreach (var packet in _packets)
                     writer.Write(packet);
+                _packets.Clear();
             }
             finally
             {
@@ -115,5 +123,10 @@ namespace Sora.Framework.Objects
 
         public void WritePackets(Stream stream)
             => WritePackets(new MStreamWriter(stream));
+
+        public void Alert(string msg)
+        {
+            Push(new Announce(msg));
+        }
     }
 }

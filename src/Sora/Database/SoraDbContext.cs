@@ -22,17 +22,15 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Sora.Database.Models;
-using Sora.Helpers;
+using Sora.Framework.Utilities;
+using CharSet = Pomelo.EntityFrameworkCore.MySql.Infrastructure.CharSet;
 
 namespace Sora.Database
 {
     public sealed class SoraDbContext : DbContext
     {
-        private static MemoryCache _memoryCache;
-
         private readonly IMySQLConfig _config;
 
         public SoraDbContext()
@@ -40,48 +38,18 @@ namespace Sora.Database
         {
         }
 
-        public SoraDbContext(ConfigUtil cfgUtil = null, IMySQLConfig config = null)
+        public SoraDbContext(IMySQLConfig config = null)
         {
-            if (cfgUtil == null)
-            {
-                if (_memoryCache == null)
-                    _memoryCache = new MemoryCache(
-                        new MemoryCacheOptions {ExpirationScanFrequency = TimeSpan.FromDays(365)}
-                    );
-                cfgUtil = new ConfigUtil(_memoryCache);
-            }
-
             _config = config;
-            if (config == null)
-                _config = cfgUtil.ReadConfig<MySQLConfig>();
+            if (config != null) return;
+            
+            if (ConfigUtil.TryReadConfig(out MySQLConfig cfg))
+                _config = cfg;
         }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<Users> Users { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<Achievements> Achievements { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<UserStats> UserStats { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<Scores> Scores { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<Friends> Friends { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<LeaderboardStd> LeaderboardStd { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<LeaderboardRx> LeaderboardRx { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<Beatmaps> Beatmaps { get; set; }
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<BeatmapSets> BeatmapSets { get; set; }
+        
+        public DbSet<DBUser> Users { get; set; }
+        public DbSet<DBFriend> Friends { get; set; }
+        
 
         public void Migrate()
         {

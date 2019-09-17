@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Sora.Framework.Packets.Server;
 
 namespace Sora.Framework.Objects
@@ -17,6 +19,22 @@ namespace Sora.Framework.Objects
         public string Topic;
         public ChannelStatus Status;
 
+        public IEnumerable<Presence> Presences
+        {
+            get
+            {
+                try
+                {
+                    RWL.AcquireReaderLock(50);
+                    return Values.Select(x => x.Value);
+                }
+                finally
+                {
+                    RWL.ReleaseReaderLock();
+                }
+            }
+        }
+        
         public int UserCount
         {
             get

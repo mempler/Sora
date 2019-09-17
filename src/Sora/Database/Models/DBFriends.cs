@@ -28,8 +28,9 @@ using JetBrains.Annotations;
 
 namespace Sora.Database.Models
 {
+    [Table("Friends")]
     [UsedImplicitly]
-    public class Friends
+    public class DBFriend
     {
         [Key]
         [Required]
@@ -51,18 +52,16 @@ namespace Sora.Database.Models
                           .Select(x => x.FriendId).ToList();
         }
 
-        public static void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
+        public static async void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using var db = factory.GetForWrite();
-
-            db.Context.Friends.Add(new Friends {UserId = userId, FriendId = friendId});
+            using (var db = factory.GetForWrite()) 
+                await db.Context.Friends.AddAsync(new DBFriend {UserId = userId, FriendId = friendId});
         }
 
         public static void RemoveFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using var db = factory.GetForWrite();
-
-            db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
+            using (var db = factory.GetForWrite())
+                db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
         }
     }
 }

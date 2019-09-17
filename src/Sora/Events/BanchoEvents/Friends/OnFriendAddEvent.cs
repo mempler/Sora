@@ -20,8 +20,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
 using Sora.Attributes;
+using Sora.Database;
+using Sora.Database.Models;
 using Sora.Enums;
+using Sora.EventArgs.BanchoEventArgs;
+using Sora.Framework.Utilities;
 
 namespace Sora.Events.BanchoEvents.Friends
 {
@@ -33,20 +38,20 @@ namespace Sora.Events.BanchoEvents.Friends
         public OnFriendAddEvent(SoraDbContextFactory factory) => _factory = factory;
 
         [Event(EventType.BanchoFriendAdd)]
-        public void OnFriendAdd(BanchoFriendAddArgs args)
+        public async Task OnFriendAdd(BanchoFriendAddArgs args)
         {
-            var u = Users.GetUser(_factory, args.FriendId);
+            var u = await DBUser.GetDBUser(_factory, args.FriendId);
 
             if (u != null)
                 Logger.Info(
-                    "%#F94848%" + args.pr.User.Username,
+                    "%#F94848%" + args.pr.User.UserName,
                     "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
                     "%#FFFFFF%added",
-                    "%#F94848%" + u.Username,
+                    "%#F94848%" + u.UserName,
                     "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as a Friend!"
                 );
 
-            Database.Models.Friends.AddFriend(_factory, args.pr.User.Id, args.FriendId);
+            DBFriend.AddFriend(_factory, args.pr.User.Id, args.FriendId);
         }
     }
 }

@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Sora.Framework.Utilities;
 
 namespace Sora
 {
-    internal class Program
+    internal static class Program
     {
-        private static void Main(string[] args)
+        private static readonly CancellationTokenSource cts = new CancellationTokenSource();
+        
+        private static void Main()
         {
+            Console.CancelKeyPress += OnProcessExit;
+            
             var defaultConfig = new Config
             {
                 MySql = new CMySql
@@ -54,7 +59,13 @@ namespace Sora
                     .UseStartup<StartUp>()
                     .Build();
             
-            _host.Start();
+            _host.RunAsync(cts.Token).Wait();
+        }
+
+        private static void OnProcessExit(object sender, System.EventArgs e)
+        {
+            Logger.Info("Killing everything..");
+            cts.Cancel();
         }
     }
 }

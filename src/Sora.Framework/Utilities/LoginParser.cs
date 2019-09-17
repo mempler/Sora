@@ -24,7 +24,7 @@ using System.IO;
 
 namespace Sora.Framework.Utilities
 {
-    internal class LoginParser
+    public class LoginParser
     {
         public static Login ParseLogin(MStreamReader reader)
         {

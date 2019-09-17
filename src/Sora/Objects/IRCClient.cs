@@ -1,18 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Enums;
-using Sora.EventArgs;
-using Sora.Helpers;
-using Sora.Packets.Client;
-using Sora.Server;
+using Sora.EventArgs.BanchoEventArgs;
+using Sora.Framework;
+using Sora.Framework.Objects;
+using Sora.Framework.Utilities;
 using Sora.Services;
 
 namespace Sora.Objects
@@ -45,7 +43,7 @@ namespace Sora.Objects
             _evmng = evmng;
         }
 
-        private Users User;
+        private User User;
         private Presence Presence;
         private bool Authorized;
         private string Nickname;
@@ -71,7 +69,7 @@ namespace Sora.Objects
         public void SendCodeMessage(int code, string message, string nickname = "", string channel = "")
         {
             if (string.IsNullOrEmpty(nickname))
-                nickname = User?.Username ?? Nickname;
+                nickname = User?.UserName ?? Nickname;
             
             if (!string.IsNullOrEmpty(channel))
                 channel += " " + channel;
@@ -119,14 +117,14 @@ namespace Sora.Objects
                                 }
 
                                 Nickname = cmd[1].Trim();
-                                var rUser = Users.GetUser(_factory, cmd[1].Trim());
+                                var rUser = DBUser.GetDBUser(_factory, cmd[1].Trim()).Result;
                                 if (rUser == null)
                                 {
                                     SendCodeMessage(451, "You have not registered");
                                     continue;
                                 }
 
-                                User = rUser;
+                                User = rUser.ToUser();
 
                                 if (Authorized)
                                 {
@@ -134,7 +132,7 @@ namespace Sora.Objects
                                     continue;
                                 }
 
-                                if (User?.IsPassword(Hex.ToHex(Crypto.GetMd5(Pass.Trim()))) != true)
+                                if (rUser?.IsPassword(Hex.ToHex(Crypto.GetMd5(Pass.Trim()))) != true)
                                 {
                                     if (string.IsNullOrEmpty(Nickname))
                                         Nickname = "anonymous";
@@ -145,7 +143,7 @@ namespace Sora.Objects
                                     continue;
                                 }
 
-                                Presence = new Presence(_cs);
+                                Presence = new Presence(User);
                                 Presence.User = User;
                                 
                                 Presence["STATUS"] = new UserStatus();
@@ -164,31 +162,33 @@ namespace Sora.Objects
                                     SendCodeMessage(444, "You're not logged in");
                                     break;
                                 }
-
-                                var channel = _cs.GetChannel(cmd[1].Trim());
-                                if (channel == null)
+                                
+                                if (_cs.TryGet(cmd[1].Trim(), out var channel))
                                 {
                                     SendCodeMessage(403, $"{cmd[1]}: No such Channel!");
                                     break;
                                 }
 
-                                if (!channel.JoinChannel(Presence))
+                                channel.Join(Presence);
+                                /*
+                                if (!)
                                 {
                                     SendCodeMessage(482, "You're not allowed to Join this Channel!");
                                     break;
                                 }
+                                */
                                 
-                                if (channel.ChannelTopic == "")
-                                    SendCodeMessage(331, "No topic is set", channel: channel.ChannelName);
+                                if (channel.Topic == "")
+                                    SendCodeMessage(331, "No topic is set", channel: channel.Name);
                                 else
-                                    SendCodeMessage(332, channel.ChannelTopic, channel: channel.ChannelName);
+                                    SendCodeMessage(332, channel.Topic, channel: channel.Name);
 
                                 var uList = string.Join(
-                                    " ", channel.PresenceList
+                                    " ", channel.Presences
                                                 .Select(
                                                     ps =>
                                                     {
-                                                        var ret = ps.User.Username.Replace(" ", "_");
+                                                        var ret = ps.User.UserName.Replace(" ", "_");
 
                                                         if (ps.User.Permissions.HasPermission(Permission.GROUP_CHAT_MOD))
                                                             ret = "@" + ret;
@@ -202,8 +202,8 @@ namespace Sora.Objects
                                                 .ToArray()
                                 );
                                 uList += " @olSora";
-                                SendCodeMessage(353, $"{uList}", channel: "= " + channel.ChannelName);
-                                SendCodeMessage(366, "End of NAMES list", channel: channel.ChannelName);
+                                SendCodeMessage(353, $"{uList}", channel: "= " + channel.Name);
+                                SendCodeMessage(366, "End of NAMES list", channel: channel.Name);
                                 break;
                             
                             case "PING":

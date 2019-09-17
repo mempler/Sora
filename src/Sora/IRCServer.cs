@@ -5,15 +5,18 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Sora.Database;
-using Sora.Helpers;
+using Sora.Framework.Utilities;
 using Sora.Objects;
 using Sora.Services;
 
-namespace Sora.Server
+namespace Sora
 {
     public class IRCServer
     {
         private readonly IServerConfig _cfg;
+
+        private readonly SoraDbContextFactory _factory;
+
         //private readonly SoraDbContextFactory _factory;
         private readonly PresenceService _ps;
         private readonly ChannelService _cs;
