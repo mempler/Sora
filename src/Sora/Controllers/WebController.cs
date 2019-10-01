@@ -392,8 +392,7 @@ namespace Sora.Controllers
             var newScorePosition = newScore != null ? await newScore.Position(_factory) : 0;
             var oldScorePosition = oldScore != null ? await oldScore.Position(_factory) : 0;
             
-            if (newScorePosition == 1 &&
-                (oldScore == null || oldScore.TotalScore < newScore.TotalScore))
+            if (newScorePosition == 1)
                 _sora.SendMessage(
                     $"[http://{_config.Server.ScreenShotHostname}/{dbScore.ScoreOwner.Id} {dbScore.ScoreOwner.UserName}] " +
                     $"has reached #1 on [https://osu.ppy.sh/b/{bm.BeatmapID} {set?.Title} [{bm.DiffName}]] " +

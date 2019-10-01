@@ -150,22 +150,6 @@ namespace Sora.Database.Models
             
             using (var db = factory.GetForWrite())
             {
-                var sc =
-                    db.Context.Scores
-                      .Where(s => s.FileMd5 == score.FileMd5 && s.PlayMode == score.PlayMode)
-                      .Where(
-                          s => (score.Mods & Mod.Relax) != 0
-                              ? (score.Mods & Mod.Relax) != 0
-                              : (score.Mods & Mod.Relax) == 0
-                      )
-                      .Where(s => s.UserId == score.UserId)
-                      .OrderByDescending(s => s.TotalScore);
-
-                var isBetter = sc.Any(scr => scr.TotalScore < score.TotalScore);
-
-                if (!isBetter)
-                    return; // Lets not even submit if is worse!
-                
                 score.ScoreOwner = null;
                 db.Context.Add(score);
             }

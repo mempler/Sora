@@ -40,7 +40,7 @@ namespace Sora.Framework.Objects
         public float Accuracy;
         public uint PlayCount;
         public ulong TotalScore;
-        public ulong Position;
+        public uint Position;
         public ushort PerformancePoints;
     }
 

@@ -11,12 +11,18 @@ namespace Sora.Services
         {
             Push("#osu", new Channel
             {
-                Name = "#osu", Status = ChannelStatus.AutoJoin, Topic = "osu! default channel"
+                Name = "#osu", Status = ChannelStatus.AutoJoin, Topic = "osu! default channel."
             });
 
             Push("#lobby", new Channel
             {
-                Name = "#lobby", Topic = "osu! default channel"
+                Name = "#lobby", Topic = "osu! default channel for multiplayer matches."
+            });
+
+
+            Push("#announce", new Channel
+            {
+                Name = "#announce", Topic = "osu! default channel for announcements."
             });
         }
         
