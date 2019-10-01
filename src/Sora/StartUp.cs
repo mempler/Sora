@@ -4,12 +4,12 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Sora.Database;
 using Sora.Framework.Allocation;
 using Sora.Framework.Utilities;
@@ -73,9 +73,12 @@ namespace Sora
                     .AddSingleton<PresenceService>()
                     .AddSingleton<Cache>()
                     .AddSingleton<ChannelService>()
+                    .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<Bot.Sora>()
                     .AddSingleton<IRCServer>()
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
+
+            services.AddLogging();
             
             services.Configure<FormOptions>(
                 x =>
@@ -90,12 +93,16 @@ namespace Sora
             );
         }
 
-        public void Configure(IApplicationBuilder app, IServiceProvider provider,
+        public void Configure(IApplicationBuilder app, IServiceProvider provider, ILogger<StartUp> logger,
             SoraDbContextFactory factory,
             EventManager ev,
+            ConsoleCommandService css,
+            Bot.Sora sora,
             PluginService plugs)
         {
-            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            logger.Log(LogLevel.Information, License.L);
+
+            app.UseMiddleware<ExceptionMiddleware>();
             if (_env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             
@@ -110,8 +117,10 @@ namespace Sora
                 plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + plug);
 
             ev.RegisterEvents();
-
             
+            css.Start();
+            sora.RunAsync();
+
             app.UseMvc(
                 routes => routes.MapRoute(
                     "default",
@@ -120,25 +129,36 @@ namespace Sora
             );
         }
     }
-    
-    public class ExceptionHandlingMiddleware
+
+    public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            _next = next;
+            _next = next ?? throw new ArgumentNullException(nameof(next));
+            _logger = loggerFactory?.CreateLogger<ExceptionMiddleware>() ??
+                      throw new ArgumentNullException(nameof(loggerFactory));
         }
+
         public async Task Invoke(HttpContext context)
         {
             try
             {
-                await _next.Invoke(context);
+                await _next(context);
             }
             catch (Exception ex)
             {
-                Logger.Fatal(ex);
-                throw;
+                if (context.Response.HasStarted)
+                    throw;
+
+                _logger.LogError("{ex}", ex);
+
+                context.Response.Clear();
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsync("Server side Error! Please Report\n");
+                await context.Response.WriteAsync(ex.Message);
             }
         }
     }

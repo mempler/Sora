@@ -38,21 +38,13 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
             if (slot == null)
                 return;
 
-            switch (slot.Team)
+            slot.Team = slot.Team switch
             {
-                case MultiSlotTeam.Blue:
-                    slot.Team = MultiSlotTeam.Red;
-                    break;
-                case MultiSlotTeam.Red:
-                    slot.Team = MultiSlotTeam.Blue;
-                    break;
-                case MultiSlotTeam.NoTeam:
-                    slot.Team = new Random().Next(1) == 1 ? MultiSlotTeam.Red : MultiSlotTeam.Blue;
-                    break;
-                default:
-                    slot.Team = MultiSlotTeam.NoTeam;
-                    break;
-            }
+                MultiSlotTeam.Blue => MultiSlotTeam.Red,
+                MultiSlotTeam.Red => MultiSlotTeam.Blue,
+                MultiSlotTeam.NoTeam => (new Random().Next(1) == 1 ? MultiSlotTeam.Red : MultiSlotTeam.Blue),
+                _ => MultiSlotTeam.NoTeam
+            };
 
             args.pr.ActiveMatch.Update();
         }

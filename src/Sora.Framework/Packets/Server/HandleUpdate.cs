@@ -47,13 +47,13 @@ namespace Sora.Framework.Packets.Server
             sw.Write((uint) Presence.Status.CurrentMods);
             sw.Write((byte) Presence.Status.Playmode);
             sw.Write(Presence.Status.BeatmapId);
-            
-            sw.Write((ulong) 0); // RankedScore
-            sw.Write((float) 0); // Accuracy
-            sw.Write((uint) 0); // PlayCount
-            sw.Write((ulong) 0); // TotalScore
-            sw.Write((ulong) 0); // Ranking Position
-            sw.Write((ushort) 0); // Performance Points
+
+            sw.Write(Presence.Stats.RankedScore);
+            sw.Write(Presence.Stats.Accuracy);
+            sw.Write(Presence.Stats.PlayCount);
+            sw.Write(Presence.Stats.TotalScore);
+            sw.Write(Presence.Stats.Position);
+            sw.Write(Presence.Stats.PerformancePoints);
         }
     }
 }

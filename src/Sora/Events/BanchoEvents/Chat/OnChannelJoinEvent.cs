@@ -20,6 +20,7 @@
 
 #endregion
 
+using Colorful;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -58,9 +59,12 @@ namespace Sora.Events.BanchoEvents.Chat
                 args.pr.Push(new ChannelRevoked(args.ChannelName));
                 return;
             }
-            
+
             channel.Leave(args.pr);
             channel.Join(args.pr);
+            
+            args.pr.Push(new ChannelJoinSuccess(channel));
+            
             channel.Push(new ChannelAvailable(channel));
         }
     }

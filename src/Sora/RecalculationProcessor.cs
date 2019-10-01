@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using Sora.Database;
-using Sora.Database.Models;
-using Sora.Helpers;
+using Sora.Framework.Utilities;
 
 namespace Sora
 {
@@ -31,7 +29,7 @@ namespace Sora
                 s =>
                 {
                     i++;
-                    s.ComputeAccuracy();
+                    s.Accuracy = s.ComputeAccuracy();
                     if (i % 10000 == 0)
                         Logger.Info($"Score Id: {s.Id} | {i} of {sCount} {(double)i/(double)sCount:P}");
                 });
@@ -65,11 +63,9 @@ namespace Sora
                         return;
                     }
                     
-                    s.ScoreOwner = Users.GetUser(_factory, s.UserId);
-
                     try
                     {
-                        s.ComputePerformancePoints();
+                        s.PerformancePoints = s.ComputePerformancePoints();
                     } catch (Exception)
                     {
                         // ignored
@@ -79,29 +75,6 @@ namespace Sora
                         Logger.Info($"Score Id: {s.Id} Performance Points: {s.PerformancePoints:F} Mode {s.PlayMode} +{s.Mods} | {i} of {sCount} {(double) i / (double) sCount:P}");
                 }
             );
-        }
-        
-        public void ProcessLowerScores()
-        {
-            using var db = _factory.GetForWrite();
-            var ctx = db.Context;
-
-            var topScores = ctx.Beatmaps
-                               .Select(beatmap => ctx.Scores.Where(s => s.FileMd5 == beatmap.FileMd5))
-                               .SelectMany(scores => scores)
-                               .OrderByDescending(score => score.TotalScore)
-                               .GroupBy(s => s.UserId)
-                               .Select(s => s.FirstOrDefault())
-                               .GroupBy(s => s.FileMd5)
-                               .Select(s => s.FirstOrDefault());
-
-            var deletableScores = ctx.Scores
-                                     .Where(s => !topScores.Any(sc => sc.Id == s.Id));
-
-            Logger.Info($"Total amount of {topScores.Count()} Top Scores!");
-            Logger.Info($"Total amount of {deletableScores.Count()} Deletable Scores!");
-            
-            ctx.Scores.RemoveRange(deletableScores);
         }
     }
 }

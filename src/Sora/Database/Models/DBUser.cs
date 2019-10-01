@@ -1,11 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Sora.Framework;
 using Sora.Framework.Objects;
 using Sora.Framework.Utilities;
+
+#nullable enable
 
 namespace Sora.Database.Models
 {
@@ -19,12 +24,29 @@ namespace Sora.Database.Models
     [Table("Users")]
     public class DBUser
     {
+        [Key]
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
+        [Required]
         public string UserName { get; set; }
+
+        [Required]
+        public string EMail { get; set; }
+
+        [Required]
         public string Password { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        
+        public byte[]? PasswordSalt { get; set; }
+        
+        [Required]
         public PasswordVersion PasswordVersion { get; set; }
+        
+        [Required]
         public string Permissions { get; set; }
+        
+        public string? Achievements { get; set; }
 
         public static Task<DBUser> GetDBUser(SoraDbContextFactory factory, int userId)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -59,9 +81,13 @@ namespace Sora.Database.Models
 
         public static DBUser RegisterUser(
             SoraDbContextFactory factory,
-            string userName, string password, bool md5 = true,
-            PasswordVersion pwVersion = PasswordVersion.V1)
+            Permission permission,
+            string userName, string eMail, string password, bool md5 = true,
+            PasswordVersion pwVersion = PasswordVersion.V2, int userId = 0) /* 0 = increased. */
         {
+            if (factory.Get().Users.Any(u => string.Equals(u.UserName, userName, StringComparison.CurrentCultureIgnoreCase)))
+                return null;
+            
             byte[] salt = null;
             string pw;
             switch (pwVersion)
@@ -85,9 +111,14 @@ namespace Sora.Database.Models
             {
                 UserName = userName,
                 Password = pw,
+                EMail = eMail,
                 PasswordSalt = salt,
-                PasswordVersion = pwVersion
+                PasswordVersion = pwVersion,
+                Permissions = permission.ToString()
             };
+
+            if (userId > 0)
+                user.Id = userId;
 
             using (var db = factory.GetForWrite())
             {

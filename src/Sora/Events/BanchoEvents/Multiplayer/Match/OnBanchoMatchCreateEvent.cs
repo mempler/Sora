@@ -43,7 +43,6 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         public async void OnBanchoMatchCreate(BanchoMatchCreateArgs args)
         {
             args.room.Password = args.room.Password.Replace(" ", "_");
-            Lobby.Self.Push(args.room);
 
             Logger.Info(
                 "%#F94848%" + args.pr.User.UserName,
@@ -58,6 +57,8 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
                 args.pr.Push(new MatchJoinFail());
 
             args.room.Update();
+
+            Lobby.Self.Push(args.room);
 
             await _ev.RunEvent(
                 EventType.BanchoChannelJoin, new BanchoChannelJoinArgs {pr = args.pr, ChannelName = "#multiplayer"}

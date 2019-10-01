@@ -65,7 +65,7 @@ namespace Sora.Framework.Objects.Scores
         private string ScoreboardHeader()
         {
             if (_bm != null)
-                return $"{(int) _parent.RankedStatus}|false|" +
+                return $"{(int) Fixer.FixRankedStatus(_parent.RankedStatus)}|false|" +
                        $"{_bm.BeatmapID}|" +
                        $"{_bm.ParentSetID}|" +
                        $"{_scores.Count}\n" +

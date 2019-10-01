@@ -26,12 +26,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Update="index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="lib\*dll">
@@ -64,7 +58,6 @@
 
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
     
     <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.6.0-preview6.19303.8" />
     <PackageReference Include="Colorful.Console" Version="1.2.9" />

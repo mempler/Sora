@@ -33,6 +33,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         public void OnBanchoMatchComplete(BanchoMatchCompleteArgs args)
         {
             args.pr.ActiveMatch?.Complete(args.pr);
+            args.pr.ActiveMatch?.Update();
         }
     }
 }

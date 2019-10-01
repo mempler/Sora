@@ -21,7 +21,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 using Sora.Database.Models;
-using Sora.Enums;
+using Sora.Framework.Enums;
 
 namespace Sora
 {
@@ -30,19 +30,14 @@ namespace Sora
     {
         public static Ruleset Convert(PlayMode mode)
         {
-            switch (mode)
+            return mode switch
             {
-                case PlayMode.Osu:
-                    return new OsuRuleset();
-                case PlayMode.Taiko:
-                    return new CatchRuleset();
-                case PlayMode.Ctb:
-                    return new TaikoRuleset();
-                case PlayMode.Mania:
-                    return new ManiaRuleset();
-                default:
-                    return new OsuRuleset();
-            }
+                PlayMode.Osu => (Ruleset) new OsuRuleset(),
+                PlayMode.Taiko => new CatchRuleset(),
+                PlayMode.Ctb => new TaikoRuleset(),
+                PlayMode.Mania => new ManiaRuleset(),
+                _ => new OsuRuleset()
+            };
         }
     }
 
@@ -158,7 +153,7 @@ namespace Sora
             }
         }
 
-        public Score Parse(Scores dbScore, string replayPath = null)
+        public Score Parse(DBScore dbScore, string replayPath = null)
         {
             using var rawReplay = replayPath == null ? File.OpenRead("data/replays/" + dbScore.ReplayMd5) : File.OpenRead(replayPath);
 
@@ -189,7 +184,7 @@ namespace Sora
                     Beatmap = beatmap.BeatmapInfo,
                     Combo = dbScore.MaxCombo,
                     MaxCombo = dbScore.MaxCombo,
-                    User = new User {Username = dbScore.ScoreOwner.Username},
+                    User = new User {Username = dbScore.ScoreOwner.UserName},
                     RulesetID = (int) dbScore.PlayMode,
                     Date = dbScore.Date,
                     Files = null,
@@ -235,14 +230,15 @@ namespace Sora
         /// Compute Performance Points from given Score and Replay!
         /// </summary>
         /// <param name="dbScore"></param>
+        /// <param name="replayPath"></param>
+        /// <param name="beatmapPath"></param>
         /// <returns>Performance Points</returns>
-        public static double Compute(Scores dbScore, string replayPath = null, string beatmapPath = null)
+        public static double Compute(DBScore dbScore, string replayPath = null, string beatmapPath = null)
         {
             ProcessorWorkingBeatmap workingBeatmap;
-            if (beatmapPath == null)
-                workingBeatmap = new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5);
-            else
-                workingBeatmap = new ProcessorWorkingBeatmap(beatmapPath);
+            workingBeatmap = beatmapPath == null ?
+                new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5) :
+                new ProcessorWorkingBeatmap(beatmapPath);
             
             var psp = new ProcessorScoreParser(workingBeatmap);
             var score = psp.Parse(dbScore, replayPath);

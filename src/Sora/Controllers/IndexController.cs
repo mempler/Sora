@@ -47,78 +47,72 @@ namespace Sora.Controllers
 
                 Response.StatusCode = 200;
 
-                using (var body = new MemoryStream()) {
-                    await Request.Body.CopyToAsync(body);
-                    body.Position = 0;
+                await using var body = new MemoryStream();
+                await Request.Body.CopyToAsync(body);
+                body.Position = 0;
 
-                    using (var mw = MStreamWriter.New())
-                    using (var mr = new MStreamReader(body))
-                    {
-                        var pr = new Presence(new User());
-                        if (string.IsNullOrEmpty(clientToken))
-                        {
-                            Response.Headers["cho-token"] = pr.Token.ToString();
-                            string ip = Response.Headers["X-Forwarded-For"];
+                await using var mw = MStreamWriter.New();
+                using var mr = new MStreamReader(body);
+                var pr = new Presence(new User());
+                if (string.IsNullOrEmpty(clientToken))
+                {
+                    Response.Headers["cho-token"] = pr.Token.ToString();
+                    string ip = Response.Headers["X-Forwarded-For"];
 
-                            if (string.IsNullOrEmpty(ip))
-                                ip = "127.0.0.1";
+                    if (string.IsNullOrEmpty(ip))
+                        ip = "127.0.0.1";
                             
-                            await _evManager.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs
-                            {
-                                Reader = mr,
-                                Writer = mw,
-                                pr = pr,
-                                IPAddress = ip
-                            });
+                    await _evManager.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs
+                    {
+                        Reader = mr,
+                        Writer = mw,
+                        pr = pr,
+                        IPAddress = ip
+                    });
 
-                            mw.Flush();
+                    mw.Flush();
 
-                            return await RetOut(mw.BaseStream);
-                        }
-
-                        if (_presenceService.TryGet(clientToken, out pr))
-                        {
-                            while (true)
-                                try
-                                {
-                                    if (Request.ContentLength - body.Position < 7)
-                                        break; // Dont handle any invalid packets! (less then bytelength of 7)
-
-                                    var packetId = (PacketId) mr.ReadInt16();
-                                    mr.ReadBoolean();
-                                    var packetData = mr.ReadBytes();
-
-                                    using (var packetDataStream = new MemoryStream(packetData))
-                                    using (var packetDataReader = new MStreamReader(packetDataStream))
-                                    {
-                                        await _evManager.RunEvent(
-                                            EventType.BanchoPacket,
-                                            new BanchoPacketArgs {pr = pr, PacketId = packetId, Data = packetDataReader}
-                                        );
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Err(ex);
-                                    break;
-                                }
-                            try
-                            {
-                                if (Response.Body.CanWrite)
-                                    pr.WritePackets(Response.Body);
-                                
-                                return await RetOut(mw.BaseStream);
-                            }
-                            catch
-                            {
-                                // Ignored because it may throw an exception.
-                            }
-                        }
-                        else
-                            return StatusCode(403);
-                    }
+                    return await RetOut(mw.BaseStream);
                 }
 
+                if (_presenceService.TryGet(new Token(clientToken.Trim()), out pr))
+                {
+                    while (true)
+                        try
+                        {
+                            if (Request.ContentLength - body.Position < 7)
+                                break; // Dont handle any invalid packets! (less then bytelength of 7)
+
+                            var packetId = (PacketId) mr.ReadInt16();
+                            mr.ReadBoolean();
+                            var packetData = mr.ReadBytes();
+
+                            await using var packetDataStream = new MemoryStream(packetData);
+                            using var packetDataReader = new MStreamReader(packetDataStream);
+                            await _evManager.RunEvent(
+                                EventType.BanchoPacket,
+                                new BanchoPacketArgs {pr = pr, PacketId = packetId, Data = packetDataReader}
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Err(ex);
+                            break;
+                        }
+                    try
+                    {
+                        if (Response.Body.CanWrite)
+                            pr.WritePackets(Response.Body);
+                                
+                        return await RetOut(mw.BaseStream);
+                    }
+                    catch
+                    {
+                        // Ignored because it may throw an exception.
+                    }
+                }
+                else
+                    return StatusCode(403);
             }
             catch (Exception ex)
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,7 +42,7 @@ namespace Sora.Framework
         /// Generate Permissions Class from String based on "Perm1, Perm2, Perm3"
         /// </summary>
         /// <param name="perm">Permisison</param>
-        public static Permission From(string perm) => new Permission() + perm.Split(", ".ToCharArray());
+        public static Permission From(string perm) => new Permission() + perm.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
 
         /// <summary>
         /// Add string as Permission to This

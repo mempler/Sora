@@ -62,6 +62,7 @@ namespace Sora.Events.BanchoEvents.Chat
             channel.Leave(args.pr);
 
             channel.Push(new ChannelAvailable(channel));
+            args.pr.Push(new ChannelAvailable(channel));
         }
     }
 }

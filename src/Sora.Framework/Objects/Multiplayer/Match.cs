@@ -187,7 +187,6 @@ namespace Sora.Framework.Objects.Multiplayer
         {
             if (!Join(pr, null))
                 throw new MultiplayerException("Password is Incorrect!");
-            base.Join(pr);
         }
 
         public bool Join(Presence pr, string password)
@@ -208,6 +207,7 @@ namespace Sora.Framework.Objects.Multiplayer
             
             Channel.Join(pr);
             pr.ActiveMatch = this;
+            base.Join(pr);
             return true;
         }
 
@@ -264,8 +264,6 @@ namespace Sora.Framework.Objects.Multiplayer
             slot.Status = status;
             slot.Team = team;
             slot.Mods = mods;
-
-            Update();
         }
 
         public void SetSlot(int slotId, MatchSlot slot)
@@ -278,8 +276,6 @@ namespace Sora.Framework.Objects.Multiplayer
             firstSlot.Status = slot.Status;
             firstSlot.Team = slot.Team;
             firstSlot.Mods = slot.Mods;
-
-            Update();
         }
 
         public void SetSlot(MatchSlot firstSlot, MatchSlot secondSlot)
@@ -288,8 +284,6 @@ namespace Sora.Framework.Objects.Multiplayer
             firstSlot.Status = secondSlot.Status;
             firstSlot.Team = secondSlot.Team;
             firstSlot.Mods = secondSlot.Mods;
-
-            Update();
         }
 
         public void ClearSlot(MatchSlot slot)
@@ -298,27 +292,24 @@ namespace Sora.Framework.Objects.Multiplayer
             slot.Status = MultiSlotStatus.Open;
             slot.Team = MultiSlotTeam.NoTeam;
             slot.Mods = Mod.None;
-
-            Update();
         }
 
         public void Update()
         {
-            Lobby.Self.Push(new MatchUpdate(this));
             Push(new MatchUpdate(this));
+            Lobby.Self.Push(new MatchUpdate(this));
         }
 
         public void Disband()
         {
-            Push(new MatchDisband(this));
             Lobby.Self.Pop(this);
+            Push(new MatchDisband(this));
             Lobby.Self.Push(new MatchDisband(this));
         }
 
         public void SetHost(int userId)
         {
             HostId = userId;
-            Update();
         }
 
         public void SetRandomHost()
@@ -328,8 +319,6 @@ namespace Sora.Framework.Objects.Multiplayer
                 HostId = slot.UserId;
             else
                 HostId = -1;
-
-            Update();
         }
 
         public void SetMods(Mod mods, MatchSlot slot)
@@ -349,8 +338,6 @@ namespace Sora.Framework.Objects.Multiplayer
 
                 ActiveMods = mods;
             }
-
-            Update();
         }
 
         public void ChangeSettings(Match room)
@@ -369,13 +356,11 @@ namespace Sora.Framework.Objects.Multiplayer
             Seed = room.Seed;
 
             SetMods(ActiveMods, GetSlotByUserId(HostId));
-            Update();
         }
 
         public void SetPassword(string password)
         {
             Password = password.Replace(" ", "_");
-            Update();
         }
 
         public void LockSlot(MatchSlot slot)
@@ -389,8 +374,6 @@ namespace Sora.Framework.Objects.Multiplayer
                 : MultiSlotStatus.Open;
 
             slot.Team = MultiSlotTeam.NoTeam;
-
-            Update();
         }
 
         public void Start()
@@ -406,7 +389,6 @@ namespace Sora.Framework.Objects.Multiplayer
                 ++PlayingPeople;
             }
 
-            Update();
             Push(new MatchStart(this));
         }
 
@@ -414,8 +396,6 @@ namespace Sora.Framework.Objects.Multiplayer
         {
             if (--NeedLoad == 0)
                 Push(new MatchAllPlayersLoaded());
-
-            Update();
         }
 
         public void Failed(Presence pr)
@@ -440,7 +420,6 @@ namespace Sora.Framework.Objects.Multiplayer
 
             var slot = GetSlotByUserId(userId);
             slot.Status = MultiSlotStatus.Complete;
-            Update();
 
             if (PlayingPeople != 0)
                 return;
@@ -449,7 +428,6 @@ namespace Sora.Framework.Objects.Multiplayer
                 slt.Status = MultiSlotStatus.NotReady;
 
             InProgress = false;
-            Update();
             Push(new MatchComplete());
         }
 

@@ -33,7 +33,8 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoPong)]
         public void OnPong(BanchoPongArgs args)
         {
-            if (args.pr.Spectator?.SpectatorCount <= 0)
+            if (args.pr.Spectator == null ||
+                args.pr.Spectator?.SpectatorCount <= 0)
                 return;
             
             args.pr.Push(new HandleUpdate(args.pr));

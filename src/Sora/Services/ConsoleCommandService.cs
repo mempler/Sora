@@ -5,7 +5,8 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sora.Database;
 using Sora.Database.Models;
-using Sora.Helpers;
+using Sora.Framework;
+using Sora.Framework.Utilities;
 
 namespace Sora.Services
 {
@@ -106,11 +107,20 @@ namespace Sora.Services
                 3,
                 args =>
                 {
-                    var u = Users.NewUser(factory, args[0], args[1], args[2], Permission.From(args[3..].Join()));
+                    var u = DBUser.RegisterUser(factory, Permission.From(args[3..].Join()),
+                        args[0], args[2], args[1], false);
+                    
+                    if (u == null) {
+                        Logger.Err("Failed! User has already been registered!");
+                        return true;
+                    }
+                    
+                    
+                    Logger.Info(args[1]);
                     Logger.Info(
                         "Created User",
-                        "%#F94848%" + u.Username,
-                        "%#B342F4%(", Users.GetUserId(factory, u.Username), "%#B342F4%)"
+                        "%#F94848%" + u.UserName,
+                        "%#B342F4%(", u.Id, "%#B342F4%)"
                     );
                     return true;
                 }

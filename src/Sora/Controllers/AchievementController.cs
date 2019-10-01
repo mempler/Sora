@@ -1,8 +1,9 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Sora.Allocation;
 using Sora.Database;
 using Sora.Database.Models;
+using Sora.Framework.Allocation;
 
 namespace Sora.Controllers
 {
@@ -23,15 +24,14 @@ namespace Sora.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(string achievement)
+        public async Task<IActionResult> Index(string achievement)
         {
-            byte[] res;
-            if ((res = _cache.Get<byte[]>($"jibril:achievements:{achievement}")) != null)
+            if (_cache.TryGet($"jibril:achievements:{achievement}", out byte[] res))
                 return File(res, "image/png");
 
-            res = Achievements
+            res = (await DBAchievement
                   .GetAchievement(_factory, achievement.Replace(".png", string.Empty))
-                  ?.GetIconImage();
+                  )?.GetIconImage();
 
             if (res == null)
                 return NotFound();

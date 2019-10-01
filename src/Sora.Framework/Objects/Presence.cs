@@ -34,18 +34,49 @@ namespace Sora.Framework.Objects
         public int RankingPosition;
     }
 
+    public class UserStats
+    {
+        public ulong RankedScore;
+        public float Accuracy;
+        public uint PlayCount;
+        public ulong TotalScore;
+        public ulong Position;
+        public ushort PerformancePoints;
+    }
+
     public class Token
     {
-        private string T { get; }
+        internal string T { get; }
 
         public Token()
         {
             T = Guid.NewGuid().ToString();
         }
 
+        public Token(string t)
+        {
+            T = t;
+        }
+        
         public override string ToString()
         {
             return T;
+        }
+    }
+
+    public class TokenEqualityComparer : IEqualityComparer<Token>
+    {
+        public bool Equals(Token x, Token y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, null)) return false;
+            if (ReferenceEquals(y, null)) return false;
+            return x.GetType() == y.GetType() && string.Equals(x.T, y.T);
+        }
+
+        public int GetHashCode(Token obj)
+        {
+            return (obj.T != null ? obj.T.GetHashCode() : 0) * 397;
         }
     }
     
@@ -56,6 +87,7 @@ namespace Sora.Framework.Objects
         public User User { get; set;  }
         public UserStatus Status { get; set; }
         public UserInformation Info { get; set; }
+        public UserStats Stats { get; set; }
         
         public Permission Permission => User.Permissions;
         
@@ -85,11 +117,13 @@ namespace Sora.Framework.Objects
                 RankingPosition = 0,
                 TimeZone = 0
             };
+            
+            Stats = new UserStats();
         }
         
-        public void Push(IPacket packet)
+        public void Push(IPacket packet, Presence skip = null)
         {
-            if ((bool) this["IRC"])
+            if (this["IRC"] != null && (bool) this["IRC"])
                 return;
             
             try
@@ -105,7 +139,7 @@ namespace Sora.Framework.Objects
 
         public void WritePackets(MStreamWriter writer)
         {
-            if ((bool) this["IRC"])
+            if (this["IRC"] != null && (bool) this["IRC"])
                 return;
             
             try

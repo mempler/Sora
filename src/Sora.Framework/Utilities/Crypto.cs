@@ -39,7 +39,7 @@ namespace Sora.Framework.Utilities
         public static string RandomString(int n)
         {
             var ret = new StringBuilder();
-            const string ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/=";
+            const string ascii = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
 
             for (var i = 0; i < n; i++)
                 ret.Append(ascii[new Random().Next(0, ascii.Length)]);

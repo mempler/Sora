@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sora.Database;
 
 namespace Sora.Database.Migrations
 {
     [DbContext(typeof(SoraDbContext))]
-    partial class SoraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190930112905_Leaderboard")]
+    partial class Leaderboard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,8 +61,6 @@ namespace Sora.Database.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("OwnerId");
-
                     b.Property<double>("PerformancePointsCtb");
 
                     b.Property<double>("PerformancePointsMania");
@@ -95,8 +95,6 @@ namespace Sora.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
-
                     b.ToTable("Leaderboard");
                 });
 
@@ -130,6 +128,8 @@ namespace Sora.Database.Migrations
                     b.Property<double>("PerformancePoints");
 
                     b.Property<byte>("PlayMode");
+
+                    b.Property<int?>("ReplayId");
 
                     b.Property<string>("ReplayMd5");
 
@@ -189,7 +189,7 @@ namespace Sora.Database.Migrations
                 {
                     b.HasOne("Sora.Database.Models.DBUser", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

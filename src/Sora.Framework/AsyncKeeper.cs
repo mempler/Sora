@@ -10,10 +10,15 @@ namespace Sora.Framework
         bool TryGet(I key, out T val);
     }
     
+    /// <summary>
+    /// a Thread Save alternative to Dictionary!
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="T"></typeparam>
+    
     public class AsyncKeeper<I, T> : IAsyncKeeper<I, T>
     {
-        protected readonly Dictionary<I, T> Values =
-            new Dictionary<I, T>();
+        protected Dictionary<I, T> Values = new Dictionary<I, T>();
 
         protected readonly ReaderWriterLock RWL = new ReaderWriterLock();
 

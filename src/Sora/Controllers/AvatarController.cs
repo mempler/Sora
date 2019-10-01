@@ -1,8 +1,7 @@
 using System.IO;
 using Jdenticon;
-using Jdenticon.Rendering;
 using Microsoft.AspNetCore.Mvc;
-using Sora.Helpers;
+using Color = Jdenticon.Rendering.Color;
 
 namespace Sora.Controllers
 {

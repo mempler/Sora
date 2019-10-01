@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sora.Database;
 using Sora.Database.Models;
+using Sora.Framework.Objects;
+using Sora.Framework.Objects.Scores;
+using Sora.Framework.Utilities;
 using Sora.Objects;
 
 namespace Sora
@@ -16,7 +20,7 @@ namespace Sora
         public static void CreateDefaultAchievements(SoraDbContextFactory factory)
         {
             if (factory.Get().Achievements.FirstOrDefault(x => x.Name == "oog") == null)
-                Achievements.NewAchievement(
+                DBAchievement.NewAchievement(
                     factory,
                     "oog",
                     "Oooooooooooooooog!",
@@ -37,30 +41,32 @@ namespace Sora
         /// <param name="newLB">New LeaderBoard</param>
         /// <returns>Obtained Achievements</returns>
         public static string ProcessAchievements(SoraDbContextFactory factory,
-            Users user,
-            Scores score,
-            CheesegullBeatmap map,
-            CheesegullBeatmapSet set,
-            LeaderboardStd oldLB,
-            LeaderboardStd newLB)
+            DBUser user,
+            Score score,
+            Beatmap map,
+            BeatmapSet set,
+            DBLeaderboard oldLB,
+            DBLeaderboard newLB
+            )
         {
-            var _l = new List<Achievements>();
+            var _l = new List<Achievement>();
 
+            /*
+            
             if ((int) newLB.PerformancePointsOsu == 4914)
             {
-                var ach = Achievements.GetAchievement(factory, "oog");
+                var ach = DBAchievement.GetAchievement(factory, "oog");
                 if (!user.AlreadyOptainedAchievement(ach))
                     _l.Add(ach);
             }
+            */
 
             // Insert custom achievements here. I'll implement a Plugin System later! but this will work for now.
 
 
             // END OF CUSTOM ACHIEVEMENTS
 
-            var retVal = "";
-            foreach (var ach in _l)
-                retVal += ach.ToOsuString() + "/";
+            var retVal = _l.Aggregate("", (current, ach) => current + ach.ToOsuString() + "/");
             retVal.TrimEnd('/');
 
             return retVal;

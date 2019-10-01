@@ -38,6 +38,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer
             foreach (var room in Lobby.Self.Rooms)
                 args.pr.Push(new MatchNew(room));
 
+            Lobby.Self.Leave(args.pr);
             Lobby.Self.Join(args.pr);
         }
     }

@@ -6,8 +6,10 @@ namespace Sora.Framework.Utilities
     {
         public static bool IsRanked(Mod mods)
         {
-            var r = (mods & Mod.Relax2) == 0;
-            
+            var r = (mods & Mod.Relax) == 0;
+
+            if ((mods & Mod.Relax2) != 0)
+                r = false;
             if ((mods & Mod.Cinema) != 0)
                 r = false;
             if ((mods & Mod.Autoplay) != 0)

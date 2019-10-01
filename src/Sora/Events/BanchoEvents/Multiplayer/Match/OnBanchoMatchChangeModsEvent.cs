@@ -27,7 +27,7 @@ using Sora.EventArgs.BanchoEventArgs;
 namespace Sora.Events.BanchoEvents.Multiplayer.Match
 {
     [EventClass]
-    public class OnMatchChangeModsEvent
+    public class OnBanchoMatchChangeModsEvent
     {
         [Event(EventType.BanchoMatchChangeMods)]
         public void OnBanchoMatchChangeMods(BanchoMatchChangeModsArgs args)
@@ -37,6 +37,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
                 return;
             
             args.pr.ActiveMatch.SetMods(args.mods, slot);
+            args.pr.ActiveMatch.Update();
         }
     }
 }

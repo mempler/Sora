@@ -5,7 +5,7 @@ namespace Sora.Framework.Objects
     public class Spectator : PresenceKeeper
     {
         public Presence Host { get; }
-        public int SpectatorCount => Values.Count;
+        public int SpectatorCount => Values.Count - 1;
         
         public Channel Channel { get; } = new Channel{Name = "#spectator"};
 

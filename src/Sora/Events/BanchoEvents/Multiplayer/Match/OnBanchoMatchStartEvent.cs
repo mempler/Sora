@@ -44,6 +44,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
             );
 
             args.pr.ActiveMatch.Start();
+            args.pr.ActiveMatch.Update();
         }
     }
 }

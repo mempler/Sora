@@ -36,6 +36,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
                 return;
 
             args.pr.ActiveMatch.SetPassword(args.room.Password);
+            args.pr.ActiveMatch.Update();
         }
     }
 }

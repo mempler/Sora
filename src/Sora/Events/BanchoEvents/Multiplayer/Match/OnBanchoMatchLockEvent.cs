@@ -40,6 +40,7 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
                 return;
 
             args.pr.ActiveMatch.LockSlot(args.pr.ActiveMatch.Slots[args.SlotId]);
+            args.pr.ActiveMatch.Update();
         }
     }
 }

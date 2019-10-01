@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sora.Database;
 
 namespace Sora.Database.Migrations
 {
     [DbContext(typeof(SoraDbContext))]
-    partial class SoraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190930090618_Scores")]
+    partial class Scores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,52 +56,6 @@ namespace Sora.Database.Migrations
                     b.ToTable("Friends");
                 });
 
-            modelBuilder.Entity("Sora.Database.Models.DBLeaderboard", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("OwnerId");
-
-                    b.Property<double>("PerformancePointsCtb");
-
-                    b.Property<double>("PerformancePointsMania");
-
-                    b.Property<double>("PerformancePointsOsu");
-
-                    b.Property<double>("PerformancePointsTaiko");
-
-                    b.Property<ulong>("PlayCountCtb");
-
-                    b.Property<ulong>("PlayCountMania");
-
-                    b.Property<ulong>("PlayCountOsu");
-
-                    b.Property<ulong>("PlayCountTaiko");
-
-                    b.Property<ulong>("RankedScoreCtb");
-
-                    b.Property<ulong>("RankedScoreMania");
-
-                    b.Property<ulong>("RankedScoreOsu");
-
-                    b.Property<ulong>("RankedScoreTaiko");
-
-                    b.Property<ulong>("TotalScoreCtb");
-
-                    b.Property<ulong>("TotalScoreMania");
-
-                    b.Property<ulong>("TotalScoreOsu");
-
-                    b.Property<ulong>("TotalScoreTaiko");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("Leaderboard");
-                });
-
             modelBuilder.Entity("Sora.Database.Models.DBScore", b =>
                 {
                     b.Property<int>("Id")
@@ -131,7 +87,7 @@ namespace Sora.Database.Migrations
 
                     b.Property<byte>("PlayMode");
 
-                    b.Property<string>("ReplayMd5");
+                    b.Property<int?>("ReplayId");
 
                     b.Property<int>("TotalScore");
 
@@ -180,23 +136,15 @@ namespace Sora.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Sora.Database.Models.DBUser", "User")
-                        .WithMany()
+                        .WithMany("Friends")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Sora.Database.Models.DBLeaderboard", b =>
-                {
-                    b.HasOne("Sora.Database.Models.DBUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Sora.Database.Models.DBScore", b =>
                 {
                     b.HasOne("Sora.Database.Models.DBUser", "ScoreOwner")
-                        .WithMany()
+                        .WithMany("Scores")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

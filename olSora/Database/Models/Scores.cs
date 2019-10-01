@@ -144,7 +144,7 @@ namespace Sora.Database.Models
             bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
             Mod mods = Mod.None, bool onlySelf = false)
         {
-CountryIds cid = 0;
+            CountryIds cid = 0;
 
             if (countryOnly)
                 cid = UserStats.GetUserStats(factory, user.Id).CountryId;

@@ -26,6 +26,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
 
+
+#nullable enable
+
 namespace Sora.Database.Models
 {
     [Table("Friends")]
@@ -39,29 +42,35 @@ namespace Sora.Database.Models
 
         [Required]
         public int UserId { get; set; }
+        
+        [Required]
+        [ForeignKey(nameof(UserId))]
+        public DBUser User { get; set; }
 
         [Required]
-        [UsedImplicitly]
         public int FriendId { get; set; }
+        
+        [Required]
+        [UsedImplicitly]
+        [ForeignKey(nameof(FriendId))]
+        public DBUser Friend { get; set; }
 
         public static IEnumerable<int> GetFriends(SoraDbContextFactory factory, int userId)
-        {
-            return factory.Get()
-                          .Friends
-                          .Where(t => t.UserId == userId)
-                          .Select(x => x.FriendId).ToList();
-        }
+            => factory.Get()
+                      .Friends
+                      .Where(t => t.UserId == userId)
+                      .Select(x => x.FriendId).ToList();
 
         public static async void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using (var db = factory.GetForWrite()) 
-                await db.Context.Friends.AddAsync(new DBFriend {UserId = userId, FriendId = friendId});
+            using var db = factory.GetForWrite();
+            await db.Context.Friends.AddAsync(new DBFriend {UserId = userId, FriendId = friendId});
         }
 
         public static void RemoveFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
-            using (var db = factory.GetForWrite())
-                db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
+            using var db = factory.GetForWrite();
+            db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
         }
     }
 }

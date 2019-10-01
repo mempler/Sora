@@ -49,7 +49,9 @@ namespace Sora.Database
         
         public DbSet<DBUser> Users { get; set; }
         public DbSet<DBFriend> Friends { get; set; }
-        
+        public DbSet<DBAchievement> Achievements { get; set; }
+        public DbSet<DBScore> Scores { get; set; }
+        public DbSet<DBLeaderboard> Leaderboard { get; set; }
 
         public void Migrate()
         {

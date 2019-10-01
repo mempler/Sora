@@ -34,6 +34,8 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         {
             if (args.pr.ActiveMatch?.GetSlotByUserId(args.pr.User.Id) != null)
                 args.pr.ActiveMatch.LoadComplete();
+
+            args.pr.ActiveMatch?.Update();
         }
     }
 }

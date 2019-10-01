@@ -1,8 +1,8 @@
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Sora.Helpers;
+using Microsoft.Extensions.Logging;
 
-namespace Jibril.Controllers
+namespace Sora.Controllers
 {
     [ApiController]
     [Route("/ss/{screenshot}")]
@@ -11,7 +11,6 @@ namespace Jibril.Controllers
         [HttpGet]
         public IActionResult Index(string screenshot)
         {
-            Logger.Info($"data/screenshots/{screenshot}");
             if (!Directory.Exists("data/screenshots"))
                 Directory.CreateDirectory("data/screenshots");
 

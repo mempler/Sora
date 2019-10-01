@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Sora.Framework.Utilities;
 
 namespace Sora
@@ -10,7 +12,7 @@ namespace Sora
     {
         private static readonly CancellationTokenSource cts = new CancellationTokenSource();
         
-        private static void Main()
+        private static async Task Main()
         {
             Console.CancelKeyPress += OnProcessExit;
             
@@ -39,7 +41,6 @@ namespace Sora
                 }
             };
             
-            Logger.Info(License.L);
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
                 Environment.Exit(0);
 
@@ -56,10 +57,18 @@ namespace Sora
                             cfg.Listen(ipAddress, scfg.Server.Port);
                         }
                     )
+                    .ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.AddProvider(new SoraLoggerProvider(new SoraLoggerConfiguration
+                        {
+                            LogLevel = LogLevel.Trace
+                        }));
+                    })
                     .UseStartup<StartUp>()
                     .Build();
             
-            _host.RunAsync(cts.Token).Wait();
+            await _host.RunAsync(cts.Token);
         }
 
         private static void OnProcessExit(object sender, System.EventArgs e)

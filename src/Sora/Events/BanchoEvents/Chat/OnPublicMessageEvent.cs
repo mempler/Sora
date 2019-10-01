@@ -25,6 +25,7 @@ using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
 using Sora.Framework.Objects;
 using Sora.Framework.Packets.Server;
+using Sora.Framework.Utilities;
 using Sora.Services;
 
 namespace Sora.Events.BanchoEvents.Chat
@@ -60,7 +61,9 @@ namespace Sora.Events.BanchoEvents.Chat
                 return;
             }
 
-            channel.Push(new SendIrcMessage(args.Message));
+            args.Message.Username = args.pr.User.UserName;
+
+            channel.Push(new SendIrcMessage(args.Message), args.pr);
         }
     }
 }

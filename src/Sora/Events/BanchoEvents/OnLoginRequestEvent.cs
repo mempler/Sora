@@ -24,6 +24,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Sora.Attributes;
 using Sora.Database;
 using Sora.Database.Models;
@@ -43,6 +44,7 @@ namespace Sora.Events.BanchoEvents
     public class OnLoginRequestEvent
     {
         private readonly Cache _cache;
+        private readonly ILogger<OnLoginRequestEvent> _logger;
         private readonly Config _cfg;
         private readonly ChannelService _cs;
         private readonly SoraDbContextFactory _factory;
@@ -52,13 +54,15 @@ namespace Sora.Events.BanchoEvents
             Config cfg,
             PresenceService pcs,
             ChannelService cs,
-            Cache cache)
+            Cache cache,
+            ILogger<OnLoginRequestEvent> logger)
         {
             _factory = factory;
             _cfg = cfg;
             _pcs = pcs;
             _cs = cs;
             _cache = cache;
+            _logger = logger;
         }
 
         [Event(EventType.BanchoLoginRequest)]
@@ -90,6 +94,9 @@ namespace Sora.Events.BanchoEvents
 
                     if (!dbUser.IsPassword(loginData.Password))
                     {
+                        _logger.Log(LogLevel.Warning, $"{LCOL.RED}{dbUser.UserName} " +
+                                                          $"{LCOL.PURPLE}({user.Id}) " +
+                                                          $"{LCOL.RED}Failed {LCOL.WHITE}to Login!");
                         LoginFailed(args.Writer);
                         return;
                     }
@@ -104,13 +111,19 @@ namespace Sora.Events.BanchoEvents
                     }
 
                     args.pr.User = user;
-
-                    //args.pr["LB_RX"] = LeaderboardRx.GetLeaderboard(_factory.Get(), args.pr.User);
-                    //args.pr["LB_STD"] = LeaderboardStd.GetLeaderboard(_factory.Get(), args.pr.User);
-
-                    //args.pr["LB_RANK"] = args.pr.Get<LeaderboardStd>("LB_STD").GetPosition(_factory.Get(), PlayMode.Osu);
-
+                    
                     args.pr.Info.TimeZone = loginData.Timezone;
+
+                    var lb = await DBLeaderboard.GetLeaderboardAsync(_factory, dbUser);
+
+                    args.pr["LB"] = lb;
+
+                    args.pr.Stats.TotalScore = lb.TotalScoreOsu;
+                    args.pr.Stats.RankedScore = lb.RankedScoreOsu;
+                    args.pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsOsu;
+                    args.pr.Stats.PlayCount = (uint) lb.PlayCountOsu;
+                    args.pr.Stats.Accuracy = (float) lb.GetAccuracy(_factory, PlayMode.Osu);
+                    args.pr.Stats.Position = lb.GetPosition(_factory, PlayMode.Osu);
 
                     //args.pr["BLOCK_NON_FRIENDS_DM"] = loginData.BlockNonFriendDMs;
                     
@@ -177,11 +190,10 @@ namespace Sora.Events.BanchoEvents
                 args.pr.WritePackets(args.Writer.BaseStream);
 
                 sw.Stop();
-                Logger.Info("MS: ", sw.Elapsed.TotalMilliseconds);
+                _logger.Log(LogLevel.Debug, "Login Time:\nMS: ", sw.Elapsed.TotalMilliseconds);
 
-                Logger.Info(
-                    "%#F94848%" + args.pr.User.UserName, "%#B342F4%(", args.pr.User.Id,
-                    "%#B342F4%) %#FFFFFF%has logged in!"
+                _logger.Log(LogLevel.Information,
+                    $"{LCOL.RED}{args.pr.User.UserName} {LCOL.PURPLE}({args.pr.User.Id}) {LCOL.WHITE}has logged in!"
                 );
             } catch (Exception ex)
             {

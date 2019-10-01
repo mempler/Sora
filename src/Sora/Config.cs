@@ -38,7 +38,5 @@ namespace Sora
         public CServer Server { get; set; }
         public CMySql MySql { get; set; }
         public CPisstaube Pisstaube { get; set; }
-
-        private static XmlSerializer _xmlSerializer = new XmlSerializer(typeof(Config));
     }
 }

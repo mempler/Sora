@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Sora.Framework.Objects;
 using Sora.Framework.Utilities;
@@ -14,13 +15,18 @@ namespace Sora.Framework
     
     public class PresenceKeeper : AsyncKeeper<Token, Presence>, IPresenceKeeper
     {
-        public void Push(IPacket packet)
+        public PresenceKeeper()
+        {
+            Values = new Dictionary<Token, Presence>(new TokenEqualityComparer());
+        }
+        
+        public void Push(IPacket packet, Presence skip = null)
         {
             try
             {
                 RWL.AcquireReaderLock(1000); // this is already too long but who cares ?
 
-                foreach (var pr in Values)
+                foreach (var pr in Values.Where(pr => pr.Value != skip))
                 {
                     pr.Value.Push(packet);
                 }

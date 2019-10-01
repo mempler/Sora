@@ -67,6 +67,12 @@ namespace Sora.Bot
 
             #endregion
 
+            factory.Get().Migrate();
+            
+            // this will fail if bot already exists!
+            DBUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Sora", "bot@gigamons.de",
+                Crypto.RandomString(32), false, PasswordVersion.V2, 100);
+            
             _dbUser = DBUser.GetDBUser(_factory, 100).Result;
         }
 
@@ -102,21 +108,21 @@ namespace Sora.Bot
 
         public Task RunAsync()
         {
-            _botPresence = new Presence(_dbUser.ToUser());
-
-            _botPresence.Status = new UserStatus
+            _botPresence = new Presence(_dbUser.ToUser())
             {
-                Status = Status.Watching,
-                Playmode = PlayMode.Osu,
-                BeatmapChecksum = "nothing",
-                BeatmapId = 0,
-                StatusText = "over you!",
-                CurrentMods = Mod.TouchDevice
+                Status = new UserStatus
+                {
+                    Status = Status.Watching,
+                    Playmode = PlayMode.Osu,
+                    BeatmapChecksum = "nothing",
+                    BeatmapId = 0,
+                    StatusText = "over you!",
+                    CurrentMods = Mod.TouchDevice
+                },
+                ["BOT"] = true,
+                ["IRC"] = true
             };
             
-            _botPresence["BOT"] = true;
-            _botPresence["IRC"] = true;
-
             _ps.Push(new PresenceSingle(_botPresence.User.Id));
             _ps.Push(new UserPresence(_botPresence));
             _ps.Push(new HandleUpdate(_botPresence));

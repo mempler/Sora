@@ -7,6 +7,19 @@ namespace Sora.Services
 {
     public class ChannelService : AsyncKeeper<string, Channel>
     {
+        public ChannelService()
+        {
+            Push("#osu", new Channel
+            {
+                Name = "#osu", Status = ChannelStatus.AutoJoin, Topic = "osu! default channel"
+            });
+
+            Push("#lobby", new Channel
+            {
+                Name = "#lobby", Topic = "osu! default channel"
+            });
+        }
+        
         public IEnumerable<Channel> ChannelsAutoJoin 
         {
             get

@@ -42,7 +42,7 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         {
             foreach (var id in args.userIds.Where(id => id != args.pr.User.Id))
             {
-                if (_ps.TryGet(id, out var opr))
+                if (!_ps.TryGet(id, out var opr))
                 {
                     args.pr.Push(new HandleUserQuit(new UserQuitStruct {UserId = id, ErrorState = ErrorStates.Ok}));
                     continue;

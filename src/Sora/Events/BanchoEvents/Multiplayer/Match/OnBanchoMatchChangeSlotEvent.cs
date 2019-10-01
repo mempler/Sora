@@ -32,18 +32,20 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         [Event(EventType.BanchoMatchChangeSlot)]
         public void OnBanchoMatchChangeSlot(BanchoMatchChangeSlotArgs args)
         {
-            if (args.pr.ActiveMatch == null ||
+            var match = args.pr.ActiveMatch;
+            if (match == null ||
                 args.SlotId > 16)
                 return;
             
-            var newSlot = args.pr.ActiveMatch.Slots[args.SlotId];
+            var newSlot = match.Slots[args.SlotId];
             if (newSlot.UserId != -1)
                 return;
 
-            var oldSlot = args.pr.ActiveMatch.GetSlotByUserId(args.pr.User.Id);
+            var oldSlot = match.GetSlotByUserId(args.pr.User.Id);
 
-            args.pr.ActiveMatch.SetSlot(newSlot, oldSlot);
-            args.pr.ActiveMatch.ClearSlot(oldSlot);
+            match.SetSlot(newSlot, oldSlot);
+            match.ClearSlot(oldSlot);
+            match.Update();
         }
     }
 }

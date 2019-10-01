@@ -16,7 +16,7 @@ namespace Sora.Framework.Utilities
         public int SetID;
         // ReSharper disable once CollectionNeverUpdated.Global
         public List<Beatmap> ChildrenBeatmaps;
-        public RankedStatus RankedStatus;
+        public Pisstaube.RankedStatus RankedStatus;
         public string ApprovedDate;
         public string LastUpdate;
         public string LastChecked;
@@ -224,7 +224,7 @@ namespace Sora.Framework.Utilities
 
             query = $"?{pm}amount={100}&offset={page * 100}&status={rankedStatus}&query={query}";
 
-            Logger.Debug($"{L_COL.YELLOW}Cheesegull {L_COL.WHITE}Query: {query}");
+            Logger.Debug($"{L_COL.YELLOW}Pisstaube {L_COL.WHITE}Query: {query}");
             SearchResult result;
 
             try
