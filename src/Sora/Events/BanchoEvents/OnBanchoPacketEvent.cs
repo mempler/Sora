@@ -374,6 +374,12 @@ namespace Sora.Events.BanchoEvents
                         new BanchoExitArgs {pr = args.pr, err = args.Data.ReadData<Exit>().ErrorState}
                     );
                     break;
+                case PacketId.ClientBeatmapInfoRequest:
+                    var data = args.Data.ReadData<BeatmapInfoRequest>();
+                    await _evmgr.RunEvent(
+                        EventType.BanchoBeatmapInfoRequest,
+                        new BanchoBeatmapInfoRequestArgs{pr = args.pr, FileNames = data.FileNames});
+                    break;
                 default:
                     Logger.Debug(
                         $"PacketId: {args.PacketId} Length: {args.Data.BaseStream.Length} Data: {Hex.ToHex(args.Data.ReadToEnd())}"

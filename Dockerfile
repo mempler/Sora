@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/core-nightly/sdk:3.0.100-preview6-alpine3.9
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0
 WORKDIR /app
 
-COPY Sora/*.csproj ./
+COPY Sora/src/Sora/*.csproj ./
 RUN dotnet restore
 
 COPY Sora/ ./
