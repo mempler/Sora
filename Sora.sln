@@ -33,8 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ripple.MergeTool", "src\Rip
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Tests", "Tests\Sora.Tests\Sora.Tests.csproj", "{1E418266-4377-447B-B720-E865D3DFA9A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.API", "plugins\Sora.API\Sora.API.csproj", "{FF162780-46EB-4696-8892-32B22C29A698}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework", "src\Sora.Framework\Sora.Framework.csproj", "{53B95480-0384-45BA-AB1A-91806C32E69A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora.Framework.Tests", "Tests\Sora.Framework.Tests\Sora.Framework.Tests.csproj", "{2ECC6B31-8306-4ABD-BD1E-66F82AB9DE7A}"
