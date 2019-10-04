@@ -61,7 +61,7 @@ namespace Sora.Controllers
 
                     if (string.IsNullOrEmpty(ip))
                         ip = "127.0.0.1";
-                            
+
                     await _evManager.RunEvent(EventType.BanchoLoginRequest, new BanchoLoginRequestArgs
                     {
                         Reader = mr,
@@ -80,6 +80,8 @@ namespace Sora.Controllers
                     while (true)
                         try
                         {
+                            pr["LAST_PONG"] = DateTime.Now;
+                            
                             if (Request.ContentLength - body.Position < 7)
                                 break; // Dont handle any invalid packets! (less then bytelength of 7)
 

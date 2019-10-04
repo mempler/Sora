@@ -55,24 +55,14 @@ namespace Sora
         {
             this.beatmap = beatmap;
 
-            switch ((PlayMode) beatmap.BeatmapInfo.RulesetID)
+            beatmap.BeatmapInfo.Ruleset = (PlayMode) beatmap.BeatmapInfo.RulesetID switch
             {
-                case PlayMode.Osu:
-                    beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
-                    break;
-                case PlayMode.Taiko:
-                    beatmap.BeatmapInfo.Ruleset = new CatchRuleset().RulesetInfo;
-                    break;
-                case PlayMode.Ctb:
-                    beatmap.BeatmapInfo.Ruleset = new TaikoRuleset().RulesetInfo;
-                    break;
-                case PlayMode.Mania:
-                    beatmap.BeatmapInfo.Ruleset = new ManiaRuleset().RulesetInfo;
-                    break;
-                default:
-                    beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
-                    break;
-            }
+                PlayMode.Osu => new OsuRuleset().RulesetInfo,
+                PlayMode.Taiko => new CatchRuleset().RulesetInfo,
+                PlayMode.Ctb => new TaikoRuleset().RulesetInfo,
+                PlayMode.Mania => new ManiaRuleset().RulesetInfo,
+                _ => new OsuRuleset().RulesetInfo
+            };
 
             if (beatmapId.HasValue)
                 beatmap.BeatmapInfo.OnlineBeatmapID = beatmapId;
@@ -235,8 +225,7 @@ namespace Sora
         /// <returns>Performance Points</returns>
         public static double Compute(DBScore dbScore, string replayPath = null, string beatmapPath = null)
         {
-            ProcessorWorkingBeatmap workingBeatmap;
-            workingBeatmap = beatmapPath == null ?
+            var workingBeatmap = beatmapPath == null ?
                 new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5) :
                 new ProcessorWorkingBeatmap(beatmapPath);
             

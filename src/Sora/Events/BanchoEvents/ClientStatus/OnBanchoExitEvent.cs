@@ -49,6 +49,8 @@ namespace Sora.Events.BanchoEvents.ClientStatus
             );
 
             _ps.Push(new HandleUserQuit(new UserQuitStruct {UserId = args.pr.User.Id, ErrorState = args.err}));
+            
+            _ps.Pop(args.pr.Token);
         }
     }
 }

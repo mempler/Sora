@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sora.Database;
 using Sora.Framework.Allocation;
 using Sora.Framework.Utilities;
@@ -31,7 +34,10 @@ namespace Sora
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore();
+            services.AddMvcCore().AddJsonFormatters(jsonOptions =>
+                {
+                    jsonOptions.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                });
             services.AddMemoryCache();
             
             var defaultConfig = new Config
@@ -98,6 +104,7 @@ namespace Sora
             EventManager ev,
             ConsoleCommandService css,
             Bot.Sora sora,
+            PresenceService ps,
             PluginService plugs)
         {
             logger.Log(LogLevel.Information, License.L);
@@ -120,6 +127,8 @@ namespace Sora
             
             css.Start();
             sora.RunAsync();
+            
+            ps.BeginTimeoutDetector();
 
             app.UseMvc(
                 routes => routes.MapRoute(

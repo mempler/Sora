@@ -20,6 +20,7 @@
 
 #endregion
 
+using System;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -33,6 +34,8 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoPong)]
         public void OnPong(BanchoPongArgs args)
         {
+            args.pr["LAST_PONG"] = DateTime.Now;
+                
             if (args.pr.Spectator == null ||
                 args.pr.Spectator?.SpectatorCount <= 0)
                 return;

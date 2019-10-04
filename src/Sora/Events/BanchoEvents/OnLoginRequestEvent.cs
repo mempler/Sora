@@ -195,6 +195,8 @@ namespace Sora.Events.BanchoEvents
                 _logger.Log(LogLevel.Information,
                     $"{LCOL.RED}{args.pr.User.UserName} {LCOL.PURPLE}({args.pr.User.Id}) {LCOL.WHITE}has logged in!"
                 );
+
+                args.pr["LAST_PONG"] = DateTime.Now;
             } catch (Exception ex)
             {
                 Logger.Err(ex);

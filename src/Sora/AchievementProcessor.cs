@@ -52,7 +52,6 @@ namespace Sora
             var _l = new List<Achievement>();
 
             /*
-            
             if ((int) newLB.PerformancePointsOsu == 4914)
             {
                 var ach = DBAchievement.GetAchievement(factory, "oog");
