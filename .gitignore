@@ -270,6 +270,8 @@ geoip/*
 geoip/
 geoip
 data/
-Plugins/
+Plugins/*.dll
 coverage.xml
 /src/Sora/config.xml
+
+src/Sora/plugins/
