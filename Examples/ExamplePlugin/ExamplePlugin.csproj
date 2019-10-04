@@ -4,9 +4,6 @@
     <LangVersion>8</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="plugin.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\olSora\olSora.csproj" />
+    <ProjectReference Include="..\..\src\Sora\Sora.csproj" />
   </ItemGroup>
 </Project>

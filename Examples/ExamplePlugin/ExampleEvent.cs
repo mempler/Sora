@@ -18,10 +18,12 @@
 */
 #endregion
 
+
 using Sora.Attributes;
 using Sora.Enums;
-using Sora.EventArgs;
-using Sora.Packets.Server;
+using Sora.EventArgs.BanchoEventArgs;
+using Sora.Framework.Enums;
+using Sora.Framework.Packets.Server;
 
 namespace ExamplePlugin
 {

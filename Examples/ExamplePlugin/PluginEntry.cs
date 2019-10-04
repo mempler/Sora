@@ -18,21 +18,29 @@
 */
 #endregion
 
+using Microsoft.Extensions.Logging;
 using Sora;
-using Sora.Helpers;
+using Sora.Framework.Utilities;
 
 namespace ExamplePlugin
 {
     public class PluginEntry : Plugin
     {
+        private readonly ILogger<PluginEntry> _logger;
+
+        public PluginEntry(ILogger<PluginEntry> logger)
+        {
+            _logger = logger;
+        }
+        
         public override void OnEnable()
         {
-            Logger.Info("Startup ExamplePlugin");
+            _logger.LogInformation("Startup ExamplePlugin");
         }
 
         public override void OnDisable()
         {
-            Logger.Info("Shutdown ExamplePlugin");
+            _logger.LogInformation("Shutdown ExamplePlugin");
         }
     }
 }
