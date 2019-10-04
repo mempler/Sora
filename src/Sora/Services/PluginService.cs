@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.Logging;
 using Sora.Framework.Utilities;
 
 namespace Sora.Services
@@ -43,21 +45,36 @@ namespace Sora.Services
             = new Dictionary<Assembly, IPlugin>();
 
         private readonly EventManager _ev;
+        private readonly ApplicationPartManager _appPartManager;
+        private readonly ILogger<PluginService> _logger;
 
         private readonly Dictionary<string, Assembly> _loadedPlugins
             = new Dictionary<string, Assembly>();
 
-        public PluginService(EventManager ev) => _ev = ev;
+        public PluginService(EventManager ev, ApplicationPartManager appPartManager,
+            ILogger<PluginService> logger)
+        {
+            _ev = ev;
+            _appPartManager = appPartManager;
+            _logger = logger;
+        }
 
         public bool LoadPlugin(string filename)
         {
             try
             {
                 var asm = _context.LoadFromAssemblyPath(filename);
+                if (asm == null) return false;
+                
                 _loadedPlugins.Add(filename, asm);
                 _ev.LoadAssembly(asm);
-                Logger.Info("Loaded new Assembly", asm);
+                _logger.LogInformation("Loaded new Assembly {asm}", asm);
+
+                // Register ASP.NET Core Controllers
+                _appPartManager.ApplicationParts.Add(new AssemblyPart(asm));
+                
                 GetEntryPoint(asm)?.OnEnable();
+                
                 return true;
             } catch (Exception ex)
             {
@@ -101,8 +118,6 @@ namespace Sora.Services
 
         public bool UnloadPlugins()
         {
-            throw new NotSupportedException(); // not yet
-            /*
             try
             {
                 _context.Unload();
@@ -112,7 +127,6 @@ namespace Sora.Services
                 Logger.Err(ex);
                 return false;
             }
-            */
         }
     }
 }
