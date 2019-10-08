@@ -59,7 +59,7 @@ namespace Sora.Services
             _logger = logger;
         }
 
-        public bool LoadPlugin(string filename)
+        public bool LoadPlugin(string filename, bool isDep = false)
         {
             try
             {
@@ -73,7 +73,8 @@ namespace Sora.Services
                 // Register ASP.NET Core Controllers
                 _appPartManager.ApplicationParts.Add(new AssemblyPart(asm));
                 
-                GetEntryPoint(asm)?.OnEnable();
+                if (!isDep)
+                    GetEntryPoint(asm)?.OnEnable();
                 
                 return true;
             } catch (Exception ex)

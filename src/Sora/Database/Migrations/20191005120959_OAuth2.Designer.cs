@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sora.Database;
 
 namespace Sora.Database.Migrations
 {
     [DbContext(typeof(SoraDbContext))]
-    partial class SoraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191005120959_OAuth2")]
+    partial class OAuth2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,12 +185,6 @@ namespace Sora.Database.Migrations
 
                     b.Property<string>("Permissions")
                         .IsRequired();
-
-                    b.Property<int>("Status");
-
-                    b.Property<string>("StatusReason");
-
-                    b.Property<DateTime?>("StatusUntil");
 
                     b.Property<string>("UserName")
                         .IsRequired();

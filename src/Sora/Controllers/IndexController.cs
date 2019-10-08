@@ -1,7 +1,12 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
 using Sora.Framework.Enums;
@@ -11,17 +16,20 @@ using Sora.Services;
 
 namespace Sora.Controllers
 {
+    [Authorize]
     [Route("/")]
     [ApiController]
     public class IndexController : Controller
     {
         private readonly EventManager _evManager;
         private readonly PresenceService _presenceService;
+        private readonly Config _cfg;
 
-        public IndexController(EventManager evManager, PresenceService presenceService)
+        public IndexController(EventManager evManager, PresenceService presenceService, Config cfg)
         {
             _evManager = evManager;
             _presenceService = presenceService;
+            _cfg = cfg;
         }
 
         private async Task<ActionResult> RetOut(Stream stream)
@@ -35,6 +43,7 @@ namespace Sora.Controllers
             return File(m, "application/octet-stream");
         }
         
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> IndexPost([FromHeader(Name = "osu-token")] string clientToken = null)
         {

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Sora.Framework;
 using Sora.Framework.Objects;
@@ -19,6 +21,15 @@ namespace Sora.Database.Models
         V0, // Md5 (never use this!)
         V1, // Md5 + BCrypt
         V2  // Md5 + SCrypt
+    }
+
+    public enum UserStatusFlags
+    {
+        None = 0,
+        Suspended = 1<<1, /* Disallow Login with a Reason! */
+        Restricted = 1<<2,
+        Silenced = 1<<3,
+        Donator = 1<<4
     }
     
     [Table("Users")]
@@ -47,6 +58,12 @@ namespace Sora.Database.Models
         public string Permissions { get; set; }
         
         public string? Achievements { get; set; }
+        
+        [Required]
+        [DefaultValue(UserStatusFlags.None)]
+        public UserStatusFlags Status { get; set; }
+        public DateTime? StatusUntil { get; set; }
+        public string? StatusReason { get; set; }
 
         public static Task<DBUser> GetDBUser(SoraDbContextFactory factory, int userId)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.Id == userId);

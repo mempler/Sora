@@ -275,3 +275,9 @@ coverage.xml
 /src/Sora/config.xml
 
 src/Sora/plugins/
+
+src/Sora/mailgun.json
+
+src/Sora/email.json
+
+src/Sora/recaptcha.json

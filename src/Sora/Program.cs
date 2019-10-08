@@ -38,7 +38,8 @@ namespace Sora
                 Pisstaube = new CPisstaube
                 {
                     URI = "https://pisstau.be"
-                }
+                },
+                ESC = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
             };
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))

@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Sora.Database;
+using Sora.Database.Models;
 using Sora.Framework.Allocation;
 using Sora.Framework.Utilities;
 using Sora.Services;
@@ -34,10 +40,11 @@ namespace Sora
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore().AddJsonFormatters(jsonOptions =>
-                {
-                    jsonOptions.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-                });
+            services.AddMvcCore(options =>
+            {
+                options.EnableEndpointRouting = false;
+            }).AddJsonOptions(jsonOptions => {});
+            
             services.AddMemoryCache();
             
             var defaultConfig = new Config
@@ -62,7 +69,8 @@ namespace Sora
                 Pisstaube = new CPisstaube
                 {
                     URI = "https://pisstau.be"
-                }
+                },
+                ESC = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
             };
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
@@ -75,16 +83,51 @@ namespace Sora
                     .AddSingleton<IServerConfig>(scfg)
                     .AddSingleton<Pisstaube>()
                     .AddSingleton<SoraDbContextFactory>()
-                    .AddSingleton<PluginService>()
                     .AddSingleton<PresenceService>()
                     .AddSingleton<Cache>()
                     .AddSingleton<ChannelService>()
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<Bot.Sora>()
                     .AddSingleton<IRCServer>()
-                    .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}));
+                    .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}))
+                    .AddSingleton<PluginService>();
 
             services.AddLogging();
+
+            services.AddDbContext<SoraDbContext>();
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var factory = context.HttpContext.RequestServices.GetRequiredService<SoraDbContextFactory>();
+                        if (await DBUser.GetDBUser(factory, context.Principal.Identity.Name) == null)
+                        {
+                            // return unauthorized if user no longer exists
+                            context.Fail("Unauthorized");
+                        }
+                        
+                        context.Success();
+                    }
+                };
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.ESC)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.ESC)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
             
             services.Configure<FormOptions>(
                 x =>
@@ -97,6 +140,18 @@ namespace Sora
                     x.MultipartHeadersLengthLimit = int.MaxValue;
                 }
             );
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                               .AllowAnyMethod()
+                               .AllowCredentials()
+                               .SetIsOriginAllowed((host) => true)
+                               .AllowAnyHeader());
+            });
+
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
         public void Configure(IApplicationBuilder app, IServiceProvider provider, ILogger<StartUp> logger,
@@ -108,10 +163,13 @@ namespace Sora
             PluginService plugs)
         {
             logger.Log(LogLevel.Information, License.L);
-
+            app.UseCors("CorsPolicy");
+            
             app.UseMiddleware<ExceptionMiddleware>();
             if (_env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+            
+            app.UseAuthentication();
             
             factory.Get().Migrate();
 
@@ -119,7 +177,13 @@ namespace Sora
 
             if (!Directory.Exists("plugins"))
                 Directory.CreateDirectory("plugins");
+            
+            if (!Directory.Exists("plugins/runtime"))
+                Directory.CreateDirectory("plugins/runtime");
 
+            foreach (var dep in Directory.GetFiles("plugins/runtime")) // Dependencies have a higher priority!
+                plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + dep, true);
+            
             foreach (var plug in Directory.GetFiles("plugins"))
                 plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + plug);
 
@@ -136,6 +200,19 @@ namespace Sora
                     "{controller=Home}/{action=Index}/{id?}"
                 )
             );
+
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (_env.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer("start");
+                }
+            });
         }
     }
 
