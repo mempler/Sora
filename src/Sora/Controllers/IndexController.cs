@@ -112,13 +112,15 @@ namespace Sora.Controllers
                         }
                     try
                     {
+                        await using var m = new MemoryStream();
                         if (Response.Body.CanWrite)
-                            pr.WritePackets(Response.Body);
+                            pr.WritePackets(m);
                                 
-                        return await RetOut(mw.BaseStream);
+                        return await RetOut(m);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Logger.Err(ex);
                         // Ignored because it may throw an exception.
                     }
                 }

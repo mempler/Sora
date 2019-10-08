@@ -54,23 +54,6 @@ namespace Sora.API
             });
 
             Email.DefaultSender = _sender;
-
-            /* DEBUG CODE
-            var em = Email
-                     .From("no-reply@gigamons.de")
-                     .To("me@mempler.de")
-                     .Subject("Email Confirmation")
-                     .Body("Click YE!");
-
-            var r = em.SendAsync().Result;
-            
-            _logger.LogInformation("Success: {s} mId: {m}", r.Successful, r.MessageId);
-
-            foreach (var m in r.ErrorMessages)
-            {
-                _logger.LogInformation("Error Message: {m}", m);
-            }
-            */
         }
         
         public override void OnEnable()

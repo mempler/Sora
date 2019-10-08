@@ -150,8 +150,6 @@ namespace Sora
                                .SetIsOriginAllowed((host) => true)
                                .AllowAnyHeader());
             });
-
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
         public void Configure(IApplicationBuilder app, IServiceProvider provider, ILogger<StartUp> logger,
@@ -200,19 +198,6 @@ namespace Sora
                     "{controller=Home}/{action=Index}/{id?}"
                 )
             );
-
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (_env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer("start");
-                }
-            });
         }
     }
 

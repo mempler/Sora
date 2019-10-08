@@ -20,6 +20,7 @@
 
 #endregion
 
+using System.Linq;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -43,14 +44,9 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         public async void OnBanchoMatchCreate(BanchoMatchCreateArgs args)
         {
             args.room.Password = args.room.Password.Replace(" ", "_");
-
-            Logger.Info(
-                "%#F94848%" + args.pr.User.UserName,
-                "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
-                "%#FFFFFF%has created a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.room.Name,
-                "%#B342F4%(", args.room.MatchId, "%#B342F4%)"
-            );
-
+            
+            Lobby.Self.Push(args.room);
+            
             if (args.room.Join(args.pr, args.room.Password))
                 args.pr.Push(new MatchJoinSuccess(args.room));
             else
@@ -58,8 +54,13 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
 
             args.room.Update();
 
-            Lobby.Self.Push(args.room);
-
+            Logger.Info(
+                "%#F94848%" + args.pr.User.UserName,
+                "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
+                "%#FFFFFF%has created a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.room.Name,
+                "%#B342F4%(", args.room.MatchId, "%#B342F4%)"
+            );
+            
             await _ev.RunEvent(
                 EventType.BanchoChannelJoin, new BanchoChannelJoinArgs {pr = args.pr, ChannelName = "#multiplayer"}
             );

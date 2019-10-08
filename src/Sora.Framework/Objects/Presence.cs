@@ -123,9 +123,6 @@ namespace Sora.Framework.Objects
         
         public void Push(IPacket packet, Presence skip = null)
         {
-            if (this["IRC"] != null && (bool) this["IRC"])
-                return;
-            
             try
             {
                 _rwl.AcquireWriterLock(50);
