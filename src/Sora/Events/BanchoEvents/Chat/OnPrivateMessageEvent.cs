@@ -26,6 +26,7 @@ using Sora.EventArgs.BanchoEventArgs;
 using Sora.Framework.Packets.Server;
 using Sora.Framework.Utilities;
 using Sora.Services;
+using Sora.Utilities;
 
 namespace Sora.Events.BanchoEvents.Chat
 {
@@ -33,10 +34,12 @@ namespace Sora.Events.BanchoEvents.Chat
     public class OnPrivateMessageEvent
     {
         private readonly PresenceService _ps;
+        private readonly ChatFilter _filter;
 
-        public OnPrivateMessageEvent(PresenceService ps)
+        public OnPrivateMessageEvent(PresenceService ps, ChatFilter filter)
         {
             _ps = ps;
+            _filter = filter;
         }
 
         [Event(EventType.BanchoSendIrcMessagePrivate)]
@@ -59,7 +62,7 @@ namespace Sora.Events.BanchoEvents.Chat
             var newMsg = new MessageStruct
             {
                 Username = args.pr.User.UserName,
-                Message = args.Message.Message,
+                Message = _filter.Filter(args.Message.Message),
                 ChannelTarget = args.pr.User.UserName,
                 SenderId = args.pr.User.Id
             };

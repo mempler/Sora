@@ -281,3 +281,5 @@ src/Sora/mailgun.json
 src/Sora/email.json
 
 src/Sora/recaptcha.json
+
+src/Sora/filters.txt

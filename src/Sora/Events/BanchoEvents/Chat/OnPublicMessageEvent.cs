@@ -27,6 +27,7 @@ using Sora.Framework.Objects;
 using Sora.Framework.Packets.Server;
 using Sora.Framework.Utilities;
 using Sora.Services;
+using Sora.Utilities;
 
 namespace Sora.Events.BanchoEvents.Chat
 {
@@ -34,8 +35,13 @@ namespace Sora.Events.BanchoEvents.Chat
     public class OnPublicMessageEvent
     {
         private readonly ChannelService _cs;
+        private readonly ChatFilter _filter;
 
-        public OnPublicMessageEvent(ChannelService cs) => _cs = cs;
+        public OnPublicMessageEvent(ChannelService cs, ChatFilter filter)
+        {
+            _cs = cs;
+            _filter = filter;
+        }
 
         [Event(EventType.BanchoSendIrcMessage)]
         public void OnPublicMessage(BanchoSendIRCMessageArgs args)
@@ -62,6 +68,7 @@ namespace Sora.Events.BanchoEvents.Chat
             }
 
             args.Message.Username = args.pr.User.UserName;
+            args.Message.Message = _filter.Filter(args.Message.Message);
 
             channel.Push(new SendIrcMessage(args.Message), args.pr);
         }

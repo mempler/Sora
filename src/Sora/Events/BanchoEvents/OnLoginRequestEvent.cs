@@ -112,7 +112,7 @@ namespace Sora.Events.BanchoEvents
 
                     args.pr.User = user;
                     
-                    args.pr.Info.TimeZone = loginData.Timezone;
+                    args.pr.Info.TimeZone = (byte) loginData.Timezone;
 
                     var lb = await DBLeaderboard.GetLeaderboardAsync(_factory, dbUser);
 

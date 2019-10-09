@@ -23,6 +23,7 @@ using Sora.Database.Models;
 using Sora.Framework.Allocation;
 using Sora.Framework.Utilities;
 using Sora.Services;
+using Sora.Utilities;
 
 namespace Sora
 {
@@ -89,6 +90,7 @@ namespace Sora
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<Bot.Sora>()
                     .AddSingleton<IRCServer>()
+                    .AddSingleton<ChatFilter>()
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}))
                     .AddSingleton<PluginService>();
 
