@@ -23,7 +23,7 @@
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
-using Sora.Framework.Packets.Client;
+using Sora.Framework.Packets.Server;
 
 namespace Sora.Events.BanchoEvents.Spectator
 {
@@ -33,7 +33,10 @@ namespace Sora.Events.BanchoEvents.Spectator
         [Event(EventType.BanchoBroadcastFrames)]
         public void OnBroadcastFrames(BanchoBroadcastFramesArgs args)
         {
-            args.pr.Spectator?.Push(new SpectatorFrames{ Frames = args.frames });
+            if (args.pr.Spectator?.Host != args.pr)
+                return;
+            
+            args.pr.Spectator?.Push(new SpectatorFrames(args.frames));
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Sora.Events.BanchoEvents.Spectator
         {
             if (args.pr?.Spectator == null)
                 return;
+            
             var opr = args.pr.Spectator.Host;
 
             opr.Push(new FellowSpectatorLeft(args.pr.User.Id));

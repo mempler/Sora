@@ -25,8 +25,9 @@ namespace Sora.Framework.Objects
 
             if (sender == Host)
                 return;
-            
-            Push(new SpectatorJoined(sender.User.Id));
+
+            Channel.Join(sender);
+            Host.Push(new SpectatorJoined(sender.User.Id));
             Push(new FellowSpectatorJoined(sender.User.Id));
         }
 
@@ -36,6 +37,8 @@ namespace Sora.Framework.Objects
 
             if (sender == Host)
                 return;
+            
+            Channel.Leave(sender);
             
             Push(new SpectatorLeft(sender.User.Id));
             Push(new FellowSpectatorLeft(sender.User.Id));

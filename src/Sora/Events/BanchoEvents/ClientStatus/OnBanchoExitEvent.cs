@@ -47,9 +47,12 @@ namespace Sora.Events.BanchoEvents.ClientStatus
                 "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
                 "%#FFFFFF%has Disconnected!"
             );
+            
+            args.pr.Spectator?.Leave(args.pr);
+            args.pr.ActiveMatch?.Leave(args.pr);
 
             _ps.Push(new HandleUserQuit(new UserQuitStruct {UserId = args.pr.User.Id, ErrorState = args.err}));
-            
+
             _ps.Pop(args.pr.Token);
         }
     }

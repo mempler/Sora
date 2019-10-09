@@ -51,10 +51,7 @@ namespace Sora.Events.BanchoEvents.Spectator
             args.pr.Spectator = opr.Spectator;
 
             opr.Spectator.Join(args.pr);
-            opr.Spectator.Channel.Join(args.pr);
             args.pr.Push(new ChannelJoinSuccess(opr.Spectator.Channel));
-
-            opr.Spectator.Push(new FellowSpectatorJoined(args.pr.User.Id));
         }
     }
 }

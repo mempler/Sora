@@ -58,9 +58,10 @@ namespace Sora.Events.BanchoEvents.Chat
             
             var newMsg = new MessageStruct
             {
-                Username = args.Message.Username,
+                Username = args.pr.User.UserName,
                 Message = args.Message.Message,
-                ChannelTarget = args.Message.Username
+                ChannelTarget = args.pr.User.UserName,
+                SenderId = args.pr.User.Id
             };
             
             target.Push(new SendIrcMessage(newMsg));

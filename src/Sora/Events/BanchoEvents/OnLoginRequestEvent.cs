@@ -79,7 +79,7 @@ namespace Sora.Events.BanchoEvents
                     Exception(args.Writer);
                     return;
                 }
-
+                
                 var cacheKey = $"sora:user:{loginData.GetHashCode()}";
 
                 if (!_cache.TryGet(cacheKey, out Presence presence))
@@ -134,6 +134,12 @@ namespace Sora.Events.BanchoEvents
                     var t = args.pr.Token;
                     args.pr = presence;
                     args.pr.Token = t;
+                }
+
+                if (_pcs.TryGet(args.pr.User.Id, out var oldPresence)) {
+                    oldPresence.ActiveMatch?.Leave(args.pr);
+                    oldPresence.Spectator?.Leave(args.pr);
+                    _pcs.Leave(oldPresence);
                 }
 
                 _pcs.Join(args.pr);

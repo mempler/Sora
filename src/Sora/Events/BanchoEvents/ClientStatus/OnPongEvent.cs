@@ -36,12 +36,12 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         {
             args.pr["LAST_PONG"] = DateTime.Now;
                 
-            if (args.pr.Spectator == null ||
+            if ((args.pr.Spectator == null ||
+                args.pr.Spectator?.Host != args.pr) ||
                 args.pr.Spectator?.SpectatorCount <= 0)
                 return;
             
-            args.pr.Push(new HandleUpdate(args.pr));
-            args.pr.Spectator.Push(new HandleUpdate(args.pr));
+            args.pr.Spectator.Push(new HandleUpdate(args.pr.Spectator.Host));
         }
     }
 }
