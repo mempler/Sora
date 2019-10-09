@@ -56,7 +56,7 @@ namespace Sora.Framework.Utilities
                 MaxCombo = short.Parse(x[10]),
                 Mods = (Mod) uint.Parse(x[13]),
                 PlayMode = (PlayMode) byte.Parse(x[15]),
-                Date = DateTime.UtcNow
+                Date = DateTime.Now
             };
 
             return (bool.Parse(x[14]), score);

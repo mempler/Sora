@@ -449,13 +449,35 @@ namespace Sora.Controllers
             );
 
             pr["LB"] = newlb;
-
-            pr.Stats.TotalScore = newlb.TotalScoreOsu;
-            pr.Stats.RankedScore = newlb.RankedScoreOsu;
-            pr.Stats.PerformancePoints = (ushort) newlb.PerformancePointsOsu;
-            pr.Stats.PlayCount = (uint) newlb.PlayCountOsu;
-            pr.Stats.Accuracy = (float) newlb.GetAccuracy(_factory, PlayMode.Osu);
-            pr.Stats.Position = newlb.GetPosition(_factory, PlayMode.Osu);
+            pr.Stats.Accuracy = (float) newlb.GetAccuracy(_factory, score.PlayMode);
+            pr.Stats.Position = newlb.GetPosition(_factory, score.PlayMode);
+            switch (score.PlayMode)
+            {
+                case PlayMode.Osu:
+                    pr.Stats.PerformancePoints = (ushort) newlb.PerformancePointsOsu;
+                    pr.Stats.TotalScore = (ushort) newlb.TotalScoreOsu;
+                    pr.Stats.RankedScore = (ushort) newlb.RankedScoreOsu;
+                    pr.Stats.PlayCount = (ushort) newlb.PlayCountOsu;
+                    break;
+                case PlayMode.Taiko:
+                    pr.Stats.PerformancePoints = (ushort) newlb.PerformancePointsTaiko;
+                    pr.Stats.TotalScore = (ushort) newlb.TotalScoreTaiko;
+                    pr.Stats.RankedScore = (ushort) newlb.RankedScoreTaiko;
+                    pr.Stats.PlayCount = (ushort) newlb.PlayCountTaiko;
+                    break;
+                case PlayMode.Ctb:
+                    pr.Stats.PerformancePoints = (ushort) newlb.PerformancePointsCtb;
+                    pr.Stats.TotalScore = (ushort) newlb.TotalScoreCtb;
+                    pr.Stats.RankedScore = (ushort) newlb.RankedScoreCtb;
+                    pr.Stats.PlayCount = (ushort) newlb.PlayCountCtb;
+                    break;
+                case PlayMode.Mania:
+                    pr.Stats.PerformancePoints = (ushort) newlb.PerformancePointsMania;
+                    pr.Stats.TotalScore = (ushort) newlb.TotalScoreMania;
+                    pr.Stats.RankedScore = (ushort) newlb.RankedScoreMania;
+                    pr.Stats.PlayCount = (ushort) newlb.PlayCountMania;
+                    break;
+            }
             
             // Send to other People
             await _ev.RunEvent(
@@ -537,8 +559,8 @@ namespace Sora.Controllers
                     MaxCombo = s.MaxCombo,
                     PlayMode = s.PlayMode,
                     TotalScore = s.TotalScore,
-                    UserId = dbUser.Id,
-                    UserName = dbUser.UserName,
+                    UserId = s.UserId,
+                    UserName = s.ScoreOwner.UserName,
                 }).ToList();
 
                 // Fetch the correct position for sScore

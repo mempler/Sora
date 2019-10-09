@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Graphics.Containers;
 using Sora.Framework.Enums;
 using Sora.Framework.Objects.Scores;
 using Sora.Framework.Utilities;
@@ -113,6 +114,8 @@ namespace Sora.Database.Models
                                .Where(score => !modOnly || score.Mods == mods)
                                .Where(score => !onlySelf || score.UserId == user.Id)
                                .OrderByDescending(score => score.TotalScore)
+                               .ThenByDescending(s => s.Accuracy) // Order by TotalScore and Accuracy. Score V2 Support
+                               .Include(x => x.ScoreOwner)
                                .GroupBy(s => s.UserId)
                                .Take(50);
 
@@ -141,7 +144,7 @@ namespace Sora.Database.Models
                                              x.UserId == NewerScore.UserId &&
                                              x.PlayMode == NewerScore.PlayMode &&
                                              x.TotalScore >= NewerScore.TotalScore)
-                    .OrderByDescending(x => x.TotalScore)
+                    .OrderByDescending(x => x.TotalScore).ThenByDescending(s => s.Accuracy)
                     .FirstOrDefaultAsync();
 
         public static void InsertScore(SoraDbContextFactory factory, DBScore score)

@@ -21,6 +21,7 @@
 #endregion
 
 using System.IO;
+using System.Linq;
 
 namespace Sora.Framework.Utilities
 {
@@ -31,13 +32,14 @@ namespace Sora.Framework.Utilities
             var l = new Login();
             using (var s = new StreamReader(reader.BaseStream))
             {
+                
                 l.Username = s.ReadLine();
                 l.Password = s.ReadLine();
                 var otherData = s.ReadLine()?.Split('|');
                 if (otherData == null || otherData.Length < 5)
                     return null;
                 l.Build = otherData[0];
-                l.Timezone = byte.Parse(otherData[1]);
+                l.Timezone = sbyte.Parse(otherData[1]);
                 l.DisplayLocation = otherData[2] == "1";
                 l.SecurityHash = otherData[3];
                 l.BlockNonFriendDMs = otherData[4] == "1";
@@ -54,7 +56,7 @@ namespace Sora.Framework.Utilities
         public bool DisplayLocation;
         public string Password;
         public string SecurityHash;
-        public byte Timezone;
+        public sbyte Timezone;
         public string Username;
 
         public override int GetHashCode()
