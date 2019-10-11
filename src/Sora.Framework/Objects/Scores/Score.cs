@@ -80,8 +80,8 @@ namespace Sora.Framework.Objects.Scores
                    $"{Count100}|" +
                    $"{Count300}|" +
                    $"{CountMiss}|" +
-                   $"{CountGeki}|" +
                    $"{CountKatu}|" +
+                   $"{CountGeki}|" +
                    $"{MaxCombo >= (Count50 + Count100 + Count300 + CountMiss)}|" +
                    $"{(short) Mods}|" +
                    $"{UserId}|" +

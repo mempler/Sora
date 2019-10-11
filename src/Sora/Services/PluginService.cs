@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using Sora.Framework.Utilities;
@@ -59,7 +60,7 @@ namespace Sora.Services
             _logger = logger;
         }
 
-        public bool LoadPlugin(string filename, bool isDep = false)
+        public bool LoadPlugin(IApplicationBuilder app, string filename, bool isDep = false)
         {
             try
             {
@@ -74,7 +75,7 @@ namespace Sora.Services
                 _appPartManager.ApplicationParts.Add(new AssemblyPart(asm));
                 
                 if (!isDep)
-                    GetEntryPoint(asm)?.OnEnable();
+                    GetEntryPoint(asm)?.OnEnable(app);
                 
                 return true;
             } catch (Exception ex)

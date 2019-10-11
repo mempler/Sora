@@ -47,11 +47,11 @@ namespace Sora.Framework.Packets.Server
 
             sw.Write( Presence.User.Id );
             sw.Write( Presence.User.UserName, false );
-            sw.Write( Presence.Info.TimeZone );
+            sw.Write( Presence.Info.TimeZone + 24 );
             sw.Write( (byte) Presence.Info.CountryId );
-            sw.Write( (int) Presence.Info.ClientPermission );
-            sw.Write( Presence.Info.Longitude );
-            sw.Write( Presence.Info.Latitude );
+            sw.Write( (byte) Presence.Info.ClientPermission );
+            sw.Write( (float) Presence.Info.Longitude );
+            sw.Write( (float) Presence.Info.Latitude );
             sw.Write( Presence.Info.RankingPosition );
         }
     }

@@ -35,7 +35,8 @@ namespace Sora.API.Controllers.api.v1
         
         [HttpGet]
         [DisableCors]
-        public async Task<ActionResult> Get([FromQuery] int offset = 0, [FromQuery] PlayMode mode = PlayMode.Osu)
+        public async Task<ActionResult> Get([FromQuery] int offset = 0, [FromQuery] PlayMode mode =
+            PlayMode.Osu)
         {
             var lb = (await _factory.Get().Leaderboard
                                    .Where(x => x.Owner.Status != UserStatusFlags.Suspended ||

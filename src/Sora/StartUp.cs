@@ -8,16 +8,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Framework.Allocation;
@@ -152,6 +146,8 @@ namespace Sora
                                .SetIsOriginAllowed((host) => true)
                                .AllowAnyHeader());
             });
+
+            services.AddGrpc();
         }
 
         public void Configure(IApplicationBuilder app, IServiceProvider provider, ILogger<StartUp> logger,
@@ -170,6 +166,7 @@ namespace Sora
                 app.UseDeveloperExceptionPage();
             
             app.UseAuthentication();
+            app.UseWebSockets();
             
             factory.Get().Migrate();
 
@@ -180,12 +177,14 @@ namespace Sora
             
             if (!Directory.Exists("plugins/runtime"))
                 Directory.CreateDirectory("plugins/runtime");
-
+            
+            app.UseRouting();
+            
             foreach (var dep in Directory.GetFiles("plugins/runtime")) // Dependencies have a higher priority!
-                plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + dep, true);
+                plugs.LoadPlugin(null, Directory.GetCurrentDirectory() + "/" + dep, true);
             
             foreach (var plug in Directory.GetFiles("plugins"))
-                plugs.LoadPlugin(Directory.GetCurrentDirectory() + "/" + plug);
+                plugs.LoadPlugin(app, Directory.GetCurrentDirectory() + "/" + plug);
 
             ev.RegisterEvents();
             

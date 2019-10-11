@@ -76,7 +76,7 @@ namespace Sora.Bot
             _dbUser = DBUser.GetDBUser(_factory, 100).Result;
         }
 
-        private Presence _botPresence { get; set; }
+        private static Presence _botPresence { get; set; }
 
         public void RegisterCommandClass<T>()
             where T : ISoraCommand
@@ -119,6 +119,20 @@ namespace Sora.Bot
                     StatusText = "over you!",
                     CurrentMods = Mod.TouchDevice
                 },
+                Info = new UserInformation
+                {
+                    Latitude = 0,
+                    Longitude = 0,
+                    ClientPermission = LoginPermissions.User |
+                                       LoginPermissions.Administrator |
+                                       LoginPermissions.Moderator |
+                                       LoginPermissions.Supporter|
+                                       LoginPermissions.TorneyStaff |
+                                       LoginPermissions.BAT,
+                    CountryId = CountryId.XX,
+                    RankingPosition = 0,
+                    TimeZone = 0
+                },
                 ["BOT"] = true,
                 ["IRC"] = true
             };
@@ -155,7 +169,7 @@ namespace Sora.Bot
 
         public async void SendMessage(string msg, string channelTarget, bool isPrivate)
         {
-            if (_cs.TryGet(channelTarget, out var _))
+            if (!_cs.TryGet(channelTarget, out var _))
                 return;
             
             if (!isPrivate)
@@ -196,47 +210,47 @@ namespace Sora.Bot
             if (args.pr == _botPresence)
                 return;
 
-            if (args.Message.Message.StartsWith("!"))
+            if (!args.Message.Message.StartsWith("!"))
+                return;
+            
+            if (!_cs.TryGet(args.Message.ChannelTarget, out var _))
+                return;
+
+            var cmds = GetCommands(args.Message.Message.TrimStart('!'));
+            foreach (var cmd in cmds)
             {
-                if (_cs.TryGet(args.Message.ChannelTarget, out var _))
-                    return;
+                if (args.pr.User.Permissions != cmd.RequiredPermission)
+                    continue;
 
-                var cmds = GetCommands(args.Message.Message.TrimStart('!'));
-                foreach (var cmd in cmds)
+                var l = args.Message.Message.TrimStart('!').Split(" ").ToList();
+                l.RemoveAt(0);
+                if (l.Count < cmd.ExpectedArgs)
                 {
-                    if (args.pr.User.Permissions != cmd.RequiredPermission)
-                        continue;
+                    var aList = "\t<";
 
-                    var l = args.Message.Message.TrimStart('!').Split(" ").ToList();
-                    l.RemoveAt(0);
-                    if (l.Count < cmd.ExpectedArgs)
+                    var i = 0;
+                    foreach (var a in cmd.Args)
                     {
-                        var aList = "\t<";
-
-                        var i = 0;
-                        foreach (var a in cmd.Args)
-                        {
-                            aList += a.ArgName;
-                            if (i >= cmd.ExpectedArgs)
-                                aList += "?";
-                            aList += ", ";
-                            i++;
-                        }
-
-                        aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
-                        if (cmd.Args.Count > 0)
-                            aList += ">";
-
-                        SendMessage(
-                            $"Insufficient amount of Arguments!\nUsage:\n     !{cmd.Command} {aList}",
-                            args.Message.ChannelTarget, false
-                        );
-                        break;
+                        aList += a.ArgName;
+                        if (i >= cmd.ExpectedArgs)
+                            aList += "?";
+                        aList += ", ";
+                        i++;
                     }
 
-                    if (cmd.Callback(args.pr, l.ToArray()))
-                        break;
+                    aList = aList.TrimEnd(cmd.Args.Count < 1 ? '<' : ' ').TrimEnd(',');
+                    if (cmd.Args.Count > 0)
+                        aList += ">";
+
+                    SendMessage(
+                        $"Insufficient amount of Arguments!\nUsage:\n     !{cmd.Command} {aList}",
+                        args.Message.ChannelTarget, false
+                    );
+                    break;
                 }
+
+                if (cmd.Callback(args.pr, l.ToArray()))
+                    break;
             }
         }
 

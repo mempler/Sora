@@ -1,7 +1,11 @@
 using System;
-using System.Linq;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentEmail.Core;
 using FluentEmail.Mailgun;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Sora.Framework.Utilities;
 
@@ -56,14 +60,51 @@ namespace Sora.API
             Email.DefaultSender = _sender;
         }
         
-        public override void OnEnable()
+        public override void OnEnable(IApplicationBuilder app)
         {
             _logger.LogInformation("Startup Sora Web API");
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path == "/api/v1/ws")
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        await HandleSocket(context, webSocket);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 400;
+                    }
+                }
+                else
+                {
+                    await next();
+                }
+
+            });
         }
 
         public override void OnDisable()
         {
             _logger.LogInformation("Shutdown olSora Web API");
+        }
+        
+        private async Task HandleSocket(HttpContext context, WebSocket webSocket)
+        {
+            var buffer = new byte[1024 * 4];
+            var result =
+                await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            while (!result.CloseStatus.HasValue)
+            {
+                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType,
+                    result.EndOfMessage, CancellationToken.None);
+
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            }
+
+            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
     }
 }

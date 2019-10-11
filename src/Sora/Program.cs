@@ -3,6 +3,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sora.Framework.Utilities;
 
@@ -12,7 +14,7 @@ namespace Sora
     {
         private static readonly CancellationTokenSource cts = new CancellationTokenSource();
         
-        private static async Task Main()
+        private static async Task Main(string[] args)
         {
             Console.CancelKeyPress += OnProcessExit;
             
@@ -46,30 +48,37 @@ namespace Sora
                 Environment.Exit(0);
 
 
-            var _host = new WebHostBuilder()
-                    .UseKestrel(
-                        cfg =>
-                        {
-                            cfg.Limits.MaxRequestBodySize = null;
+            var _host = Host.CreateDefaultBuilder(args)
+                            .ConfigureWebHostDefaults(builder =>
+                            {
+                                builder.UseKestrel(cfg =>
+                                {
+                                    cfg.Limits.MaxRequestBodySize = null;
 
-                            if (!IPAddress.TryParse(scfg.Server.Hostname, out var ipAddress))
-                                ipAddress = Dns.GetHostEntry(scfg.Server.Hostname).AddressList[0];
+                                    if (!IPAddress.TryParse(scfg.Server.Hostname, out var ipAddress))
+                                        ipAddress = Dns.GetHostEntry(scfg.Server.Hostname).AddressList[0];
+                                    cfg.ConfigureEndpointDefaults(cfgEndPoints =>
+                                        {
+                                            cfgEndPoints.Protocols = HttpProtocols.Http1AndHttp2;
+                                        });
+                                    
+                                    cfg.Listen(IPAddress.Loopback, 5001,
+                                        listenOptions => { listenOptions.UseHttps(); });
+                                    cfg.Listen(ipAddress, scfg.Server.Port);
+                                });
 
-                            cfg.Listen(ipAddress, scfg.Server.Port);
-                        }
-                    )
-                    .ConfigureLogging(logging =>
-                    {
-                        logging.ClearProviders();
-                        logging.AddProvider(new SoraLoggerProvider(new SoraLoggerConfiguration
-                        {
-                            LogLevel = LogLevel.Trace
-                        }));
-                    })
-                    .UseStartup<StartUp>()
-                    .Build();
-            
-            await _host.RunAsync(cts.Token);
+                                builder.UseStartup<StartUp>();
+                            })
+                            .ConfigureLogging(logging =>
+                            {
+                                logging.ClearProviders();
+                                logging.AddProvider(new SoraLoggerProvider(new SoraLoggerConfiguration
+                                {
+                                    LogLevel = LogLevel.Trace
+                                }));
+                            });
+
+            await _host.StartAsync(cts.Token);
         }
 
         private static void OnProcessExit(object sender, System.EventArgs e)

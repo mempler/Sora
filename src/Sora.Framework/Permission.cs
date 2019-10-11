@@ -42,7 +42,7 @@ namespace Sora.Framework
         /// Generate Permissions Class from String based on "Perm1, Perm2, Perm3"
         /// </summary>
         /// <param name="perm">Permisison</param>
-        public static Permission From(string perm) => new Permission() + perm.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+        public static Permission From(string perm) => new Permission() + perm.Trim().Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
 
         /// <summary>
         /// Add string as Permission to This
@@ -132,7 +132,21 @@ namespace Sora.Framework
         /// </summary>
         /// <param name="perm">Permission</param>
         /// <returns>Has Permission</returns>
-        public bool HasPermission(string perm) => Perms.Any(p => perm == p);
+        public bool HasPermission(string perm)
+        {
+            var prediction = true;
+            
+            var perms = From(perm);
+            
+            foreach (var pe in perms.Perms)
+            {
+                if (Perms.All(p => p != pe))
+                    prediction = false;
+            }
+            
+
+            return prediction;
+        }
 
         /// <summary>
         /// Check if This has Permission based on String

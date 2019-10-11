@@ -33,7 +33,8 @@ namespace Sora.Database.Models
             => s.Split(", ")
                 .Select(str => factory.Get().Achievements.FirstOrDefault(a => a.Name == str))
                 .Where(r => r != null)
-                .Select(achievement => achievement.ToAchievement()).ToList();
+                .Select(achievement => achievement.ToAchievement())
+                .ToList();
 
         public static Task<DBAchievement> GetAchievement(SoraDbContextFactory factory, string name)
             => factory.Get().Achievements.FirstOrDefaultAsync(x => x.Name == name);

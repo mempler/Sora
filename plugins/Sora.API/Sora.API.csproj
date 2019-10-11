@@ -11,5 +11,5 @@
     <ItemGroup>
       <PackageReference Include="FluentEmail.Mailgun" Version="2.7.0" />
     </ItemGroup>
-
+    
 </Project>

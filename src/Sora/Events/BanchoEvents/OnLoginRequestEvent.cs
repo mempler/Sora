@@ -154,7 +154,14 @@ namespace Sora.Events.BanchoEvents
                 args.pr.Push(new HandleUpdate(args.pr));
 
                 args.pr.Info.ClientPermission = LoginPermissions.User;
-                
+
+                if (args.pr.User.Permissions == Permission.GROUP_DONATOR)
+                    args.pr.Info.ClientPermission |= LoginPermissions.Supporter;
+                if (args.pr.User.Permissions == Permission.GROUP_ADMIN)
+                    args.pr.Info.ClientPermission |= LoginPermissions.BAT | LoginPermissions.Administrator | LoginPermissions.Moderator;
+                if (args.pr.User.Permissions == Permission.GROUP_DEVELOPER)
+                    args.pr.Info.ClientPermission |= LoginPermissions.Developer;
+
                 if (!args.pr.User.Permissions.HasPermission(Permission.GROUP_DONATOR))
                 {
                     if (_cfg.Server.FreeDirect)

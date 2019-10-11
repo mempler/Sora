@@ -21,6 +21,7 @@
 #endregion
 
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Builder;
 
 namespace Sora
 {
@@ -29,7 +30,7 @@ namespace Sora
         /// <summary>
         /// Enable Plugin
         /// </summary>
-        void OnEnable();
+        void OnEnable(IApplicationBuilder app);
         
         /// <summary>
         /// Disable Plugin
@@ -40,7 +41,7 @@ namespace Sora
     [MeansImplicitUse]
     public class Plugin : IPlugin
     {
-        public virtual void OnEnable()
+        public virtual void OnEnable(IApplicationBuilder app)
         {
         }
 
