@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.IO;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
@@ -71,7 +73,7 @@ namespace Sora
         private static Beatmap readFromFile(string filename)
         {
             using var stream = File.OpenRead(filename);
-            using var streamReader = new StreamReader(stream);
+            using var streamReader = new LineBufferedReader(stream);
 
             return Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader);
         }
@@ -79,6 +81,10 @@ namespace Sora
         protected override IBeatmap GetBeatmap() => beatmap;
 
         protected override Texture GetBackground() => null;
+        protected override VideoSprite GetVideo()
+        {
+            throw new NotImplementedException();
+        }
 
         protected override Track GetTrack() => null;
     }

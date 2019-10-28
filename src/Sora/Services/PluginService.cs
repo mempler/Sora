@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -64,7 +65,8 @@ namespace Sora.Services
         {
             try
             {
-                var asm = _context.LoadFromAssemblyPath(filename);
+                using var strm = File.OpenRead(filename); // Load from stream instead, allow us to live reload.
+                var asm = _context.LoadFromStream(strm);
                 if (asm == null) return false;
                 
                 _loadedPlugins.Add(filename, asm);
