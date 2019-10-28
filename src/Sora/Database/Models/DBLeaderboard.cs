@@ -223,6 +223,7 @@ namespace Sora.Database.Models
             return divideTotal > 0 ? totalAcc / divideTotal : 0;
         }
 
+        // TODO: optimize this
         public void UpdatePP(SoraDbContextFactory factory, PlayMode mode)
         {
             var TotalPP = factory.Get()
@@ -231,10 +232,10 @@ namespace Sora.Database.Models
                                  .Where(s => s.PlayMode == mode)
                                  .Where(s => s.UserId == OwnerId)
                                  .OrderByDescending(s => s.PerformancePoints)
+                                 .ToList() // There goes our memory one more time :c
                                  .GroupBy(s => s.FileMd5)
                                  .Select(s => s.First())
                                  .Take(100)
-                                 .ToList()
                                  .Select((t, i) => t.PerformancePoints * Math.Pow(0.95d, i))
                                  .Sum();
             switch (mode)

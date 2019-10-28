@@ -18,6 +18,7 @@
 */
 #endregion
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Sora;
 using Sora.Framework.Utilities;
@@ -33,7 +34,7 @@ namespace ExamplePlugin
             _logger = logger;
         }
         
-        public override void OnEnable()
+        public override void OnEnable(IApplicationBuilder app)
         {
             _logger.LogInformation("Startup ExamplePlugin");
         }

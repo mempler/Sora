@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using osu.Framework.Graphics.Containers;
+using Pomelo.EntityFrameworkCore.MySql.Query.Internal;
 using Sora.Framework.Enums;
 using Sora.Framework.Objects.Scores;
 using Sora.Framework.Utilities;
@@ -116,10 +118,12 @@ namespace Sora.Database.Models
                                .OrderByDescending(score => score.TotalScore)
                                .ThenByDescending(s => s.Accuracy) // Order by TotalScore and Accuracy. Score V2 Support
                                .Include(x => x.ScoreOwner)
-                               .GroupBy(s => s.UserId)
-                               .Take(50);
+                               .ToList() // There goes our memory :c
+                               .GroupBy(s => s.UserId) // Requires to be Client Side since EF Core is the big stupid and don't recognize this.
+                               .Take(50)
+                               .Select(s => s.First());
 
-            return query.Select(s => s.First()).ToList();
+            return query.ToList();
         }
 
         public static Task<DBScore> GetScore(
