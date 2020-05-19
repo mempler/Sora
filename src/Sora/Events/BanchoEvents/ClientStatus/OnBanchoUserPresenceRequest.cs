@@ -19,10 +19,10 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoUserPresenceRequest)]
         public void RequestBanchoPresence(BanchoClientUserPresenceRequestArgs args)
         {
-            foreach (var id in args.userIds)
+            foreach (var id in args.UserIds)
             {
                 if (_ps.TryGet(id, out var pr))
-                    args.pr.Push(new UserPresence(pr));
+                    args.Pr.Push(new UserPresence(pr));
             }
         }
     }

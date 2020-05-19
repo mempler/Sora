@@ -74,7 +74,7 @@ namespace Sora
         public async Task RunEvent(EventType etype, IEventArgs args = null)
         {
             foreach (var evcls in _events)
-            foreach ((EventType evTypes, List<MethodInfo> mInfos) in evcls.Value)
+            foreach (var (evTypes, mInfos) in evcls.Value)
             {
                 if (evTypes != etype)
                     continue;

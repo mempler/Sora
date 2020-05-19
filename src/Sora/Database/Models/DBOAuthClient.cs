@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +14,7 @@ namespace Sora.Database.Models
     }
     
     [Table("OAuthClients")]
-    public class DBOAuthClient
+    public class DboAuthClient
     {
         [Key]
         public Guid Id { get; set; }
@@ -25,13 +24,13 @@ namespace Sora.Database.Models
 
         [Required]
         [ForeignKey(nameof(OwnerId))]
-        public DBUser Owner { get; set; }
+        public DbUser Owner { get; set; }
         
         public string Secret { get; set; }
         public OAuthClientFlags Flags { get; set; }
         public bool Disabled { get; set; }
 
-        public static Task<DBOAuthClient> GetClient(SoraDbContextFactory factory, string id)
+        public static Task<DboAuthClient> GetClient(SoraDbContextFactory factory, string id)
         {
             var gid = new Guid(id);
             return factory.Get().OAuthClients.FirstOrDefaultAsync(x => x.Id == gid);

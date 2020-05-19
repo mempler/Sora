@@ -11,7 +11,7 @@ using Sora.Services;
 
 namespace Sora
 {
-    public class IRCServer
+    public class IrcServer
     {
         private readonly IServerConfig _cfg;
 
@@ -23,11 +23,11 @@ namespace Sora
         private readonly EventManager _evmng;
         private CancellationTokenSource _token;
         private TcpListener _listener;
-        private List<IRCClient> _connectedClients;
+        private List<IrcClient> _connectedClients;
 
-        private object conLocker;
+        private object _conLocker;
 
-        public IRCServer(IServerConfig cfg,
+        public IrcServer(IServerConfig cfg,
             SoraDbContextFactory factory,
             PresenceService ps,
             ChannelService cs,
@@ -42,11 +42,11 @@ namespace Sora
             IPAddress ipAddress;
             if (!IPAddress.TryParse(cfg.Server.Hostname, out ipAddress))
                 ipAddress = Dns.GetHostEntry(cfg.Server.Hostname).AddressList[0];
-            _listener = new TcpListener(ipAddress, cfg.Server.IRCPort);
+            _listener = new TcpListener(ipAddress, cfg.Server.IrcPort);
 
             _token = new CancellationTokenSource();
-            _connectedClients = new List<IRCClient>();
-            conLocker = new object();
+            _connectedClients = new List<IrcClient>();
+            _conLocker = new object();
         }
         public async void StartAsync()
         {
@@ -66,8 +66,8 @@ namespace Sora
                         {
                             var client = _listener.AcceptTcpClient();
                             
-                            var ircClient = new IRCClient(client, _factory, _cfg, _ps, _cs, _evmng, this);
-                            lock(conLocker)
+                            var ircClient = new IrcClient(client, _factory, _cfg, _ps, _cs, _evmng, this);
+                            lock(_conLocker)
                                 _connectedClients.Add(ircClient);
                             new Thread(ircClient.Start).Start();
                         }
@@ -77,7 +77,7 @@ namespace Sora
                         }
                     }
 
-                    lock (conLocker)
+                    lock (_conLocker)
                     {
                         foreach (var c in _connectedClients)
                         {
@@ -88,9 +88,9 @@ namespace Sora
             );
         }
 
-        public void RemoveTCPClient(IRCClient client)
+        public void RemoveTcpClient(IrcClient client)
         {
-            lock(conLocker)
+            lock(_conLocker)
                 _connectedClients.Remove(client);
         }
         

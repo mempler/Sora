@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Sora.Framework;
 using Sora.Framework.Objects;
@@ -33,7 +30,7 @@ namespace Sora.Database.Models
     }
     
     [Table("Users")]
-    public class DBUser
+    public class DbUser
     {
         [Key]
         [Required]
@@ -65,14 +62,14 @@ namespace Sora.Database.Models
         public DateTime? StatusUntil { get; set; }
         public string? StatusReason { get; set; }
 
-        public static Task<DBUser> GetDBUser(SoraDbContextFactory factory, int userId)
+        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, int userId)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        public static Task<DBUser> GetDBUser(SoraDbContextFactory factory, string userName)
+        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, string userName)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.UserName == userName);
         
-        public static Task<DBUser> GetDBUser(SoraDbContextFactory factory, User user)
-            => GetDBUser(factory, user.Id);
+        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, User user)
+            => GetDbUser(factory, user.Id);
 
         public User ToUser() => new User
         {
@@ -96,7 +93,7 @@ namespace Sora.Database.Models
             }
         }
 
-        public static DBUser RegisterUser(
+        public static DbUser RegisterUser(
             SoraDbContextFactory factory,
             Permission permission,
             string userName, string eMail, string password, bool md5 = true,
@@ -124,7 +121,7 @@ namespace Sora.Database.Models
                     throw new ArgumentOutOfRangeException(nameof(pwVersion), pwVersion, "PasswordVersion MUST be either v0,v1 or v2!");
             }
             
-            var user = new DBUser
+            var user = new DbUser
             {
                 UserName = userName,
                 Password = pw,

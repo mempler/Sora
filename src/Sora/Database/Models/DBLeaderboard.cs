@@ -12,7 +12,7 @@ using Sora.Framework.Enums;
 namespace Sora.Database.Models
 {
     [Table("Leaderboard")]
-    public class DBLeaderboard
+    public class DbLeaderboard
     {
         [Key]
         [Required]
@@ -89,21 +89,21 @@ namespace Sora.Database.Models
         [Required]
         [UsedImplicitly]
         [ForeignKey(nameof(OwnerId))]
-        public DBUser Owner { get; set; }
+        public DbUser Owner { get; set; }
         
-        public static async Task<DBLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, int userId)
+        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, int userId)
         {
             var result = factory.Get().Leaderboard.Where(t => t.OwnerId == userId).Select(e => e).AsNoTracking().FirstOrDefault();
             if (result != null)
                 return result;
 
             using var db = factory.GetForWrite();
-            var lb = new DBLeaderboard{OwnerId = userId};
+            var lb = new DbLeaderboard{OwnerId = userId};
             await db.Context.Leaderboard.AddAsync(lb);
             return lb;
         }
 
-        public static async Task<DBLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, DBUser user)
+        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, DbUser user)
             => await GetLeaderboardAsync(factory, user.Id);
 
         public void IncreaseScore(ulong score, bool ranked, PlayMode mode)
@@ -224,9 +224,9 @@ namespace Sora.Database.Models
         }
 
         // TODO: optimize this
-        public void UpdatePP(SoraDbContextFactory factory, PlayMode mode)
+        public void UpdatePp(SoraDbContextFactory factory, PlayMode mode)
         {
-            var TotalPP = factory.Get()
+            var totalPp = factory.Get()
                                  .Scores
                                  //.Where(s => (s.Mods & Mod.Relax) == 0)
                                  .Where(s => s.PlayMode == mode)
@@ -241,19 +241,19 @@ namespace Sora.Database.Models
             switch (mode)
             {
                 case PlayMode.Osu:
-                    PerformancePointsOsu = TotalPP;
+                    PerformancePointsOsu = totalPp;
                     break;
 
                 case PlayMode.Taiko:
-                    PerformancePointsTaiko = TotalPP;
+                    PerformancePointsTaiko = totalPp;
                     break;
 
                 case PlayMode.Ctb:
-                    PerformancePointsCtb = TotalPP;
+                    PerformancePointsCtb = totalPp;
                     break;
 
                 case PlayMode.Mania:
-                    PerformancePointsMania = TotalPP;
+                    PerformancePointsMania = totalPp;
                     break;
 
                 default:

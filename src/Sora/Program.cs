@@ -12,7 +12,7 @@ namespace Sora
 {
     internal static class Program
     {
-        private static readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private static readonly CancellationTokenSource Cts = new CancellationTokenSource();
         
         private static async Task Main(string[] args)
         {
@@ -32,7 +32,7 @@ namespace Sora
                 {
                     Hostname = "0.0.0.0",
                     Port = 5001,
-                    IRCPort = 6667,
+                    IrcPort = 6667,
 
                     ScreenShotHostname = "localhost",
                     FreeDirect = true
@@ -41,14 +41,14 @@ namespace Sora
                 {
                     URI = "https://pisstau.be"
                 },
-                ESC = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
+                Esc = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
             };
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
                 Environment.Exit(0);
 
 
-            var _host = Host.CreateDefaultBuilder(args)
+            var host = Host.CreateDefaultBuilder(args)
                             .ConfigureWebHostDefaults(builder =>
                             {
                                 builder.UseKestrel(cfg =>
@@ -78,13 +78,13 @@ namespace Sora
                                 }));
                             });
 
-            await _host.StartAsync(cts.Token);
+            await host.StartAsync(Cts.Token);
         }
 
         private static void OnProcessExit(object sender, System.EventArgs e)
         {
             Logger.Info("Killing everything..");
-            cts.Cancel();
+            Cts.Cancel();
         }
     }
 }

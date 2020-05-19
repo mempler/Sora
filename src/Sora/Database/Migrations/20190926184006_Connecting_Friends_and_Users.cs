@@ -2,7 +2,7 @@
 
 namespace Sora.Database.Migrations
 {
-    public partial class Connecting_Friends_and_Users : Migration
+    public partial class ConnectingFriendsAndUsers : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -68,7 +68,7 @@ namespace Sora.API.Controllers.api.v1
                     });
             }
             
-            var u = DBUser.RegisterUser(_factory, Permission.From(Permission.DEFAULT), credentials.UserName,
+            var u = DbUser.RegisterUser(_factory, Permission.From(Permission.DEFAULT), credentials.UserName,
                 credentials.EMail,
                 credentials.Password, false);
 

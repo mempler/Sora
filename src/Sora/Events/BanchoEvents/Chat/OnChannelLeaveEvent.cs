@@ -1,25 +1,3 @@
-#region LICENSE
-
-/*
-    olSora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
-#endregion
-
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -43,10 +21,10 @@ namespace Sora.Events.BanchoEvents.Chat
             switch (args.ChannelName)
             {
                 case "#spectator":
-                    channel = args.pr.Spectator?.Channel;
+                    channel = args.Pr.Spectator?.Channel;
                     break;
                 case "#multiplayer":
-                    channel = args.pr.ActiveMatch?.Channel;
+                    channel = args.Pr.ActiveMatch?.Channel;
                     break;
                 default:
                     _cs.TryGet(args.ChannelName, out channel);
@@ -55,14 +33,14 @@ namespace Sora.Events.BanchoEvents.Chat
 
             if (channel == null)
             {
-                args.pr.Push(new ChannelRevoked(args.ChannelName));
+                args.Pr.Push(new ChannelRevoked(args.ChannelName));
                 return;
             }
 
-            channel.Leave(args.pr);
+            channel.Leave(args.Pr);
 
             channel.Push(new ChannelAvailable(channel));
-            args.pr.Push(new ChannelAvailable(channel));
+            args.Pr.Push(new ChannelAvailable(channel));
         }
     }
 }

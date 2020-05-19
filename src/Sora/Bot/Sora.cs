@@ -45,7 +45,7 @@ namespace Sora.Bot
         private readonly IServiceProvider _provider;
         private readonly PresenceService _ps;
         
-        private readonly DBUser _dbUser;
+        private readonly DbUser _dbUser;
 
         public Sora(SoraDbContextFactory factory,
             IServiceProvider provider,
@@ -70,13 +70,13 @@ namespace Sora.Bot
             factory.Get().Migrate();
             
             // this will fail if bot already exists!
-            DBUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Sora", "bot@gigamons.de",
+            DbUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Sora", "bot@gigamons.de",
                 Crypto.RandomString(32), false, PasswordVersion.V2, 100);
             
-            _dbUser = DBUser.GetDBUser(_factory, 100).Result;
+            _dbUser = DbUser.GetDbUser(_factory, 100).Result;
         }
 
-        private static Presence _botPresence { get; set; }
+        private static Presence BotPresence { get; set; }
 
         public void RegisterCommandClass<T>()
             where T : ISoraCommand
@@ -108,7 +108,7 @@ namespace Sora.Bot
 
         public Task RunAsync()
         {
-            _botPresence = new Presence(_dbUser.ToUser())
+            BotPresence = new Presence(_dbUser.ToUser())
             {
                 Status = new UserStatus
                 {
@@ -137,33 +137,33 @@ namespace Sora.Bot
                 ["IRC"] = true
             };
             
-            _ps.Push(new PresenceSingle(_botPresence.User.Id));
-            _ps.Push(new UserPresence(_botPresence));
-            _ps.Push(new HandleUpdate(_botPresence));
+            _ps.Push(new PresenceSingle(BotPresence.User.Id));
+            _ps.Push(new UserPresence(BotPresence));
+            _ps.Push(new HandleUpdate(BotPresence));
 
-            _ps.Join(_botPresence);
+            _ps.Join(BotPresence);
 
             Logger.Info("Hey, I'm Sora! I'm a bot and i say Hello World!");
 
             return Task.CompletedTask;
         }
 
-        public void SoraCommand(string Command, string Description, List<Argument> args,
+        public void SoraCommand(string command, string description, List<Argument> args,
             SoraCommand.SoraCommandExecution cb)
         {
             lock (_mut)
             {
                 _commands.Add(
-                    new SoraCommand {Command = Command, Description = Description, Args = args, Callback = cb}
+                    new SoraCommand {Command = command, Description = description, Args = args, Callback = cb}
                 );
             }
         }
 
-        public IEnumerable<SoraCommand> GetCommands(string Command)
+        public IEnumerable<SoraCommand> GetCommands(string command)
         {
             lock (_mut)
             {
-                return _commands.Where(z => z.Command == Command.Split(" ")[0]);
+                return _commands.Where(z => z.Command == command.Split(" ")[0]);
             }
         }
 
@@ -175,39 +175,39 @@ namespace Sora.Bot
             if (!isPrivate)
                 await _ev.RunEvent(
                     EventType.BanchoSendIrcMessage,
-                    new BanchoSendIRCMessageArgs
+                    new BanchoSendIrcMessageArgs
                     {
                         Message = new MessageStruct
                         {
                             Message = msg,
-                            Username = _botPresence.User.UserName,
+                            Username = BotPresence.User.UserName,
                             ChannelTarget = channelTarget,
-                            SenderId = _botPresence.User.Id
+                            SenderId = BotPresence.User.Id
                         },
-                        pr = _botPresence
+                        Pr = BotPresence
                     }
                 );
             else
                 await _ev.RunEvent(
                     EventType.BanchoSendIrcMessagePrivate,
-                    new BanchoSendIRCMessageArgs
+                    new BanchoSendIrcMessageArgs
                     {
                         Message = new MessageStruct
                         {
                             Message = msg,
-                            Username = _botPresence.User.UserName,
+                            Username = BotPresence.User.UserName,
                             ChannelTarget = channelTarget,
-                            SenderId = _botPresence.User.Id
+                            SenderId = BotPresence.User.Id
                         },
-                        pr = _botPresence
+                        Pr = BotPresence
                     }
                 );
         }
 
         [Event(EventType.BanchoSendIrcMessage)]
-        public void OnPublicMessageEvent(BanchoSendIRCMessageArgs args)
+        public void OnPublicMessageEvent(BanchoSendIrcMessageArgs args)
         {
-            if (args.pr == _botPresence)
+            if (args.Pr == BotPresence)
                 return;
 
             if (!args.Message.Message.StartsWith("!"))
@@ -219,7 +219,7 @@ namespace Sora.Bot
             var cmds = GetCommands(args.Message.Message.TrimStart('!'));
             foreach (var cmd in cmds)
             {
-                if (args.pr.User.Permissions != cmd.RequiredPermission)
+                if (args.Pr.User.Permissions != cmd.RequiredPermission)
                     continue;
 
                 var l = args.Message.Message.TrimStart('!').Split(" ").ToList();
@@ -249,15 +249,15 @@ namespace Sora.Bot
                     break;
                 }
 
-                if (cmd.Callback(args.pr, l.ToArray()))
+                if (cmd.Callback(args.Pr, l.ToArray()))
                     break;
             }
         }
 
         [Event(EventType.BanchoSendIrcMessage)]
-        public void OnPrivateMessageEvent(BanchoSendIRCMessageArgs args)
+        public void OnPrivateMessageEvent(BanchoSendIrcMessageArgs args)
         {
-            if (args.pr == _botPresence)
+            if (args.Pr == BotPresence)
                 return;
         }
     }

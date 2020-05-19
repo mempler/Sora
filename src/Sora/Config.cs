@@ -1,9 +1,8 @@
-using System.Xml.Serialization;
 using Sora.Framework.Utilities;
 
 namespace Sora
 {
-    public interface IMySQLConfig : IConfig
+    public interface IMySqlConfig : IConfig
     {
         CMySql MySql { get; set; }
     }
@@ -27,18 +26,18 @@ namespace Sora
     {
         public string Hostname;
         public short Port;
-        public short IRCPort;
+        public short IrcPort;
 
         public string ScreenShotHostname;
         public bool FreeDirect;
     }
     
-    public class Config : IServerConfig, IMySQLConfig, IPisstaubeConfig
+    public class Config : IServerConfig, IMySqlConfig, IPisstaubeConfig
     {
         public CServer Server { get; set; }
         public CMySql MySql { get; set; }
         public CPisstaube Pisstaube { get; set; }
         
-        public string ESC { get; set; }
+        public string Esc { get; set; }
     }
 }

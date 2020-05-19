@@ -1,12 +1,8 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
 using Sora.Framework.Enums;
@@ -75,8 +71,8 @@ namespace Sora.Controllers
                     {
                         Reader = mr,
                         Writer = mw,
-                        pr = pr,
-                        IPAddress = ip
+                        Pr = pr,
+                        IpAddress = ip
                     });
 
                     mw.Flush();
@@ -102,7 +98,7 @@ namespace Sora.Controllers
                             using var packetDataReader = new MStreamReader(packetDataStream);
                             await _evManager.RunEvent(
                                 EventType.BanchoPacket,
-                                new BanchoPacketArgs {pr = pr, PacketId = packetId, Data = packetDataReader}
+                                new BanchoPacketArgs {Pr = pr, PacketId = packetId, Data = packetDataReader}
                             );
                         }
                         catch (Exception ex)

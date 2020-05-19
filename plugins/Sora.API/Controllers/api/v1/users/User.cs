@@ -26,7 +26,7 @@ namespace Sora.API.Controllers.api.v1.users
         [HttpGet("/api/v1/users/{userId:int}")]
         public async Task<ActionResult> Get(int userId)
         {
-            var user = await DBUser.GetDBUser(_factory, userId);
+            var user = await DbUser.GetDbUser(_factory, userId);
             if (user == null)
                 return NotFound(new
                 {
@@ -34,7 +34,7 @@ namespace Sora.API.Controllers.api.v1.users
                     message = "User not found!"
                 });
 
-            var lb = await DBLeaderboard.GetLeaderboardAsync(_factory, user);
+            var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, user);
 
             return Ok(new
             {
@@ -44,7 +44,7 @@ namespace Sora.API.Controllers.api.v1.users
                 user.Status,
                 user.StatusUntil,
                 user.StatusReason,
-                Achievements = DBAchievement.FromString(_factory, user.Achievements ?? ""),
+                Achievements = DbAchievement.FromString(_factory, user.Achievements ?? ""),
                 Country = "XX",
                 globalRank = lb.GetPosition(_factory, PlayMode.Osu),
                 Accuracy = lb.GetAccuracy(_factory, PlayMode.Osu),
@@ -59,7 +59,7 @@ namespace Sora.API.Controllers.api.v1.users
         [HttpGet("/api/v1/users/{userName}")]
         public async Task<ActionResult> Get(string userName)
         {
-            var user = await DBUser.GetDBUser(_factory, userName);
+            var user = await DbUser.GetDbUser(_factory, userName);
             if (user == null)
                 return NotFound(new
                 {
@@ -67,7 +67,7 @@ namespace Sora.API.Controllers.api.v1.users
                     message = "User not found!"
                 });
 
-            var lb = await DBLeaderboard.GetLeaderboardAsync(_factory, user);
+            var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, user);
 
             return Ok(new
             {
@@ -77,7 +77,7 @@ namespace Sora.API.Controllers.api.v1.users
                 user.Status,
                 user.StatusUntil,
                 user.StatusReason,
-                Achievements = DBAchievement.FromString(_factory, user.Achievements ?? ""),
+                Achievements = DbAchievement.FromString(_factory, user.Achievements ?? ""),
                 Country = "XX",
                 globalRank = lb.GetPosition(_factory, PlayMode.Osu),
                 Accuracy = lb.GetAccuracy(_factory, PlayMode.Osu),
