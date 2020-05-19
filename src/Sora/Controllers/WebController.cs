@@ -402,12 +402,12 @@ namespace Sora.Controllers
                 );
 
             Logger.Info(
-                $"{L_COL.RED}{dbScore.ScoreOwner.UserName}",
-                $"{L_COL.PURPLE}( {dbScore.ScoreOwner.Id} ){L_COL.WHITE}",
-                $"has just submitted a Score! he earned {L_COL.BLUE}{newScore?.PerformancePoints:F}PP",
-                $"{L_COL.WHITE}with an Accuracy of {L_COL.RED}{newScore?.Accuracy * 100:F}",
-                $"{L_COL.WHITE}on {L_COL.YELLOW}{set?.Title} [{bm.DiffName}]",
-                $"{L_COL.WHITE}using {L_COL.BLUE}{ModUtil.ToString(newScore?.Mods ?? Mod.None)}"
+                $"{LCol.RED}{dbScore.ScoreOwner.UserName}",
+                $"{LCol.PURPLE}( {dbScore.ScoreOwner.Id} ){LCol.WHITE}",
+                $"has just submitted a Score! he earned {LCol.BLUE}{newScore?.PerformancePoints:F}PP",
+                $"{LCol.WHITE}with an Accuracy of {LCol.RED}{newScore?.Accuracy * 100:F}",
+                $"{LCol.WHITE}on {LCol.YELLOW}{set?.Title} [{bm.DiffName}]",
+                $"{LCol.WHITE}using {LCol.BLUE}{ModUtil.ToString(newScore?.Mods ?? Mod.None)}"
             );
 
             var bmChart = new Chart(

@@ -46,8 +46,7 @@ namespace Sora
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
                 Environment.Exit(0);
-
-
+            
             var host = Host.CreateDefaultBuilder(args)
                             .ConfigureWebHostDefaults(builder =>
                             {

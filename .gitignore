@@ -285,3 +285,4 @@ src/Sora/recaptcha.json
 src/Sora/filters.txt
 
 plugins/Sora.FX/
+_runtime/

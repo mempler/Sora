@@ -224,7 +224,7 @@ namespace Sora.Framework.Utilities
 
             query = $"?{pm}amount={100}&offset={page * 100}&status={rankedStatus}&query={query}";
 
-            Logger.Debug($"{L_COL.YELLOW}Pisstaube {L_COL.WHITE}Query: {query}");
+            Logger.Debug($"{LCol.YELLOW}Pisstaube {LCol.WHITE}Query: {query}");
             SearchResult result;
 
             try

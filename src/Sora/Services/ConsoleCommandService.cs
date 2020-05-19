@@ -69,7 +69,7 @@ namespace Sora.Services
 
                         l += "\n%#1c9624%/*\n";
                         l += cmd.Description;
-                        l += $"\n*/{L_COL.WHITE}\n";
+                        l += $"\n*/{LCol.WHITE}\n";
                         l += "\n" + cmd.Command + aList;
                         l += "\n";
                     }

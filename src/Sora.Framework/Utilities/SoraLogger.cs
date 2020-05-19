@@ -86,7 +86,11 @@ namespace Sora.Framework.Utilities
 
                 prefix += " ";
 
-                PrintColorized(prefix, prefixColor, logLevel == LogLevel.Critical, formatter(state, exception));
+                var msg = state.ToString();
+                if (exception != null)
+                    msg += "\n" + exception;
+                
+                PrintColorized(prefix, prefixColor, logLevel == LogLevel.Critical, msg);
             }
         }
 

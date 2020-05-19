@@ -30,7 +30,7 @@ using Console = Colorful.Console;
 
 namespace Sora.Framework.Utilities
 {
-    public static class L_COL
+    public static class LCol
     {
         public const string WHITE = "%#FFFFFF%";
         public const string BLACK = "%#000000%";
