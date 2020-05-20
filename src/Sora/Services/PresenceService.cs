@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -48,8 +49,7 @@ namespace Sora.Services
 
                         foreach (var pr in Values.Select(presenceK => presenceK.Value).Where(pr => pr["BOT"] == null || !(bool) pr["BOT"]))
                         {
-                            if (pr["LAST_PONG"] == null)
-                                pr["LAST_PONG"] = DateTime.Now;
+                            pr["LAST_PONG"] ??= DateTime.Now;
                             
                             var lastPong = (DateTime) pr["LAST_PONG"];
                             if (lastPong < DateTime.Now - TimeSpan.FromSeconds(60))
@@ -69,6 +69,8 @@ namespace Sora.Services
                             Err = ErrorStates.Ok
                         });
                     }
+                    
+                    Thread.Sleep(1000);
                 }
             });
         }
