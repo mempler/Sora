@@ -33,7 +33,7 @@ namespace Sora.Database.Models
 {
     [Table("Friends")]
     [UsedImplicitly]
-    public class DBFriend
+    public class DbFriend
     {
         [Key]
         [Required]
@@ -45,7 +45,7 @@ namespace Sora.Database.Models
         
         [Required]
         [ForeignKey(nameof(UserId))]
-        public DBUser User { get; set; }
+        public DbUser User { get; set; }
 
         [Required]
         public int FriendId { get; set; }
@@ -53,7 +53,7 @@ namespace Sora.Database.Models
         [Required]
         [UsedImplicitly]
         [ForeignKey(nameof(FriendId))]
-        public DBUser Friend { get; set; }
+        public DbUser Friend { get; set; }
 
         public static IEnumerable<int> GetFriends(SoraDbContextFactory factory, int userId)
             => factory.Get()
@@ -64,7 +64,7 @@ namespace Sora.Database.Models
         public static async void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
         {
             using var db = factory.GetForWrite();
-            await db.Context.Friends.AddAsync(new DBFriend {UserId = userId, FriendId = friendId});
+            await db.Context.Friends.AddAsync(new DbFriend {UserId = userId, FriendId = friendId});
         }
 
         public static void RemoveFriend(SoraDbContextFactory factory, int userId, int friendId)

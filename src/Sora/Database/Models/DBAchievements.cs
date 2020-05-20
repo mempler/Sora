@@ -11,7 +11,7 @@ namespace Sora.Database.Models
 {
     [Table("Achievements")]
     [UsedImplicitly]
-    public class DBAchievement : Achievement
+    public class DbAchievement : Achievement
     {
         [Key]
         [Required]
@@ -25,7 +25,7 @@ namespace Sora.Database.Models
         public new string Description { get; set; }
 
         [Required]
-        public new string IconURI { get; set; }
+        public new string IconUri { get; set; }
 
         public Achievement ToAchievement() => this;
 
@@ -36,7 +36,7 @@ namespace Sora.Database.Models
                 .Select(achievement => achievement.ToAchievement())
                 .ToList();
 
-        public static Task<DBAchievement> GetAchievement(SoraDbContextFactory factory, string name)
+        public static Task<DbAchievement> GetAchievement(SoraDbContextFactory factory, string name)
             => factory.Get().Achievements.FirstOrDefaultAsync(x => x.Name == name);
 
         public static async void NewAchievement(SoraDbContextFactory factory,
@@ -44,12 +44,12 @@ namespace Sora.Database.Models
         {
             using var db = factory.GetForWrite();
 
-            await db.Context.Achievements.AddAsync(new DBAchievement
+            await db.Context.Achievements.AddAsync(new DbAchievement
             {
                 Name = name,
                 Description = desc,
                 DisplayName = displayName,
-                IconURI = icon
+                IconUri = icon
             });
         }
     }

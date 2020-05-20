@@ -4,19 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using osu.Framework.Graphics.Containers;
-using Pomelo.EntityFrameworkCore.MySql.Query.Internal;
 using Sora.Framework.Enums;
-using Sora.Framework.Objects.Scores;
 using Sora.Framework.Utilities;
 
 namespace Sora.Database.Models
 {
     [Table("Scores")]
-    public class DBScore
+    public class DbScore
     {
         [Key]
         [Required]
@@ -44,7 +39,7 @@ namespace Sora.Database.Models
         
         [Required]
         [ForeignKey(nameof(UserId))]
-        public DBUser ScoreOwner { get; set; }
+        public DbUser ScoreOwner { get; set; }
 
         public async Task<int> Position(SoraDbContextFactory factory)
             => await factory.Get().Scores.Where(s => s.TotalScore > TotalScore &&
@@ -82,9 +77,9 @@ namespace Sora.Database.Models
             )
         );
 
-        public static async Task<List<DBScore>> GetScores(
+        public static async Task<List<DbScore>> GetScores(
                 SoraDbContextFactory factory,
-                string fileMd5, DBUser user, PlayMode playMode = PlayMode.Osu,
+                string fileMd5, DbUser user, PlayMode playMode = PlayMode.Osu,
                 bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
                 Mod mods = Mod.None, bool onlySelf = false
             )
@@ -126,32 +121,32 @@ namespace Sora.Database.Models
             return query.ToList();
         }
 
-        public static Task<DBScore> GetScore(
+        public static Task<DbScore> GetScore(
             SoraDbContextFactory factory,
             int replayId
         ) => factory.Get().Scores.Where(x => x.Id == replayId).FirstOrDefaultAsync();
 
-        public static Task<DBScore> GetScore(
+        public static Task<DbScore> GetScore(
             SoraDbContextFactory factory,
             string fileMd5
         ) => factory.Get().Scores.Where(x => x.FileMd5 == fileMd5).FirstOrDefaultAsync();
 
-        public static Task<DBScore> GetScore(
+        public static Task<DbScore> GetScore(
             SoraDbContextFactory factory,
-            DBScore otherScore
+            DbScore otherScore
         ) => factory.Get().Scores.Where(x => x.Checksum == otherScore.Checksum).FirstOrDefaultAsync();
 
-        public static Task<DBScore> GetLatestScore(
+        public static Task<DbScore> GetLatestScore(
             SoraDbContextFactory factory,
-            DBScore NewerScore
-        ) => factory.Get().Scores.Where(x => x.FileMd5 == NewerScore.FileMd5 &&
-                                             x.UserId == NewerScore.UserId &&
-                                             x.PlayMode == NewerScore.PlayMode &&
-                                             x.TotalScore >= NewerScore.TotalScore)
+            DbScore newerScore
+        ) => factory.Get().Scores.Where(x => x.FileMd5 == newerScore.FileMd5 &&
+                                             x.UserId == newerScore.UserId &&
+                                             x.PlayMode == newerScore.PlayMode &&
+                                             x.TotalScore >= newerScore.TotalScore)
                     .OrderByDescending(x => x.TotalScore).ThenByDescending(s => s.Accuracy)
                     .FirstOrDefaultAsync();
 
-        public static void InsertScore(SoraDbContextFactory factory, DBScore score)
+        public static void InsertScore(SoraDbContextFactory factory, DbScore score)
         {
             var so = score.ScoreOwner; // Fix for an Issue with Inserting.
             

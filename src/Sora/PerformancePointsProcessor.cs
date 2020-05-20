@@ -45,17 +45,17 @@ namespace Sora
 
     public class ProcessorWorkingBeatmap : WorkingBeatmap
     {
-        private readonly Beatmap beatmap;
+        private readonly Beatmap _beatmap;
 
         public ProcessorWorkingBeatmap(string file, int? beatmapId = null)
-            : this(readFromFile(file), beatmapId)
+            : this(ReadFromFile(file), beatmapId)
         {
         }
 
         private ProcessorWorkingBeatmap(Beatmap beatmap, int? beatmapId = null)
             : base(beatmap.BeatmapInfo, null)
         {
-            this.beatmap = beatmap;
+            _beatmap = beatmap;
 
             beatmap.BeatmapInfo.Ruleset = (PlayMode) beatmap.BeatmapInfo.RulesetID switch
             {
@@ -70,7 +70,7 @@ namespace Sora
                 beatmap.BeatmapInfo.OnlineBeatmapID = beatmapId;
         }
 
-        private static Beatmap readFromFile(string filename)
+        private static Beatmap ReadFromFile(string filename)
         {
             using var stream = File.OpenRead(filename);
             using var streamReader = new LineBufferedReader(stream);
@@ -78,7 +78,7 @@ namespace Sora
             return Decoder.GetDecoder<Beatmap>(streamReader).Decode(streamReader);
         }
 
-        protected override IBeatmap GetBeatmap() => beatmap;
+        protected override IBeatmap GetBeatmap() => _beatmap;
 
         protected override Texture GetBackground() => null;
         protected override VideoSprite GetVideo()
@@ -91,20 +91,20 @@ namespace Sora
 
     public class ProcessorScoreParser : LegacyScoreParser
     {
-        private readonly WorkingBeatmap beatmap;
-        private Ruleset ruleset;
+        private readonly WorkingBeatmap _beatmap;
+        private Ruleset _ruleset;
 
-        public ProcessorScoreParser(WorkingBeatmap beatmap) => this.beatmap = beatmap;
+        public ProcessorScoreParser(WorkingBeatmap beatmap) => _beatmap = beatmap;
 
-        private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
+        private ReplayFrame ConvertFrame(LegacyReplayFrame legacyFrame)
         {
-            var convertible = ruleset.CreateConvertibleReplayFrame();
+            var convertible = _ruleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException(
-                    $"Legacy replay cannot be converted for the ruleset: {ruleset.Description}"
+                    $"Legacy replay cannot be converted for the ruleset: {_ruleset.Description}"
                 );
 
-            convertible.ConvertFrom(legacyFrame, beatmap.Beatmap);
+            convertible.ConvertFrom(legacyFrame, _beatmap.Beatmap);
 
             var frame = (ReplayFrame) convertible;
             frame.Time = legacyFrame.Time;
@@ -112,7 +112,7 @@ namespace Sora
             return frame;
         }
 
-        private void readLegacyReplay(Replay replay, TextReader reader)
+        private void ReadLegacyReplay(Replay replay, TextReader reader)
         {
             float lastTime = 0;
 
@@ -133,7 +133,7 @@ namespace Sora
                     continue;
 
                 replay.Frames.Add(
-                    convertFrame(
+                    ConvertFrame(
                         new LegacyReplayFrame(
                             lastTime,
                             Parsing.ParseFloat(
@@ -149,7 +149,7 @@ namespace Sora
             }
         }
 
-        public Score Parse(DBScore dbScore, string replayPath = null)
+        public Score Parse(DbScore dbScore, string replayPath = null)
         {
             using var rawReplay = replayPath == null ? File.OpenRead("data/replays/" + dbScore.ReplayMd5) : File.OpenRead(replayPath);
 
@@ -170,14 +170,14 @@ namespace Sora
 
             var compressedSize = rawReplay.Length - rawReplay.Position;
 
-            ruleset = LegacyHelper.Convert(dbScore.PlayMode);
+            _ruleset = LegacyHelper.Convert(dbScore.PlayMode);
 
             var score = new Score
             {
                 ScoreInfo = new ScoreInfo
                 {
                     Accuracy = dbScore.Accuracy,
-                    Beatmap = beatmap.BeatmapInfo,
+                    Beatmap = _beatmap.BeatmapInfo,
                     Combo = dbScore.MaxCombo,
                     MaxCombo = dbScore.MaxCombo,
                     User = new User {Username = dbScore.ScoreOwner.UserName},
@@ -207,7 +207,7 @@ namespace Sora
             using (var lzma = new LzmaStream(properties, rawReplay, compressedSize, outSize))
             using (var reader = new StreamReader(lzma))
             {
-                readLegacyReplay(score.Replay, reader);
+                ReadLegacyReplay(score.Replay, reader);
             }
 
             CalculateAccuracy(score.ScoreInfo);
@@ -217,7 +217,7 @@ namespace Sora
 
         protected override Ruleset GetRuleset(int rulesetId) => LegacyHelper.Convert((PlayMode) rulesetId);
 
-        protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmap;
+        protected override WorkingBeatmap GetBeatmap(string md5Hash) => _beatmap;
     }
 
     public class PerformancePointsProcessor
@@ -229,7 +229,7 @@ namespace Sora
         /// <param name="replayPath"></param>
         /// <param name="beatmapPath"></param>
         /// <returns>Performance Points</returns>
-        public static double Compute(DBScore dbScore, string replayPath = null, string beatmapPath = null)
+        public static double Compute(DbScore dbScore, string replayPath = null, string beatmapPath = null)
         {
             var workingBeatmap = beatmapPath == null ?
                 new ProcessorWorkingBeatmap("data/beatmaps/" + dbScore.FileMd5) :

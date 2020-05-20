@@ -15,24 +15,24 @@ using Sora.Services;
 
 namespace Sora.Objects
 {
-    public class IRCClient
+    public class IrcClient
     {
         private TcpClient _client;
         private readonly SoraDbContextFactory _factory;
         private readonly IServerConfig _cfg;
         private readonly PresenceService _ps;
-        private readonly IRCServer _parent;
+        private readonly IrcServer _parent;
         private readonly ChannelService _cs;
         private readonly EventManager _evmng;
-        private bool exit;
+        private bool _exit;
 
-        public IRCClient(TcpClient client,
+        public IrcClient(TcpClient client,
             SoraDbContextFactory factory,
             IServerConfig cfg,
             PresenceService ps,
             ChannelService cs,
             EventManager evmng,
-            IRCServer parent)
+            IrcServer parent)
         {
             _client = client;
             _factory = factory;
@@ -43,11 +43,11 @@ namespace Sora.Objects
             _evmng = evmng;
         }
 
-        private User User;
-        private Presence Presence;
-        private bool Authorized;
-        private string Nickname;
-        private string Pass;
+        private User _user;
+        private Presence _presence;
+        private bool _authorized;
+        private string _nickname;
+        private string _pass;
 
         private StreamWriter _writer;
 
@@ -58,7 +58,7 @@ namespace Sora.Objects
 
         public void Stop()
         {
-            exit = true;
+            _exit = true;
         }
 
         public void SendMessage(string message)
@@ -69,7 +69,7 @@ namespace Sora.Objects
         public void SendCodeMessage(int code, string message, string nickname = "", string channel = "")
         {
             if (string.IsNullOrEmpty(nickname))
-                nickname = User?.UserName ?? Nickname;
+                nickname = _user?.UserName ?? _nickname;
             
             if (!string.IsNullOrEmpty(channel))
                 channel += " " + channel;
@@ -90,7 +90,7 @@ namespace Sora.Objects
                 int i;
                 while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
-                    if (exit)
+                    if (_exit)
                     {
                         return;
                     }
@@ -104,7 +104,7 @@ namespace Sora.Objects
                         switch (cmd[0])
                         {
                             case "USER":
-                                if (Authorized)
+                                if (_authorized)
                                 {
                                     SendCodeMessage(462, "Unauthorized command (already authorized!)");
                                     continue;
@@ -116,48 +116,48 @@ namespace Sora.Objects
                                     continue;
                                 }
 
-                                Nickname = cmd[1].Trim();
-                                var rUser = DBUser.GetDBUser(_factory, cmd[1].Trim()).Result;
+                                _nickname = cmd[1].Trim();
+                                var rUser = DbUser.GetDbUser(_factory, cmd[1].Trim()).Result;
                                 if (rUser == null)
                                 {
                                     SendCodeMessage(451, "You have not registered");
                                     continue;
                                 }
 
-                                User = rUser.ToUser();
+                                _user = rUser.ToUser();
 
-                                if (Authorized)
+                                if (_authorized)
                                 {
                                     SendCodeMessage(462, "Unauthorized command (already authorized!)");
                                     continue;
                                 }
 
-                                if (rUser?.IsPassword(Hex.ToHex(Crypto.GetMd5(Pass.Trim()))) != true)
+                                if (rUser?.IsPassword(Hex.ToHex(Crypto.GetMd5(_pass.Trim()))) != true)
                                 {
-                                    if (string.IsNullOrEmpty(Nickname))
-                                        Nickname = "anonymous";
+                                    if (string.IsNullOrEmpty(_nickname))
+                                        _nickname = "anonymous";
                                     
-                                    Logger.Info(Pass);
+                                    Logger.Info(_pass);
 
                                     SendCodeMessage(464, "Password incorrect");
                                     continue;
                                 }
 
-                                Presence = new Presence(User);
-                                Presence.User = User;
+                                _presence = new Presence(_user);
+                                _presence.User = _user;
                                 
-                                Presence["STATUS"] = new UserStatus();
-                                Presence["IRC"] = true;
+                                _presence["STATUS"] = new UserStatus();
+                                _presence["IRC"] = true;
 
                                 WriteConnectionResponse();
                                 WriteStatus();
-                                WriteMOTD();
+                                WriteMotd();
 
-                                Authorized = true;
+                                _authorized = true;
                                 break;
                             
                             case "JOIN":
-                                if (Presence == null || !Authorized)
+                                if (_presence == null || !_authorized)
                                 {
                                     SendCodeMessage(444, "You're not logged in");
                                     break;
@@ -169,7 +169,7 @@ namespace Sora.Objects
                                     break;
                                 }
 
-                                channel.Join(Presence);
+                                channel.Join(_presence);
                                 /*
                                 if (!)
                                 {
@@ -207,23 +207,23 @@ namespace Sora.Objects
                                 break;
                             
                             case "PING":
-                                if (Presence == null || !Authorized) {
+                                if (_presence == null || !_authorized) {
                                     SendCodeMessage(444, "You're not logged in");
                                     break;
                                 }
 
-                                await _evmng.RunEvent(EventType.BanchoPong, new BanchoPongArgs {pr = Presence});
+                                await _evmng.RunEvent(EventType.BanchoPong, new BanchoPongArgs {Pr = _presence});
                                 
                                 SendMessage($"PONG {_cfg.Server.Hostname}: {cmd[1]}");
                                 break;
                             
                             case "PASS":
-                                Pass = cmd[1];
+                                _pass = cmd[1];
                                 break;
                             
                             case "QUIT":
                                 _client.Close();
-                                _parent.RemoveTCPClient(this);
+                                _parent.RemoveTcpClient(this);
                                 return;
 
                             // Ignored Commands
@@ -233,7 +233,7 @@ namespace Sora.Objects
                             
                             default:
                                 Logger.Debug(string.Join(" ", cmd));
-                                if (!Authorized)
+                                if (!_authorized)
                                     SendCodeMessage(444, "You're not logged in");
                                 break;
                         }
@@ -262,7 +262,7 @@ namespace Sora.Objects
             SendCodeMessage(251, $"There are {_ps.ConnectedPresences} users and 0 services on 1 server");
         }
         
-        private void WriteMOTD()
+        private void WriteMotd()
         {
             SendCodeMessage(375, $"- {_cfg.Server.Hostname} Message of the day - ");
             SendCodeMessage(422, "MOTD File is missing"); // No MOTD for us :c

@@ -29,7 +29,7 @@ namespace Sora.Controllers
             if (_cache.TryGet($"jibril:achievements:{achievement}", out byte[] res))
                 return File(res, "image/png");
 
-            res = (await DBAchievement
+            res = (await DbAchievement
                   .GetAchievement(_factory, achievement.Replace(".png", string.Empty))
                   )?.GetIconImage();
 

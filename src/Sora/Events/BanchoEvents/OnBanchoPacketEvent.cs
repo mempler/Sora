@@ -1,25 +1,3 @@
-#region LICENSE
-
-/*
-    olSora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
-#endregion
-
 using System.Threading.Tasks;
 using Sora.Attributes;
 using Sora.Enums;
@@ -72,20 +50,20 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoSendUserStatus,
                         new BanchoSendUserStatusArgs
                         {
-                            pr = args.pr, status = args.Data.ReadData<SendUserStatus>().Status
+                            Pr = args.Pr, Status = args.Data.ReadData<SendUserStatus>().Status
                         }
                     );
                     break;
                 case PacketId.ClientPong:
                     await _evmgr.RunEvent(
                         EventType.BanchoPong,
-                        new BanchoPongArgs {pr = args.pr}
+                        new BanchoPongArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientRequestStatusUpdate:
                     await _evmgr.RunEvent(
                         EventType.BanchoRequestStatusUpdate,
-                        new BanchoSendUserStatusArgs {pr = args.pr, status = args.pr.Status}
+                        new BanchoSendUserStatusArgs {Pr = args.Pr, Status = args.Pr.Status}
                     );
                     break;
                 case PacketId.ClientUserStatsRequest:
@@ -93,20 +71,20 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoUserStatsRequest,
                         new BanchoUserStatsRequestArgs
                         {
-                            pr = args.pr, userIds = args.Data.ReadData<UserStatsRequest>().Userids
+                            Pr = args.Pr, UserIds = args.Data.ReadData<UserStatsRequest>().Userids
                         }
                     );
                     break;
                 case PacketId.ClientReceiveUpdates:
                     await _evmgr.RunEvent(
                         EventType.BanchoReceiveUpdates,
-                        new BanchoEmptyEventArgs {pr = args.pr}
+                        new BanchoEmptyEventArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientUserPresenceRequest:
                     await _evmgr.RunEvent(
                         EventType.BanchoUserPresenceRequest,
-                        new BanchoClientUserPresenceRequestArgs {pr = args.pr, userIds = args.Data.ReadData<UserPresenceRequest>().UserIds }
+                        new BanchoClientUserPresenceRequestArgs {Pr = args.Pr, UserIds = args.Data.ReadData<UserPresenceRequest>().UserIds }
                     );
                     break;
 
@@ -119,7 +97,7 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoChannelJoin,
                         new BanchoChannelJoinArgs
                         {
-                            pr = args.pr, ChannelName = args.Data.ReadData<ChannelJoin>().ChannelName
+                            Pr = args.Pr, ChannelName = args.Data.ReadData<ChannelJoin>().ChannelName
                         }
                     );
                     break;
@@ -128,7 +106,7 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoChannelLeave,
                         new BanchoChannelLeaveArgs
                         {
-                            pr = args.pr, ChannelName = args.Data.ReadData<ChannelLeave>().ChannelName
+                            Pr = args.Pr, ChannelName = args.Data.ReadData<ChannelLeave>().ChannelName
                         }
                     );
                     break;
@@ -144,7 +122,7 @@ namespace Sora.Events.BanchoEvents
                         msg.Msg.ChannelTarget.StartsWith("#")
                             ? EventType.BanchoSendIrcMessage
                             : EventType.BanchoSendIrcMessagePrivate,
-                        new BanchoSendIRCMessageArgs {pr = args.pr, Message = msg.Msg}
+                        new BanchoSendIrcMessageArgs {Pr = args.Pr, Message = msg.Msg}
                     );
 
                     break;
@@ -156,7 +134,7 @@ namespace Sora.Events.BanchoEvents
                 case PacketId.ClientFriendAdd:
                     await _evmgr.RunEvent(
                         EventType.BanchoFriendAdd,
-                        new BanchoFriendAddArgs {pr = args.pr, FriendId = args.Data.ReadData<FriendAdd>().FriendId}
+                        new BanchoFriendAddArgs {Pr = args.Pr, FriendId = args.Data.ReadData<FriendAdd>().FriendId}
                     );
                     break;
                 case PacketId.ClientFriendRemove:
@@ -164,7 +142,7 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoFriendRemove,
                         new BanchoFriendRemoveArgs
                         {
-                            pr = args.pr, FriendId = args.Data.ReadData<FriendRemove>().FriendId
+                            Pr = args.Pr, FriendId = args.Data.ReadData<FriendRemove>().FriendId
                         }
                     );
                     break;
@@ -178,20 +156,20 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoStartSpectating,
                         new BanchoStartSpectatingArgs
                         {
-                            pr = args.pr, SpectatorHostID = args.Data.ReadData<StartSpectating>().ToSpectateId
+                            Pr = args.Pr, SpectatorHostId = args.Data.ReadData<StartSpectating>().ToSpectateId
                         }
                     );
                     break;
                 case PacketId.ClientStopSpectating:
                     await _evmgr.RunEvent(
                         EventType.BanchoStopSpectating,
-                        new BanchoStopSpectatingArgs {pr = args.pr}
+                        new BanchoStopSpectatingArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientCantSpectate:
                     await _evmgr.RunEvent(
                         EventType.BanchoCantSpectate,
-                        new BanchoCantSpectateArgs {pr = args.pr}
+                        new BanchoCantSpectateArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientSpectateFrames:
@@ -199,7 +177,7 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoBroadcastFrames,
                         new BanchoBroadcastFramesArgs
                         {
-                            pr = args.pr, frames = args.Data.ReadData<SpectatorFrames>().Frames
+                            Pr = args.Pr, Frames = args.Data.ReadData<SpectatorFrames>().Frames
                         }
                     );
                     break;
@@ -211,13 +189,13 @@ namespace Sora.Events.BanchoEvents
                 case PacketId.ClientLobbyJoin:
                     await _evmgr.RunEvent(
                         EventType.BanchoLobbyJoin,
-                        new BanchoLobbyJoinArgs {pr = args.pr}
+                        new BanchoLobbyJoinArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientLobbyPart:
                     await _evmgr.RunEvent(
                         EventType.BanchoLobbyPart,
-                        new BanchoLobbyPartArgs {pr = args.pr}
+                        new BanchoLobbyPartArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchCreate:
@@ -225,7 +203,7 @@ namespace Sora.Events.BanchoEvents
 
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchCreate,
-                        new BanchoMatchCreateArgs {pr = args.pr, room = x}
+                        new BanchoMatchCreateArgs {Pr = args.Pr, Room = x}
                     );
                     break;
                 case PacketId.ClientMatchJoin:
@@ -233,13 +211,13 @@ namespace Sora.Events.BanchoEvents
 
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchJoin,
-                        new BanchoMatchJoinArgs {pr = args.pr, matchId = mJoin.MatchId, password = mJoin.Password}
+                        new BanchoMatchJoinArgs {Pr = args.Pr, MatchId = mJoin.MatchId, Password = mJoin.Password}
                     );
                     break;
                 case PacketId.ClientMatchPart:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchPart,
-                        new BanchoMatchPartArgs {pr = args.pr}
+                        new BanchoMatchPartArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchChangeSlot:
@@ -247,20 +225,20 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoMatchChangeSlot,
                         new BanchoMatchChangeSlotArgs
                         {
-                            pr = args.pr, SlotId = args.Data.ReadData<MatchChangeSlot>().SlotId
+                            Pr = args.Pr, SlotId = args.Data.ReadData<MatchChangeSlot>().SlotId
                         }
                     );
                     break;
                 case PacketId.ClientMatchChangeMods:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchChangeMods,
-                        new BanchoMatchChangeModsArgs {pr = args.pr, mods = args.Data.ReadData<MatchChangeMods>().Mods}
+                        new BanchoMatchChangeModsArgs {Pr = args.Pr, Mods = args.Data.ReadData<MatchChangeMods>().Mods}
                     );
                     break;
                 case PacketId.ClientMatchLock:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchLock,
-                        new BanchoMatchLockArgs {pr = args.pr, SlotId = args.Data.ReadData<MatchLock>().SlotId}
+                        new BanchoMatchLockArgs {Pr = args.Pr, SlotId = args.Data.ReadData<MatchLock>().SlotId}
                     );
                     break;
                 case PacketId.ClientMatchChangeSettings:
@@ -268,7 +246,7 @@ namespace Sora.Events.BanchoEvents
                     
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchChangeSettings,
-                        new BanchoMatchChangeSettingsArgs {pr = args.pr, room = y}
+                        new BanchoMatchChangeSettingsArgs {Pr = args.Pr, Room = y}
                     );
                     break;
                 case PacketId.ClientMatchChangePassword:
@@ -276,25 +254,25 @@ namespace Sora.Events.BanchoEvents
 
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchChangePassword,
-                        new BanchoMatchChangePasswordArgs {pr = args.pr, room = xy}
+                        new BanchoMatchChangePasswordArgs {Pr = args.Pr, Room = xy}
                     );
                     break;
                 case PacketId.ClientMatchChangeTeam:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchChangeTeam,
-                        new BanchoMatchChangeTeamArgs {pr = args.pr}
+                        new BanchoMatchChangeTeamArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchReady:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchReady,
-                        new BanchoMatchReadyArgs {pr = args.pr}
+                        new BanchoMatchReadyArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchNotReady:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchNotReady,
-                        new BanchoMatchNotReadyArgs {pr = args.pr}
+                        new BanchoMatchNotReadyArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchTransferHost:
@@ -302,38 +280,38 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoMatchTransferHost,
                         new BanchoMatchTransferHostArgs
                         {
-                            pr = args.pr, SlotId = args.Data.ReadData<MatchTransferHost>().SlotId
+                            Pr = args.Pr, SlotId = args.Data.ReadData<MatchTransferHost>().SlotId
                         }
                     );
                     break;
                 case PacketId.ClientMatchNoBeatmap:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchNoBeatmap,
-                        new BanchoMatchNoBeatmapArgs {pr = args.pr}
+                        new BanchoMatchNoBeatmapArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchHasBeatmap:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchHasBeatmap,
-                        new BanchoMatchHasBeatmapArgs {pr = args.pr}
+                        new BanchoMatchHasBeatmapArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientInvite:
                     await _evmgr.RunEvent(
                         EventType.BanchoInvite,
-                        new BanchoInviteArgs {pr = args.pr, UserId = args.Data.ReadData<Invite>().UserId}
+                        new BanchoInviteArgs {Pr = args.Pr, UserId = args.Data.ReadData<Invite>().UserId}
                     );
                     break;
                 case PacketId.ClientMatchStart:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchStart,
-                        new BanchoMatchStartArgs {pr = args.pr}
+                        new BanchoMatchStartArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchLoadComplete:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchLoadComplete,
-                        new BanchoMatchLoadCompleteArgs {pr = args.pr}
+                        new BanchoMatchLoadCompleteArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchScoreUpdate:
@@ -341,26 +319,26 @@ namespace Sora.Events.BanchoEvents
                         EventType.BanchoMatchScoreUpdate,
                         new BanchoMatchScoreUpdateArgs
                         {
-                            pr = args.pr, Frame = args.Data.ReadData<MatchScoreUpdate>().Frame
+                            Pr = args.Pr, Frame = args.Data.ReadData<MatchScoreUpdate>().Frame
                         }
                     );
                     break;
                 case PacketId.ClientMatchFailed:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchFailed,
-                        new BanchoMatchFailedArgs {pr = args.pr}
+                        new BanchoMatchFailedArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchSkipRequest:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchSkipRequest,
-                        new BanchoMatchSkipRequestArgs {pr = args.pr}
+                        new BanchoMatchSkipRequestArgs {Pr = args.Pr}
                     );
                     break;
                 case PacketId.ClientMatchComplete:
                     await _evmgr.RunEvent(
                         EventType.BanchoMatchComplete,
-                        new BanchoMatchCompleteArgs {pr = args.pr}
+                        new BanchoMatchCompleteArgs {Pr = args.Pr}
                     );
                     break;
 
@@ -371,14 +349,14 @@ namespace Sora.Events.BanchoEvents
                 case PacketId.ClientExit:
                     await _evmgr.RunEvent(
                         EventType.BanchoExit,
-                        new BanchoExitArgs {pr = args.pr, err = args.Data.ReadData<Exit>().ErrorState}
+                        new BanchoExitArgs {Pr = args.Pr, Err = args.Data.ReadData<Exit>().ErrorState}
                     );
                     break;
                 case PacketId.ClientBeatmapInfoRequest:
                     var data = args.Data.ReadData<BeatmapInfoRequest>();
                     await _evmgr.RunEvent(
                         EventType.BanchoBeatmapInfoRequest,
-                        new BanchoBeatmapInfoRequestArgs{pr = args.pr, FileNames = data.FileNames});
+                        new BanchoBeatmapInfoRequestArgs{Pr = args.Pr, FileNames = data.FileNames});
                     break;
                 default:
                     Logger.Debug(

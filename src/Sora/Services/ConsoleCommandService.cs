@@ -69,7 +69,7 @@ namespace Sora.Services
 
                         l += "\n%#1c9624%/*\n";
                         l += cmd.Description;
-                        l += $"\n*/{L_COL.WHITE}\n";
+                        l += $"\n*/{LCol.WHITE}\n";
                         l += "\n" + cmd.Command + aList;
                         l += "\n";
                     }
@@ -107,7 +107,7 @@ namespace Sora.Services
                 3,
                 args =>
                 {
-                    var u = DBUser.RegisterUser(factory, Permission.From(args[3..].Join()),
+                    var u = DbUser.RegisterUser(factory, Permission.From(args[3..].Join()),
                         args[0], args[2], args[1], false);
                     
                     if (u == null) {
@@ -131,7 +131,7 @@ namespace Sora.Services
 
         public List<ConsoleCommand> Commands { get; }
 
-        public void RegisterCommand(string Command, string Description, List<Argument> args, int expectedArgs,
+        public void RegisterCommand(string command, string description, List<Argument> args, int expectedArgs,
             ConsoleCommand.ConsoleCommandExecution cb)
         {
             lock (_mut)
@@ -139,8 +139,8 @@ namespace Sora.Services
                 Commands.Add(
                     new ConsoleCommand
                     {
-                        Command = Command,
-                        Description = Description,
+                        Command = command,
+                        Description = description,
                         Args = args,
                         ExpectedArgs = expectedArgs,
                         Callback = cb
@@ -149,11 +149,11 @@ namespace Sora.Services
             }
         }
 
-        public IEnumerable<ConsoleCommand> GetCommands(string Command)
+        public IEnumerable<ConsoleCommand> GetCommands(string command)
         {
             lock (_mut)
             {
-                return Commands.Where(z => z.Command == Command.Split(" ")[0]);
+                return Commands.Where(z => z.Command == command.Split(" ")[0]);
             }
         }
 

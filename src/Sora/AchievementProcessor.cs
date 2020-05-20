@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sora.Database;
@@ -6,7 +5,6 @@ using Sora.Database.Models;
 using Sora.Framework.Objects;
 using Sora.Framework.Objects.Scores;
 using Sora.Framework.Utilities;
-using Sora.Objects;
 
 namespace Sora
 {
@@ -20,7 +18,7 @@ namespace Sora
         public static void CreateDefaultAchievements(SoraDbContextFactory factory)
         {
             if (factory.Get().Achievements.FirstOrDefault(x => x.Name == "oog") == null)
-                DBAchievement.NewAchievement(
+                DbAchievement.NewAchievement(
                     factory,
                     "oog",
                     "Oooooooooooooooog!",
@@ -37,19 +35,19 @@ namespace Sora
         /// <param name="score">Submitted Score</param>
         /// <param name="map">Beatmap</param>
         /// <param name="set">Beatmap Set</param>
-        /// <param name="oldLB">Old LeaderBoard</param>
-        /// <param name="newLB">New LeaderBoard</param>
+        /// <param name="oldLb">Old LeaderBoard</param>
+        /// <param name="newLb">New LeaderBoard</param>
         /// <returns>Obtained Achievements</returns>
         public static string ProcessAchievements(SoraDbContextFactory factory,
-            DBUser user,
+            DbUser user,
             Score score,
             Beatmap map,
             BeatmapSet set,
-            DBLeaderboard oldLB,
-            DBLeaderboard newLB
+            DbLeaderboard oldLb,
+            DbLeaderboard newLb
             )
         {
-            var _l = new List<Achievement>();
+            var l = new List<Achievement>();
 
             /*
             if ((int) newLB.PerformancePointsOsu == 4914)
@@ -65,7 +63,7 @@ namespace Sora
 
             // END OF CUSTOM ACHIEVEMENTS
 
-            var retVal = _l.Aggregate("", (current, ach) => current + ach.ToOsuString() + "/");
+            var retVal = l.Aggregate("", (current, ach) => current + ach.ToOsuString() + "/");
             retVal.TrimEnd('/');
 
             return retVal;

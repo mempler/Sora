@@ -49,7 +49,7 @@ namespace Sora.API.Controllers.api.v1
                                        new LBResponse
                                        {
                                            Id = l.OwnerId,
-                                           Username = DBUser.GetDBUser(_factory, l.OwnerId).Result.UserName,
+                                           Username = DbUser.GetDbUser(_factory, l.OwnerId).Result.UserName,
                                            Accuracy = l.GetAccuracy(_factory, mode),
                                            Performance = mode switch
                                            {

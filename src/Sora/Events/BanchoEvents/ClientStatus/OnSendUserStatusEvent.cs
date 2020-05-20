@@ -1,25 +1,3 @@
-#region LICENSE
-
-/*
-    olSora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
-#endregion
-
 using System;
 using Sora.Attributes;
 using Sora.Database;
@@ -48,43 +26,43 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoSendUserStatus)]
         public void OnSendUserStatus(BanchoSendUserStatusArgs args)
         {
-            if (args.pr.Status.Playmode != args.status.Playmode)
+            if (args.Pr.Status.Playmode != args.Status.Playmode)
             {
-                var lb = (DBLeaderboard) args.pr["LB"];
-                args.pr.Stats.Accuracy = (float) lb.GetAccuracy(_factory, args.status.Playmode);
-                args.pr.Stats.Position = lb.GetPosition(_factory, args.status.Playmode);
-                switch (args.status.Playmode)
+                var lb = (DbLeaderboard) args.Pr["LB"];
+                args.Pr.Stats.Accuracy = (float) lb.GetAccuracy(_factory, args.Status.Playmode);
+                args.Pr.Stats.Position = lb.GetPosition(_factory, args.Status.Playmode);
+                switch (args.Status.Playmode)
                 {
                     case PlayMode.Osu:
-                        args.pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsOsu;
-                        args.pr.Stats.TotalScore = (ushort) lb.TotalScoreOsu;
-                        args.pr.Stats.RankedScore = (ushort) lb.RankedScoreOsu;
-                        args.pr.Stats.PlayCount = (ushort) lb.PlayCountOsu;
+                        args.Pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsOsu;
+                        args.Pr.Stats.TotalScore = (ushort) lb.TotalScoreOsu;
+                        args.Pr.Stats.RankedScore = (ushort) lb.RankedScoreOsu;
+                        args.Pr.Stats.PlayCount = (ushort) lb.PlayCountOsu;
                         break;
                     case PlayMode.Taiko:
-                        args.pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsTaiko;
-                        args.pr.Stats.TotalScore = (ushort) lb.TotalScoreTaiko;
-                        args.pr.Stats.RankedScore = (ushort) lb.RankedScoreTaiko;
-                        args.pr.Stats.PlayCount = (ushort) lb.PlayCountTaiko;
+                        args.Pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsTaiko;
+                        args.Pr.Stats.TotalScore = (ushort) lb.TotalScoreTaiko;
+                        args.Pr.Stats.RankedScore = (ushort) lb.RankedScoreTaiko;
+                        args.Pr.Stats.PlayCount = (ushort) lb.PlayCountTaiko;
                         break;
                     case PlayMode.Ctb:
-                        args.pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsCtb;
-                        args.pr.Stats.TotalScore = (ushort) lb.TotalScoreCtb;
-                        args.pr.Stats.RankedScore = (ushort) lb.RankedScoreCtb;
-                        args.pr.Stats.PlayCount = (ushort) lb.PlayCountCtb;
+                        args.Pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsCtb;
+                        args.Pr.Stats.TotalScore = (ushort) lb.TotalScoreCtb;
+                        args.Pr.Stats.RankedScore = (ushort) lb.RankedScoreCtb;
+                        args.Pr.Stats.PlayCount = (ushort) lb.PlayCountCtb;
                         break;
                     case PlayMode.Mania:
-                        args.pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsMania;
-                        args.pr.Stats.TotalScore = (ushort) lb.TotalScoreMania;
-                        args.pr.Stats.RankedScore = (ushort) lb.RankedScoreMania;
-                        args.pr.Stats.PlayCount = (ushort) lb.PlayCountMania;
+                        args.Pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsMania;
+                        args.Pr.Stats.TotalScore = (ushort) lb.TotalScoreMania;
+                        args.Pr.Stats.RankedScore = (ushort) lb.RankedScoreMania;
+                        args.Pr.Stats.PlayCount = (ushort) lb.PlayCountMania;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            args.pr.Status = args.status;
-            _ps.Push(new HandleUpdate(args.pr));
+            args.Pr.Status = args.Status;
+            _ps.Push(new HandleUpdate(args.Pr));
         }
     }
 }

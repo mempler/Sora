@@ -24,13 +24,13 @@ namespace Sora
     public class StartUp
     {
         private readonly IHostingEnvironment _env;
-        private readonly IConfiguration config;
+        private readonly IConfiguration _config;
 
         public StartUp(IHostingEnvironment env)
         {
             _env = env;
             
-            config = new ConfigurationBuilder().Build();
+            _config = new ConfigurationBuilder().Build();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -56,7 +56,7 @@ namespace Sora
                 {
                     Hostname = "0.0.0.0",
                     Port = 5001,
-                    IRCPort = 6667,
+                    IrcPort = 6667,
 
                     ScreenShotHostname = "localhost",
                     FreeDirect = true
@@ -65,7 +65,7 @@ namespace Sora
                 {
                     URI = "https://pisstau.be"
                 },
-                ESC = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
+                Esc = Convert.ToBase64String(Crypto.SCrypt.generate_salt())
             };
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
@@ -73,7 +73,7 @@ namespace Sora
             
             services.AddSingleton(scfg)
                     .AddSingleton<IConfig>(scfg)
-                    .AddSingleton<IMySQLConfig>(scfg)
+                    .AddSingleton<IMySqlConfig>(scfg)
                     .AddSingleton<IPisstaubeConfig>(scfg)
                     .AddSingleton<IServerConfig>(scfg)
                     .AddSingleton<Pisstaube>()
@@ -83,7 +83,7 @@ namespace Sora
                     .AddSingleton<ChannelService>()
                     .AddSingleton<ConsoleCommandService>()
                     .AddSingleton<Bot.Sora>()
-                    .AddSingleton<IRCServer>()
+                    .AddSingleton<IrcServer>()
                     .AddSingleton<ChatFilter>()
                     .AddSingleton(new EventManager(new List<Assembly> {Assembly.GetEntryAssembly()}))
                     .AddSingleton<PluginService>();
@@ -103,7 +103,7 @@ namespace Sora
                     OnTokenValidated = async context =>
                     {
                         var factory = context.HttpContext.RequestServices.GetRequiredService<SoraDbContextFactory>();
-                        if (await DBUser.GetDBUser(factory, context.Principal.Identity.Name) == null)
+                        if (await DbUser.GetDbUser(factory, context.Principal.Identity.Name) == null)
                         {
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
@@ -118,8 +118,8 @@ namespace Sora
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.ESC)),
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.ESC)),
+                    TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.Esc)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(scfg.Esc)),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
@@ -158,7 +158,7 @@ namespace Sora
             PresenceService ps,
             PluginService plugs)
         {
-            logger.Log(LogLevel.Information, License.L);
+            logger.Log(LogLevel.Information, License.l);
             app.UseCors("CorsPolicy");
             
             app.UseMiddleware<ExceptionMiddleware>();

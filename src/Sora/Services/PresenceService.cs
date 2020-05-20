@@ -65,8 +65,8 @@ namespace Sora.Services
                     {
                         _ev?.RunEvent(EventType.BanchoExit, new BanchoExitArgs
                         {
-                            pr = removableValue,
-                            err = ErrorStates.Ok
+                            Pr = removableValue,
+                            Err = ErrorStates.Ok
                         });
                     }
                 }

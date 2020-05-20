@@ -27,6 +27,6 @@ namespace Sora.EventArgs.BanchoEventArgs
     public class BanchoChannelLeaveArgs : IEventArgs, INeedPresence
     {
         public string ChannelName;
-        public Presence pr { get; set; }
+        public Presence Pr { get; set; }
     }
 }

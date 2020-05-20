@@ -27,27 +27,27 @@ namespace Sora.Controllers
 
         public interface IOAuth
         {
-            string grant_type { get; set; }
-            string client_id { get; set; }
-            string client_secret { get; set; }
+            string GrantType { get; set; }
+            string ClientId { get; set; }
+            string ClientSecret { get; set; }
         }
 
         public struct PasswordAuth
         {
-            public string username;
-            public string password;
+            public string Username;
+            public string Password;
         }
         
         public struct OAuthPasswordAuth : IOAuth
         {
-            public string username;
-            public string password;
-            public string grant_type { get; set; }
-            public string client_id { get; set; }
-            public string client_secret { get; set; }
+            public string Username;
+            public string Password;
+            public string GrantType { get; set; }
+            public string ClientId { get; set; }
+            public string ClientSecret { get; set; }
             
             public override string ToString()
-                => $"U: {username} PW: {password} GT: {grant_type} CID: {client_id} CS: {client_secret}";
+                => $"U: {Username} PW: {Password} GT: {GrantType} CID: {ClientId} CS: {ClientSecret}";
         }
 
         public OAuthController(SoraDbContextFactory factory, Config cfg, ILogger<OAuthController> logger)
@@ -92,13 +92,13 @@ namespace Sora.Controllers
                 auth = JsonConvert.DeserializeObject<PasswordAuth>(await reader.ReadToEndAsync());
             }
             
-            var user = await DBUser.GetDBUser(_factory, auth.username);
+            var user = await DbUser.GetDbUser(_factory, auth.Username);
             if (user == null)
                 return BadRequest(new {code = 401, message = "Username is incorrect!"});
-            if (!user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.password))))
+            if (!user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.Password))))
                 return BadRequest(new {code = 402, message = "Password is incorrect"});
 
-            var key = Convert.FromBase64String(_cfg.ESC);
+            var key = Convert.FromBase64String(_cfg.Esc);
             return Authorized(key, new [] { new Claim(ClaimTypes.Name, user.Id.ToString()), });
         }
         
@@ -112,17 +112,17 @@ namespace Sora.Controllers
                 auth = JsonConvert.DeserializeObject<OAuthPasswordAuth>(await reader.ReadToEndAsync());
             }
 
-            var oauthClient = await DBOAuthClient.GetClient(_factory, auth.client_id);
+            var oauthClient = await DboAuthClient.GetClient(_factory, auth.ClientId);
             if (oauthClient == null)
                 return BadRequest(new {code = 403, message = "Client Doesn't exists!"});
-            if (oauthClient.Secret != auth.client_secret)
+            if (oauthClient.Secret != auth.ClientSecret)
                 return BadRequest(new {code = 404, message = "invalid secret!"});
             
-            var user = await DBUser.GetDBUser(_factory, auth.username);
-            if (user == null || !user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.password))))
+            var user = await DbUser.GetDbUser(_factory, auth.Username);
+            if (user == null || !user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.Password))))
                 return BadRequest(new {code = 400, message = "Username or password is incorrect"});
 
-            var key = Convert.FromBase64String(_cfg.ESC);
+            var key = Convert.FromBase64String(_cfg.Esc);
             return Authorized(key, new[] {new Claim(ClaimTypes.Name, user.Id.ToString())});
         }
     }

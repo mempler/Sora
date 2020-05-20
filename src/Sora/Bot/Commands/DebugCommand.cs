@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -44,22 +43,22 @@ namespace Sora.Bot.Commands
         [Event(EventType.BanchoPacket)]
         public void OnBanchoPacketEvent(BanchoPacketArgs args)
         {
-            if (args.pr["IS_PACKET_DEBUGGING"] == null)
+            if (args.Pr["IS_PACKET_DEBUGGING"] == null)
                 return;
 
-            if ((bool) args.pr["IS_PACKET_DEBUGGING"])
-                _ev?.RunEvent(EventType.BanchoSendIrcMessagePrivate, new BanchoSendIRCMessageArgs
+            if ((bool) args.Pr["IS_PACKET_DEBUGGING"])
+                _ev?.RunEvent(EventType.BanchoSendIrcMessagePrivate, new BanchoSendIrcMessageArgs
                 {
-                    pr = args.pr,
+                    Pr = args.Pr,
                     Message = new MessageStruct
                     {
                         Message = $"\n\n\n\n\n\n\n\n\n\n" +
                                   $"\nPacketId: {args.PacketId}" +
                                   $"\nPacket Length: {args.Data.BaseStream.Length}" +
                                   $"\nPacketData: {Hex.ToHex(((MemoryStream) args.Data.BaseStream).ToArray())}",
-                        Username = args.pr.User.UserName,
-                        ChannelTarget = args.pr.User.UserName,
-                        SenderId = args.pr.User.Id
+                        Username = args.Pr.User.UserName,
+                        ChannelTarget = args.Pr.User.UserName,
+                        SenderId = args.Pr.User.Id
                     }
                 });
         }

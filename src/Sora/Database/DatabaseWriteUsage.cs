@@ -7,10 +7,10 @@ namespace Sora.Database
     public class DatabaseWriteUsage : IDisposable
     {
         public readonly SoraDbContext Context;
-        private readonly Action<DatabaseWriteUsage> usageCompleted;
+        private readonly Action<DatabaseWriteUsage> _usageCompleted;
         public List<Exception> Errors = new List<Exception>();
 
-        private bool isDisposed;
+        private bool _isDisposed;
 
         /// <summary>
         ///     Whether this write usage will commit a transaction on completion.
@@ -21,7 +21,7 @@ namespace Sora.Database
         public DatabaseWriteUsage(SoraDbContext context, Action<DatabaseWriteUsage> onCompleted)
         {
             Context = context;
-            usageCompleted = onCompleted;
+            _usageCompleted = onCompleted;
         }
 
         public bool PerformedWrite { get; private set; }
@@ -34,10 +34,10 @@ namespace Sora.Database
 
         protected void Dispose(bool disposing)
         {
-            if (isDisposed)
+            if (_isDisposed)
                 return;
 
-            isDisposed = true;
+            _isDisposed = true;
 
             try
             {
@@ -49,7 +49,7 @@ namespace Sora.Database
             }
             finally
             {
-                usageCompleted?.Invoke(this);
+                _usageCompleted?.Invoke(this);
             }
         }
 

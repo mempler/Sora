@@ -10,7 +10,7 @@ namespace Sora.Database.Migrations
 {
     [DbContext(typeof(SoraDbContext))]
     [Migration("20190926184006_Connecting_Friends_and_Users")]
-    partial class Connecting_Friends_and_Users
+    partial class ConnectingFriendsAndUsers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

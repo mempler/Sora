@@ -1,26 +1,3 @@
-#region LICENSE
-
-/*
-    olSora - A Modular Bancho written in C#
-    Copyright (C) 2019 Robin A. P.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
-#endregion
-
-using System.Linq;
 using Sora.Attributes;
 using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
@@ -43,26 +20,26 @@ namespace Sora.Events.BanchoEvents.Multiplayer.Match
         [Event(EventType.BanchoMatchCreate)]
         public async void OnBanchoMatchCreate(BanchoMatchCreateArgs args)
         {
-            args.room.Password = args.room.Password.Replace(" ", "_");
+            args.Room.Password = args.Room.Password.Replace(" ", "_");
             
-            Lobby.Self.Push(args.room);
+            Lobby.Self.Push(args.Room);
             
-            if (args.room.Join(args.pr, args.room.Password))
-                args.pr.Push(new MatchJoinSuccess(args.room));
+            if (args.Room.Join(args.Pr, args.Room.Password))
+                args.Pr.Push(new MatchJoinSuccess(args.Room));
             else
-                args.pr.Push(new MatchJoinFail());
+                args.Pr.Push(new MatchJoinFail());
 
-            args.room.Update();
+            args.Room.Update();
 
             Logger.Info(
-                "%#F94848%" + args.pr.User.UserName,
-                "%#B342F4%(", args.pr.User.Id, "%#B342F4%)",
-                "%#FFFFFF%has created a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.room.Name,
-                "%#B342F4%(", args.room.MatchId, "%#B342F4%)"
+                "%#F94848%" + args.Pr.User.UserName,
+                "%#B342F4%(", args.Pr.User.Id, "%#B342F4%)",
+                "%#FFFFFF%has created a %#f1fc5a%Multiplayer Room %#FFFFFF%called %#F94848%" + args.Room.Name,
+                "%#B342F4%(", args.Room.MatchId, "%#B342F4%)"
             );
             
             await _ev.RunEvent(
-                EventType.BanchoChannelJoin, new BanchoChannelJoinArgs {pr = args.pr, ChannelName = "#multiplayer"}
+                EventType.BanchoChannelJoin, new BanchoChannelJoinArgs {Pr = args.Pr, ChannelName = "#multiplayer"}
             );
         }
     }

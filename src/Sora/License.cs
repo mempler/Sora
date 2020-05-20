@@ -2,12 +2,13 @@ namespace Sora
 {
     public static class License
     {
-        public const string L =
+        public const string l =
 @"%#FFFFFF%Sora V1.0.0
 
 %#800000%=============================== %#F94848%License %#800000%=================================
 %#F94848%Sora - A Modular Bancho written in C#
-Copyright (C) 2019 Robin A. P. yeet
+
+Copyright (C) 2019 Robin A. P.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
