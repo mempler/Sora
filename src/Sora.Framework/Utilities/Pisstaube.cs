@@ -176,7 +176,7 @@ namespace Sora.Framework.Utilities
             => RequestJsonAsync<BeatmapSet>($"/api/cheesegull/s/{beatmapSetId}");
 
         public Task<BeatmapSet> FetchBeatmapSetAsync(string fileMd5)
-            => RequestJsonAsync<BeatmapSet>($"/api/cheesegull/hash/{fileMd5}");
+            => RequestJsonAsync<BeatmapSet>($"/api/v1/hash/{fileMd5}");
 
         public Task<Beatmap> FetchBeatmapAsync(int beatmapId)
             => RequestJsonAsync<Beatmap>($"/api/cheesegull/b/{beatmapId}");
