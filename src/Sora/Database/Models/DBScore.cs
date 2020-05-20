@@ -43,11 +43,11 @@ namespace Sora.Database.Models
         [ForeignKey(nameof(UserId))]
         public DbUser ScoreOwner { get; set; }
 
-        public async Task<int> Position(SoraDbContextFactory factory)
-            => await factory.Get().Scores.Where(s => s.TotalScore > TotalScore &&
-                                                     s.FileMd5 == FileMd5 &&
-                                                     s.PlayMode == PlayMode &&
-                                                     s.UserId != UserId).CountAsync() +1;
+        public async Task<int> Position(SoraDbContext ctx)
+            => await ctx.Scores.Where(s => s.TotalScore > TotalScore &&
+                                           s.FileMd5 == FileMd5 && 
+                                           s.PlayMode == PlayMode && 
+                                           s.UserId != UserId).CountAsync() +1;
 
         public double ComputeAccuracy()
         {
@@ -80,7 +80,7 @@ namespace Sora.Database.Models
         );
 
         public static async Task<List<DbScore>> GetScores(
-                SoraDbContextFactory factory,
+                SoraDbContext ctx,
                 string fileMd5, DbUser user, PlayMode playMode = PlayMode.Osu,
                 bool friendsOnly = false, bool countryOnly = false, bool modOnly = false,
                 Mod mods = Mod.None, bool onlySelf = false
@@ -93,11 +93,11 @@ namespace Sora.Database.Models
                 cid = UserStats.GetUserStats(factory, user.Id).CountryId;
             */
 
-            var query = factory.Get().Scores
+            var query = ctx.Scores
                                .Where(score => score.FileMd5 == fileMd5 && score.PlayMode == playMode)
                                .Where(
                                    score
-                                       => !friendsOnly || factory.Get().Friends
+                                       => !friendsOnly || ctx.Friends
                                                                  .Where(f => f.UserId == user.Id)
                                                                  .Select(f => f.FriendId)
                                                                  .Contains(score.UserId)
@@ -124,41 +124,40 @@ namespace Sora.Database.Models
         }
 
         public static Task<DbScore> GetScore(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             int replayId
-        ) => factory.Get().Scores.Where(x => x.Id == replayId).FirstOrDefaultAsync();
+        ) => ctx.Scores.Where(x => x.Id == replayId).FirstOrDefaultAsync();
 
         public static Task<DbScore> GetScore(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             string fileMd5
-        ) => factory.Get().Scores.Where(x => x.FileMd5 == fileMd5).FirstOrDefaultAsync();
+        ) => ctx.Scores.Where(x => x.FileMd5 == fileMd5).FirstOrDefaultAsync();
 
         public static Task<DbScore> GetScore(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             DbScore otherScore
-        ) => factory.Get().Scores.Where(x => x.Checksum == otherScore.Checksum).FirstOrDefaultAsync();
+        ) => ctx.Scores.Where(x => x.Checksum == otherScore.Checksum).FirstOrDefaultAsync();
 
         public static Task<DbScore> GetLatestScore(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             DbScore newerScore
-        ) => factory.Get().Scores.Where(x => x.FileMd5 == newerScore.FileMd5 &&
+        ) => ctx.Scores.Where(x => x.FileMd5 == newerScore.FileMd5 &&
                                              x.UserId == newerScore.UserId &&
                                              x.PlayMode == newerScore.PlayMode &&
                                              x.TotalScore >= newerScore.TotalScore)
                     .OrderByDescending(x => x.TotalScore).ThenByDescending(s => s.Accuracy)
                     .FirstOrDefaultAsync();
 
-        public static void InsertScore(SoraDbContextFactory factory, DbScore score)
+        public static async void InsertScore(SoraDbContext ctx, DbScore score)
         {
             var so = score.ScoreOwner; // Fix for an Issue with Inserting.
             
-            using (var db = factory.GetForWrite())
-            {
-                score.ScoreOwner = null;
-                db.Context.Add(score);
-            }
-            
+            score.ScoreOwner = null;
+            ctx.Add(score);
+
             score.ScoreOwner = so; // Restore ScoreOwner
+
+            await ctx.SaveChangesAsync();
         }
     }
 }

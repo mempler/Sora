@@ -64,14 +64,14 @@ namespace Sora.Database.Models
         public DateTime? StatusUntil { get; set; }
         public string? StatusReason { get; set; }
 
-        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, int userId)
-            => factory.Get().Users.FirstOrDefaultAsync(u => u.Id == userId);
+        public static Task<DbUser?> GetDbUser(SoraDbContext ctx, int userId)
+            => ctx.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, string userName)
-            => factory.Get().Users.FirstOrDefaultAsync(u => u.UserName == userName);
+        public static Task<DbUser?> GetDbUser(SoraDbContext ctx, string userName)
+            => ctx.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         
-        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, User user)
-            => GetDbUser(factory, user.Id);
+        public static Task<DbUser?> GetDbUser(SoraDbContext ctx, User user)
+            => GetDbUser(ctx, user.Id);
 
         public User ToUser() => new User
         {
@@ -95,13 +95,13 @@ namespace Sora.Database.Models
             }
         }
 
-        public static DbUser RegisterUser(
-            SoraDbContextFactory factory,
+        public static async Task<DbUser> RegisterUser(
+            SoraDbContext ctx,
             Permission permission,
             string userName, string eMail, string password, bool md5 = true,
             PasswordVersion pwVersion = PasswordVersion.V2, int userId = 0) /* 0 = increased. */
         {
-            if (factory.Get().Users.Any(u => string.Equals(u.UserName, userName, StringComparison.CurrentCultureIgnoreCase)))
+            if (ctx.Users.Any(u => string.Equals(u.UserName, userName, StringComparison.CurrentCultureIgnoreCase)))
                 return null;
             
             byte[] salt = null;
@@ -135,11 +135,9 @@ namespace Sora.Database.Models
 
             if (userId > 0)
                 user.Id = userId;
-
-            using (var db = factory.GetForWrite())
-            {
-                db.Context.Add(user);
-            }
+            
+            ctx.Add(user);
+            await ctx.SaveChangesAsync();
             
             return user;
         }

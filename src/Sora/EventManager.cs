@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Sora.Enums;
 using Sora.Framework.Utilities;
 using Sora.Attributes;
@@ -40,9 +42,8 @@ namespace Sora
     {
         private readonly IEnumerable<Assembly> _asma;
 
-        private readonly Dictionary<object, List<Tuple<EventType, List<MethodInfo>>>> _events =
-            new Dictionary<object, List<Tuple<EventType, List<MethodInfo>>>>();
-
+        private Dictionary<EventType, List<Type>> _eventClasses = new Dictionary<EventType, List<Type>>();
+        
         public EventManager(IEnumerable<Assembly> asma) => _asma = asma;
 
         public IServiceProvider Provider { get; private set; }
@@ -51,9 +52,9 @@ namespace Sora
         /// Set Active Service Provider
         /// </summary>
         /// <param name="provider"></param>
-        public void SetProvider(IServiceProvider provider)
+        public void SetProvider(IApplicationBuilder app)
         {
-            Provider = provider;
+            Provider = app.ApplicationServices;
         }
 
         /// <summary>
@@ -73,18 +74,31 @@ namespace Sora
         /// <returns>Awaiter</returns>
         public async Task RunEvent(EventType etype, IEventArgs args = null)
         {
-            foreach (var evcls in _events)
-            foreach (var (evTypes, mInfos) in evcls.Value)
+            foreach (var type in _eventClasses[etype])
             {
-                if (evTypes != etype)
-                    continue;
+                var methods = AttributeUtility.GetTFromMethod<EventAttribute>(type);
 
-                foreach (var mInfo in mInfos)
+                var tArgs = (from cInfo in type.GetConstructors()
+                             from pInfo in cInfo.GetParameters()
+                             select Provider.GetService(pInfo.ParameterType)).ToArray();
+
+                for (var i = 0; i < tArgs.Length; i++)
+                {
+                    if (tArgs[i].GetType() == typeof(IServiceProvider))
+                        tArgs[i] = Provider;
+                }
+                
+                if (tArgs.Any(x => x == null))
+                    throw new Exception("Could not find Dependency, are you sure you registered the Dependency?");
+
+                var cls = Activator.CreateInstance(type, tArgs);
+                
+                foreach (var method in methods)
                 {
                     var o = new List<object>();
-                    if (args != null || mInfo.GetParameters().Length > 0)
+                    if (args != null || method.GetParameters().Length > 0)
                         o.Add(args);
-                    var r = mInfo.Invoke(evcls.Key, o.ToArray());
+                    var r = method.Invoke(cls, o.ToArray());
                     if (r == null)
                         continue;
 
@@ -109,29 +123,22 @@ namespace Sora
                 if (!t.IsClass)
                     throw new Exception("Event " + t + " Failed because " + t + " Is not a class!");
 
-                var methods = AttributeUtility.GetTFromMethod<EventAttribute>(t);
+                var eventTypes = AttributeUtility.GetTFromMethod<EventAttribute>(t)
+                                                 .Select(s => s.GetCustomAttribute<EventAttribute>()?.Type)
+                                                 .Where(s => s.HasValue)
+                                                 .Select(s => s.Value);
 
-                var tArgs = (from cInfo in t.GetConstructors()
-                             from pInfo in cInfo.GetParameters()
-                             select Provider.GetService(pInfo.ParameterType)).ToArray();
-
-                if (tArgs.Any(x => x == null))
-                    throw new Exception("Could not find Dependency, are you sure you registered the Dependency?");
-
-                var cls = Activator.CreateInstance(t, tArgs);
-
-                foreach (var mInfo in methods)
+                foreach (var eType in eventTypes)
                 {
-                    var eventTy = mInfo.GetCustomAttributes<EventAttribute>().First().Type;
-                    if (_events.All(x => x.Key.GetType() != t))
-                        _events.Add(cls, new List<Tuple<EventType, List<MethodInfo>>>());
+                    if (_eventClasses.TryGetValue(eType, out var types)) // TODO: finish
+                    {
+                        if (!types.Contains(t))
+                            types.Add(t);   
+                    }
                     else
-                        cls = _events.First(x => x.Key.GetType() == t).Key;
-
-                    if (_events[cls].All(x => x.Item1 != eventTy))
-                        _events[cls].Add(new Tuple<EventType, List<MethodInfo>>(eventTy, new List<MethodInfo> {mInfo}));
-                    else
-                        _events[cls].First(x => x.Item1 == eventTy).Item2.Add(mInfo);
+                    {
+                        _eventClasses.Add(eType, new List<Type>{ t });
+                    }
                 }
             }
         }

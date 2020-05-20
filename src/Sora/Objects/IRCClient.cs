@@ -18,7 +18,7 @@ namespace Sora.Objects
     public class IrcClient
     {
         private TcpClient _client;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
         private readonly IServerConfig _cfg;
         private readonly PresenceService _ps;
         private readonly IrcServer _parent;
@@ -27,15 +27,15 @@ namespace Sora.Objects
         private bool _exit;
 
         public IrcClient(TcpClient client,
-            SoraDbContextFactory factory,
-            IServerConfig cfg,
-            PresenceService ps,
-            ChannelService cs,
-            EventManager evmng,
-            IrcServer parent)
+                         SoraDbContext ctx,
+                         IServerConfig cfg,
+                         PresenceService ps,
+                         ChannelService cs,
+                         EventManager evmng,
+                         IrcServer parent)
         {
             _client = client;
-            _factory = factory;
+            _ctx = ctx;
             _cfg = cfg;
             _ps = ps;
             _parent = parent;
@@ -117,7 +117,7 @@ namespace Sora.Objects
                                 }
 
                                 _nickname = cmd[1].Trim();
-                                var rUser = DbUser.GetDbUser(_factory, cmd[1].Trim()).Result;
+                                var rUser = DbUser.GetDbUser(_ctx, cmd[1].Trim()).Result;
                                 if (rUser == null)
                                 {
                                     SendCodeMessage(451, "You have not registered");

@@ -14,12 +14,12 @@ namespace Sora.Events.BanchoEvents.ClientStatus
     public class OnSendUserStatusEvent
     {
         private readonly PresenceService _ps;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
 
-        public OnSendUserStatusEvent(PresenceService ps, SoraDbContextFactory factory)
+        public OnSendUserStatusEvent(PresenceService ps, SoraDbContext ctx)
         {
             _ps = ps;
-            _factory = factory;
+            _ctx = ctx;
         }
 
 
@@ -29,8 +29,8 @@ namespace Sora.Events.BanchoEvents.ClientStatus
             if (args.Pr.Status.Playmode != args.Status.Playmode)
             {
                 var lb = (DbLeaderboard) args.Pr["LB"];
-                args.Pr.Stats.Accuracy = (float) lb.GetAccuracy(_factory, args.Status.Playmode);
-                args.Pr.Stats.Position = lb.GetPosition(_factory, args.Status.Playmode);
+                args.Pr.Stats.Accuracy = (float) lb.GetAccuracy(_ctx, args.Status.Playmode);
+                args.Pr.Stats.Position = lb.GetPosition(_ctx, args.Status.Playmode);
                 switch (args.Status.Playmode)
                 {
                     case PlayMode.Osu:

@@ -15,11 +15,11 @@ namespace Sora
         /// Create Default Achievements
         /// </summary>
         /// <param name="factory">Context Factory</param>
-        public static void CreateDefaultAchievements(SoraDbContextFactory factory)
+        public static void CreateDefaultAchievements(SoraDbContext ctx)
         {
-            if (factory.Get().Achievements.FirstOrDefault(x => x.Name == "oog") == null)
+            if (ctx.Achievements.FirstOrDefault(x => x.Name == "oog") == null)
                 DbAchievement.NewAchievement(
-                    factory,
+                    ctx,
                     "oog",
                     "Oooooooooooooooog!",
                     "You just oooged JSE",
@@ -38,7 +38,7 @@ namespace Sora
         /// <param name="oldLb">Old LeaderBoard</param>
         /// <param name="newLb">New LeaderBoard</param>
         /// <returns>Obtained Achievements</returns>
-        public static string ProcessAchievements(SoraDbContextFactory factory,
+        public static string ProcessAchievements(SoraDbContext ctx,
             DbUser user,
             Score score,
             Beatmap map,

@@ -91,20 +91,22 @@ namespace Sora.Database.Models
         [ForeignKey(nameof(OwnerId))]
         public DbUser Owner { get; set; }
         
-        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, int userId)
+        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContext ctx, int userId)
         {
-            var result = factory.Get().Leaderboard.Where(t => t.OwnerId == userId).Select(e => e).AsNoTracking().FirstOrDefault();
+            var result = ctx.Leaderboard.Where(t => t.OwnerId == userId).Select(e => e).AsNoTracking().FirstOrDefault();
             if (result != null)
                 return result;
 
-            using var db = factory.GetForWrite();
             var lb = new DbLeaderboard{OwnerId = userId};
-            await db.Context.Leaderboard.AddAsync(lb);
+            
+            await ctx.Leaderboard.AddAsync(lb);
+            await ctx.SaveChangesAsync();
+            
             return lb;
         }
 
-        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContextFactory factory, DbUser user)
-            => await GetLeaderboardAsync(factory, user.Id);
+        public static async Task<DbLeaderboard> GetLeaderboardAsync(SoraDbContext ctx, DbUser user)
+            => await GetLeaderboardAsync(ctx, user.Id);
 
         public void IncreaseScore(ulong score, bool ranked, PlayMode mode)
         {
@@ -167,7 +169,7 @@ namespace Sora.Database.Models
             }
         }
 
-        public uint GetPosition(SoraDbContextFactory factory, PlayMode mode)
+        public uint GetPosition(SoraDbContext ctx, PlayMode mode)
         {
             var pos = mode switch // Prevent position jumping around.
             {
@@ -181,11 +183,11 @@ namespace Sora.Database.Models
             if (pos == -1)
                 pos = mode switch
                 {
-                    PlayMode.Osu => factory.Get().Leaderboard.Count(x => x.PerformancePointsOsu > PerformancePointsOsu),
-                    PlayMode.Taiko => factory.Get().Leaderboard
+                    PlayMode.Osu => ctx.Leaderboard.Count(x => x.PerformancePointsOsu > PerformancePointsOsu),
+                    PlayMode.Taiko => ctx.Leaderboard
                                          .Count(x => x.PerformancePointsTaiko > PerformancePointsTaiko),
-                    PlayMode.Ctb => factory.Get().Leaderboard.Count(x => x.PerformancePointsCtb > PerformancePointsCtb),
-                    PlayMode.Mania => factory.Get().Leaderboard
+                    PlayMode.Ctb => ctx.Leaderboard.Count(x => x.PerformancePointsCtb > PerformancePointsCtb),
+                    PlayMode.Mania => ctx.Leaderboard
                                          .Count(x => x.PerformancePointsMania > PerformancePointsMania),
                     _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
                 };
@@ -195,13 +197,13 @@ namespace Sora.Database.Models
             return (uint) pos + 1;
         }
 
-        public double GetAccuracy(SoraDbContextFactory factory, PlayMode mode)
+        public double GetAccuracy(SoraDbContext ctx, PlayMode mode)
         {
             var totalAcc = 0d;
             var divideTotal = 0d;
             var i = 0;
 
-            factory.Get()
+            ctx
                 .Scores
                 .Where(s => s.PlayMode == mode)
                //.Where(s => (s.Mods & Mod.Relax) == 0 && (s.Mods & Mod.Relax2) == 0)
@@ -224,9 +226,9 @@ namespace Sora.Database.Models
         }
 
         // TODO: optimize this
-        public void UpdatePp(SoraDbContextFactory factory, PlayMode mode)
+        public void UpdatePp(SoraDbContext ctx, PlayMode mode)
         {
-            var totalPp = factory.Get()
+            var totalPp = ctx
                                  .Scores
                                  //.Where(s => (s.Mods & Mod.Relax) == 0)
                                  .Where(s => s.PlayMode == mode)
@@ -261,10 +263,11 @@ namespace Sora.Database.Models
             }
         }
 
-        public void SaveChanges(SoraDbContextFactory factory)
+        public async void SaveChanges(SoraDbContext ctx)
         {
-            using var db = factory.GetForWrite();
-            db.Context.Update(this);
+            ctx.Update(this);
+            
+            await ctx.SaveChangesAsync();
         }
     }
 }

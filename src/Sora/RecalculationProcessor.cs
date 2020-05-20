@@ -9,17 +9,14 @@ namespace Sora
 {
     public class RecalculationProcessor
     {
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
 
-        public RecalculationProcessor(SoraDbContextFactory factory) => _factory = factory;
+        public RecalculationProcessor(SoraDbContext ctx) => _ctx = ctx;
 
         public void ProcessAccuracyRecalculation()
         {
-            using var db = _factory.GetForWrite();
-            var ctx = db.Context;
-
-            var scores = ctx.Users
-                            .Select(user => ctx.Scores.Where(s => s.UserId == user.Id))
+            var scores = _ctx.Users
+                            .Select(user => _ctx.Scores.Where(s => s.UserId == user.Id))
                             .SelectMany(sc => sc);
 
             var i = 0;
@@ -37,12 +34,9 @@ namespace Sora
 
         public void ProcessPerformanceRecalculation()
         {
-            using var db = _factory.GetForWrite();
-            var ctx = db.Context;
-
-            var scores = ctx.Users
-                            .Select(user => ctx.Scores.Where(s => s.UserId == user.Id))
-                            .SelectMany(s => s);
+            var scores = _ctx.Users
+                             .Select(user => _ctx.Scores.Where(s => s.UserId == user.Id))
+                             .SelectMany(s => s);
 
             var i = 0;
             var sCount = scores.Count();

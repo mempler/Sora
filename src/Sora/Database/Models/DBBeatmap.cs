@@ -75,9 +75,9 @@ namespace Sora.Database.Models
         public static IEnumerable<DbBeatmap> FromBeatmapSet(BeatmapSet set) =>
             set.ChildrenBeatmaps.Select(beatmap => FromBeatmap(beatmap, set));
 
-        public static DbBeatmap GetBeatmap(SoraDbContextFactory factory, string fileMd5)
-            => factory.Get()
-                      .Beatmaps
-                      .FirstOrDefault(t => t.FileMd5 == fileMd5);
+        public static DbBeatmap GetBeatmap(SoraDbContext ctx, string fileMd5)
+            => ctx
+                .Beatmaps
+                .FirstOrDefault(t => t.FileMd5 == fileMd5);
     }
 }

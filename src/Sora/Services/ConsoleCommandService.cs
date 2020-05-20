@@ -33,7 +33,7 @@ namespace Sora.Services
         private Thread _consoleThread;
         private bool _shouldStop;
 
-        public ConsoleCommandService(SoraDbContextFactory factory)
+        public ConsoleCommandService(SoraDbContext ctx)
         {
             Commands = new List<ConsoleCommand>();
             _mut = new object();
@@ -107,8 +107,8 @@ namespace Sora.Services
                 3,
                 args =>
                 {
-                    var u = DbUser.RegisterUser(factory, Permission.From(args[3..].Join()),
-                        args[0], args[2], args[1], false);
+                    var u = DbUser.RegisterUser(ctx, Permission.From(args[3..].Join()),
+                        args[0], args[2], args[1], false).Result;
                     
                     if (u == null) {
                         Logger.Err("Failed! User has already been registered!");

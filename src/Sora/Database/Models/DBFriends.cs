@@ -55,22 +55,24 @@ namespace Sora.Database.Models
         [ForeignKey(nameof(FriendId))]
         public DbUser Friend { get; set; }
 
-        public static IEnumerable<int> GetFriends(SoraDbContextFactory factory, int userId)
-            => factory.Get()
-                      .Friends
-                      .Where(t => t.UserId == userId)
-                      .Select(x => x.FriendId).ToList();
+        public static IEnumerable<int> GetFriends(SoraDbContext ctx, int userId)
+            => ctx
+                .Friends
+                .Where(t => t.UserId == userId)
+                .Select(x => x.FriendId).ToList();
 
-        public static async void AddFriend(SoraDbContextFactory factory, int userId, int friendId)
+        public static async void AddFriend(SoraDbContext ctx, int userId, int friendId)
         {
-            using var db = factory.GetForWrite();
-            await db.Context.Friends.AddAsync(new DbFriend {UserId = userId, FriendId = friendId});
+            await ctx.Friends.AddAsync(new DbFriend {UserId = userId, FriendId = friendId});
+
+            await ctx.SaveChangesAsync();
         }
 
-        public static void RemoveFriend(SoraDbContextFactory factory, int userId, int friendId)
+        public static async void RemoveFriend(SoraDbContext ctx, int userId, int friendId)
         {
-            using var db = factory.GetForWrite();
-            db.Context.RemoveRange(db.Context.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
+            ctx.RemoveRange(ctx.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
+            
+            await ctx.SaveChangesAsync();
         }
     }
 }

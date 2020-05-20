@@ -15,7 +15,7 @@ namespace Sora
     {
         private readonly IServerConfig _cfg;
 
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
 
         //private readonly SoraDbContextFactory _factory;
         private readonly PresenceService _ps;
@@ -28,13 +28,13 @@ namespace Sora
         private object _conLocker;
 
         public IrcServer(IServerConfig cfg,
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             PresenceService ps,
             ChannelService cs,
             EventManager evmng)
         {
             _cfg = cfg;
-            _factory = factory;
+            _ctx = ctx;
             _ps = ps;
             _cs = cs;
             _evmng = evmng;
@@ -66,7 +66,7 @@ namespace Sora
                         {
                             var client = _listener.AcceptTcpClient();
                             
-                            var ircClient = new IrcClient(client, _factory, _cfg, _ps, _cs, _evmng, this);
+                            var ircClient = new IrcClient(client, _ctx, _cfg, _ps, _cs, _evmng, this);
                             lock(_conLocker)
                                 _connectedClients.Add(ircClient);
                             new Thread(ircClient.Start).Start();

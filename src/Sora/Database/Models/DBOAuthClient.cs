@@ -30,10 +30,11 @@ namespace Sora.Database.Models
         public OAuthClientFlags Flags { get; set; }
         public bool Disabled { get; set; }
 
-        public static Task<DboAuthClient> GetClient(SoraDbContextFactory factory, string id)
+        public static Task<DboAuthClient> GetClient(SoraDbContext ctx, string id)
         {
             var gid = new Guid(id);
-            return factory.Get().OAuthClients.FirstOrDefaultAsync(x => x.Id == gid);
+            
+            return ctx.OAuthClients.FirstOrDefaultAsync(x => x.Id == gid);
         }
     }
 }

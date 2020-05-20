@@ -8,10 +8,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Framework.Allocation;
@@ -24,13 +27,11 @@ namespace Sora
     public class StartUp
     {
         private readonly IHostingEnvironment _env;
-        private readonly IConfiguration _config;
+        private Config _config;
 
         public StartUp(IHostingEnvironment env)
         {
             _env = env;
-            
-            _config = new ConfigurationBuilder().Build();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -70,6 +71,8 @@ namespace Sora
             
             if (!ConfigUtil.TryReadConfig(out var scfg, "config.json", defaultConfig))
                 Environment.Exit(0);
+
+            _config = scfg;
             
             services.AddSingleton(scfg)
                     .AddSingleton<IConfig>(scfg)
@@ -77,7 +80,26 @@ namespace Sora
                     .AddSingleton<IPisstaubeConfig>(scfg)
                     .AddSingleton<IServerConfig>(scfg)
                     .AddSingleton<Pisstaube>()
-                    .AddSingleton<SoraDbContextFactory>()
+                    .AddDbContextPool<SoraDbContext>(builder =>
+                    {
+                        if (_config.MySql.Hostname == null)
+                            Logger.Fatal("MySQL Hostname cannot be null!");
+                        
+                        builder.UseMySql(
+                            $"Server={_config.MySql.Hostname};" +
+                            $"Database={_config.MySql.Database};" +
+                            $"User={_config.MySql.Username};" +
+                            $"Password={_config.MySql.Password};" +
+                            $"Port={_config.MySql.Port};CharSet=utf8mb4;",
+                            mysqlOptions =>
+                            {
+                                mysqlOptions.CommandTimeout(int.MaxValue);
+
+                                mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb);
+                                mysqlOptions.CharSet(CharSet.Utf8Mb4);
+                            }
+                        );
+                    }, 1024)
                     .AddSingleton<PresenceService>()
                     .AddSingleton<Cache>()
                     .AddSingleton<ChannelService>()
@@ -102,7 +124,7 @@ namespace Sora
                 {
                     OnTokenValidated = async context =>
                     {
-                        var factory = context.HttpContext.RequestServices.GetRequiredService<SoraDbContextFactory>();
+                        var factory = context.HttpContext.RequestServices.GetRequiredService<SoraDbContext>();
                         if (await DbUser.GetDbUser(factory, context.Principal.Identity.Name) == null)
                         {
                             // return unauthorized if user no longer exists
@@ -151,7 +173,7 @@ namespace Sora
         }
 
         public void Configure(IApplicationBuilder app, IServiceProvider provider, ILogger<StartUp> logger,
-            SoraDbContextFactory factory,
+            SoraDbContext dbContext,
             EventManager ev,
             ConsoleCommandService css,
             Bot.Sora sora,
@@ -167,10 +189,10 @@ namespace Sora
             
             app.UseAuthentication();
             app.UseWebSockets();
-            
-            factory.Get().Migrate();
 
-            ev.SetProvider(provider);
+            dbContext.Migrate();
+
+            ev.SetProvider(app);
 
             if (!Directory.Exists("plugins"))
                 Directory.CreateDirectory("plugins");

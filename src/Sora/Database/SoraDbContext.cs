@@ -11,20 +11,11 @@ namespace Sora.Database
     {
         private readonly IMySqlConfig _config;
 
-        public SoraDbContext()
-            : this(null)
+        public SoraDbContext(DbContextOptions<SoraDbContext> options)
+            : base(options)
         {
         }
 
-        public SoraDbContext(IMySqlConfig config = null)
-        {
-            _config = config;
-            if (config != null) return;
-            
-            if (ConfigUtil.TryReadConfig(out MySqlConfig cfg))
-                _config = cfg;
-        }
-        
         public DbSet<DbUser> Users { get; set; }
         public DbSet<DbFriend> Friends { get; set; }
         public DbSet<DbAchievement> Achievements { get; set; }
@@ -37,28 +28,7 @@ namespace Sora.Database
         {
             Database.Migrate();
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (_config.MySql.Hostname == null)
-                Logger.Fatal("MySQL Hostname cannot be null!");
-
-            optionsBuilder.UseMySql(
-                $"Server={_config.MySql.Hostname};" +
-                $"Database={_config.MySql.Database};" +
-                $"User={_config.MySql.Username};" +
-                $"Password={_config.MySql.Password};" +
-                $"Port={_config.MySql.Port};CharSet=utf8mb4;",
-                mysqlOptions =>
-                {
-                    mysqlOptions.CommandTimeout(int.MaxValue);
-                    
-                    mysqlOptions.ServerVersion(new Version(10, 2, 15), ServerType.MariaDb);
-                    mysqlOptions.CharSet(CharSet.Utf8Mb4);
-                }
-            );
-        }
-
+        
         private class MySqlConfig : IMySqlConfig
         {
             public CMySql MySql { get; set; }

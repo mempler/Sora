@@ -40,14 +40,14 @@ namespace Sora.Bot
         private readonly List<SoraCommand> _commands = new List<SoraCommand>();
         private readonly ChannelService _cs;
         private readonly EventManager _ev;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
         private readonly object _mut = new object();
         private readonly IServiceProvider _provider;
         private readonly PresenceService _ps;
         
         private readonly DbUser _dbUser;
 
-        public Sora(SoraDbContextFactory factory,
+        public Sora(SoraDbContext ctx,
             IServiceProvider provider,
             PresenceService ps,
             ChannelService cs,
@@ -55,7 +55,7 @@ namespace Sora.Bot
         )
         {
             _provider = provider;
-            _factory = factory;
+            _ctx = ctx;
             _ps = ps;
             _cs = cs;
             _ev = ev;
@@ -67,13 +67,13 @@ namespace Sora.Bot
 
             #endregion
 
-            factory.Get().Migrate();
+            ctx.Migrate();
             
             // this will fail if bot already exists!
-            DbUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Aisuru", "bot@gigamons.de",
+            DbUser.RegisterUser(_ctx, Permission.From(Permission.GROUP_ADMIN), "Aisuru", "bot@gigamons.de",
                 Crypto.RandomString(32), false, PasswordVersion.V2, 100);
             
-            _dbUser = DbUser.GetDbUser(_factory, 100).Result;
+            _dbUser = DbUser.GetDbUser(ctx, 100).Result;
         }
 
         private static Presence BotPresence { get; set; }

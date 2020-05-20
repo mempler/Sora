@@ -21,7 +21,7 @@ namespace Sora.Controllers
     [ApiController]
     public class OAuthController : Controller
     {
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
         private readonly Config _cfg;
         private readonly ILogger<OAuthController> _logger;
 
@@ -50,9 +50,9 @@ namespace Sora.Controllers
                 => $"U: {Username} PW: {Password} GT: {GrantType} CID: {ClientId} CS: {ClientSecret}";
         }
 
-        public OAuthController(SoraDbContextFactory factory, Config cfg, ILogger<OAuthController> logger)
+        public OAuthController(SoraDbContext ctx, Config cfg, ILogger<OAuthController> logger)
         {
-            _factory = factory;
+            _ctx = ctx;
             _cfg = cfg;
             _logger = logger;
         }
@@ -92,7 +92,7 @@ namespace Sora.Controllers
                 auth = JsonConvert.DeserializeObject<PasswordAuth>(await reader.ReadToEndAsync());
             }
             
-            var user = await DbUser.GetDbUser(_factory, auth.Username);
+            var user = await DbUser.GetDbUser(_ctx, auth.Username);
             if (user == null)
                 return BadRequest(new {code = 401, message = "Username is incorrect!"});
             if (!user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.Password))))
@@ -112,13 +112,13 @@ namespace Sora.Controllers
                 auth = JsonConvert.DeserializeObject<OAuthPasswordAuth>(await reader.ReadToEndAsync());
             }
 
-            var oauthClient = await DboAuthClient.GetClient(_factory, auth.ClientId);
+            var oauthClient = await DboAuthClient.GetClient(_ctx, auth.ClientId);
             if (oauthClient == null)
                 return BadRequest(new {code = 403, message = "Client Doesn't exists!"});
             if (oauthClient.Secret != auth.ClientSecret)
                 return BadRequest(new {code = 404, message = "invalid secret!"});
             
-            var user = await DbUser.GetDbUser(_factory, auth.Username);
+            var user = await DbUser.GetDbUser(_ctx, auth.Username);
             if (user == null || !user.IsPassword(Hex.ToHex(Crypto.GetMd5(auth.Password))))
                 return BadRequest(new {code = 400, message = "Username or password is incorrect"});
 

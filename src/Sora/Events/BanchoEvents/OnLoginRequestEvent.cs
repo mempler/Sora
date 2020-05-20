@@ -25,17 +25,17 @@ namespace Sora.Events.BanchoEvents
         private readonly ILogger<OnLoginRequestEvent> _logger;
         private readonly Config _cfg;
         private readonly ChannelService _cs;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
         private PresenceService _pcs;
 
-        public OnLoginRequestEvent(SoraDbContextFactory factory,
-            Config cfg,
-            PresenceService pcs,
-            ChannelService cs,
-            Cache cache,
-            ILogger<OnLoginRequestEvent> logger)
+        public OnLoginRequestEvent(SoraDbContext ctx,
+                                   Config cfg,
+                                   PresenceService pcs,
+                                   ChannelService cs,
+                                   Cache cache,
+                                   ILogger<OnLoginRequestEvent> logger)
         {
-            _factory = factory;
+            _ctx = ctx;
             _cfg = cfg;
             _pcs = pcs;
             _cs = cs;
@@ -62,7 +62,7 @@ namespace Sora.Events.BanchoEvents
 
                 if (!_cache.TryGet(cacheKey, out Presence presence))
                 {
-                    var dbUser = await DbUser.GetDbUser(_factory, loginData.Username);
+                    var dbUser = await DbUser.GetDbUser(_ctx, loginData.Username);
                     var user = dbUser?.ToUser();
                     if (dbUser == null)
                     {
@@ -92,7 +92,7 @@ namespace Sora.Events.BanchoEvents
                     
                     args.Pr.Info.TimeZone = (byte) loginData.Timezone;
 
-                    var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, dbUser);
+                    var lb = await DbLeaderboard.GetLeaderboardAsync(_ctx, dbUser);
 
                     args.Pr["LB"] = lb;
 
@@ -100,8 +100,8 @@ namespace Sora.Events.BanchoEvents
                     args.Pr.Stats.RankedScore = lb.RankedScoreOsu;
                     args.Pr.Stats.PerformancePoints = (ushort) lb.PerformancePointsOsu;
                     args.Pr.Stats.PlayCount = (uint) lb.PlayCountOsu;
-                    args.Pr.Stats.Accuracy = (float) lb.GetAccuracy(_factory, PlayMode.Osu);
-                    args.Pr.Stats.Position = lb.GetPosition(_factory, PlayMode.Osu);
+                    args.Pr.Stats.Accuracy = (float) lb.GetAccuracy(_ctx, PlayMode.Osu);
+                    args.Pr.Stats.Position = lb.GetPosition(_ctx, PlayMode.Osu);
 
                     //args.pr["BLOCK_NON_FRIENDS_DM"] = loginData.BlockNonFriendDMs;
                     
@@ -151,7 +151,7 @@ namespace Sora.Events.BanchoEvents
                     args.Pr.Push(new LoginPermission(args.Pr.Info.ClientPermission));
                 }
 
-                args.Pr.Push(new FriendsList(DbFriend.GetFriends(_factory, args.Pr.User.Id).ToList()));
+                args.Pr.Push(new FriendsList(DbFriend.GetFriends(_ctx, args.Pr.User.Id).ToList()));
                 args.Pr.Push(new PresenceBundle(_pcs.GetUserIds(args.Pr).ToList()));
                 
                 foreach (var chanAuto in _cs.ChannelsAutoJoin)

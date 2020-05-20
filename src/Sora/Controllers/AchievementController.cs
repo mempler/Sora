@@ -12,14 +12,14 @@ namespace Sora.Controllers
     public class AchievementController : Controller
     {
         private readonly Cache _cache;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
 
         public AchievementController(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             Cache cache
         )
         {
-            _factory = factory;
+            _ctx = ctx;
             _cache = cache;
         }
 
@@ -30,7 +30,7 @@ namespace Sora.Controllers
                 return File(res, "image/png");
 
             res = (await DbAchievement
-                  .GetAchievement(_factory, achievement.Replace(".png", string.Empty))
+                  .GetAchievement(_ctx, achievement.Replace(".png", string.Empty))
                   )?.GetIconImage();
 
             if (res == null)
