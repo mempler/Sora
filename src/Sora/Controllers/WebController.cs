@@ -551,20 +551,22 @@ namespace Sora.Controllers
                     var dbBeatmaps =
                         db.Context.Beatmaps.Where(rset => beatmapChecksums.Any(lFileMd5 => rset.FileMd5 == lFileMd5))
                           .ToList();
-                    
-                    foreach (var rawBeatmap in beatmaps)
+
+                    Task.WaitAll(beatmaps.Select(rawBeatmap => Task.Run(() =>
                     {
+                        using var innerDb = new SoraDbContext();
+                        
                         var dbBeatmap = dbBeatmaps.FirstOrDefault(s => s.FileMd5 == rawBeatmap.FileMd5);
 
                         if (dbBeatmap != null && (dbBeatmap.Flags & DbBeatmapFlags.RankedFreeze) != 0)
                         {
                             rawBeatmap.RankedStatus = dbBeatmap.RankedStatus;
-                            rawBeatmap.Flags = dbBeatmap.Flags;
+                            rawBeatmap.Flags        = dbBeatmap.Flags;
                         }
-                        
-                        db.Context.Beatmaps.AddOrUpdate(rawBeatmap);
-                    }
 
+                        innerDb.Beatmaps.AddOrUpdate(rawBeatmap);
+                    })).ToArray());
+                    
                     beatmap = beatmaps.FirstOrDefault(s => s.FileMd5 == fileMd5);
                 }
 
