@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -343,7 +344,6 @@ namespace Sora.Framework.Objects.Multiplayer
         public void ChangeSettings(Match room)
         {
             MatchType = room.MatchType;
-            ActiveMods = room.ActiveMods;
             Name = room.Name;
             BeatmapName = room.BeatmapName;
             BeatmapId = room.BeatmapId;
@@ -352,10 +352,12 @@ namespace Sora.Framework.Objects.Multiplayer
             PlayMode = room.PlayMode;
             ScoringType = room.ScoringType;
             TeamType = room.TeamType;
-            SpecialModes = room.SpecialModes;
             Seed = room.Seed;
-
-            SetMods(ActiveMods, GetSlotByUserId(HostId));
+            SpecialModes = room.SpecialModes;
+            ActiveMods = room.ActiveMods;
+            
+            if (SpecialModes == MatchSpecialModes.Normal)
+                SetMods(ActiveMods, GetSlotByUserId(HostId));
         }
 
         public void SetPassword(string password)
