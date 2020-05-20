@@ -48,8 +48,8 @@ namespace Sora.Framework.Objects.Scores
 
             if (_bm == null)
             {
-                Logger.Err("Failed to set Beatmap! Beatmap is Null!");
-                return $"{(int) RankedStatus.NotSubmited}|false";
+                Logger.Err("Failed to set Beatmap! Beatmap is null!");
+                return $"{(int) RankedStatus.NeedUpdate}|false\n";
             }
 
             x.Append(ScoreboardHeader());
@@ -64,7 +64,7 @@ namespace Sora.Framework.Objects.Scores
 
         private string ScoreboardHeader()
         {
-            if (_bm != null)
+            if (_bm != null && _parent != null)
                 return $"{(int) Fixer.FixRankedStatus(_parent.RankedStatus)}|false|" +
                        $"{_bm.BeatmapID}|" +
                        $"{_bm.ParentSetID}|" +
@@ -73,7 +73,7 @@ namespace Sora.Framework.Objects.Scores
                        $"{_parent.Artist} - {_parent.Title} [{_bm.DiffName}]\n" +
                        "10.0\n";
             
-            return $"{(int) RankedStatus.NotSubmited}|false|" +
+            return $"{(int) RankedStatus.NeedUpdate}|false|" +
                    "-1|" +
                    "-1|" +
                    "-1\n" +

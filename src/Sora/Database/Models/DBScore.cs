@@ -20,6 +20,7 @@ namespace Sora.Database.Models
 
         public int UserId { get; set; }
 
+        [Column(TypeName = "varchar(32)")]
         public string FileMd5 { get; set; }
         public int Count300 { get; set; }
         public int Count100 { get; set; }
@@ -32,7 +33,8 @@ namespace Sora.Database.Models
         public Mod Mods { get; set; }
         public PlayMode PlayMode { get; set; }
         public DateTime Date { get; set; }
-
+        
+        [Column(TypeName = "varchar(32)")]
         public string? ReplayMd5 { get; set; }
         public double Accuracy { get; set; }
         public double PerformancePoints { get; set; }
