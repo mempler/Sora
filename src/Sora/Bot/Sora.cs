@@ -70,7 +70,7 @@ namespace Sora.Bot
             factory.Get().Migrate();
             
             // this will fail if bot already exists!
-            DbUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Sora", "bot@gigamons.de",
+            DbUser.RegisterUser(_factory, Permission.From(Permission.GROUP_ADMIN), "Aisuru", "bot@gigamons.de",
                 Crypto.RandomString(32), false, PasswordVersion.V2, 100);
             
             _dbUser = DbUser.GetDbUser(_factory, 100).Result;
