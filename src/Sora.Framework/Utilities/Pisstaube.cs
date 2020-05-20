@@ -173,13 +173,13 @@ namespace Sora.Framework.Utilities
         #region Beatmap API Requests
 
         public Task<BeatmapSet> FetchBeatmapSetAsync(int beatmapSetId)
-            => RequestJsonAsync<BeatmapSet>($"/api/s/{beatmapSetId}");
+            => RequestJsonAsync<BeatmapSet>($"/api/cheesegull/s/{beatmapSetId}");
 
         public Task<BeatmapSet> FetchBeatmapSetAsync(string fileMd5)
-            => RequestJsonAsync<BeatmapSet>($"/api/hash/{fileMd5}");
+            => RequestJsonAsync<BeatmapSet>($"/api/v1/hash/{fileMd5}");
 
         public Task<Beatmap> FetchBeatmapAsync(int beatmapId)
-            => RequestJsonAsync<Beatmap>($"/api/b/{beatmapId}");
+            => RequestJsonAsync<Beatmap>($"/api/cheesegull/b/{beatmapId}");
 
         #endregion
         
@@ -232,7 +232,7 @@ namespace Sora.Framework.Utilities
                 result = new SearchResult
                 {
                     Failed = false,
-                    Result = await RequestJsonAsync<List<BeatmapSet>>($"/api/search{query}")
+                    Result = await RequestJsonAsync<List<BeatmapSet>>($"/api/cheesegull/search{query}")
                 };
             }
             catch

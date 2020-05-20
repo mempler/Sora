@@ -85,6 +85,7 @@ namespace Sora
         {
             Logger.Info("Killing everything..");
             cts.Cancel();
+            Environment.Exit(0);
         }
     }
 }
