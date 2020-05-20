@@ -184,7 +184,7 @@ namespace Sora.Events.BanchoEvents
                 _logger.Log(LogLevel.Debug, "Login Time:\nMS: ", sw.Elapsed.TotalMilliseconds);
 
                 _logger.Log(LogLevel.Information,
-                    $"{LCOL.RED}{args.Pr.User.UserName} {LCOL.PURPLE}({args.Pr.User.Id}) {LCOL.WHITE}has logged in!"
+                    $"{LCOL.RED}{args.Pr.User.UserName} {LCOL.PURPLE}( {args.Pr.User.Id} ) {LCOL.WHITE}has logged in!"
                 );
 
                 args.Pr["LAST_PONG"] = DateTime.Now;
