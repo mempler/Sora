@@ -38,9 +38,11 @@ namespace Sora.Database.Models
         public int Id { get; set; }
 
         [Required]
+        [Column(TypeName = "varchar(32)")]
         public string UserName { get; set; }
 
         [Required]
+        [Column(TypeName = "varchar(64)")]
         public string EMail { get; set; }
 
         [Required]
@@ -62,13 +64,13 @@ namespace Sora.Database.Models
         public DateTime? StatusUntil { get; set; }
         public string? StatusReason { get; set; }
 
-        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, int userId)
+        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, int userId)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, string userName)
+        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, string userName)
             => factory.Get().Users.FirstOrDefaultAsync(u => u.UserName == userName);
         
-        public static Task<DbUser> GetDbUser(SoraDbContextFactory factory, User user)
+        public static Task<DbUser?> GetDbUser(SoraDbContextFactory factory, User user)
             => GetDbUser(factory, user.Id);
 
         public User ToUser() => new User

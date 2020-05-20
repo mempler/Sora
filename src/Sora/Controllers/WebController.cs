@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using osu.Game.Overlays.KeyBinding;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Enums;
@@ -151,10 +152,11 @@ namespace Sora.Controllers
                 return Ok(answer);
 
             var request = (HttpWebRequest) WebRequest.Create(
-                $"http://1.1.1.1/web/check-updates.php?action={action}&stream={qstream}&time={time}"
+                $"https://1.1.1.1/web/check-updates.php?action={action}&stream={qstream}&time={time}"
             );
             request.AutomaticDecompression = DecompressionMethods.GZip;
             request.Host = "osu.ppy.sh";
+            request.UserAgent = "osu!";
 
             using var response = (HttpWebResponse) request.GetResponse();
             using var stream = response.GetResponseStream();
@@ -534,8 +536,39 @@ namespace Sora.Controllers
                     type == ScoreboardType.Mods,
                     mods);
 
-                var set = await _pisstaube.FetchBeatmapSetAsync(fileMd5);
+                var beatmap = DbBeatmap.GetBeatmap(_factory, fileMd5);
+                BeatmapSet apiSet;
+                if (beatmap == null)
+                {
+                    apiSet = await _pisstaube.FetchBeatmapSetAsync(fileMd5);
+                    using var db = _factory.GetForWrite();
+                    
+                    if (apiSet == null)
+                        goto JustContinue;
 
+                    var beatmaps = DbBeatmap.FromBeatmapSet(apiSet).ToList();
+                    var beatmapChecksums = beatmaps.Select(s => s.FileMd5);
+                    var dbBeatmaps =
+                        db.Context.Beatmaps.Where(rset => beatmapChecksums.Any(lFileMd5 => rset.FileMd5 == lFileMd5))
+                          .ToList();
+                    
+                    foreach (var rawBeatmap in beatmaps)
+                    {
+                        var dbBeatmap = dbBeatmaps.FirstOrDefault(s => s.FileMd5 == rawBeatmap.FileMd5);
+
+                        if (dbBeatmap != null && (dbBeatmap.Flags & DbBeatmapFlags.RankedFreeze) != 0)
+                        {
+                            rawBeatmap.RankedStatus = dbBeatmap.RankedStatus;
+                            rawBeatmap.Flags = dbBeatmap.Flags;
+                        }
+                        
+                        db.Context.Beatmaps.AddOrUpdate(rawBeatmap);
+                    }
+
+                    beatmap = beatmaps.FirstOrDefault(s => s.FileMd5 == fileMd5);
+                }
+
+                JustContinue:
                 var ownScore = await DbScore.GetLatestScore(_factory, new DbScore
                 {
                     FileMd5 = fileMd5,
@@ -588,8 +621,32 @@ namespace Sora.Controllers
                         UserName = dbUser.UserName,
                         Position = await ownScore.Position(_factory)
                     };
-                    
-                var sboard = new Scoreboard(set.ChildrenBeatmaps.FirstOrDefault(bm => bm.FileMD5 == fileMd5), set, sScores, ownsScore);
+
+                BeatmapSet set = null;
+                
+                if (beatmap != null)
+                    set = new BeatmapSet
+                    {
+                        SetID = beatmap.Id,
+                        Artist = beatmap.Artist,
+                        Title = beatmap.Title,
+                        RankedStatus = beatmap.RankedStatus,
+                        
+                        ChildrenBeatmaps = new List<Beatmap>
+                        {
+                            new Beatmap
+                            {
+                                FileMD5 = beatmap.FileMd5,
+                                DiffName = beatmap.DiffName,
+                                ParentSetID = beatmap.SetId,
+                                BeatmapID = beatmap.Id,
+                                Mode = beatmap.PlayMode
+                            }
+                        }
+                    };
+                
+                var sboard = new Scoreboard(set?.ChildrenBeatmaps.FirstOrDefault(bm => bm.FileMD5 == fileMd5),
+                                            set, sScores, ownsScore);
 
                 _cache.Set($"sora:Scoreboards:{cacheHash}", cachedData = sboard.ToOsuString(), TimeSpan.FromSeconds(30));
                 return Ok(cachedData);

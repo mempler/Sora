@@ -158,6 +158,7 @@ namespace Sora.Framework.Utilities
 
         private Task<byte[]> RequestBytesAsync(string endPoint)
         {
+            Logger.Debug($"Pisstaube request {endPoint}");
             using (var wc = new WebClient())
                 return wc.DownloadDataTaskAsync(GetFromEndpoint(endPoint));
         }

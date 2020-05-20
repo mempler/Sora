@@ -31,6 +31,7 @@ namespace Sora.Database
         public DbSet<DbScore> Scores { get; set; }
         public DbSet<DbLeaderboard> Leaderboard { get; set; }
         public DbSet<DboAuthClient> OAuthClients { get; set; }
+        public DbSet<DbBeatmap> Beatmaps { get; set; }
 
         public void Migrate()
         {

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sora.Database;
 
 namespace Sora.Database.Migrations
 {
     [DbContext(typeof(SoraDbContext))]
-    partial class SoraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200520151230_Beatmaps")]
+    partial class Beatmaps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,19 +53,19 @@ namespace Sora.Database.Migrations
 
                     b.Property<string>("Artist")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("DiffName")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("FileMd5")
                         .IsRequired()
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("varchat(255)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<int>("Flags")
                         .HasColumnType("int");
@@ -79,7 +81,7 @@ namespace Sora.Database.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 
@@ -217,7 +219,7 @@ namespace Sora.Database.Migrations
                         .HasColumnType("tinyint unsigned");
 
                     b.Property<string>("ReplayMd5")
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<int>("TotalScore")
                         .HasColumnType("int");
@@ -243,7 +245,7 @@ namespace Sora.Database.Migrations
 
                     b.Property<string>("EMail")
                         .IsRequired()
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -270,7 +272,7 @@ namespace Sora.Database.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("varchar(32)");
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 
