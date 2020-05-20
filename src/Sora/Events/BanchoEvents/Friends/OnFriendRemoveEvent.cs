@@ -11,14 +11,14 @@ namespace Sora.Events.BanchoEvents.Friends
     [EventClass]
     public class OnFriendRemoveEvent
     {
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
 
-        public OnFriendRemoveEvent(SoraDbContextFactory factory) => _factory = factory;
+        public OnFriendRemoveEvent(SoraDbContext ctx) => _ctx = ctx;
 
         [Event(EventType.BanchoFriendRemove)]
         public async Task OnFriendRemove(BanchoFriendRemoveArgs args)
         {
-            var u = await DbUser.GetDbUser(_factory, args.FriendId);
+            var u = await DbUser.GetDbUser(_ctx, args.FriendId);
 
             if (u != null)
                 Logger.Info(
@@ -29,7 +29,8 @@ namespace Sora.Events.BanchoEvents.Friends
                     "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as Friend!"
                 );
 
-            DbFriend.RemoveFriend(_factory, args.Pr.User.Id, args.FriendId);
+            DbFriend.RemoveFriend(_ctx, args.Pr.User.Id, args.FriendId);
+            await _ctx.SaveChangesAsync();
         }
     }
 }

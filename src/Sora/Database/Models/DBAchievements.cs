@@ -25,32 +25,32 @@ namespace Sora.Database.Models
         public new string Description { get; set; }
 
         [Required]
-        public new string IconUri { get; set; }
+        public new string IconURI { get; set; }
 
         public Achievement ToAchievement() => this;
 
-        public static List<Achievement> FromString(SoraDbContextFactory factory, string s)
+        public static List<Achievement> FromString(SoraDbContext ctx, string s)
             => s.Split(", ")
-                .Select(str => factory.Get().Achievements.FirstOrDefault(a => a.Name == str))
+                .Select(str => ctx.Achievements.FirstOrDefault(a => a.Name == str))
                 .Where(r => r != null)
                 .Select(achievement => achievement.ToAchievement())
                 .ToList();
 
-        public static Task<DbAchievement> GetAchievement(SoraDbContextFactory factory, string name)
-            => factory.Get().Achievements.FirstOrDefaultAsync(x => x.Name == name);
+        public static Task<DbAchievement> GetAchievement(SoraDbContext ctx, string name)
+            => ctx.Achievements.FirstOrDefaultAsync(x => x.Name == name);
 
-        public static async void NewAchievement(SoraDbContextFactory factory,
+        public static async void NewAchievement(SoraDbContext ctx,
             string name, string displayName, string desc, string icon)
         {
-            using var db = factory.GetForWrite();
-
-            await db.Context.Achievements.AddAsync(new DbAchievement
+            await ctx.Achievements.AddAsync(new DbAchievement
             {
                 Name = name,
                 Description = desc,
                 DisplayName = displayName,
-                IconUri = icon
+                IconURI = icon
             });
+
+            await ctx.SaveChangesAsync();
         }
     }
 }

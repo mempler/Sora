@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using osu.Game.Overlays.KeyBinding;
 using Sora.Database;
 using Sora.Database.Models;
@@ -28,13 +31,13 @@ namespace Sora.Controllers
         private readonly Cache _cache;
         private readonly Config _config;
         private readonly Bot.Sora _sora;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _ctx;
         private readonly EventManager _ev;
         private readonly PresenceService _ps;
         private readonly Pisstaube _pisstaube;
 
         public WebController(
-            SoraDbContextFactory factory,
+            SoraDbContext ctx,
             EventManager ev,
             PresenceService ps,
             Cache cache,
@@ -42,7 +45,7 @@ namespace Sora.Controllers
             Bot.Sora sora,
             Pisstaube pisstaube)
         {
-            _factory = factory;
+            _ctx = ctx;
             _ev = ev;
             _ps = ps;
             _cache = cache;
@@ -70,7 +73,7 @@ namespace Sora.Controllers
             [FromQuery(Name = "h")] string pass
         )
         {
-            var user = await DbUser.GetDbUser(_factory, userName);
+            var user = await DbUser.GetDbUser(_ctx, userName);
             if (user == null)
                 return Ok("err: pass");
 
@@ -104,7 +107,7 @@ namespace Sora.Controllers
             [FromQuery(Name = "h")] string pass
         )
         {
-            var user = await DbUser.GetDbUser(_factory, userName);
+            var user = await DbUser.GetDbUser(_ctx, userName);
             if (user == null)
                 return Ok("err: pass");
 
@@ -201,14 +204,14 @@ namespace Sora.Controllers
             [FromQuery(Name = "h")] string pass
         )
         {
-            var user = await DbUser.GetDbUser(_factory, userName);
+            var user = await DbUser.GetDbUser(_ctx, userName);
             if (user == null)
                 return Ok("err: pass");
 
             if (!user.IsPassword(pass))
                 return Ok("err: pass");
 
-            var s = await DbScore.GetScore(_factory, replayId);
+            var s = await DbScore.GetScore(_ctx, replayId);
             if (s == null)
                 return NotFound();
 
@@ -231,7 +234,7 @@ namespace Sora.Controllers
             string passwd = Request.Form["pass"];
 
             var (pass, score) = ScoreSubmissionParser.ParseScore(encScore, iv, osuver);
-            var dbUser = await DbUser.GetDbUser(_factory, score.UserName);
+            var dbUser = await DbUser.GetDbUser(_ctx, score.UserName);
 
             if (dbUser == null)
                 return Ok("error: pass");
@@ -244,12 +247,12 @@ namespace Sora.Controllers
 
             if (!pass || !RankedMods.IsRanked(score.Mods))
             {
-                var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, dbUser);
+                var lb = await DbLeaderboard.GetLeaderboardAsync(_ctx, dbUser);
 
                 lb.IncreasePlaycount(score.PlayMode);
                 lb.IncreaseScore((ulong) score.TotalScore, false, score.PlayMode);
 
-                lb.SaveChanges(_factory);
+                lb.SaveChanges(_ctx);
                 
                 // Send to other People
                 await _ev.RunEvent(
@@ -306,45 +309,45 @@ namespace Sora.Controllers
 
             dbScore.PerformancePoints = dbScore.ComputePerformancePoints();
 
-            var oldScore = await DbScore.GetLatestScore(_factory, dbScore);
+            var oldScore = await DbScore.GetLatestScore(_ctx, dbScore);
 
-            var oldLb = await DbLeaderboard.GetLeaderboardAsync(_factory, dbScore.ScoreOwner);
-            var oldStdPos = oldLb.GetPosition(_factory, dbScore.PlayMode);
+            var oldLb = await DbLeaderboard.GetLeaderboardAsync(_ctx, dbScore.ScoreOwner);
+            var oldStdPos = oldLb.GetPosition(_ctx, dbScore.PlayMode);
             
-            var oldAcc = oldLb.GetAccuracy(_factory, dbScore.PlayMode);
+            var oldAcc = oldLb.GetAccuracy(_ctx, dbScore.PlayMode);
             double newAcc;
 
             if (oldScore != null && oldScore.TotalScore <= dbScore.TotalScore)
             {
-                using var db = _factory.GetForWrite();
-                db.Context.Scores.Remove(oldScore);
+                _ctx.Remove(oldScore);
                 System.IO.File.Delete($"data/replays/{oldScore.ReplayMd5}");
 
-                DbScore.InsertScore(_factory, dbScore);
+                DbScore.InsertScore(_ctx, dbScore);
+                await _ctx.SaveChangesAsync();
             }
             else if (oldScore == null)
             {
-                DbScore.InsertScore(_factory, dbScore);
+                DbScore.InsertScore(_ctx, dbScore);
             }
             else
             {
                 System.IO.File.Delete($"data/replays/{oldScore.ReplayMd5}");
             }
 
-            var newlb = await DbLeaderboard.GetLeaderboardAsync(_factory, dbScore.ScoreOwner);
+            var newlb = await DbLeaderboard.GetLeaderboardAsync(_ctx, dbScore.ScoreOwner);
 
             newlb.IncreasePlaycount(dbScore.PlayMode);
             newlb.IncreaseScore((ulong) dbScore.TotalScore, true, dbScore.PlayMode);
             newlb.IncreaseScore((ulong) dbScore.TotalScore, false, dbScore.PlayMode);
 
-            newlb.UpdatePp(_factory, dbScore.PlayMode);
+            newlb.UpdatePp(_ctx, dbScore.PlayMode);
 
-            newlb.SaveChanges(_factory);
+            newlb.SaveChanges(_ctx);
 
-            var newStdPos = newlb.GetPosition(_factory, dbScore.PlayMode);
-            newAcc = newlb.GetAccuracy(_factory, dbScore.PlayMode);
+            var newStdPos = newlb.GetPosition(_ctx, dbScore.PlayMode);
+            newAcc = newlb.GetAccuracy(_ctx, dbScore.PlayMode);
 
-            var newScore = await DbScore.GetLatestScore(_factory, dbScore);
+            var newScore = await DbScore.GetLatestScore(_ctx, dbScore);
 
             var set = await _pisstaube.FetchBeatmapSetAsync(dbScore.FileMd5);
 
@@ -390,8 +393,8 @@ namespace Sora.Controllers
                     return Ok("");
             }
 
-            var newScorePosition = newScore != null ? await newScore.Position(_factory) : 0;
-            var oldScorePosition = oldScore != null ? await oldScore.Position(_factory) : 0;
+            var newScorePosition = newScore != null ? await newScore.Position(_ctx) : 0;
+            var oldScorePosition = oldScore != null ? await oldScore.Position(_ctx) : 0;
             
             if (newScorePosition == 1)
                 _sora.SendMessage(
@@ -445,13 +448,13 @@ namespace Sora.Controllers
                 newPp,
                 newScore?.Id ?? 0,
                 AchievementProcessor.ProcessAchievements(
-                    _factory, dbScore.ScoreOwner, score, bm, set, oldLb, newlb
+                    _ctx, dbScore.ScoreOwner, score, bm, set, oldLb, newlb
                 )
             );
 
             pr["LB"] = newlb;
-            pr.Stats.Accuracy = (float) newlb.GetAccuracy(_factory, score.PlayMode);
-            pr.Stats.Position = newlb.GetPosition(_factory, score.PlayMode);
+            pr.Stats.Accuracy = (float) newlb.GetAccuracy(_ctx, score.PlayMode);
+            pr.Stats.Position = newlb.GetPosition(_ctx, score.PlayMode);
             switch (score.PlayMode)
             {
                 case PlayMode.Osu:
@@ -511,11 +514,12 @@ namespace Sora.Controllers
             [FromQuery(Name = "i")] int i,
             [FromQuery(Name = "mods")] Mod mods,
             [FromQuery(Name = "us")] string us,
-            [FromQuery(Name = "ha")] string pa)
+            [FromQuery(Name = "ha")] string pa,
+            [FromServices] IServiceProvider serviceProvider)
         {
             try
             {
-                var dbUser = await DbUser.GetDbUser(_factory, us);
+                var dbUser = await DbUser.GetDbUser(_ctx, us);
                 var user = dbUser?.ToUser();
                 if (dbUser?.IsPassword(pa) != true)
                     return Ok("error: pass");
@@ -530,18 +534,17 @@ namespace Sora.Controllers
                 if (_cache.TryGet($"sora:Scoreboards:{cacheHash}", out string cachedData))
                     return Ok(cachedData);
 
-                var scores = await DbScore.GetScores(_factory, fileMd5, dbUser, playMode,
-                    type == ScoreboardType.Friends,
-                    type == ScoreboardType.Country,
-                    type == ScoreboardType.Mods,
-                    mods);
+                var scores = await DbScore.GetScores(_ctx, fileMd5, dbUser, playMode,
+                                                     type == ScoreboardType.Friends,
+                                                     type == ScoreboardType.Country,
+                                                     type == ScoreboardType.Mods,
+                                                     mods);
 
-                var beatmap = DbBeatmap.GetBeatmap(_factory, fileMd5);
+                var beatmap = DbBeatmap.GetBeatmap(_ctx, fileMd5);
                 BeatmapSet apiSet;
                 if (beatmap == null)
                 {
                     apiSet = await _pisstaube.FetchBeatmapSetAsync(fileMd5);
-                    using var db = _factory.GetForWrite();
                     
                     if (apiSet == null)
                         goto JustContinue;
@@ -549,13 +552,15 @@ namespace Sora.Controllers
                     var beatmaps = DbBeatmap.FromBeatmapSet(apiSet).ToList();
                     var beatmapChecksums = beatmaps.Select(s => s.FileMd5);
                     var dbBeatmaps =
-                        db.Context.Beatmaps.Where(rset => beatmapChecksums.Any(lFileMd5 => rset.FileMd5 == lFileMd5))
-                          .ToList();
-
-                    Task.WaitAll(beatmaps.Select(rawBeatmap => Task.Run(() =>
+                        _ctx.Beatmaps.Where(rset => beatmapChecksums.Any(lFileMd5 => rset.FileMd5 == lFileMd5))
+                            .ToList();
+                    
+                    var concurrentLock = new object();
+                    var pool = serviceProvider.GetRequiredService<DbContextPool<SoraDbContext>>();
+                    Task.WaitAll(beatmaps.Select(rawBeatmap => Task.Run(async () =>
                     {
-                        using var innerDb = new SoraDbContext();
-                        
+                        var context = pool.Rent();
+    
                         var dbBeatmap = dbBeatmaps.FirstOrDefault(s => s.FileMd5 == rawBeatmap.FileMd5);
 
                         if (dbBeatmap != null && (dbBeatmap.Flags & DbBeatmapFlags.RankedFreeze) != 0)
@@ -564,14 +569,17 @@ namespace Sora.Controllers
                             rawBeatmap.Flags        = dbBeatmap.Flags;
                         }
 
-                        innerDb.Beatmaps.AddOrUpdate(rawBeatmap);
+                        context.Beatmaps.AddOrUpdate(rawBeatmap);
+                        await context.SaveChangesAsync();
+
+                        pool.Return(context);
                     })).ToArray());
                     
                     beatmap = beatmaps.FirstOrDefault(s => s.FileMd5 == fileMd5);
                 }
 
                 JustContinue:
-                var ownScore = await DbScore.GetLatestScore(_factory, new DbScore
+                var ownScore = await DbScore.GetLatestScore(_ctx, new DbScore
                 {
                     FileMd5 = fileMd5,
                     UserId = user.Id,
@@ -600,7 +608,7 @@ namespace Sora.Controllers
                 // Fetch the correct position for sScore
                 for (var j = 0; j < scores.Count; j++)
                 {
-                    sScores[j].Position = await scores[j].Position(_factory);
+                    sScores[j].Position = await scores[j].Position(_ctx);
                 }
 
                 Score ownsScore = null;
@@ -621,7 +629,7 @@ namespace Sora.Controllers
                         TotalScore = ownScore.TotalScore,
                         UserId = dbUser.Id,
                         UserName = dbUser.UserName,
-                        Position = await ownScore.Position(_factory)
+                        Position = await ownScore.Position(_ctx)
                     };
 
                 BeatmapSet set = null;
