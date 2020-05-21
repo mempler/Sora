@@ -22,7 +22,7 @@ namespace Sora.Services
 
             Push("#announce", new Channel
             {
-                Name = "#announce", Topic = "osu! default channel for announcements."
+                Name = "#announce", Status = ChannelStatus.AutoJoin | ChannelStatus.ReadOnly, Topic = "osu! default channel for announcements."
             });
         }
         
