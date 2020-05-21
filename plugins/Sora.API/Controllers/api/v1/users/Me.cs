@@ -16,12 +16,12 @@ namespace Sora.API.Controllers.api.v1.users
     public class Me : Controller
     {
         private readonly ILogger<Me> _logger;
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _context;
 
-        public Me(ILogger<Me> logger, SoraDbContextFactory factory)
+        public Me(ILogger<Me> logger, SoraDbContext context)
         {
             _logger = logger;
-            _factory = factory;
+            _context = context;
         }
         
         [HttpGet]
@@ -35,14 +35,14 @@ namespace Sora.API.Controllers.api.v1.users
                     authentication = "basic"
                 });
 
-            var user = await DbUser.GetDbUser(_factory, int.Parse(User.Identity.Name));
+            var user = await DbUser.GetDbUser(_context, int.Parse(User.Identity.Name));
             if (user == null)
                 return Ok(new
                 {
                     authentication = "basic"
                 });
 
-            var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, user);
+            var lb = await DbLeaderboard.GetLeaderboardAsync(_context, user);
 
             return Ok(new
             {
@@ -52,10 +52,10 @@ namespace Sora.API.Controllers.api.v1.users
                 user.Status,
                 user.StatusUntil,
                 user.StatusReason,
-                Achievements = DbAchievement.FromString(_factory, user.Achievements ?? ""),
+                Achievements = DbAchievement.FromString(_context, user.Achievements ?? ""),
                 Country = "XX",
-                globalRank = lb.GetPosition(_factory, PlayMode.Osu),
-                Accuracy = lb.GetAccuracy(_factory, PlayMode.Osu),
+                globalRank = lb.GetPosition(_context, PlayMode.Osu),
+                Accuracy = lb.GetAccuracy(_context, PlayMode.Osu),
                 Performance = lb.PerformancePointsOsu,
                 TotalScore = lb.TotalScoreOsu,
                 RankedScore = lb.RankedScoreOsu,

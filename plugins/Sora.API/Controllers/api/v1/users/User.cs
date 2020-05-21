@@ -14,11 +14,11 @@ namespace Sora.API.Controllers.api.v1.users
     [AllowAnonymous]
     public class User : Controller
     {
-        private readonly SoraDbContextFactory _factory;
+        private readonly SoraDbContext _context;
 
-        public User(SoraDbContextFactory factory)
+        public User(SoraDbContext context)
         {
-            _factory = factory;
+            _context = context;
         }
 
         [AllowAnonymous]
@@ -26,7 +26,7 @@ namespace Sora.API.Controllers.api.v1.users
         [HttpGet("/api/v1/users/{userId:int}")]
         public async Task<ActionResult> Get(int userId)
         {
-            var user = await DbUser.GetDbUser(_factory, userId);
+            var user = await DbUser.GetDbUser(_context, userId);
             if (user == null)
                 return NotFound(new
                 {
@@ -34,7 +34,7 @@ namespace Sora.API.Controllers.api.v1.users
                     message = "User not found!"
                 });
 
-            var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, user);
+            var lb = await DbLeaderboard.GetLeaderboardAsync(_context, user);
 
             return Ok(new
             {
@@ -44,10 +44,10 @@ namespace Sora.API.Controllers.api.v1.users
                 user.Status,
                 user.StatusUntil,
                 user.StatusReason,
-                Achievements = DbAchievement.FromString(_factory, user.Achievements ?? ""),
+                Achievements = DbAchievement.FromString(_context, user.Achievements ?? ""),
                 Country = "XX",
-                globalRank = lb.GetPosition(_factory, PlayMode.Osu),
-                Accuracy = lb.GetAccuracy(_factory, PlayMode.Osu),
+                globalRank = lb.GetPosition(_context, PlayMode.Osu),
+                Accuracy = lb.GetAccuracy(_context, PlayMode.Osu),
                 Performance = lb.PerformancePointsOsu,
                 TotalScore = lb.TotalScoreOsu,
                 RankedScore = lb.RankedScoreOsu,
@@ -59,7 +59,7 @@ namespace Sora.API.Controllers.api.v1.users
         [HttpGet("/api/v1/users/{userName}")]
         public async Task<ActionResult> Get(string userName)
         {
-            var user = await DbUser.GetDbUser(_factory, userName);
+            var user = await DbUser.GetDbUser(_context, userName);
             if (user == null)
                 return NotFound(new
                 {
@@ -67,7 +67,7 @@ namespace Sora.API.Controllers.api.v1.users
                     message = "User not found!"
                 });
 
-            var lb = await DbLeaderboard.GetLeaderboardAsync(_factory, user);
+            var lb = await DbLeaderboard.GetLeaderboardAsync(_context, user);
 
             return Ok(new
             {
@@ -77,10 +77,10 @@ namespace Sora.API.Controllers.api.v1.users
                 user.Status,
                 user.StatusUntil,
                 user.StatusReason,
-                Achievements = DbAchievement.FromString(_factory, user.Achievements ?? ""),
+                Achievements = DbAchievement.FromString(_context, user.Achievements ?? ""),
                 Country = "XX",
-                globalRank = lb.GetPosition(_factory, PlayMode.Osu),
-                Accuracy = lb.GetAccuracy(_factory, PlayMode.Osu),
+                globalRank = lb.GetPosition(_context, PlayMode.Osu),
+                Accuracy = lb.GetAccuracy(_context, PlayMode.Osu),
                 Performance = lb.PerformancePointsOsu,
                 TotalScore = lb.TotalScoreOsu,
                 RankedScore = lb.RankedScoreOsu,

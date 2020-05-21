@@ -14,11 +14,11 @@ namespace Sora.API.Controllers.api.v1
     [Route("/api/v1/get_top_leaderboard")] // /api/v1/get_top_leaderboard
     public class Leaderboard : Controller
     {
-        private SoraDbContextFactory _factory;
+        private SoraDbContext _context;
 
-        public Leaderboard(SoraDbContextFactory factory)
+        public Leaderboard(SoraDbContext context)
         {
-            _factory = factory;
+            _context = context;
         }
 
         public struct LBResponse
@@ -38,7 +38,7 @@ namespace Sora.API.Controllers.api.v1
         public async Task<ActionResult> Get([FromQuery] int offset = 0, [FromQuery] PlayMode mode =
             PlayMode.Osu)
         {
-            var lb = (await _factory.Get().Leaderboard
+            var lb = (await _context.Leaderboard
                                    .Where(x => x.Owner.Status != UserStatusFlags.Suspended ||
                                                x.Owner.Status != UserStatusFlags.Restricted)
                                    .OrderByDescending(x => x.PerformancePointsOsu)
@@ -49,8 +49,8 @@ namespace Sora.API.Controllers.api.v1
                                        new LBResponse
                                        {
                                            Id = l.OwnerId,
-                                           Username = DbUser.GetDbUser(_factory, l.OwnerId).Result.UserName,
-                                           Accuracy = l.GetAccuracy(_factory, mode),
+                                           Username = DbUser.GetDbUser(_context, l.OwnerId).Result.UserName,
+                                           Accuracy = l.GetAccuracy(_context, mode),
                                            Performance = mode switch
                                            {
                                                PlayMode.Osu => l.PerformancePointsOsu,
