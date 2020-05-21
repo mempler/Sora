@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Sora.Database;
 using Sora.Database.Models;
 using Sora.Framework.Objects;
@@ -15,10 +16,10 @@ namespace Sora
         /// Create Default Achievements
         /// </summary>
         /// <param name="factory">Context Factory</param>
-        public static void CreateDefaultAchievements(SoraDbContext ctx)
+        public static async Task CreateDefaultAchievements(SoraDbContext ctx)
         {
             if (ctx.Achievements.FirstOrDefault(x => x.Name == "oog") == null)
-                DbAchievement.NewAchievement(
+                await DbAchievement.NewAchievement(
                     ctx,
                     "oog",
                     "Oooooooooooooooog!",

@@ -39,7 +39,7 @@ namespace Sora.Database.Models
         public static Task<DbAchievement> GetAchievement(SoraDbContext ctx, string name)
             => ctx.Achievements.FirstOrDefaultAsync(x => x.Name == name);
 
-        public static async void NewAchievement(SoraDbContext ctx,
+        public static async Task NewAchievement(SoraDbContext ctx,
             string name, string displayName, string desc, string icon)
         {
             await ctx.Achievements.AddAsync(new DbAchievement

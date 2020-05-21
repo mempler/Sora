@@ -148,7 +148,7 @@ namespace Sora.Database.Models
                     .OrderByDescending(x => x.TotalScore).ThenByDescending(s => s.Accuracy)
                     .FirstOrDefaultAsync();
 
-        public static async void InsertScore(SoraDbContext ctx, DbScore score)
+        public static async Task InsertScore(SoraDbContext ctx, DbScore score)
         {
             var so = score.ScoreOwner; // Fix for an Issue with Inserting.
             

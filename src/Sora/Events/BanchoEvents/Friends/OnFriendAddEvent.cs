@@ -29,7 +29,7 @@ namespace Sora.Events.BanchoEvents.Friends
                     "%#B342F4%(", u.Id, "%#B342F4%)%#FFFFFF% as a Friend!"
                 );
 
-            DbFriend.AddFriend(_ctx, args.Pr.User.Id, args.FriendId);
+            await DbFriend.AddFriend(_ctx, args.Pr.User.Id, args.FriendId);
             await _ctx.SaveChangesAsync();
         }
     }
