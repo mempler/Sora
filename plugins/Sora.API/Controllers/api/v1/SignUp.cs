@@ -21,12 +21,12 @@ namespace Sora.API.Controllers.api.v1
     [Route("/api/v1/signup")] // /api/v1/signup
     public class SignUp : Controller
     {
-        private SoraDbContextFactory _factory;
+        private SoraDbContext _context;
         private readonly IServerConfig _serverConfig;
 
-        public SignUp(SoraDbContextFactory factory, IServerConfig serverConfig)
+        public SignUp(SoraDbContext context, IServerConfig serverConfig)
         {
-            _factory = factory;
+            _context = context;
             _serverConfig = serverConfig;
         }
 
@@ -68,7 +68,7 @@ namespace Sora.API.Controllers.api.v1
                     });
             }
             
-            var u = DbUser.RegisterUser(_factory, Permission.From(Permission.DEFAULT), credentials.UserName,
+            var u = DbUser.RegisterUser(_context, Permission.From(Permission.DEFAULT), credentials.UserName,
                 credentials.EMail,
                 credentials.Password, false);
 
@@ -80,16 +80,16 @@ namespace Sora.API.Controllers.api.v1
                 });
             
             var emailKey = Crypto.RandomString(512);
-            using var db = _factory.GetForWrite();
-            u.Status = UserStatusFlags.Suspended;
-            u.StatusReason = "Verification|" + emailKey;
-            u.StatusUntil =
+            var user = await u;
+            user.Status = UserStatusFlags.Suspended;
+            user.StatusReason = "Verification|" + emailKey;
+            user.StatusUntil =
                 DateTime.Today + TimeSpan.FromDays(365 * 100); // Suspend for 100 years (or until EMail Verified!)
-            db.Context.Update(u);
+            _context.Update(u);
 
             var em = Email
                      .From("no-reply@gigamons.de")
-                     .To(u.EMail)
+                     .To(user.EMail)
                      .Subject("Email Confirmation")
                      .Body("Your EMail has to be Verificated! Please click <a href=\"" +
                            "http://" + _serverConfig.Server.ScreenShotHostname + "/verificate?k" + emailKey
