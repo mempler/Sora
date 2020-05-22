@@ -68,7 +68,7 @@ namespace Sora.API.Controllers.api.v1
                     });
             }
             
-            var u = DbUser.RegisterUser(_context, Permission.From(Permission.DEFAULT), credentials.UserName,
+            var u = await DbUser.RegisterUser(_context, Permission.From(Permission.DEFAULT), credentials.UserName,
                 credentials.EMail,
                 credentials.Password, false);
 
@@ -80,16 +80,15 @@ namespace Sora.API.Controllers.api.v1
                 });
             
             var emailKey = Crypto.RandomString(512);
-            var user = await u;
-            user.Status = UserStatusFlags.Suspended;
-            user.StatusReason = "Verification|" + emailKey;
-            user.StatusUntil =
+            u.Status = UserStatusFlags.Suspended;
+            u.StatusReason = "Verification|" + emailKey;
+            u.StatusUntil =
                 DateTime.Today + TimeSpan.FromDays(365 * 100); // Suspend for 100 years (or until EMail Verified!)
             _context.Update(u);
 
             var em = Email
                      .From("no-reply@gigamons.de")
-                     .To(user.EMail)
+                     .To(u.EMail)
                      .Subject("Email Confirmation")
                      .Body("Your EMail has to be Verificated! Please click <a href=\"" +
                            "http://" + _serverConfig.Server.ScreenShotHostname + "/verificate?k" + emailKey
