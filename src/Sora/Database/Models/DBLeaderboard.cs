@@ -263,7 +263,7 @@ namespace Sora.Database.Models
             }
         }
 
-        public async void SaveChanges(SoraDbContext ctx)
+        public async Task SaveChanges(SoraDbContext ctx)
         {
             ctx.Update(this);
             

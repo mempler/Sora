@@ -252,7 +252,7 @@ namespace Sora.Controllers
                 lb.IncreasePlaycount(score.PlayMode);
                 lb.IncreaseScore((ulong) score.TotalScore, false, score.PlayMode);
 
-                lb.SaveChanges(_ctx);
+                await lb.SaveChanges(_ctx);
                 
                 // Send to other People
                 await _ev.RunEvent(
@@ -322,12 +322,11 @@ namespace Sora.Controllers
                 _ctx.Remove(oldScore);
                 System.IO.File.Delete($"data/replays/{oldScore.ReplayMd5}");
 
-                DbScore.InsertScore(_ctx, dbScore);
-                await _ctx.SaveChangesAsync();
+                await DbScore.InsertScore(_ctx, dbScore);
             }
             else if (oldScore == null)
             {
-                DbScore.InsertScore(_ctx, dbScore);
+                await DbScore.InsertScore(_ctx, dbScore);
             }
             else
             {
@@ -342,7 +341,7 @@ namespace Sora.Controllers
 
             newlb.UpdatePp(_ctx, dbScore.PlayMode);
 
-            newlb.SaveChanges(_ctx);
+            await newlb.SaveChanges(_ctx);
 
             var newStdPos = newlb.GetPosition(_ctx, dbScore.PlayMode);
             newAcc = newlb.GetAccuracy(_ctx, dbScore.PlayMode);

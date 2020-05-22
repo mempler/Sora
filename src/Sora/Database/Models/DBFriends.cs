@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 
@@ -61,14 +62,14 @@ namespace Sora.Database.Models
                 .Where(t => t.UserId == userId)
                 .Select(x => x.FriendId).ToList();
 
-        public static async void AddFriend(SoraDbContext ctx, int userId, int friendId)
+        public static async Task AddFriend(SoraDbContext ctx, int userId, int friendId)
         {
             await ctx.Friends.AddAsync(new DbFriend {UserId = userId, FriendId = friendId});
 
             await ctx.SaveChangesAsync();
         }
 
-        public static async void RemoveFriend(SoraDbContext ctx, int userId, int friendId)
+        public static async Task RemoveFriend(SoraDbContext ctx, int userId, int friendId)
         {
             ctx.RemoveRange(ctx.Friends.Where(x => x.UserId == userId && x.FriendId == friendId));
             
