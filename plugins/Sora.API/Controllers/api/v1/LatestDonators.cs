@@ -14,18 +14,18 @@ namespace Sora.API.Controllers.api.v1
     [Route("/api/v1/latest_donators")] // /api/v1/latest_donators
     public class LatestDonators : Controller
     {
-        private SoraDbContextFactory _factory;
+        private SoraDbContext _context;
 
-        public LatestDonators(SoraDbContextFactory factory)
+        public LatestDonators(SoraDbContext context)
         {
-            _factory = factory;
+            _context = context;
         }
 
         [HttpGet]
         [DisableCors]
         public async Task<ActionResult> Get()
         {
-            var users = await _factory.Get().Users.Where(u => u.Status == UserStatusFlags.Donator &&
+            var users = await _context.Users.Where(u => u.Status == UserStatusFlags.Donator &&
                                                               u.StatusUntil >= DateTime.Now)
                                 .OrderByDescending(x => x.StatusUntil)
                                 .Take(20)
