@@ -62,7 +62,7 @@ namespace Sora.Controllers
                 if (string.IsNullOrEmpty(clientToken))
                 {
                     Response.Headers["cho-token"] = pr.Token.ToString();
-                    string ip = Response.Headers["X-Forwarded-For"];
+                    string ip = Response.Headers["X-Real-IP"];
 
                     if (string.IsNullOrEmpty(ip))
                         ip = "127.0.0.1";
