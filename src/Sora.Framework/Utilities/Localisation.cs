@@ -23,7 +23,7 @@ namespace Sora.Framework.Utilities
                 return client.City(ip);
         }
 
-        public static CountryId StringToCountryId(string x) => Enum.TryParse(x, true, out CountryId o) ? o : CountryId.BL;
+        public static CountryId StringToCountryId(string x) => Enum.TryParse(x, true, out CountryId o) ? o : CountryId.XX;
 
 
         // ReSharper disable once UnusedMember.Global

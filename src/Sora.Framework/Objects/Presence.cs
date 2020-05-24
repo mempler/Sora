@@ -31,7 +31,6 @@ namespace Sora.Framework.Objects
         public LoginPermissions ClientPermission;
         public double Longitude;
         public double Latitude;
-        public int RankingPosition;
     }
 
     public class UserStats
@@ -114,7 +113,6 @@ namespace Sora.Framework.Objects
                 Longitude = 0,
                 ClientPermission = LoginPermissions.User,
                 CountryId = CountryId.XX,
-                RankingPosition = 0,
                 TimeZone = 0
             };
             

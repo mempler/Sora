@@ -130,7 +130,6 @@ namespace Sora.Bot
                                        LoginPermissions.TorneyStaff |
                                        LoginPermissions.BAT,
                     CountryId = CountryId.XX,
-                    RankingPosition = 0,
                     TimeZone = 0
                 },
                 ["BOT"] = true,
@@ -138,8 +137,6 @@ namespace Sora.Bot
             };
             
             _ps.Push(new PresenceSingle(BotPresence.User.Id));
-            _ps.Push(new UserPresence(BotPresence));
-            _ps.Push(new HandleUpdate(BotPresence));
 
             _ps.Join(BotPresence);
 
