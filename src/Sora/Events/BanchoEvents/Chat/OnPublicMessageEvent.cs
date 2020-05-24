@@ -3,6 +3,7 @@ using Sora.Enums;
 using Sora.EventArgs.BanchoEventArgs;
 using Sora.Framework.Objects;
 using Sora.Framework.Packets.Server;
+using Sora.Framework.Utilities;
 using Sora.Services;
 using Sora.Utilities;
 
@@ -43,6 +44,14 @@ namespace Sora.Events.BanchoEvents.Chat
                 args.Pr.Push(new ChannelRevoked(args.Message.ChannelTarget));
                 return;
             }
+
+            Logger.Info(
+                $"{LCol.RED}{args.Pr.User.UserName}",
+                $"{LCol.PURPLE}( {args.Pr.User.Id} )",
+                $"{LCol.YELLOW}{args.Message.Message}",
+                $"{LCol.WHITE} => ",
+                $"{LCol.RED}{channel.Name}"
+            );
 
             args.Message.Username = args.Pr.User.UserName;
             args.Message.Message = _filter.Filter(args.Message.Message);
