@@ -169,7 +169,14 @@ namespace Sora.Services
 
                     while (!_shouldStop)
                     {
-                        var k = Colorful.Console.ReadKey();
+                        ConsoleKeyInfo k;
+                        try {
+                            k = Colorful.Console.ReadKey();
+                        } catch {
+                            Stop();
+                            return;
+                        }
+                       
                         Colorful.Console.SetCursorPosition(0, Colorful.Console.CursorTop);
                         Console.Write(x);
 

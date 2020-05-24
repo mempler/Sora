@@ -127,10 +127,7 @@ namespace Sora.Events.BanchoEvents
                 args.Pr.Push(new ProtocolNegotiation());
                 args.Pr.Push(new UserPresence(args.Pr));
 
-                // args.pr["ACCURACY"] = args.pr.Get<LeaderboardStd>("LB_STD").GetAccuracy(_factory.Get(), PlayMode.Osu);
-                
                 args.Pr.Push(new HandleUpdate(args.Pr));
-
                 args.Pr.Info.ClientPermission = LoginPermissions.User;
 
                 if (args.Pr.User.Permissions == Permission.GROUP_DONATOR)
@@ -174,8 +171,6 @@ namespace Sora.Events.BanchoEvents
                         args.Pr.Push(new ChannelAvailable(channel));
                 
                 _pcs.Push(new PresenceSingle(args.Pr.User.Id));
-                _pcs.Push(new UserPresence(args.Pr));
-                _pcs.Push(new HandleUpdate(args.Pr));
                 _pcs.Join(args.Pr);
 
                 args.Pr.WritePackets(args.Writer.BaseStream);

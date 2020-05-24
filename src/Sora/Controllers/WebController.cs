@@ -87,9 +87,9 @@ namespace Sora.Controllers
 
             Response.ContentType = "text/plain";
 
-            var searchResult = await _pisstaube.SearchAsync(query, rankedStatus, playMode, page);
+            var searchResult = await _pisstaube.SearchDirectAsync(query, rankedStatus, playMode, page);
 
-            _cache.Set($"sora:DirectSearches:{cacheHash}", cachedData = searchResult.ToDirect(),
+            _cache.Set($"sora:DirectSearches:{cacheHash}", cachedData = searchResult,
                 TimeSpan.FromMinutes(10));
 
             return Ok(cachedData);
@@ -126,15 +126,12 @@ namespace Sora.Controllers
             
             if (setId != 0)
             {
-                var set = await _pisstaube.FetchBeatmapSetAsync(setId);
-                _cache.Set($"sora:DirectNP:{cacheHash}", cachedData = BeatmapSet.ToNP(set),
+                _cache.Set($"sora:DirectNP:{cacheHash}", cachedData = await _pisstaube.FetchDirectBeatmapSetAsync(setId),
                     TimeSpan.FromMinutes(10));
             }
             else
             {
-                var bm = await _pisstaube.FetchBeatmapAsync(beatmapId);
-                var set = await _pisstaube.FetchBeatmapSetAsync(bm.ParentSetID);
-                _cache.Set($"sora:DirectNP:{cacheHash}", cachedData = BeatmapSet.ToNP(set),
+                _cache.Set($"sora:DirectNP:{cacheHash}", cachedData = await _pisstaube.FetchDirectBeatmapAsync(beatmapId),
                     TimeSpan.FromMinutes(10));
             }
 
@@ -667,6 +664,24 @@ namespace Sora.Controllers
             }
         }
 
+        #endregion
+    
+        #region GET /web/maps/*
+        [HttpGet("/web/maps/{map}")]
+        public async Task<IActionResult> GetBeatmap(string map)
+        {
+            if (!Directory.Exists("data/beatmaps"))
+                Directory.CreateDirectory("data/beatmaps");
+            
+            var beatmap = await _pisstaube.DownloadBeatmapAsync(map, false);
+
+            // No config reading for you :3
+            map = map.Replace("..", string.Empty);
+            if (!System.IO.File.Exists(beatmap))
+                return NotFound($"Could not find Beatmap with the Name of {map}");
+            
+            return File(System.IO.File.OpenRead(beatmap), "image/jpg");
+        }
         #endregion
     }
 }

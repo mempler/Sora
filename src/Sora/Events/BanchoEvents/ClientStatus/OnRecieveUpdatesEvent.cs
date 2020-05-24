@@ -11,7 +11,6 @@ namespace Sora.Events.BanchoEvents.ClientStatus
         [Event(EventType.BanchoReceiveUpdates)]
         public void OnRecieveUpdates(BanchoEmptyEventArgs args)
         {
-            args.Pr.Push(new UserPresence(args.Pr));
             args.Pr.Push(new HandleUpdate(args.Pr));
         }
     }

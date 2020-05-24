@@ -43,6 +43,8 @@ namespace Sora
             
             services.AddMemoryCache();
             
+            Localisation.Initialize();
+            
             var defaultConfig = new Config
             {
                 MySql = new CMySql

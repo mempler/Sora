@@ -27,16 +27,16 @@ namespace Sora.Events.BanchoEvents.Chat
                 args.Pr.Push(new Announce("This User is Offline!"));
                 return;
             }
-            
+  
             Logger.Info(
-                "%#F94848%" + args.Pr.User.UserName,
-                "%#B342F4%(", args.Pr.User.Id, "%#B342F4%)",
-                "%#f1fc5a%(Private Message)",
-                "%#FFFFFF%=>",
-                "%#F94848%" + target.User.UserName,
-                "%#B342F4%(", target.User.Id, "%#B342F4%)"
+                $"{LCol.RED}{args.Pr.User.UserName}",
+                $"{LCol.PURPLE}( {args.Pr.User.Id} )",
+                $"{LCol.YELLOW}(Private Message)",
+                $"{LCol.WHITE}=>",
+                $"{LCol.RED}{args.Pr.User.UserName}",
+                $"{LCol.PURPLE}( {args.Pr.User.Id} )"
             );
-            
+
             var newMsg = new MessageStruct
             {
                 Username = args.Pr.User.UserName,
