@@ -16,7 +16,7 @@ namespace Sora.Framework.Packets.Server
         public string FileMd5;
     }
     
-    public class BanchoInfoReply : IPacket
+    public class BeatmapInfoReply : IPacket
     {
         public List<BeatmapInfo> Info;
         

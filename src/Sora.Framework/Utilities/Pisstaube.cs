@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -179,8 +180,17 @@ namespace Sora.Framework.Utilities
         public Task<BeatmapSet> FetchBeatmapSetAsync(string fileMd5)
             => RequestJsonAsync<BeatmapSet>($"/api/v1/hash/{fileMd5}");
 
+        public Task<string> FetchDirectBeatmapSetAsync(string fileMd5)
+            => RequestStringAsync($"/api/v1/hash/{fileMd5}?raw");
+    
+        public Task<string> FetchDirectBeatmapSetAsync(int beatmapId)
+            => RequestStringAsync($"/api/cheesegull/s/{beatmapId}?raw");
+
         public Task<Beatmap> FetchBeatmapAsync(int beatmapId)
             => RequestJsonAsync<Beatmap>($"/api/cheesegull/b/{beatmapId}");
+
+        public Task<string> FetchDirectBeatmapAsync(int beatmapId)
+            => RequestStringAsync($"/api/cheesegull/b/{beatmapId}?raw");
 
         #endregion
         
@@ -247,27 +257,52 @@ namespace Sora.Framework.Utilities
 
             return result;
         }
+
+        public async Task<string> SearchDirectAsync(string query, int rankedStatus, int playMode, int page)
+        {
+            query = query.ToLower();
+            if (query.Contains("newest") || query.Contains("top rated") || query.Contains("most played"))
+                query = "";
+
+            rankedStatus = CheeseStatus(rankedStatus);
+
+            string pm;
+            if (playMode < 0 || playMode > 3)
+                pm = "";
+            else
+                pm = $"mode={playMode.ToString()}&";
+
+            query = $"?{pm}amount={100}&offset={page * 100}&status={rankedStatus}&query={query}&raw";
+
+            Logger.Debug($"{LCol.YELLOW}Pisstaube {LCol.WHITE}Query: {query}");
+
+            return await RequestStringAsync($"/api/cheesegull/search{query}");
+        }
         
         #endregion
 
-        public async Task<string> DownloadBeatmapAsync(string fileMd5)
+        public async Task<string> DownloadBeatmapAsync(string file, bool md5 = true)
         {
             if (!Directory.Exists("data/beatmaps"))
                 Directory.CreateDirectory("data/beatmaps");
 
-            if (File.Exists($"data/beatmaps/{fileMd5}"))
-                return $"data/beatmaps/{fileMd5}";
+            if (md5) {
+                if (File.Exists($"data/beatmaps/{file}"))
+                    return $"data/beatmaps/{file}";
 
-            var bmSet = await FetchBeatmapSetAsync(fileMd5);
-            var bm = bmSet.ChildrenBeatmaps.FirstOrDefault(cb => cb.FileMD5 == fileMd5);
+                var bmSet = await FetchBeatmapSetAsync(file);
+                var bm = bmSet.ChildrenBeatmaps.FirstOrDefault(cb => cb.FileMD5 == file);
 
-            if (bm == null)
-                return string.Empty;
+                if (bm == null)
+                    return string.Empty;
+            }
 
-            var bmBytes = await RequestBytesAsync($"/osu/{bm.FileMD5}");
-            File.WriteAllBytes($"data/beatmaps/{bm.FileMD5}", bmBytes);
+            var bmBytes = await RequestBytesAsync($"/osu/{file}");
 
-            return $"data/beatmaps/{bm.FileMD5}";
+            string fileMd5 = Hex.ToHex(Crypto.GetMd5(bmBytes));
+            File.WriteAllBytes($"data/beatmaps/{fileMd5}", bmBytes);
+
+            return $"data/beatmaps/{fileMd5}";
         }
     }
 }
