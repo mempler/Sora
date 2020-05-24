@@ -49,7 +49,7 @@ namespace Sora.Events.BanchoEvents.Chat
                 $"{LCol.RED}{args.Pr.User.UserName}",
                 $"{LCol.PURPLE}( {args.Pr.User.Id} )",
                 $"{LCol.YELLOW}{args.Message.Message}",
-                $"{LCol.WHITE} => ",
+                $"{LCol.WHITE}=>",
                 $"{LCol.RED}{channel.Name}"
             );
 
