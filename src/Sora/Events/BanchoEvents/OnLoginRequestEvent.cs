@@ -127,6 +127,7 @@ namespace Sora.Events.BanchoEvents
                 args.Pr.Push(new ProtocolNegotiation());
                 args.Pr.Push(new UserPresence(args.Pr));
 
+                args.Pr.Push(new HandleUpdate(args.Pr));
                 args.Pr.Info.ClientPermission = LoginPermissions.User;
 
                 if (args.Pr.User.Permissions == Permission.GROUP_DONATOR)
