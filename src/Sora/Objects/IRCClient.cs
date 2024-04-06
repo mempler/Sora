@@ -201,7 +201,7 @@ namespace Sora.Objects
                                                     })
                                                 .ToArray()
                                 );
-                                uList += " @olSora";
+                                uList += " @Sora";
                                 SendCodeMessage(353, $"{uList}", channel: "= " + channel.Name);
                                 SendCodeMessage(366, "End of NAMES list", channel: channel.Name);
                                 break;
@@ -252,9 +252,9 @@ namespace Sora.Objects
         private void WriteConnectionResponse()
         {
             SendCodeMessage(1, "Welcome to the Internet Relay Network");
-            SendCodeMessage(2, $"Your host is {_cfg.Server.Hostname}, running version olSora~UNKNOWN");
+            SendCodeMessage(2, $"Your host is {_cfg.Server.Hostname}, running version Sora~UNKNOWN");
             SendCodeMessage(3, "This server was created 5/7/2019");
-            SendCodeMessage(4, $"{_cfg.Server.Hostname} olSora~UNKNOWN o o");
+            SendCodeMessage(4, $"{_cfg.Server.Hostname} Sora~UNKNOWN o o");
         }
 
         private void WriteStatus()

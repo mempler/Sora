@@ -88,7 +88,7 @@ namespace Sora.API
 
         public override void OnDisable()
         {
-            _logger.LogInformation("Shutdown olSora Web API");
+            _logger.LogInformation("Shutdown Sora Web API");
         }
         
         private async Task HandleSocket(HttpContext context, WebSocket webSocket)
